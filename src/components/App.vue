@@ -1,14 +1,30 @@
 <template>
   <div id="app">
-    <router-view :is-web3-active='isWeb3Active'></router-view>
+    <router-view :is-connected-to-web3="isConnectedToWeb3" :user="user"></router-view>
   </div>
 </template>
 
 <script>
 export default {
   name: 'app',
-  props: ['isWeb3Active']
+  props: ['user'],
+  computed: {
+    ...mapState({
+      isConnectedToWeb3: state => state.web3.isConnected
+    })
+  },
+  watch: {
+    isConnectedToWeb3: function (web3ConnectionValue) {
+      if (web3ConnectionValue) {
+        console.log('ODLL dApp has successfully connected to Web3')
+      } else {
+        console.log('Unable to connect ODLL dApp to Web3', web3ConnectionValue, this.web3Error)
+      }
+    }
+  }
 }
+
+import { mapState } from 'vuex'
 </script>
 
 <style>

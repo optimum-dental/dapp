@@ -1,4 +1,5 @@
 import Web3 from 'web3'
+// import { NETWORKS } from '../constants'
 
 let getWeb3 = new Promise(function (resolve, reject) {
   // Wait for loading completion to avoid race conditions with web3 injection timing.
@@ -10,14 +11,12 @@ let getWeb3 = new Promise(function (resolve, reject) {
       // Use Mist/MetaMask's provider.
       web3 = new Web3(web3.currentProvider)
       console.log('web3-injected environment detected.')
-    } else {
-      // Fallback to localhost if no web3 injection.
-      var provider = new Web3.providers.HttpProvider('http://localhost:8545')
-      web3 = new Web3(provider)
-      console.log('web3-injected environment not found. Using Local web3.')
     }
 
-    resolve(web3)
+    resolve({
+      web3Instance: web3,
+      isConnectedToWeb3: web3 !== undefined
+    })
   })
 })
 

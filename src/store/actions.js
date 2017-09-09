@@ -1,18 +1,20 @@
+import { MUTATION_TYPES } from '../util/constants'
 import getWeb3 from '../util/web3/getWeb3'
-import { runVue } from '../main'
 
 export default {
   registerWeb3Instance ({ commit }) {
-    // Initialize web3
+    // Try to initialize web3
     getWeb3
-    .then(web3Instance => {
-      console.log('Web3 initialized! Address: ')
-      runVue(true)
-      commit('registerWeb3Instance')
+    .then(result => {
+      commit(MUTATION_TYPES.REGISTER_WEB3_INSTANCE, result)
     })
     .catch((e) => {
-      runVue(false)
-      console.log('Error in web3 initialization.' + e)
+      console.log(e)
+      commit(MUTATION_TYPES.REGISTER_WEB3_INSTANCE, {
+        web3Instance: null,
+        isConnectedToWeb3: false,
+        web3Error: e
+      })
     })
   }
 }

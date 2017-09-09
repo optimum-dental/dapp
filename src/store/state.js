@@ -1,5 +1,16 @@
 export default {
-  web3Instance: null,
-  userAddress: '',
-  currentRoute: '/'
+  currentRoute: '/',
+  web3: {
+    address: null,
+    error: null,
+    instance: null,
+    isConnected: false,
+    networkId: null
+  },
+  user: {
+    email: '',
+    name: '',
+    phone: '',
+    type: ''
+  }
 }
