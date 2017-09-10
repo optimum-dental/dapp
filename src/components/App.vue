@@ -61,6 +61,10 @@ body {
   width: 100%;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -68,7 +72,7 @@ body {
   color: #2c3e50;
   width: 100%;
   /*max-width: 960px;*/
-  min-width: 800px;
+  min-width: 1020px;
   margin: auto;
 }
 </style>

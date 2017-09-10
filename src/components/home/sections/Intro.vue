@@ -24,16 +24,18 @@ export default {
   height: 420px;
   background: #282735;
   background: linear-gradient(90deg, #595053 15%, #3d3a43 30%, #282735 60%, #282735 75%, #282735 100%);
-  margin-top: 70px;
 }
+
 .content {
   height: 100%;
   text-align: center;
+  max-width: 920px;
+  margin: auto;
 }
 
 .texts {
   clear: both;
-  height: 150px;
+  height: 250px;
   margin-bottom: 30px;
   padding-top: 100px;
 }
@@ -55,8 +57,8 @@ export default {
 
 .get-started-button {
   background: #e79849;
-  color: #ffffff;
-  width: 120px;
+  color: #feffff;
+  width: 200px;
   height: 40px;
   border: 1px solid #f3c89e;
   display: inline-block;
