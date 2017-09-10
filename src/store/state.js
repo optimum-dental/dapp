@@ -2,9 +2,10 @@ export default {
   currentRoute: '/',
   web3: {
     address: null,
+    coinbase: null,
     error: null,
     instance: null,
-    isConnected: false,
+    isInjected: false,
     networkId: null
   },
   user: {

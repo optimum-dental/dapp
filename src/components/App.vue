@@ -1,39 +1,64 @@
 <template>
   <div id="app">
-    <router-view :is-connected-to-web3="isConnectedToWeb3" :user="user"></router-view>
+    <router-view :has-injected-web3="hasInjectedWeb3"></router-view>
   </div>
 </template>
 
 <script>
 export default {
   name: 'app',
-  props: ['user'],
   computed: {
     ...mapState({
-      isConnectedToWeb3: state => state.web3.isConnected
+      hasInjectedWeb3: state => state.web3.isInjected,
+      networkId: state => state.web3.networkId,
+      coinbase: state => state.web3.coinbase
     })
   },
   watch: {
-    isConnectedToWeb3: function (web3ConnectionValue) {
+    hasInjectedWeb3: function (web3ConnectionValue) {
       if (web3ConnectionValue) {
-        console.log('ODLL dApp has successfully connected to Web3')
+        console.log('Browser has Web3 injected.')
       } else {
-        console.log('Unable to connect ODLL dApp to Web3', web3ConnectionValue, this.web3Error)
+        console.log('No injected Web3 on browser')
+      }
+    },
+    networkId: function (networkId) {
+      if (networkId && networkId !== '') {
+        console.log(`Current Network: ${NETWORKS[networkId]}`)
+      } else {
+        console.log('You are not connected to the ODLL blockchain network')
+      }
+    },
+    coinbase: function (coinbase) {
+      if (coinbase && coinbase !== '') {
+        console.log(`Coinbase: ${coinbase}`)
+      } else {
+        console.log('Unable to get your coinbase')
       }
     }
   }
 }
 
 import { mapState } from 'vuex'
+import { NETWORKS } from '../util/constants'
 </script>
 
 <style>
+html {}
+
+body {
+  margin: 0;
+  width: 100%;
+}
+
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  width: 100%;
+  max-width: 960px;
+  min-width: 800px;
+  margin: auto;
 }
 </style>

@@ -8,5 +8,6 @@ export const NETWORKS = {
 }
 
 export const MUTATION_TYPES = {
+  CHANGE_CURRENT_ROUTE_TO: 'changeCurrentRouteTo',
   REGISTER_WEB3_INSTANCE: 'registerWeb3Instance'
 }

@@ -17,6 +17,11 @@ export default new Router({
     },
     {
       mode: 'history',
+      path: '/home',
+      component: Home
+    },
+    {
+      mode: 'history',
       path: '/main-page',
       name: 'MainPage',
       component: MainPage,

@@ -1,8 +1,5 @@
 <template>
-  <div id="main-page" :is-connected-to-web3="isConnectedToWeb3">
-    <div> Web3 Active in MainPage? {{ isConnectedToWeb3 }} </div>
-    <div v-if="isConnectedToWeb3">Main Page::::Web3 is Active</div>
-    <div v-else>Main Page::::Web3 is NOT Active</div>
+  <div id="main-page" :has-injected-web3="hasInjectedWeb3">
     <router-link to="/">Home</router-link>
   </div>
 </template>
@@ -10,8 +7,13 @@
 <script>
 export default {
   name: 'main-page',
-  props: ['isConnectedToWeb3']
+  props: ['hasInjectedWeb3'],
+  created: function () {
+    this.$store.dispatch(MUTATION_TYPES.CHANGE_CURRENT_ROUTE_TO, '/main-page')
+  }
 }
+
+import { MUTATION_TYPES } from '../../util/constants'
 </script>
 
 <style>
