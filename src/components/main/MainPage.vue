@@ -7,13 +7,9 @@
 <script>
 export default {
   name: 'main-page',
-  props: ['hasInjectedWeb3'],
-  created: function () {
-    this.$store.dispatch(MUTATION_TYPES.CHANGE_CURRENT_ROUTE_TO, '/main-page')
-  }
+  props: ['hasInjectedWeb3']
 }
 
-import { MUTATION_TYPES } from '../../util/constants'
 </script>
 
 <style>

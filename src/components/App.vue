@@ -11,8 +11,15 @@ export default {
     ...mapState({
       hasInjectedWeb3: state => state.web3.isInjected,
       networkId: state => state.web3.networkId,
-      coinbase: state => state.web3.coinbase
+      coinbase: state => state.web3.coinbase,
+      currentRoute: state => state.currentRoute
     })
+  },
+  beforeCreate: function () {
+    this.$store.dispatch(MUTATION_TYPES.REGISTER_WEB3_INSTANCE)
+  },
+  created: function () {
+    this.$store.dispatch(MUTATION_TYPES.CHANGE_CURRENT_ROUTE_TO, this.$route)
   },
   watch: {
     hasInjectedWeb3: function (web3ConnectionValue) {
@@ -35,12 +42,15 @@ export default {
       } else {
         console.log('Unable to get your coinbase')
       }
+    },
+    $route: function (newRoute) {
+      this.$store.dispatch(MUTATION_TYPES.CHANGE_CURRENT_ROUTE_TO, newRoute)
     }
   }
 }
 
 import { mapState } from 'vuex'
-import { NETWORKS } from '../util/constants'
+import { MUTATION_TYPES, NETWORKS } from '../util/constants'
 </script>
 
 <style>
@@ -51,6 +61,10 @@ body {
   width: 100%;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -58,7 +72,7 @@ body {
   color: #2c3e50;
   width: 100%;
   /*max-width: 960px;*/
-  min-width: 800px;
+  min-width: 1020px;
   margin: auto;
 }
 </style>
