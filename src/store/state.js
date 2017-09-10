@@ -1,5 +1,5 @@
 export default {
-  currentRoute: '/',
+  currentRoute: null,
   web3: {
     address: null,
     coinbase: null,

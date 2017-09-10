@@ -20,13 +20,11 @@
 export default {
   name: 'home',
   props: [ 'hasInjectedWeb3' ],
-  created: function () {
-    this.$store.dispatch(MUTATION_TYPES.CHANGE_CURRENT_ROUTE_TO, '/')
-  },
-  components: { Intro }
+  components: {
+    Intro
+  }
 }
 
-import { MUTATION_TYPES } from '../../util/constants'
 import Intro from './sections/Intro'
 </script>
 
@@ -36,7 +34,7 @@ import Intro from './sections/Intro'
 }
 
 .sticky {
-  position: absolute;
+  position: fixed;
   padding: 5px 20px;
   top: 0px;
   height: 70px;
