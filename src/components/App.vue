@@ -57,7 +57,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
   width: 100%;
-  max-width: 960px;
+  /*max-width: 960px;*/
   min-width: 800px;
   margin: auto;
 }

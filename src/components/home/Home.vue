@@ -11,7 +11,8 @@
         </div>
       </div>
     </div>
-    <router-link to="/main-page">Get Started</router-link>
+
+    <Intro />
   </div>
 </template>
 
@@ -21,13 +22,15 @@ export default {
   props: [ 'hasInjectedWeb3' ],
   created: function () {
     this.$store.dispatch(MUTATION_TYPES.CHANGE_CURRENT_ROUTE_TO, '/')
-  }
+  },
+  components: { Intro }
 }
 
 import { MUTATION_TYPES } from '../../util/constants'
+import Intro from './sections/Intro'
 </script>
 
-<style>
+<style scoped>
 #home {
   width: 100%;
 }
@@ -36,16 +39,16 @@ import { MUTATION_TYPES } from '../../util/constants'
   position: absolute;
   padding: 5px 20px;
   top: 0px;
-  height: 40px;
+  height: 70px;
   background: #292836;
   width: 100%;
-  max-width: 960px;
+  /*max-width: 960px;*/
   box-sizing: border-box;
 }
 
 .content {
-  height: 30px;
-  line-height: 30px;
+  height: 60px;
+  line-height: 60px;
 }
 
 .logo {
@@ -59,7 +62,7 @@ import { MUTATION_TYPES } from '../../util/constants'
 }
 
 .links a {
-  font-size: 12px;
+  font-size: 14px;
   color: #feffff;
   text-decoration: none;
 }
