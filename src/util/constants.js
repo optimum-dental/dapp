@@ -4,10 +4,14 @@ export const NETWORKS = {
   '3': 'Ropsten test network',
   '4': 'Rinkeby test network',
   '42': 'Kovan test network',
-  '765': 'DanielNet test network'
+  '765': 'DanielNet test network',
+  'ODLLBlockchainNetwork': '1'
 }
 
 export const MUTATION_TYPES = {
   CHANGE_CURRENT_ROUTE_TO: 'changeCurrentRouteTo',
-  REGISTER_WEB3_INSTANCE: 'registerWeb3Instance'
+  REGISTER_WEB3_INSTANCE: 'registerWeb3Instance',
+  UPDATE_USER_BLOCKCHAIN_STATUS: 'updateUserBlockchainStatus'
 }
+
+export const ACTION_TYPES = MUTATION_TYPES

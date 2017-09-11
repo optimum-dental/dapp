@@ -1,8 +1,8 @@
-import { MUTATION_TYPES } from '../util/constants'
+import { ACTION_TYPES, MUTATION_TYPES } from '../util/constants'
 import getWeb3 from '../util/web3/getWeb3'
 
 export default {
-  registerWeb3Instance ({ commit }) {
+  [ACTION_TYPES.REGISTER_WEB3_INSTANCE] ({ commit, dispatch }) {
     // Try to initialize web3
     getWeb3
     .then((result) => {
@@ -19,7 +19,10 @@ export default {
       }
     })
   },
-  changeCurrentRouteTo ({ commit }, newRoute) {
+  [ACTION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS] ({ commit }, result) {
+    commit(MUTATION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS, result)
+  },
+  [ACTION_TYPES.CHANGE_CURRENT_ROUTE_TO] ({ commit }, newRoute) {
     commit(MUTATION_TYPES.CHANGE_CURRENT_ROUTE_TO, newRoute)
   }
 }

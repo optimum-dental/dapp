@@ -9,6 +9,9 @@ export default {
     state.web3.error = payload.web3Error
     state.web3.isInjected = payload.hasInjectedWeb3
   },
+  [MUTATION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS] (state, payload) {
+    Object.assign(state.user, payload)
+  },
   [MUTATION_TYPES.CHANGE_CURRENT_ROUTE_TO] (state, newRoute) {
     state.currentRoute = newRoute
   }

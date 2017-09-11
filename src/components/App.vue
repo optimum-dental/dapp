@@ -10,16 +10,25 @@ export default {
   computed: {
     ...mapState({
       hasInjectedWeb3: state => state.web3.isInjected,
+      isConnectedToODLLNetwork: state => state.user.isConnectedToODLLNetwork,
+      hasCoinbase: state => state.user.hasCoinbase,
       networkId: state => state.web3.networkId,
       coinbase: state => state.web3.coinbase,
-      currentRoute: state => state.currentRoute
+      currentRoute: state => state.currentRoute,
+      user: state => state.user
     })
   },
   beforeCreate: function () {
-    this.$store.dispatch(MUTATION_TYPES.REGISTER_WEB3_INSTANCE)
+    this.$store.dispatch(ACTION_TYPES.REGISTER_WEB3_INSTANCE)
   },
   created: function () {
-    this.$store.dispatch(MUTATION_TYPES.CHANGE_CURRENT_ROUTE_TO, this.$route)
+    this[ACTION_TYPES.CHANGE_CURRENT_ROUTE_TO](this.$route)
+  },
+  methods: {
+    ...mapActions([
+      ACTION_TYPES.CHANGE_CURRENT_ROUTE_TO,
+      ACTION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS
+    ])
   },
   watch: {
     hasInjectedWeb3: function (web3ConnectionValue) {
@@ -30,27 +39,23 @@ export default {
       }
     },
     networkId: function (networkId) {
-      if (networkId && networkId !== '') {
-        console.log(`Current Network: ${NETWORKS[networkId]}`)
-      } else {
-        console.log('You are not connected to the ODLL blockchain network')
-      }
+      networkId && networkId !== '' && networkId === NETWORKS['ODLLBlockchainNetwork']
+      ? this[ACTION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS]({ isConnectedToODLLNetwork: true })
+      : this[ACTION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS]({ isConnectedToODLLNetwork: false })
     },
     coinbase: function (coinbase) {
-      if (coinbase && coinbase !== '') {
-        console.log(`Coinbase: ${coinbase}`)
-      } else {
-        console.log('Unable to get your coinbase')
-      }
+      coinbase && coinbase !== ''
+      ? this[ACTION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS]({ hasCoinbase: true })
+      : this[ACTION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS]({ hasCoinbase: false })
     },
     $route: function (newRoute) {
-      this.$store.dispatch(MUTATION_TYPES.CHANGE_CURRENT_ROUTE_TO, newRoute)
+      this[ACTION_TYPES.CHANGE_CURRENT_ROUTE_TO](newRoute)
     }
   }
 }
 
-import { mapState } from 'vuex'
-import { MUTATION_TYPES, NETWORKS } from '../util/constants'
+import { mapState, mapActions } from 'vuex'
+import { ACTION_TYPES, NETWORKS } from '../util/constants'
 </script>
 
 <style>

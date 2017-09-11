@@ -12,6 +12,8 @@ export default {
     email: '',
     name: '',
     phone: '',
-    type: ''
+    type: '',
+    hasCoinbase: false,
+    isConnectedToODLLNetwork: false
   }
 }

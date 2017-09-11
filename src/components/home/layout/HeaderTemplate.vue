@@ -1,7 +1,7 @@
 <template>
   <div id="header-template" class="sticky header">
     <div class="content">
-      <div class="logo"></div>
+      <router-link to="/" class="logo"></router-link>
       <div class="links">
         <router-link to="/about-us" class="link1">About Us</router-link> <span class="divider"></span>
         <router-link to="/our-services" class="link2">Our Services</router-link> <span class="divider"></span>

@@ -14,6 +14,11 @@ export default {
     HeaderTemplate,
     BodyTemplate,
     FooterTemplate
+  },
+  computed: {
+    user () {
+      return this.$store.state.user
+    }
   }
 }
 
