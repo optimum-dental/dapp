@@ -23,8 +23,7 @@
 
 <script type="text/javascript">
   export default {
-    name: 'footer-template',
-    props: [ 'hasInjectedWeb3' ]
+    name: 'footer-template'
   }
 </script>
 

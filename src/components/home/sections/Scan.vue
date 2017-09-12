@@ -1,5 +1,5 @@
 <template>
-  <div id="scan" :has-injected-web3="hasInjectedWeb3">
+  <div id="scan">
     <div class="content">
       <div class="scan-image"></div>
       <div class="scan-content">
@@ -15,8 +15,7 @@
 
 <script>
 export default {
-  name: 'scan',
-  props: ['hasInjectedWeb3']
+  name: 'scan'
 }
 </script>
 

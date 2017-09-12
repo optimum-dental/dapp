@@ -1,20 +1,19 @@
 <template>
-  <div id="intro" :has-injected-web3="hasInjectedWeb3">
+  <div id="intro">
     <div class="content">
       <div class="texts">
         <div class="text-item">Find That</div>
         <div class="text-item"><span class='odll-blue'>Dental</span> <span class='odll-orange'>Care</span> Designed Around</div>
         <div class="text-item third-text">Your Needs</div>
       </div>
-      <router-link to="/main-page" class="get-started-button">Get Started</router-link>
+      <router-link to="/get-started" class="get-started-button">Get Started</router-link>
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'intro',
-  props: ['hasInjectedWeb3']
+  name: 'intro'
 }
 </script>
 

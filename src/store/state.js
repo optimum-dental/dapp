@@ -13,6 +13,7 @@ export default {
     name: '',
     phone: '',
     type: '',
+    hasWeb3InjectedBrowser: false,
     hasCoinbase: false,
     isConnectedToODLLNetwork: false
   }

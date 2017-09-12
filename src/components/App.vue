@@ -1,25 +1,46 @@
 <template>
   <div id="app">
-    <router-view :has-injected-web3="hasInjectedWeb3"></router-view>
+    <router-view :current-view="currentView"></router-view>
   </div>
 </template>
 
 <script>
 export default {
   name: 'app',
+  beforeCreate: function () {
+    this.$store.dispatch(ACTION_TYPES.REGISTER_WEB3_INSTANCE)
+  },
+  components: {
+    Home,
+    MainPage
+  },
   computed: {
     ...mapState({
       hasInjectedWeb3: state => state.web3.isInjected,
+      hasWeb3InjectedBrowser: state => state.user.hasWeb3InjectedBrowser,
       isConnectedToODLLNetwork: state => state.user.isConnectedToODLLNetwork,
       hasCoinbase: state => state.user.hasCoinbase,
       networkId: state => state.web3.networkId,
       coinbase: state => state.web3.coinbase,
       currentRoute: state => state.currentRoute,
       user: state => state.user
-    })
-  },
-  beforeCreate: function () {
-    this.$store.dispatch(ACTION_TYPES.REGISTER_WEB3_INSTANCE)
+    }),
+    currentView () {
+      switch (this.$route.path) {
+        case '/home':
+          return Home
+        case '/get-started':
+          return GetStarted
+        case '/faq':
+          return FAQ
+        case '/how-it-works':
+          return HowItWorks
+        case '/profile':
+          return Profile
+        default:
+          return Home
+      }
+    }
   },
   created: function () {
     this[ACTION_TYPES.CHANGE_CURRENT_ROUTE_TO](this.$route)
@@ -32,11 +53,9 @@ export default {
   },
   watch: {
     hasInjectedWeb3: function (web3ConnectionValue) {
-      if (web3ConnectionValue) {
-        console.log('Browser has Web3 injected.')
-      } else {
-        console.log('No injected Web3 on browser')
-      }
+      web3ConnectionValue
+      ? this[ACTION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS]({ hasWeb3InjectedBrowser: true })
+      : this[ACTION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS]({ hasWeb3InjectedBrowser: false })
     },
     networkId: function (networkId) {
       networkId && networkId !== '' && networkId === NETWORKS['ODLLBlockchainNetwork']
@@ -55,6 +74,12 @@ export default {
 }
 
 import { mapState, mapActions } from 'vuex'
+import Home from './home/Home.vue'
+import MainPage from './main/MainPage.vue'
+import GetStarted from './main/view-sections/GetStarted.vue'
+import FAQ from './main/view-sections/FAQ.vue'
+import HowItWorks from './main/view-sections/HowItWorks.vue'
+import Profile from './main/view-sections/Profile.vue'
 import { ACTION_TYPES, NETWORKS } from '../util/constants'
 </script>
 

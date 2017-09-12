@@ -2,7 +2,7 @@ import { MUTATION_TYPES } from '../util/constants'
 
 export default {
   [MUTATION_TYPES.REGISTER_WEB3_INSTANCE] (state, payload) {
-    state.web3.instance = () => payload.web3Instance
+    state.web3.instance = () => payload.web3
     state.web3.address = payload.address
     state.web3.coinbase = payload.coinbase
     state.web3.networkId = payload.networkId

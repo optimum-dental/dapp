@@ -1,5 +1,5 @@
 <template>
-  <div id="how-it-works" :has-injected-web3="hasInjectedWeb3">
+  <div id="how-it-works">
     <div class="content">
       <div class="title">How it works?</div>
       <div class="flow-line"></div>
@@ -22,8 +22,7 @@
 
 <script>
 export default {
-  name: 'how-it-works',
-  props: ['hasInjectedWeb3']
+  name: 'how-it-works'
 }
 </script>
 

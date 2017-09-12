@@ -1,5 +1,5 @@
 <template>
-  <div id="home" :has-injected-web3="hasInjectedWeb3">
+  <div id="home" :current-view="currentView">
     <HeaderTemplate />
     <BodyTemplate />
     <FooterTemplate />
@@ -9,7 +9,7 @@
 <script>
 export default {
   name: 'home',
-  props: [ 'hasInjectedWeb3' ],
+  props: [ 'currentView' ],
   components: {
     HeaderTemplate,
     BodyTemplate,

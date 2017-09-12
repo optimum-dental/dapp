@@ -14,8 +14,7 @@
 
 <script type="text/javascript">
   export default {
-    name: 'header-template',
-    props: [ 'hasInjectedWeb3' ]
+    name: 'header-template'
   }
 </script>
 

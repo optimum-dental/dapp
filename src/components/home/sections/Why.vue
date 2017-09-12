@@ -1,5 +1,5 @@
 <template>
-  <div id="why" :has-injected-web3="hasInjectedWeb3">
+  <div id="why">
     <div class="content">
       <div class="why-image"></div>
       <div class="why-content">
@@ -23,8 +23,7 @@
 
 <script>
 export default {
-  name: 'why',
-  props: ['hasInjectedWeb3']
+  name: 'why'
 }
 </script>
 

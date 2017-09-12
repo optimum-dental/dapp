@@ -1,9 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from '@/components/home/Home'
-import MainPage from '@/components/main/MainPage'
-import User from '@/components/main/User'
-import FAQ from '@/components/main/FAQ'
+import Home from '@/components/home/Home.vue'
+import MainPage from '@/components/main/MainPage.vue'
 
 Vue.use(Router)
 
@@ -22,21 +20,27 @@ export default new Router({
     },
     {
       mode: 'history',
-      path: '/main-page',
-      name: 'MainPage',
-      component: MainPage,
-      children: [
-        {
-          path: 'faq',
-          name: 'FAQ',
-          component: FAQ
-        },
-        {
-          path: 'users/:id/',
-          name: 'User',
-          component: User
-        }
-      ]
+      path: '/faq',
+      name: 'FAQ',
+      component: MainPage
+    },
+    {
+      mode: 'history',
+      path: '/get-started',
+      name: 'GetStarted',
+      component: MainPage
+    },
+    {
+      mode: 'history',
+      path: '/how-it-works',
+      name: 'HowItWorks',
+      component: MainPage
+    },
+    {
+      mode: 'history',
+      path: '/profile',
+      name: 'Profile',
+      component: MainPage
     }
   ]
 })

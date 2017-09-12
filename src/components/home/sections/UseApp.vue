@@ -1,9 +1,9 @@
 <template>
-  <div id="use-app" :has-injected-web3="hasInjectedWeb3">
+  <div id="use-app">
     <div class="content">
       <div class="advice">
         <div class="text">Register today. Find a Dentist. Get all the Dental Care you deserve.</div>
-        <router-link to="/main-page" class="get-started-button">Get Started</router-link>
+        <router-link to="/get-started" class="get-started-button">Get Started</router-link>
       </div>
     </div>
   </div>
@@ -11,8 +11,7 @@
 
 <script>
 export default {
-  name: 'use-app',
-  props: ['hasInjectedWeb3']
+  name: 'use-app'
 }
 </script>
 

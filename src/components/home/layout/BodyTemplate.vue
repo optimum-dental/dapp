@@ -1,5 +1,5 @@
 <template>
-  <div id="body-template" :has-injected-web3="hasInjectedWeb3">
+  <div id="body-template">
     <Intro />
     <About />
     <Appointment />
@@ -13,7 +13,6 @@
 <script>
 export default {
   name: 'body-template',
-  props: [ 'hasInjectedWeb3' ],
   components: {
     Intro,
     About,
