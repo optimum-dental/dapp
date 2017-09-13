@@ -23,7 +23,7 @@ export default {
 <style scoped>
 #appointment {
   width: 100%;
-  height: 400px;
+  height: 648px;
   background: #ffffff;
   margin-top: 0px;
 }
@@ -41,7 +41,7 @@ export default {
   float: left;
   height: 200px;
   width: 550px;
-  margin: 100px 0px 0px 0px;
+  margin: 224px 0px 0px 0px;
   font-size: 15px;
 }
 
@@ -62,7 +62,7 @@ export default {
   float: left;
   height: 300px;
   width: 300px;
-  margin: 50px 0px 0px 70px;
+  margin: 174px 0px 0px 70px;
   background: url('/static/images/bookAppointment.png') no-repeat;
   background-size: contain;
 }

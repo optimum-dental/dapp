@@ -22,7 +22,7 @@ export default {
 <style scoped>
 #scan {
   width: 100%;
-  height: 400px;
+  height: 648px;
   background: #f4a763;
   margin-top: 0px;
 }
@@ -40,7 +40,7 @@ export default {
   float: left;
   height: 300px;
   width: 300px;
-  margin-top: 50px;
+  margin-top: 174px;
   background: url('/static/images/scanAppointment.png') no-repeat;
   background-size: contain;
 }
@@ -50,7 +50,7 @@ export default {
   float: left;
   height: 150px;
   width: 350px;
-  margin: 125px 0px 0px 270px;
+  margin: 249px 0px 0px 270px;
   font-size: 15px;
 }
 

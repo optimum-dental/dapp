@@ -23,7 +23,7 @@ export default {
 <style scoped>
 #about {
   width: 100%;
-  height: 400px;
+  height: 648px;
   background: #dfe8ef;
   margin-top: 0px;
 }
@@ -41,7 +41,7 @@ export default {
   float: left;
   height: 300px;
   width: 300px;
-  margin-top: 50px;
+  margin-top: 174px;
   background: url('/static/images/withinBlockChain.png') no-repeat;
   background-size: contain;
 }
@@ -51,7 +51,7 @@ export default {
   float: left;
   height: 150px;
   width: 550px;
-  margin: 125px 0px 0px 70px;
+  margin: 249px 0px 0px 70px;
   font-size: 15px;
 }
 

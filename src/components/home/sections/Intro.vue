@@ -20,9 +20,10 @@ export default {
 <style scoped>
 #intro {
   width: 100%;
-  height: 420px;
-  background: #282735;
-  background: linear-gradient(90deg, #595053 15%, #3d3a43 30%, #282735 60%, #282735 75%, #282735 100%);
+  height: 662px;
+  /*background: linear-gradient(90deg, #595053 15%, #3d3a43 30%, #282735 60%, #282735 75%, #282735 100%);*/
+  background: url('/static/images/header-img.jpg') no-repeat;
+  background-size: cover;
 }
 
 .content {
@@ -35,8 +36,8 @@ export default {
 .texts {
   clear: both;
   height: 250px;
-  margin-bottom: 30px;
-  padding-top: 100px;
+  margin-bottom: 200px;
+  padding-top: 270px;
 }
 
 .text-item {

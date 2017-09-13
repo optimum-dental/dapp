@@ -43,6 +43,8 @@ export default {
           return HowItWorks
         case '/profile':
           return Profile
+        case '/main-page':
+          return GetStarted
         default:
           return Home
       }

@@ -41,6 +41,11 @@ export default new Router({
       path: '/profile',
       name: 'Profile',
       component: MainPage
+    },
+    {
+      mode: 'history',
+      path: '/main-page',
+      component: MainPage
     }
   ]
 })

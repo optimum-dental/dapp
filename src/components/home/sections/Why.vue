@@ -30,7 +30,7 @@ export default {
 <style scoped>
 #why {
   width: 100%;
-  height: 400px;
+  height: 648px;
   background: #ffffff;
   margin-top: 0px;
 }
@@ -48,8 +48,8 @@ export default {
   float: left;
   height: 300px;
   width: 300px;
-  margin-top: 50px;
-  background: url('/static/images/OralDataLink2.png') no-repeat;
+  margin-top: 174px;
+  background: url('/static/images/OralDataLink1.png') no-repeat;
   background-size: contain;
 }
 
@@ -58,7 +58,7 @@ export default {
   float: left;
   height: 330px;
   width: 550px;
-  margin: 45px 0px 0px 70px;
+  margin: 169px 0px 0px 70px;
   font-size: 15px;
 }
 
