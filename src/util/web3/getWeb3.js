@@ -1,5 +1,4 @@
 import Web3 from 'web3'
-import { NETWORKS } from '../constants'
 
 let getWeb3 = new Promise(function (resolve, reject) {
   // Wait for loading completion to avoid race conditions with web3 injection timing.
@@ -33,20 +32,8 @@ let getWeb3 = new Promise(function (resolve, reject) {
         })
       } else {
         networkId = networkId.toString()
-        switch (networkId) {
-          case NETWORKS['ODLLBlockchainNetwork']:
-            result = Object.assign({}, result, { networkId })
-            resolve(result)
-            break
-
-          default:
-            result = Object.assign({}, result)
-            reject({
-              result,
-              err
-            })
-            break
-        }
+        result = Object.assign({}, result, { networkId })
+        resolve(result)
       }
     })
   })

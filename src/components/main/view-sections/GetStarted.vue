@@ -12,11 +12,12 @@
             You're all set to use the ODLL dApp. All you need to do now is register your account with ODLL.
           </div>
           <div v-else>
-            But you don't have an account on the blockchain. Create an account on the blockchain and register it with the ODLL dApp to experience the awesome services we offer.
+            But it seems you don't have an account with ODLL on the blockchain.<br>Or you do but the account is currently inaccessible.<br>Create an account on the blockchain and register with us to begin experiencing the awesome services we offer, or make your existing account accessible.
           </div>
         </div>
         <div v-else>
-          But you are not connected to the ODLL network on the blockchain. Change your connection.
+          But you are not connected to the ODLL network on the blockchain [{{ approvedNetworkName }}].<br>
+            Connect to the {{ approvedNetworkName }}.
         </div>
       </div>
       <div v-else>Your browser is not Web3-injected. To use the ODLL dApp, you can install <a href='https://metamask.io/'>Metamask</a>.</div>
@@ -33,12 +34,19 @@
 <script type="text/javascript">
   export default {
     name: 'get-started',
+    data: () => {
+      return {
+        approvedNetworkName: NETWORKS[NETWORKS['ODLLBlockchainNetwork']]
+      }
+    },
     computed: {
       user () {
         return this.$store.state.user
       }
     }
   }
+
+  import { NETWORKS } from '../../../util/constants'
 </script>
 
 <style scoped>

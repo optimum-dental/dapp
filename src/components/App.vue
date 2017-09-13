@@ -9,6 +9,12 @@ export default {
   name: 'app',
   beforeCreate: function () {
     this.$store.dispatch(ACTION_TYPES.REGISTER_WEB3_INSTANCE)
+    .then(() => {
+      this.$store.dispatch(ACTION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS)
+    })
+    .catch((result) => {
+      console.log("We've encountered problems with your Web3 connection")
+    })
   },
   components: {
     Home,
@@ -53,19 +59,13 @@ export default {
   },
   watch: {
     hasInjectedWeb3: function (web3ConnectionValue) {
-      web3ConnectionValue
-      ? this[ACTION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS]({ hasWeb3InjectedBrowser: true })
-      : this[ACTION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS]({ hasWeb3InjectedBrowser: false })
+      console.log('hasInjectedWeb3: ', web3ConnectionValue)
     },
     networkId: function (networkId) {
-      networkId && networkId !== '' && networkId === NETWORKS['ODLLBlockchainNetwork']
-      ? this[ACTION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS]({ isConnectedToODLLNetwork: true })
-      : this[ACTION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS]({ isConnectedToODLLNetwork: false })
+      console.log('networkId: ', networkId)
     },
     coinbase: function (coinbase) {
-      coinbase && coinbase !== ''
-      ? this[ACTION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS]({ hasCoinbase: true })
-      : this[ACTION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS]({ hasCoinbase: false })
+      console.log('coinbase: ', coinbase)
     },
     $route: function (newRoute) {
       this[ACTION_TYPES.CHANGE_CURRENT_ROUTE_TO](newRoute)
@@ -80,7 +80,7 @@ import GetStarted from './main/view-sections/GetStarted.vue'
 import FAQ from './main/view-sections/FAQ.vue'
 import HowItWorks from './main/view-sections/HowItWorks.vue'
 import Profile from './main/view-sections/Profile.vue'
-import { ACTION_TYPES, NETWORKS } from '../util/constants'
+import { ACTION_TYPES } from '../util/constants'
 </script>
 
 <style>
