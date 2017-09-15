@@ -8,12 +8,12 @@
         </div>
         <div class="text">
           <ul class="reasons">
-            <li class="reason"><strong>Security</strong>: Your dental record is 100% safe. It exists on the blockchain.</li>
-            <li class="reason"><strong>Speed</strong>: Get your Dental issues treated faster than usual.</li>
-            <li class="reason"><strong>Cost</strong>: We offer the best prices, allowing you save more.</li>
-            <li class="reason"><strong>Freedom</strong>: Your health records are yours indeed.</li>
-            <li class="reason"><strong>Ease</strong>: Get the best doctors closest to you and pay unbelievably low for their quality services with a user friendly dApp.</li>
-            <li class="reason"><strong>Satisfaction</strong>: We have been patients too, and we know exactly how it is to be treated right and in time. Satisfaction is 100% guaranteed.</li>
+            <li class="reason"><strong>Security</strong>: Your personal chart on the Blockchain is 100% secure. Your HIPAA information is 100% safe and encrypted.</li>
+            <li class="reason"><strong>Freedom</strong>: Your records are yours - they stay with you, not our doctors.</li>
+            <li class="reason"><strong>Speed</strong>: See a doctor and receive treatment faster than ever!</li>
+            <li class="reason"><strong>Cost</strong>: We offer the best prices anywhere, which gives your wallet a break.</li>
+            <li class="reason"><strong>Ease</strong>: Get the nearest, very best doctors all at your fingertips.</li>
+            <li class="reason"><strong>Satisfaction</strong>: We have been patients too - treating your dental needs correctly, on time, the first time is our goal. We're not happy with your smile until YOU are.</li>
           </ul>
         </div>
       </div>

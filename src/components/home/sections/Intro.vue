@@ -2,7 +2,7 @@
   <div id="intro">
     <div class="content">
       <div class="texts">
-        <div class="text-item">Find That</div>
+        <div class="text-item">Know</div>
         <div class="text-item"><span class='odll-blue'>Dental</span> <span class='odll-orange'>Care</span> Designed Around</div>
         <div class="text-item third-text">Your Needs</div>
       </div>
