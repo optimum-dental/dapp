@@ -55,7 +55,7 @@
     height: 620px;
     position: relative;
     top: 40px;
-    left: 250px;
+    left: 20%;
     padding: 10px;
   }
 

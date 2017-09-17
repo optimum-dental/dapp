@@ -1,7 +1,7 @@
 <template>
   <div class="main-page">
-    <HeaderTemplate />
     <SideBarTemplate />
+    <HeaderTemplate />
     <MainViewTemplate :is="currentView" />
   </div>
 </template>
@@ -29,7 +29,7 @@
 
 <style scoped>
   .main-page {
-    width: 1020px;
+    width: 100%;
     height: auto;
     margin: auto;
     position: relative;
