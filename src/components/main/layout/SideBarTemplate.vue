@@ -1,13 +1,13 @@
 <template>
   <div id="sidebar-template" class="sticky sidebar">
     <div class="content">
-      <section id='brand-home'>
+      <section id='brand'>
         <img class="asset" src="/static/images/odll_title_icon.png" alt="brand-image"/>
         <div class="footer">
         </div>
       </section>
-      <section id="menu-list">
-        <MenuItemTemplate/>
+      <section id="menu">
+        <MenuTemplate/>
       </section>
     </div>
   </div>
@@ -17,11 +17,11 @@
   export default {
     name: 'sidebar-template',
     components: {
-      MenuItemTemplate
+      MenuTemplate
     }
   }
 
-  import MenuItemTemplate from './MenuItemTemplate.vue'
+  import MenuTemplate from './MenuTemplate.vue'
 </script>
 
 <style scoped>
@@ -29,9 +29,9 @@
     width: 20%;
   }
 
-  #brand-home {
-    background-color: #36303e;
-    height: 300px;
+  #brand {
+    background-color: #282735;
+    height: 250px;
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -40,13 +40,12 @@
   }
 
 
-  #brand-home .asset{
-    margin-top: 40px;
-    height: 220px;
-    height: 220px;
+  #brand .asset{
+    height: 200px;
+    margin: 20px;
   }
 
-  #brand-home .footer {
+  #brand .footer {
   height: 7px;
   width: 100%;
   background-image: linear-gradient(
@@ -70,7 +69,7 @@
     z-index: 666;
   }
 
-  #menu-list {
+  #menu {
     background-color: #3285b1;
     flex: 1;
   }
