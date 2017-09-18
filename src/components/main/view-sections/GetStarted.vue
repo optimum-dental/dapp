@@ -23,10 +23,7 @@
       <div v-else>Your browser is not Web3-injected. To use the ODLL dApp, you can install <a href='https://metamask.io/'>Metamask</a>.</div>
     </div>
     <div class="content">
-      <div class="message">
-        <div class="text">We're currently working on this ODLL Main Page</div>
-        <router-link to="/" class="return-home-button">Return Home</router-link>
-      </div>
+
     </div>
   </div>
 </template>
@@ -51,28 +48,25 @@
 
 <style scoped>
   #get-started {
-    width: 770px;
-    height: 620px;
+    width: 80%;
+    height: 100vh;
     position: relative;
-    top: 40px;
-    left: 250px;
-    padding: 10px;
+    left: 20%;
+    padding-top: 60px;
+    background: #eef0ef;
   }
 
   .blockchain-message {
-    float: left;
     margin-top: 20px;
-    font-size: 14px;
     border: 1px solid #dcdede;
     color: #4d4c49;
-    width: auto;
     padding: 10px;
+    display: inline-block;
   }
 
   .content {
-    height: 100%;
     text-align: center;
-    max-width: 920px;
+    width: 960px;
     margin: auto;
     padding: 160px;
   }
@@ -96,5 +90,11 @@
     clear: both;
     line-height: 40px;
     text-decoration: none;
+  }
+
+  .content {
+    border: none;
+    border-top: 5px solid #dd5b21;
+    background-color: #fff;
   }
 </style>

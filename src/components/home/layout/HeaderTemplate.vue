@@ -27,7 +27,7 @@
     position: fixed;
     padding: 5px 20px;
     top: 0px;
-    height: 70px;
+    height: 100px;
     background: #292836;
     width: 100%;
     box-sizing: border-box;
@@ -45,9 +45,9 @@
     height: 36px;
     background: url('/static/images/OralDataLink4.png') no-repeat;
     background-size: contain;
-    margin: 15px 0px; 
+    margin: 15px 0px;
   }
-  
+
   .links {
     float: right;
     height: 60px;

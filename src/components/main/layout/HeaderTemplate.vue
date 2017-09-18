@@ -12,19 +12,20 @@
 
 <style scoped>
   #header-template {
-    width: 770px;
+    width: 80%;
   }
 
   .sticky {
     position: absolute;
-    left: 250px;
+    left: 20%;
     top: 0px;
-    height: 40px;
-    background: #f9f9f9;
+    height: 60px;
+    background: #fff;
     width: 100%;
     box-sizing: border-box;
     z-index: 666;
-    border: 1px solid #dcdede;
+    border: none;
+    border-bottom: 2px solid #c4c4c4;
   }
 
   .content {
