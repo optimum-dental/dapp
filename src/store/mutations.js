@@ -18,5 +18,9 @@ export default {
   },
   [MUTATION_TYPES.CHANGE_CURRENT_ROUTE_TO] (state, newRoute) {
     state.currentRoute = newRoute
+  },
+
+  [MUTATION_TYPES.UPDATE_CURRENT_VIEW] (state, newView) {
+    state.currentView = newView
   }
 }

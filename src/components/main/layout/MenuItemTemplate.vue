@@ -1,6 +1,6 @@
 <template>
   <div id="menu-item-template" :class="{ 'menu-item': true, active: item.isActive }">
-    <div class="container">
+    <div class="container" @click="setCurrentView(item.key)">
       <span v-if="item.isActive" class='active-indicator'/>
       <section class='content'>
         <div class="menu-icon">
@@ -18,7 +18,14 @@
 <script type="text/javascript">
   export default {
     name: 'menu-item-template',
-    props: ['item']
+    props: ['item', 'setCurrentView'],
+    methods: {
+      setActiveView: function (viewKey) {
+        this.switchView(viewKey)
+        console.log('active view =======>> ', viewKey)
+      }
+
+    }
   }
 </script>
 
@@ -31,7 +38,7 @@
   .menu-item .content {
     height: 70px;
     display: flex;
-    flex=-direction: column;
+    flex-direction: column;
     cursor: pointer;
   }
 
@@ -69,7 +76,7 @@
     height: 0;
     border-top: 10px solid transparent;
     border-bottom: 10px solid transparent;
-    border-right: 10px solid #fff;
+    border-right: 10px solid  #eef0ef;
   }
 
 </style>

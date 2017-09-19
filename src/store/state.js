@@ -16,5 +16,7 @@ export default {
     hasWeb3InjectedBrowser: false,
     hasCoinbase: false,
     isConnectedToODLLNetwork: false
-  }
+  },
+
+  currentView: 'gettingStarted'
 }
