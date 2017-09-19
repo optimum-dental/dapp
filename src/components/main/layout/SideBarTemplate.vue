@@ -7,7 +7,7 @@
         </div>
       </section>
       <section id="menu">
-        <MenuTemplate/>
+        <MenuTemplate :updateCurrentView="setCurrentView"/>
       </section>
     </div>
   </div>
@@ -16,6 +16,7 @@
 <script type="text/javascript">
   export default {
     name: 'sidebar-template',
+    props: ['setCurrentView'],
     components: {
       MenuTemplate
     }

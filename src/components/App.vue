@@ -5,6 +5,14 @@
 </template>
 
 <script>
+const APP_VIEWS = {
+  'get-started': GetStarted,
+  'find-dentist': GetStarted,
+  'view-services': GetStarted,
+  'request-appointment': GetStarted,
+  'view-scans': GetStarted,
+  'view-treatments': GetStarted
+}
 export default {
   name: 'app',
   beforeCreate: function () {
@@ -29,6 +37,7 @@ export default {
       networkId: state => state.web3.networkId,
       coinbase: state => state.web3.coinbase,
       currentRoute: state => state.currentRoute,
+      currentView: state => APP_VIEWS[state.currentView],
       user: state => state.user
     }),
     currentView () {
@@ -56,7 +65,8 @@ export default {
   methods: {
     ...mapActions([
       ACTION_TYPES.CHANGE_CURRENT_ROUTE_TO,
-      ACTION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS
+      ACTION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS,
+      ACTION_TYPES.UPDATE_CURRENT_VIEW
     ])
   },
   watch: {
