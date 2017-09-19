@@ -7,9 +7,9 @@
 <script>
 const APP_VIEWS = {
   'get-started': GetStarted,
-  'find-dentist': GetStarted,
-  'view-services': GetStarted,
-  'request-appointment': GetStarted,
+  'find-dentist': '',
+  'view-services': '',
+  'request-appointment': '',
   'view-scans': GetStarted,
   'view-treatments': GetStarted
 }
