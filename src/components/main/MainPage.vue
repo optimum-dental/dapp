@@ -2,7 +2,7 @@
   <div class="main-page">
     <SideBarTemplate :setCurrentView='setCurrentView'/>
     <HeaderTemplate />
-    <MainViewTemplate :is="currentView" />
+    <MainViewTemplate :current-view='currentView' />
   </div>
 </template>
 

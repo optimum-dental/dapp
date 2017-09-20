@@ -1,5 +1,14 @@
 import { MUTATION_TYPES, NETWORKS } from '../util/constants'
 
+function resetUser (state) {
+  state.user.firstName = ''
+  state.user.lastName = ''
+  state.user.email = ''
+  state.user.phone = ''
+  state.user.type = ''
+  state.user.isValid = false
+}
+
 export default {
   [MUTATION_TYPES.REGISTER_WEB3_INSTANCE] (state, payload) {
     const result = payload.result
@@ -13,8 +22,14 @@ export default {
   },
   [MUTATION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS] (state) {
     state.user.hasWeb3InjectedBrowser = state.web3.isInjected
-    state.user.hasCoinbase = state.web3.coinbase && state.web3.coinbase !== ''
-    state.user.isConnectedToODLLNetwork = state.web3.networkId && state.web3.networkId !== '' && state.web3.networkId === NETWORKS['ODLLBlockchainNetwork']
+    state.user.hasCoinbase = !!(state.web3.coinbase && state.web3.coinbase !== '')
+    state.user.isConnectedToODLLNetwork = !!(state.web3.networkId && state.web3.networkId !== '' && state.web3.networkId === NETWORKS['ODLLBlockchainNetwork'])
+    const user = state.user
+    if (user.hasWeb3InjectedBrowser && user.hasCoinbase && user.isConnectedToODLLNetwork) {
+      state.user.isValid = true
+    } else {
+      resetUser(state)
+    }
   },
   [MUTATION_TYPES.CHANGE_CURRENT_ROUTE_TO] (state, newRoute) {
     state.currentRoute = newRoute
