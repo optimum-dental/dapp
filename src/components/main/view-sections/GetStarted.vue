@@ -49,10 +49,11 @@
 <style scoped>
   #get-started {
     width: 80%;
-    height: 100vh;
+    height: 100%;
+    min-height: 100vh;
     position: relative;
     left: 20%;
-    padding-top: 60px;
+    padding: 60px 50px 20px 50px;
     background: #eef0ef;
   }
 
@@ -66,9 +67,9 @@
 
   .content {
     text-align: center;
-    width: 960px;
     margin: auto;
     padding: 160px;
+    height: 800px;
   }
 
   .message {

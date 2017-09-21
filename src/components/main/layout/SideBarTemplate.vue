@@ -3,7 +3,7 @@
     <div class="content">
       <section id='brand'>
         <div class='image-wrap'>
-          <div class='image'></div>
+          <img class='image' src='/static/images/odll_title_icon.png'/>
         </div>
         <div class="footer">
         </div>
@@ -37,6 +37,7 @@
 <style scoped>
   #sidebar-template {
     width: 20%;
+    position: fixed;
   }
 
   #brand {
@@ -56,27 +57,27 @@
     display: block;
     width: 100%;
     text-align: center;
-    flex: 0.95;
-    margin: 25px auto;
+    flex: 0.9;
+    margin: 20px auto;
   }
 
   #brand .image {
-    background: url(/static/images/odll_title_icon.png) no-repeat;
-    background-size: contain;
+    display: inline-block;
     width: 100%;
     height: 100%;
+    min-width: 70px;
+    max-width: 120px;
+    max-height: 150px;
+    min-height: 80px;
   }
 
-  #brand .asset {
-    display: flex;
-    flex: 1;
-    width: 100%;
-  }
 
   #brand .footer {
-  flex: 0.05;
-  width: 100%;
-  background-image: linear-gradient(
+    min-height: 7px;
+    max-height: 10px;
+    flex: 0.1;
+    width: 100%;
+    background-image: linear-gradient(
       to right,
       #dd5b22,
       #dd5b22 20%,
@@ -120,7 +121,7 @@
     display: flex;
     flex-direction: row;
     justify-content: space-around;
-    flex: 0.4;
+    flex: 0.35;
     margin-left: 10px;
   }
 
