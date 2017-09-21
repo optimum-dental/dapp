@@ -51,7 +51,7 @@
     background-color: #fff;
     /*text-align: center;*/
     width: 100%;
-    min-height: 120vh;
+    min-height: 80vh;
     margin: auto;
     display: flex;
     flex-direction: column;
