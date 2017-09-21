@@ -1,7 +1,10 @@
 <template>
   <div id="get-started">
     <div class="content" v-if="user.isValid">
-      <user-form />
+      <user-form
+        :avatarCanvas="avatarCanvas"
+        :user="user"
+      />
     </div>
 
     <div class="content" v-else>
@@ -13,23 +16,13 @@
 <script type="text/javascript">
   export default {
     name: 'get-started',
-    data: () => {
-      return {
-        approvedNetworkName: NETWORKS[NETWORKS['ODLLBlockchainNetwork']]
-      }
-    },
-    computed: {
-      user () {
-        return this.$store.state.user
-      }
-    },
+    props: [ 'avatarCanvas', 'user' ],
     components: {
       UserForm,
       HowItWorks
     }
   }
 
-  import { NETWORKS } from '../../../util/constants'
   import UserForm from './UserForm.vue'
   import HowItWorks from './HowItWorks.vue'
 </script>
@@ -48,8 +41,6 @@
   .content {
     border: none;
     border-top: 5px solid #dd5b21;
-    background-color: #fff;
-    /*text-align: center;*/
     width: 100%;
     min-height: 80vh;
     margin: auto;

@@ -2,25 +2,23 @@
   <div class="main-page">
     <SideBarTemplate :setCurrentView='setCurrentView'/>
     <HeaderTemplate />
-    <MainViewTemplate :current-view='currentView' />
+    <MainViewTemplate
+      :current-view='currentView'
+      :avatarCanvas="avatarCanvas"
+      :user="user"
+    />
   </div>
 </template>
 
 <script>
   export default {
     name: 'main-page',
-    props: ['currentView'],
-    computed: {
-      user () {
-        return this.$store.state.user
-      }
-    },
+    props: ['avatarCanvas', 'user', 'currentView'],
     components: {
       HeaderTemplate,
       MainViewTemplate,
       SideBarTemplate
     },
-
     methods: {
       setCurrentView: function (currentView) {
         this.$store.dispatch(ACTION_TYPES.UPDATE_CURRENT_VIEW, currentView)
