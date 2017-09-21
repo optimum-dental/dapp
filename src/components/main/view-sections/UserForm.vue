@@ -28,8 +28,7 @@
 
     <div class="field">
       <label for="phone-number" class="field-key">Phone Number</label>
-      <input type="text" class="field-value has-tip" id="phone-number" v-model="user.phoneNumber" placeholder="Phone Number" @input="displayLabel">
-      <div class="tip">Write between 5 to 32 characters</div>
+      <input type="text" class="field-value" id="phone-number" v-model="user.phoneNumber" placeholder="Phone Number" @input="displayLabel">
     </div>
 
     <div class="field">
@@ -124,7 +123,8 @@
   #user-form {
     background: #ffffff;
     min-height: 80vh;
-    width: 90vh;
+    /*width: 90vh;*/
+    font-size: 12px;
     margin: 30px auto;
     color: #adadad;
     display: flex;
@@ -136,14 +136,14 @@
 
   .title {
     height: 25px;
-    margin-bottom: 50px;
+    margin-bottom: 20px;
     width: 100%;
     font-size: 20px;
     color: #4d4c49;
   }
 
   .field {
-    min-height: 80px;
+    min-height: 60px;
     margin-bottom: 10px;
     width: 100%;
   }
@@ -180,7 +180,7 @@
   }
 
   .avatar {
-    height: 130px;
+    height: 110px;
   }
 
   input[type=email].field-value, input[type=text].field-value, select {
