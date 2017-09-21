@@ -57,17 +57,24 @@
         Array.from(document.querySelectorAll('.gender')).forEach((checkBox) => {
           if (checkBox.id !== id) checkBox.checked = false
         })
+      },
+      addAvatar () {
+        const avatarCanvas = this.avatarCanvas
+        const avatarContainer = document.querySelector('.avatar')
+        if (avatarContainer && avatarCanvas && avatarCanvas.style) {
+          avatarCanvas.style.borderRadius = '100px'
+          avatarContainer.appendChild(avatarCanvas)
+        }
       }
     },
     mounted: function () {
       dateSelectionManager.loadDate()
       document.querySelector('#user-form').closest('.content').style.borderTop = 'none'
+      this.addAvatar()
     },
     watch: {
       avatarCanvas () {
-        const avatarCanvas = this.avatarCanvas
-        avatarCanvas.style.borderRadius = '100px'
-        document.querySelector('.avatar').appendChild(avatarCanvas)
+        this.addAvatar()
       }
     }
   }
