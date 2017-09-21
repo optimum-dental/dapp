@@ -22,7 +22,6 @@
     methods: {
       setActiveView: function (viewKey) {
         this.switchView(viewKey)
-        console.log('active view =======>> ', viewKey)
       }
 
     }
@@ -36,7 +35,7 @@
   }
 
   .menu-item .content {
-    height: 70px;
+    height: 65px;
     display: flex;
     flex-direction: column;
     cursor: pointer;
@@ -57,8 +56,8 @@
     border-top: 1px transparent solid;
     height: 100%;
     width: 100%;
-    font-size: 15px;
-    padding-left: 35px;
+    font-size: 14px;
+    padding-left: 25px;
     color: #efefef;
     font-weight: 400;
   }

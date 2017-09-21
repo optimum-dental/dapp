@@ -16,7 +16,7 @@
   }
 
   .sticky {
-    position: absolute;
+    position: fixed;
     left: 20%;
     top: 0px;
     height: 60px;
