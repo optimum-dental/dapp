@@ -2,19 +2,18 @@
   <div class="main-page">
     <SideBarTemplate :set-current-view='setCurrentView'/>
     <HeaderTemplate />
-    <MainViewTemplate :current-view='currentView' />
+    <MainViewTemplate
+      :avatar-canvas="avatarCanvas"
+      :current-view='currentView'
+      :user="user"
+    />
   </div>
 </template>
 
 <script>
   export default {
     name: 'main-page',
-    props: ['currentView', 'setCurrentView'],
-    computed: {
-      user () {
-        return this.$store.state.user
-      }
-    },
+    props: ['avatarCanvas', 'currentView', 'setCurrentView', 'user'],
     components: {
       HeaderTemplate,
       MainViewTemplate,
@@ -25,7 +24,6 @@
   import HeaderTemplate from './layout/HeaderTemplate.vue'
   import SideBarTemplate from './layout/SideBarTemplate.vue'
   import MainViewTemplate from './layout/MainViewTemplate.vue'
-
 </script>
 
 <style scoped>

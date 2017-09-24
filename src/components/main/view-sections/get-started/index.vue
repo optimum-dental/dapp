@@ -1,8 +1,11 @@
 <template>
   <div id="get-started">
     <section class="content">
-      <div v-if="user.isValid">
-        <user />
+      <div v-if="user && user.isValid">
+        <user
+          :avatar-canvas="avatarCanvas"
+          :user="user"
+        />
       </div>
 
       <div v-else>
@@ -44,12 +47,7 @@
         ]
       }
     },
-    computed: {
-      user () {
-        return this.$store.state.user
-      }
-    },
-    props: [ 'setCurrentView' ]
+    props: [ 'avatarCanvas', 'setCurrentView', 'user' ]
   }
 
   import { NETWORKS, APPROVED_BLOCKCHAIN_NETWORK_ID } from '../../../../util/constants'
