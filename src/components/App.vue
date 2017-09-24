@@ -1,6 +1,10 @@
 <template>
   <div id="app">
-    <router-view :current-view="currentView"></router-view>
+    <router-view
+      :current-view="currentView"
+      :set-current-view="setCurrentView"
+    >
+    </router-view>
   </div>
 </template>
 
@@ -48,12 +52,6 @@ export default {
           return GetStarted
         case '/faq':
           return FAQ
-        case '/how-it-works':
-          return HowItWorks
-        case '/profile':
-          return Profile
-        case '/main-page':
-          return GetStarted
         default:
           return Home
       }
@@ -67,7 +65,10 @@ export default {
       ACTION_TYPES.CHANGE_CURRENT_ROUTE_TO,
       ACTION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS,
       ACTION_TYPES.UPDATE_CURRENT_VIEW
-    ])
+    ]),
+    setCurrentView: function (currentView) {
+      this[ACTION_TYPES.UPDATE_CURRENT_VIEW](currentView)
+    }
   },
   watch: {
     hasInjectedWeb3: function (web3ConnectionValue) {
@@ -88,16 +89,12 @@ export default {
 import { mapState, mapActions } from 'vuex'
 import Home from './home/Home.vue'
 import MainPage from './main/MainPage.vue'
-import GetStarted from './main/view-sections/GetStarted.vue'
+import GetStarted from './main/view-sections/get-started'
 import FAQ from './main/view-sections/FAQ.vue'
-import HowItWorks from './main/view-sections/HowItWorks.vue'
-import Profile from './main/view-sections/Profile.vue'
 import { ACTION_TYPES } from '../util/constants'
 </script>
 
 <style>
-html {}
-
 body {
   margin: 0;
   width: 100%;

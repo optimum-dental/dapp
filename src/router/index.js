@@ -20,31 +20,14 @@ export default new Router({
     },
     {
       mode: 'history',
-      path: '/faq',
-      name: 'FAQ',
-      component: MainPage
-    },
-    {
-      mode: 'history',
       path: '/get-started',
       name: 'GetStarted',
       component: MainPage
     },
     {
       mode: 'history',
-      path: '/how-it-works',
-      name: 'HowItWorks',
-      component: MainPage
-    },
-    {
-      mode: 'history',
-      path: '/profile',
-      name: 'Profile',
-      component: MainPage
-    },
-    {
-      mode: 'history',
-      path: '/main-page',
+      path: '/faq',
+      name: 'FAQ',
       component: MainPage
     }
   ]

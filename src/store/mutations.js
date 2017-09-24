@@ -1,4 +1,4 @@
-import { MUTATION_TYPES, NETWORKS } from '../util/constants'
+import { MUTATION_TYPES, APPROVED_BLOCKCHAIN_NETWORK_ID } from '../util/constants'
 
 function resetUser (state) {
   state.user.firstName = ''
@@ -23,7 +23,7 @@ export default {
   [MUTATION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS] (state) {
     state.user.hasWeb3InjectedBrowser = state.web3.isInjected
     state.user.hasCoinbase = !!(state.web3.coinbase && state.web3.coinbase !== '')
-    state.user.isConnectedToODLLNetwork = !!(state.web3.networkId && state.web3.networkId !== '' && state.web3.networkId === NETWORKS['ODLLBlockchainNetwork'])
+    state.user.isConnectedToODLLNetwork = !!(state.web3.networkId && state.web3.networkId !== '' && state.web3.networkId === APPROVED_BLOCKCHAIN_NETWORK_ID)
     const user = state.user
     if (user.hasWeb3InjectedBrowser && user.hasCoinbase && user.isConnectedToODLLNetwork) {
       state.user.isValid = true
