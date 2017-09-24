@@ -1,17 +1,17 @@
 <template>
-  <div id="how-it-works">
-    HOW IT WORKS
+  <div id="user-form">
+    USER FORM
   </div>
 </template>
 
 <script>
   export default {
-    name: 'how-it-works'
+    name: 'user-form'
   }
 </script>
 
 <style scoped>
-  #how-it-works {
+  #user-form {
     
   }
 </style>

@@ -10,12 +10,14 @@ export default {
   },
   user: {
     email: '',
-    name: '',
+    firstName: '',
+    lastName: '',
     phone: '',
     type: '',
     hasWeb3InjectedBrowser: false,
     hasCoinbase: false,
-    isConnectedToODLLNetwork: false
+    isConnectedToODLLNetwork: false,
+    isValid: false
   },
 
   currentView: 'gettingStarted'
