@@ -84,6 +84,7 @@
 
   .container {
     width: 560px;
+    margin: auto;
   }
   .header-2 {
     font-size: 20px;
