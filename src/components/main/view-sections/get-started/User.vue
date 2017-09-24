@@ -1,9 +1,9 @@
 <template>
-  <div id="user-form">
+  <div id="user">
     <div class="title">Register as Patient</div>
     <div class="field">
       <label for="name" class="field-key">Your Name</label>
-      <input type="text" class="field-value has-tip" id="name" v-model="user.fullName" placeholder="Your Name" @input="displayLabel">
+      <input type="text" class="field-value has-tip" id="name" v-model="user.fullName" placeholder="First Name   Last Name" @input="displayLabel">
       <div class="tip">Write between 5 to 32 characters</div>
     </div>
 
@@ -52,7 +52,7 @@
 <script>
   export default {
     props: [ 'avatarCanvas', 'user' ],
-    name: 'user-form',
+    name: 'user',
     methods: {
       resetCheckeBoxValues (evt) {
         const target = evt.target
@@ -65,7 +65,8 @@
         const avatarCanvas = this.avatarCanvas
         const avatarContainer = document.querySelector('.avatar')
         if (avatarContainer && avatarCanvas && avatarCanvas.style) {
-          avatarCanvas.style.borderRadius = '100px'
+          avatarCanvas.style.borderRadius = '104px'
+          avatarCanvas.style.marginTop = '3px'
           avatarContainer.appendChild(avatarCanvas)
         }
       },
@@ -104,7 +105,7 @@
     },
     mounted: function () {
       dateSelectionManager.loadDate()
-      document.querySelector('#user-form').closest('.content').style.borderTop = 'none'
+      document.querySelector('#user').closest('.content').style.borderTop = 'none'
       this.addAvatar()
       this.populateStates()
     },
@@ -116,11 +117,11 @@
   }
 
   import dateSelectionManager from 'date-selection-manager'
-  import states from '../../../../static/json/states/states_hash.json'
+  import states from '../../../../../static/json/states/states_hash.json'
 </script>
 
 <style scoped>
-  #user-form {
+  #user {
     background: #ffffff;
     min-height: 80vh;
     /*width: 90vh;*/

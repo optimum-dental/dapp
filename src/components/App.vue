@@ -3,7 +3,9 @@
     <router-view
       :current-view="currentView"
       :user="user"
-      :avatarCanvas="avatarCanvas">
+      :avatar-canvas="avatarCanvas"
+      :set-current-view="setCurrentView"
+    >
     </router-view>
   </div>
 </template>
@@ -17,6 +19,7 @@
     'view-scans': GetStarted,
     'view-treatments': GetStarted
   }
+
   export default {
     name: 'app',
     beforeCreate: function () {
@@ -53,12 +56,6 @@
             return GetStarted
           case '/faq':
             return FAQ
-          case '/how-it-works':
-            return HowItWorks
-          case '/profile':
-            return Profile
-          case '/main-page':
-            return GetStarted
           default:
             return Home
         }
@@ -72,7 +69,10 @@
         ACTION_TYPES.CHANGE_CURRENT_ROUTE_TO,
         ACTION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS,
         ACTION_TYPES.UPDATE_CURRENT_VIEW
-      ])
+      ]),
+      setCurrentView (currentView) {
+        this[ACTION_TYPES.UPDATE_CURRENT_VIEW](currentView)
+      }
     },
     watch: {
       hasInjectedWeb3 (web3ConnectionValue) {
@@ -93,33 +93,29 @@
   import { mapState, mapActions } from 'vuex'
   import Home from './home/Home.vue'
   import MainPage from './main/MainPage.vue'
-  import GetStarted from './main/view-sections/GetStarted.vue'
+  import GetStarted from './main/view-sections/get-started'
   import FAQ from './main/view-sections/FAQ.vue'
-  import HowItWorks from './main/view-sections/HowItWorks.vue'
-  import Profile from './main/view-sections/Profile.vue'
   import { ACTION_TYPES } from '../util/constants'
 </script>
 
 <style>
-html {}
+  body {
+    margin: 0;
+    width: 100%;
+  }
 
-body {
-  margin: 0;
-  width: 100%;
-}
+  * {
+    box-sizing: border-box;
+  }
 
-* {
-  box-sizing: border-box;
-}
-
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
-  width: 100%;
-  /*max-width: 960px;*/
-  min-width: 1020px;
-  margin: auto;
-}
+  #app {
+    font-family: 'Avenir', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: #2c3e50;
+    width: 100%;
+    /*max-width: 960px;*/
+    min-width: 1020px;
+    margin: auto;
+  }
 </style>

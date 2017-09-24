@@ -1,10 +1,10 @@
 <template>
   <div class="main-page">
-    <SideBarTemplate :setCurrentView='setCurrentView'/>
+    <SideBarTemplate :set-current-view='setCurrentView'/>
     <HeaderTemplate />
     <MainViewTemplate
+      :avatar-canvas="avatarCanvas"
       :current-view='currentView'
-      :avatarCanvas="avatarCanvas"
       :user="user"
     />
   </div>
@@ -13,24 +13,17 @@
 <script>
   export default {
     name: 'main-page',
-    props: ['avatarCanvas', 'user', 'currentView'],
+    props: ['avatarCanvas', 'currentView', 'setCurrentView', 'user'],
     components: {
       HeaderTemplate,
       MainViewTemplate,
       SideBarTemplate
-    },
-    methods: {
-      setCurrentView: function (currentView) {
-        this.$store.dispatch(ACTION_TYPES.UPDATE_CURRENT_VIEW, currentView)
-      }
     }
   }
 
   import HeaderTemplate from './layout/HeaderTemplate.vue'
   import SideBarTemplate from './layout/SideBarTemplate.vue'
   import MainViewTemplate from './layout/MainViewTemplate.vue'
-  import { ACTION_TYPES } from '../../util/constants'
-
 </script>
 
 <style scoped>

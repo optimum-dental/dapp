@@ -1,5 +1,5 @@
-import { MUTATION_TYPES, NETWORKS } from '../util/constants'
 import ethereumBlockies from 'ethereum-blockies'
+import { MUTATION_TYPES, APPROVED_BLOCKCHAIN_NETWORK_ID, IDENTICON_COLORS } from '../util/constants'
 
 function resetUser (state) {
   const user = {
@@ -20,6 +20,21 @@ function resetUser (state) {
   state.user = user
 }
 
+function getHash (stringValue) {
+  let hash = 0
+  let characterCode
+
+  if (stringValue.length === 0) return hash
+
+  for (let i = 0; i < stringValue.length; i++) {
+    characterCode = stringValue.charCodeAt(i)
+    hash = ((hash << 5) - hash) + characterCode
+    hash |= 0 // Convert to 32-bit integer
+  }
+
+  return hash
+}
+
 export default {
   [MUTATION_TYPES.REGISTER_WEB3_INSTANCE] (state, payload) {
     const result = payload.result
@@ -38,20 +53,25 @@ export default {
   [MUTATION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS] (state) {
     const hasWeb3InjectedBrowser = state.web3.isInjected
     const hasCoinbase = !!(state.web3.coinbase && state.web3.coinbase !== '')
-    const isConnectedToODLLNetwork = !!(state.web3.networkId && state.web3.networkId !== '' && state.web3.networkId === NETWORKS['ODLLBlockchainNetwork'])
+    const isConnectedToODLLNetwork = !!(state.web3.networkId && state.web3.networkId !== '' && state.web3.networkId === APPROVED_BLOCKCHAIN_NETWORK_ID)
     if (hasWeb3InjectedBrowser && hasCoinbase && isConnectedToODLLNetwork) {
       const userCopy = state.user
-      userCopy.hasWeb3InjectedBrowser = true
-      userCopy.hasCoinbase = true
-      userCopy.isConnectedToODLLNetwork = true
-      userCopy.isValid = true
-      userCopy.avatarCanvas = ethereumBlockies.create({
-        seed: state.web3.coinbase,
-        color: '#dadada',
-        bgcolor: '#838383',
-        size: 5,
-        scale: 20,
-        spotcolor: '#9f9f9f'
+      const colorPosition = Math.abs(getHash(state.web3.coinbase) % IDENTICON_COLORS.length)
+      const identiconColor = IDENTICON_COLORS[colorPosition]
+
+      Object.assign(userCopy, {
+        hasWeb3InjectedBrowser,
+        hasCoinbase,
+        isConnectedToODLLNetwork,
+        isValid: true,
+        avatarCanvas: ethereumBlockies.create({
+          seed: state.web3.coinbase,
+          color: identiconColor.color,
+          bgcolor: identiconColor.bgColor,
+          size: 8,
+          scale: 13,
+          spotcolor: identiconColor.spotColor
+        })
       })
 
       state.user = userCopy
