@@ -3,10 +3,10 @@
     <div class="content">
       <div class="appointment-content">
         <div class="title">
-          Book appointment on demand with Dentist easily.
+          Book appointments with Dentists easily, right from home.
         </div>
         <div class="text">
-          Oral Data Link makes fast access to the very best dentists an easy reality.
+          ODL connects you with the best dentists around you. No more office waiting rooms.
         </div>
       </div>
       <div class="appointment-image"></div>
@@ -47,8 +47,8 @@ export default {
 
 .title {
   font-size: 30px;
-  height: 110px;
-  width: 270px;
+  height: 75px;
+  width: 450px;
   margin-bottom: 10px;
 }
 

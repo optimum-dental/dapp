@@ -37,6 +37,7 @@
   .menu-item .content {
     height: 65px;
     display: flex;
+    flex-direction: column;
     cursor: pointer;
   }
 

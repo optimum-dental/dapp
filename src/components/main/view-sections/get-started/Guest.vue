@@ -1,6 +1,6 @@
 <template>
   <div id="getstarted-guest-template">
-    <div class="container" @click="setCurrentView(item.key)">
+    <div class="container">
       <section class='header-group'>
         <p class='header-1 header-main'>How to get started</p>
         <div class='header-body'>
@@ -18,9 +18,9 @@
       <section class='faq-section'>
         <p class='header-2 faq-title'>Frequently Asked Questions</p>
         <div class='faq-list'>
-          <div class='faq-container' v-for="item in faqs">
-          <p class='question'>{{ item.question }}</p>
-          <p class='answer'>{{ item.answer }}</p>
+          <div class='faq-container' v-for="item in faqs" :key="item.id">
+            <p class='question'>{{ item.question }}</p>
+            <p class='answer'>{{ item.answer }}</p>
           </div>
         </div>
       </section>
@@ -59,7 +59,7 @@
         ]
       }
     },
-    props: ['item', 'setCurrentView', 'faqs'],
+    props: ['item', 'faqs'],
     components: {
       VideoTutorial
     }

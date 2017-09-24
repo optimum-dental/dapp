@@ -4,9 +4,16 @@
       <div class="scan-image"></div>
       <div class="scan-content">
         <div class="title">
-          Get quick <br>scan appointment <br>with Dentist
+          Schedule a quick scan consultation with a doctor of your choice<br>
         </div>
         <div class="text">
+          Your savings start right here!<br>
+          As easy as 1 2 3:
+          <ol>
+            <li>Come in for your consultation and digital scan.</li>
+            <li>Your case plan is submitted to hundreds of doctors in your area.</li>
+            <li>Review quotes from the dentists at your leisure.</li>
+          </ol>
         </div>
       </div>
     </div>
@@ -48,21 +55,26 @@ export default {
 .scan-content {
   clear: none;
   float: left;
-  height: 150px;
-  width: 350px;
-  margin: 249px 0px 0px 270px;
+  height: 350px;
+  width: 400px;
+  margin: 149px 0px 0px 170px;
   font-size: 15px;
 }
 
 .title {
   font-size: 30px;
-  height: 110px;
-  width: 250px;
+  height: 120px;
+  width: 390px;
   margin-bottom: 10px;
 }
 
 .text {
-  height: 100px;
+  height: 150px;
   text-align: justify;
+}
+
+ol {
+  list-style-position: inside;
+  padding: 0px;
 }
 </style>

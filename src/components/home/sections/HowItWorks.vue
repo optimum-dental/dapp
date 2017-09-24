@@ -13,7 +13,7 @@
       <div class="flow-texts">
         <div class="text">Find Dentist</div>
         <div class="text">Request Appointment</div>
-        <div class="text">Receive Medical Care</div>
+        <div class="text">Receive Care</div>
         <div class="text">Leave Feedback</div>
       </div>
     </div>
