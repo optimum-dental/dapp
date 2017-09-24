@@ -88,7 +88,7 @@ export default {
 import { mapState, mapActions } from 'vuex'
 import Home from './home/Home.vue'
 import MainPage from './main/MainPage.vue'
-import GetStarted from './main/view-sections/GetStarted.vue'
+import GetStarted from './main/view-sections/get-started'
 import FAQ from './main/view-sections/FAQ.vue'
 import HowItWorks from './main/view-sections/HowItWorks.vue'
 import Profile from './main/view-sections/Profile.vue'
@@ -96,8 +96,6 @@ import { ACTION_TYPES } from '../util/constants'
 </script>
 
 <style>
-html {}
-
 body {
   margin: 0;
   width: 100%;

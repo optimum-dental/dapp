@@ -22,18 +22,42 @@
       </div>
       <div v-else>Your browser is not Web3-injected. To use the ODLL dApp, you can install <a href='https://metamask.io/'>Metamask</a>.</div>
     </div>
-    <div class="content">
-
-    </div>
+    <section class="content">
+      <div v-if="!user.hasCoinbase">
+        <GuestIntroduction :faqs="faqs"/>
+      </div>
+      <div v-else>
+      </div>
+    </section>
   </div>
 </template>
 
 <script type="text/javascript">
   export default {
     name: 'get-started',
-    data: () => {
+    components: {
+      GuestIntroduction
+    },
+    data: function () {
       return {
-        approvedNetworkName: NETWORKS[NETWORKS['ODLLBlockchainNetwork']]
+        approvedNetworkName: NETWORKS[NETWORKS['ODLLBlockchainNetwork']],
+        faqs: [
+          {
+            id: 1,
+            question: 'How do I get Ether Cryptocurrency?',
+            answer: ''
+          },
+          {
+            id: 2,
+            question: 'Why do I have to pay Ethereum gas fees?',
+            answer: ''
+          },
+          {
+            id: 3,
+            question: 'How can I find a dentist?',
+            answer: ''
+          }
+        ]
       }
     },
     computed: {
@@ -43,7 +67,8 @@
     }
   }
 
-  import { NETWORKS } from '../../../util/constants'
+  import { NETWORKS } from '../../../../util/constants'
+  import GuestIntroduction from './Guest.vue'
 </script>
 
 <style scoped>
@@ -62,6 +87,7 @@
     border: 1px solid #dcdede;
     color: #4d4c49;
     padding: 10px;
+    width: 100%;
     display: inline-block;
   }
 
@@ -69,7 +95,8 @@
     text-align: center;
     margin: auto;
     padding: 160px;
-    height: 800px;
+    padding-top: 20px;
+    min-height: 600px;
   }
 
   .message {
