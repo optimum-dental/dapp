@@ -62,6 +62,11 @@
     props: ['item', 'faqs'],
     components: {
       VideoTutorial
+    },
+    mounted: function () {
+      let contentElement = document.querySelector('#getstarted-guest-template').closest('.content')
+      contentElement.style.width = '100%'
+      contentElement.style.borderTop = 'none'
     }
   }
 

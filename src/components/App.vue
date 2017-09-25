@@ -99,6 +99,10 @@
 </script>
 
 <style>
+  html {
+    background: #eef0ef;
+  }
+
   body {
     margin: 0;
     width: 100%;

@@ -35,7 +35,7 @@
   }
 
   .menu-item .content {
-    height: 65px;
+    height: 50px;
     display: flex;
     flex-direction: column;
     cursor: pointer;
@@ -70,11 +70,11 @@
     display: inline-block;
     position: absolute;
     right: 0;
-    margin-top: 27px;
+    margin-top: 17px;
     width: 0;
     height: 0;
-    border-top: 10px solid transparent;
-    border-bottom: 10px solid transparent;
+    border-top: 7px solid transparent;
+    border-bottom: 7px solid transparent;
     border-right: 10px solid  #eef0ef;
   }
 

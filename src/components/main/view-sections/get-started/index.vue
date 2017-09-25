@@ -57,12 +57,7 @@
 
 <style scoped>
   #get-started {
-    width: 80%;
-    height: 100%;
-    min-height: 100vh;
-    position: relative;
-    left: 20%;
-    padding: 60px 50px 20px 50px;
+    padding: 20px 50px;
     background: #eef0ef;
   }
 

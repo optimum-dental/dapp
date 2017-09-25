@@ -12,12 +12,12 @@
 
 <style scoped>
   #header-template {
-    width: 80%;
+    min-width: 80%;
   }
 
   .sticky {
     position: fixed;
-    left: 20%;
+    left: 257px;
     top: 0px;
     height: 60px;
     background: #fff;

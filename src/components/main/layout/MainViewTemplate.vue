@@ -15,6 +15,12 @@
 
 <style scoped>
   .main-view-template {
-    width: 250px;
+    min-width: 80%;
+    position: absolute;
+    flex-direction: column;
+    display: flex;
+    justify-content: space-between;
+    left: 257px;
+    top: 60px;
   }
 </style>

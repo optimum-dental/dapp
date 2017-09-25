@@ -2,10 +2,8 @@
   <div id="sidebar-template" class="sticky sidebar">
     <div class="content">
       <section id='brand'>
-        <div class='image-wrap'>
-          <img class='image' src='/static/images/odll_title_icon.png'/>
-        </div>
-        <div class="footer">
+        <div class='image-wrap'></div>
+        <div class="brand-footer">
         </div>
       </section>
       <section id="menu">
@@ -36,46 +34,46 @@
 
 <style scoped>
   #sidebar-template {
-    width: 20%;
+    width: 257px;
     position: fixed;
+    height: 100%;
+    left: 0px;
+    top: 0px;
+    background: #3285b1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin-left: 0px;
+    margin-right: 0px;
+    height: 100%;
+  }
+
+  .content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
   }
 
   #brand {
     background-color: #282735;
-    flex: 0.3;
-    display: flex;
-    flex-direction: column;
     width: 100%;
-    align-items: center;
-    justify-content: space-between;
-    position: relative;
+    height: 257px;
   }
 
 
-  #brand .image-wrap{
+  #brand .image-wrap {
     box-sizing: border-box;
     display: block;
-    width: 100%;
-    text-align: center;
-    flex: 0.9;
-    margin: 20px auto;
-  }
-
-  #brand .image {
-    display: inline-block;
-    width: 100%;
-    height: 100%;
-    min-width: 70px;
-    max-width: 120px;
-    max-height: 150px;
-    min-height: 80px;
+    height: 201px;
+    width: 201px;
+    margin: 25px 28px ;
+    background: url('/static/images/odll_title_icon.png') no-repeat;
+    background-size: contain;
+    background-position-x: 21px;
   }
 
 
-  #brand .footer {
-    min-height: 7px;
-    max-height: 10px;
-    flex: 0.1;
+  #brand .brand-footer {
+    height: 7px;
     width: 100%;
     background-image: linear-gradient(
       to right,
@@ -100,29 +98,22 @@
 
   #menu {
     background-color: #3285b1;
-    flex: 0.63;
-  }
-
-  .content {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
+    width: 100%;
   }
 
   .footer {
-    flex: 0.07;
-    display: flex;
-    justify-content: space-between;
     background-color: #3285b1;
-    align-items: center;
+    width: 257px;
+    bottom: 0px;
+    position: fixed;
+    z-index: 666;
   }
 
   .social-links {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    flex: 0.35;
+    display: inline-block;
     margin-left: 10px;
+    margin-bottom: 10px;
+    float: left;
   }
 
   .social-links .item {
@@ -148,5 +139,6 @@
     vertical-align: middle;
     text-decoration: none;
     cursor: pointer;
+    float: right;
   }
 </style>

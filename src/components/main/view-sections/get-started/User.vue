@@ -104,8 +104,13 @@
       }
     },
     mounted: function () {
-      dateSelectionManager.loadDate()
-      document.querySelector('#user').closest('.content').style.borderTop = 'none'
+      dateSelectionManager.loadDate({
+        yearEndDigit: 2000,
+        yearStartDigit: 1920
+      })
+      let contentElement = document.querySelector('#user').closest('.content')
+      contentElement.style.width = '600px'
+      contentElement.style.borderTop = 'none'
       this.addAvatar()
       this.populateStates()
     },
@@ -124,15 +129,13 @@
   #user {
     background: #ffffff;
     min-height: 80vh;
-    /*width: 90vh;*/
+    width: 400px;
     font-size: 12px;
     margin: 30px auto;
     color: #adadad;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    padding: 50px 150px;
   }
 
   .title {
