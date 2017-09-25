@@ -2,7 +2,7 @@
   "name": "oral-data-link",
   "version": "1.0.0",
   "description": "Oral Data Link app",
-  "author": "Daniel Okwufulueze <daniel.okwufulueze@gmail.com>",
+  "author": "Oral Data Link LLC Dev Team",
   "private": true,
   "scripts": {
     "dev": "node build/dev-server.js",
@@ -14,7 +14,7 @@
     "lint": "eslint --ext .js,.vue src test/unit/specs test/e2e/specs"
   },
   "dependencies": {
-    "date-selection-manager": "^4.0.0",
+    "date-selection-manager": "^5.2.0",
     "ethereum-blockies": "^0.1.1",
     "vue": "^2.4.2",
     "vue-router": "^2.7.0",
