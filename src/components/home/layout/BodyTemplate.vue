@@ -1,9 +1,9 @@
 <template>
   <div id="body-template">
     <Intro />
-    <About />
-    <Appointment />
-    <Scan />
+    <About :within-the-blockchain-vector="withinTheBlockchainVector" />
+    <Appointment :book-appointment-vector="bookAppointmentVector" />
+    <Scan :scan-appointment-vector="scanAppointmentVector" />
     <Why />
     <HowItWorks />
     <UseApp />
@@ -21,7 +21,19 @@ export default {
     Why,
     HowItWorks,
     UseApp
-  }
+  },
+  computed: {
+    bookAppointmentVector () {
+      return this.vectors.bookAppointmentVector
+    },
+    scanAppointmentVector () {
+      return this.vectors.scanAppointmentVector
+    },
+    withinTheBlockchainVector () {
+      return this.vectors.withinTheBlockchainVector
+    }
+  },
+  props: [ 'vectors' ]
 }
 
 import Intro from '../sections/Intro'

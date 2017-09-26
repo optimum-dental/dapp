@@ -1,7 +1,7 @@
 <template>
   <div id="home" :current-view="currentView">
     <HeaderTemplate />
-    <BodyTemplate />
+    <BodyTemplate :vectors="vectors" />
     <FooterTemplate />
   </div>
 </template>
@@ -16,8 +16,8 @@ export default {
     FooterTemplate
   },
   computed: {
-    user () {
-      return this.$store.state.user
+    vectors () {
+      return vectorStyle
     }
   }
 }
@@ -25,6 +25,7 @@ export default {
 import HeaderTemplate from './layout/HeaderTemplate'
 import BodyTemplate from './layout/BodyTemplate'
 import FooterTemplate from './layout/FooterTemplate'
+import vectorStyle from '../../../static/js/vectorAnimation.js'
 </script>
 
 <style scoped>

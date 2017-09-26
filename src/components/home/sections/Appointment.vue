@@ -9,14 +9,19 @@
           ODL connects you with the best dentists around you. No more office waiting rooms.
         </div>
       </div>
-      <div class="appointment-image"></div>
+      <div class="appointment-image" id="appointment-image"></div>
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'appointment'
+  name: 'appointment',
+  props: [ 'bookAppointmentVector' ],
+  mounted: function () {
+    const appointmentImage = document.getElementById('appointment-image')
+    appointmentImage.appendChild(new DOMParser().parseFromString(this.bookAppointmentVector, 'text/html').body.firstChild)
+  }
 }
 </script>
 
@@ -63,7 +68,5 @@ export default {
   height: 300px;
   width: 300px;
   margin: 174px 0px 0px 70px;
-  background: url('/static/images/bookAppointment.png') no-repeat;
-  background-size: contain;
 }
 </style>

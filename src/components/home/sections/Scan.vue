@@ -1,7 +1,7 @@
 <template>
   <div id="scan">
     <div class="content">
-      <div class="scan-image"></div>
+      <div class="scan-image" id="scan-image"></div>
       <div class="scan-content">
         <div class="title">
           Schedule a quick scan consultation with a doctor of your choice<br>
@@ -22,7 +22,12 @@
 
 <script>
 export default {
-  name: 'scan'
+  name: 'scan',
+  props: [ 'scanAppointmentVector' ],
+  mounted: function () {
+    const scanImage = document.getElementById('scan-image')
+    scanImage.appendChild(new DOMParser().parseFromString(this.scanAppointmentVector, 'text/html').body.firstChild)
+  }
 }
 </script>
 
@@ -48,8 +53,6 @@ export default {
   height: 300px;
   width: 300px;
   margin-top: 174px;
-  background: url('/static/images/scanAppointment.png') no-repeat;
-  background-size: contain;
 }
 
 .scan-content {

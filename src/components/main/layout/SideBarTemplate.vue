@@ -2,7 +2,7 @@
   <div id="sidebar-template" class="sticky sidebar">
     <div class="content">
       <section id='brand'>
-        <div class='image-wrap'></div>
+        <router-link to="/" class='image-wrap'></router-link>
         <div class="brand-footer">
         </div>
       </section>

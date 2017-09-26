@@ -1,7 +1,7 @@
 <template>
   <div id="about">
     <div class="content">
-      <div class="about-image"></div>
+      <div class="about-image" id="about-image"></div>
       <div class="about-content">
         <div class="title">
           Dentistry for the modern world!
@@ -16,7 +16,12 @@
 
 <script>
 export default {
-  name: 'about'
+  name: 'about',
+  props: [ 'withinTheBlockchainVector' ],
+  mounted: function () {
+    const aboutImage = document.getElementById('about-image')
+    aboutImage.appendChild(new DOMParser().parseFromString(this.withinTheBlockchainVector, 'text/html').body.firstChild)
+  }
 }
 </script>
 
@@ -42,8 +47,6 @@ export default {
   height: 300px;
   width: 300px;
   margin-top: 174px;
-  background: url('/static/images/withinBlockChain.png') no-repeat;
-  background-size: contain;
 }
 
 .about-content {
