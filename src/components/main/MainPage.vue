@@ -1,7 +1,7 @@
 <template>
   <div class="main-page">
     <SideBarTemplate :set-current-view='setCurrentView'/>
-    <HeaderTemplate />
+    <HeaderTemplate :user="user" />
     <MainViewTemplate
       :avatar-canvas="avatarCanvas"
       :current-view='currentView'

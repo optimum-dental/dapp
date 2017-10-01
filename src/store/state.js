@@ -32,7 +32,8 @@ export default {
     hasWeb3InjectedBrowser: false,
     hasCoinbase: false,
     isConnectedToODLLNetwork: false,
-    isValid: false
+    isValid: false,
+    coinbase: null
   },
 
   currentView: 'gettingStarted'

@@ -93,11 +93,13 @@ export default {
   [MUTATION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS] (state) {
     const hasWeb3InjectedBrowser = state.web3.isInjected
     const hasCoinbase = !!(state.web3.coinbase && state.web3.coinbase !== '')
+    const coinbase = state.web3.coinbase
     const isConnectedToODLLNetwork = !!(state.web3.networkId && state.web3.networkId !== '' && state.web3.networkId === APPROVED_BLOCKCHAIN_NETWORK_ID)
     const web3Status = {
       hasWeb3InjectedBrowser,
       hasCoinbase,
-      isConnectedToODLLNetwork
+      isConnectedToODLLNetwork,
+      coinbase
     }
 
     if (hasWeb3InjectedBrowser && hasCoinbase && isConnectedToODLLNetwork) {
