@@ -2,55 +2,93 @@
   <div id="user">
     <div class="title">Register as Patient</div>
     <div class="field">
-      <label for="name" class="field-key">Your Name</label>
-      <input type="text" class="field-value has-tip" id="name" v-model="user.fullName" placeholder="First Name   Last Name" @input="displayLabel">
+      <label for="name" class="field-key">Last Name   First Name   Middle Name</label>
+      <input type="text" class="field-value has-tip" id="name" placeholder="Last Name   First Name   Middle Name" @input="displayLabel" data-name="fullName">
       <div class="tip">Write between 5 to 32 characters</div>
     </div>
 
     <div class="field">
       <label for="email" class="field-key">Your Email</label>
-      <input type="email" class="field-value has-tip" id="email" v-model="user.email" placeholder="Your Email" @input="displayLabel">
+      <input type="email" class="field-value has-tip" id="email" placeholder="Your Email" @input="displayLabel" @blur="setAvatar" data-name="email">
       <div class="tip">Write between 5 to 32 characters</div>
     </div>
 
     <div class="field avatar"></div>
 
     <div class="field">
-      <label for="state" class="field-key">State</label>
-      <select id='state' class="field-value" @input="displayLabel"><option value=''>State</option></select>
+      <label for="street" class="field-key">Street</label>
+      <input type="text" class="field-value has-tip" id="street" placeholder="Street" @input="displayLabel" data-name="street">
+      <div class="tip">Write between 5 to 32 characters</div>
+    </div>
+
+
+    <div class="field">
+      <label for="city" class="field-key">City</label>
+      <input type="text" class="field-value" id="city" placeholder="City" @input="displayLabel" data-name="city">
     </div>
 
     <div class="field">
-      <label for="residential-address" class="field-key">Residential Address</label>
-      <input type="text" class="field-value has-tip" id="residential-address" v-model="user.residentialAddress" placeholder="Residential Address" @input="displayLabel">
+      <label for="state" class="field-key">State</label>
+      <select id='state' class="field-value" @input="displayLabel" data-name="state"><option value=''>State</option></select>
+    </div>
+
+    <div class="field">
+      <label for="zip-code" class="field-key">Zip Code</label>
+      <input type="text" class="field-value has-tip" id="zip-code" placeholder="Zip Code" @input="displayLabel" data-name="zipCode">
       <div class="tip">Write between 5 to 32 characters</div>
     </div>
 
     <div class="field">
-      <label for="phone-number" class="field-key">Phone Number</label>
-      <input type="text" class="field-value" id="phone-number" v-model="user.phoneNumber" placeholder="Phone Number" @input="displayLabel">
+      <label for="country" class="field-key">Country</label>
+      <select id='country' class="field-value" @input="displayLabel" data-name="country"><option value=''>Country</option></select>
     </div>
 
     <div class="field">
-      <label class="field-key date-of-birth">Birthday</label>
+      <label for="phone-number" class="field-key">Phone Number</label>
+      <input type="text" class="field-value" id="phone-number" placeholder="Phone Number" @input="displayLabel" data-name="phoneNumber">
+    </div>
+
+    <div class="field">
+      <label class="field-key show">Social Security Number</label>
+      <input type="text" id='area-number' data-next="group-number" class="field-value special social-security-number" maxlength="3" size="3" required placeholder="XXX" @input="decideIfNext" data-name="areaNumber"><span class="hyphen"></span>
+      <input type="text" id='group-number' data-next="sequence-number" class="field-value special social-security-number" maxlength="2" size="2" required placeholder="XX" @input="decideIfNext" data-name="groupNumber"><span class="hyphen"></span>
+      <input type="text" id='sequence-number' class="field-value special social-security-number" maxlength="4" size="4" required placeholder="XXXX" @input="decideIfNext" data-name="sequenceNumber">
+    </div>
+
+    <div class="field">
+      <label class="field-key show">Birthday</label>
       <div class='date-holder'>
-        <select id='day'><option value=''>Day</option></select>
-        <select id='month'><option value=''>Month</option></select>
-        <select id='year'><option value=''>Year</option></select>
+        <select id='day' data-name="day"><option value=''>Day</option></select>
+        <select id='month' data-name="month"><option value=''>Month</option></select>
+        <select id='year' data-name="year"><option value=''>Year</option></select>
       </div>
     </div>
 
     <div class="field">
       <label class="field-key">Gender</label>
-      <input type="checkbox" class="field-value gender" name="gender" id="female" value="Female" @click="resetCheckeBoxValues"><label for="female" class="side-key">Female</label>
-      <input type="checkbox" class="field-value gender" name="gender" id="male" value="Male" @click="resetCheckeBoxValues"><label for="male" class="side-key">Male</label>
-      <input type="checkbox" class="field-value gender" name="gender" id="others" value="Others" @click="resetCheckeBoxValues"><label for="others" class="side-key">Others</label>
+      <input type="checkbox" class="field-value gender" name="gender" id="female" value="1" @click="resetCheckeBoxValues" :checked="user.gender === '1'"><label for="female" class="side-key">Female</label>
+      <input type="checkbox" class="field-value gender" name="gender" id="male" value="2" @click="resetCheckeBoxValues" :checked="user.gender === '2'"><label for="male" class="side-key">Male</label>
+      <input type="checkbox" class="field-value gender" name="gender" id="others" value="3" @click="resetCheckeBoxValues" :checked="user.gender === '3'"><label for="others" class="side-key">Others</label>
+    </div>
+
+    <div class="field">
+      <input type="button" class='submit-button' value="Register">
     </div>
   </div>
 </template>
 
 <script>
   export default {
+    computed: {
+      socialSecurityNumber () {
+        const areaNumber = this.user.areaNumber
+        const groupNumber = this.user.groupNumber
+        const sequenceNumber = this.user.sequenceNumber
+        if (areaNumber && groupNumber && sequenceNumber) {
+          return `${areaNumber}-${groupNumber}-${sequenceNumber}`
+        }
+      }
+    },
     props: [ 'avatarCanvas', 'user' ],
     name: 'user',
     methods: {
@@ -61,29 +99,68 @@
           if (checkBox.id !== id) checkBox.checked = false
         })
       },
-      addAvatar () {
-        const avatarCanvas = this.avatarCanvas
-        const avatarContainer = document.querySelector('.avatar')
-        if (avatarContainer && avatarCanvas && avatarCanvas.style) {
-          avatarCanvas.style.borderRadius = '104px'
-          avatarCanvas.style.marginTop = '3px'
-          avatarContainer.appendChild(avatarCanvas)
+      setAvatar (evt = null) {
+        if (evt) {
+          const email = evt.target.value.trim()
+          this.$emit('updateAvatarCanvas', email)
+        } else {
+          const avatarCanvas = this.avatarCanvas
+          this.styleAndAddAvatarCanvasToPage(avatarCanvas)
         }
       },
-      populateStates () {
-        Object.keys(states).forEach((id) => {
-          const stateName = states[id]
+      styleAvatarCanvas (avatarCanvas) {
+        if (avatarCanvas && avatarCanvas.style) {
+          avatarCanvas.style.borderRadius = '104px'
+          avatarCanvas.style.marginTop = '3px'
+        }
+      },
+      addAvatarCanvasToPage (avatarCanvas) {
+        const avatarContainer = document.querySelector('.avatar')
+        if (avatarContainer && avatarCanvas && avatarCanvas.style) {
+          const formerCanvas = avatarContainer.querySelector('canvas')
+          if (formerCanvas) {
+            avatarContainer.replaceChild(avatarCanvas, formerCanvas)
+          } else {
+            avatarContainer.appendChild(avatarCanvas)
+          }
+        }
+      },
+      styleAndAddAvatarCanvasToPage (avatarCanvas) {
+        this.styleAvatarCanvas(avatarCanvas)
+        this.addAvatarCanvasToPage(avatarCanvas)
+      },
+      populateCountries () {
+        const countriesElement = document.getElementById('country')
+        countries.forEach((country) => {
           const optionElement = document.createElement('option')
-          optionElement.text = stateName
-          optionElement.value = id
-          const statesElement = document.getElementById('state')
+          optionElement.text = country.name
+          optionElement.value = country.code
+          if (countriesElement) {
+            countriesElement.appendChild(optionElement)
+            if (this.user.country === country.code) {
+              optionElement.selected = true
+            }
+          }
+        })
+
+        this.setEventListeners()
+      },
+      populateStates () {
+        const statesElement = document.getElementById('state')
+        states.forEach((state) => {
+          const optionElement = document.createElement('option')
+          optionElement.text = state.name
+          optionElement.value = state.code
           if (statesElement) {
             statesElement.appendChild(optionElement)
+            if (this.user.state === state.code) {
+              optionElement.selected = true
+            }
           }
         })
       },
-      displayLabel (evt) {
-        const target = evt.target
+      displayLabel (evt, target = null) {
+        target = target || evt.target
         const id = target.id
         document.querySelector(`label[for=${id}]`).style.display = target.value === '' ? 'none' : 'block'
         if (target.classList.contains('has-tip')) this.warnOfInputLength(target)
@@ -101,28 +178,76 @@
         }
 
         tip && tip.classList && entryValue !== '' && (entryValue.length < 5 || entryValue.length > 32) ? tip.classList.add('error') : tip.classList.remove('error')
+      },
+      setEventListeners () {
+        const countriesElement = document.getElementById('country')
+        if (countriesElement) {
+          const _this = this
+          countriesElement.addEventListener('change', function () {
+            const phoneNumberElement = document.getElementById('phone-number')
+            if (phoneNumberElement) {
+              console.log(`${countries.find((country) => country.code === this.options[this.selectedIndex].value).dial}`)
+              phoneNumberElement.value = `${countries.find((country) => country.code === this.options[this.selectedIndex].value).dial} `
+              _this.displayLabel(null, phoneNumberElement)
+              phoneNumberElement.focus()
+            }
+          })
+        }
+      },
+      decideIfNext (evt) {
+        const target = evt.target
+        const entry = target.value.trim()
+        if (isNaN(entry)) {
+          target.value = ''
+        } else {
+          if (target.value.trim().length === target.maxLength) {
+            if (!validateFor(target.id, entry)) {
+              target.value = ''
+            } else {
+              const nextInput = document.getElementById(target.dataset.next)
+              if (nextInput) {
+                nextInput.focus()
+              }
+            }
+          }
+        }
+      },
+      populateOtherInputs () {
+        const elements = [ document.getElementById('name'), document.getElementById('email'), document.getElementById('street'), document.getElementById('city'), document.getElementById('zip-code'), document.getElementById('phone-number'), document.getElementById('area-number'), document.getElementById('group-number'), document.getElementById('sequence-number') ]
+        elements.forEach((element) => {
+          if (element) {
+            element.value = this.user[element.dataset.name]
+          }
+        })
       }
     },
     mounted: function () {
       dateSelectionManager.loadDate({
         yearEndDigit: 2000,
-        yearStartDigit: 1920
+        yearStartDigit: 1920,
+        dayDefaultValue: this.user.day,
+        monthDefaultValue: this.user.month,
+        yearDefaultValue: this.user.year
       })
       let contentElement = document.querySelector('#user').closest('.content')
       contentElement.style.width = '600px'
       contentElement.style.borderTop = 'none'
-      this.addAvatar()
+      this.setAvatar()
+      this.populateCountries()
       this.populateStates()
+      this.populateOtherInputs()
     },
     watch: {
       avatarCanvas () {
-        this.addAvatar()
+        this.setAvatar()
       }
     }
   }
 
   import dateSelectionManager from 'date-selection-manager'
-  import states from '../../../../../static/json/states/states_hash.json'
+  import { validateFor } from '../../../../util/ssnValidator'
+  import countries from '../../../../../static/json/countries/countries.json'
+  import states from '../../../../../static/json/states/states.json'
 </script>
 
 <style scoped>
@@ -152,13 +277,20 @@
     width: 100%;
   }
 
-  .field-key:not(.date-of-birth) {
+  .field-key {
     height: 20px;
+    display: block;
+  }
+
+  .field-key:not(.show) {
     display: none;
   }
 
   .field-value {
     height: 30px;
+  }
+
+  .field-value:not(.special) {
     width: 100%;
   }
 
@@ -213,5 +345,27 @@
 
   input:not(:placeholder-shown):not(:focus):invalid {
     border-bottom: 2px solid #f18787;
+  }
+
+  .hyphen {
+    display: inline-block;
+  }
+
+  .hyphen:after {
+    content: '-'
+  }
+
+  .social-security-number {
+    text-align: center;
+  }
+
+  .submit-button {
+    background: #adcddf;
+    color: #ffffff;
+    height: 30px;
+    width: 100px;
+    float: right;
+    outline: 0px;
+    border: 0px;
   }
 </style>

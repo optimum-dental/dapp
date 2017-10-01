@@ -2,14 +2,21 @@
   <component class="main-view-template"
     :is="currentView"
     :avatar-canvas="avatarCanvas"
-    :user="user">
+    :user="user"
+    @updateAvatarCanvas="updateAvatarCanvas"
+  >
   </component>
 </template>
 
 <script type="text/javascript">
   export default {
     name: 'main-view-template',
-    props: [ 'avatarCanvas', 'currentView', 'user' ]
+    props: [ 'avatarCanvas', 'currentView', 'user' ],
+    methods: {
+      updateAvatarCanvas (email = '') {
+        this.$emit('updateAvatarCanvas', email)
+      }
+    }
   }
 </script>
 

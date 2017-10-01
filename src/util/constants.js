@@ -7,13 +7,14 @@ export const NETWORKS = {
   '765': 'DanielNet test network'
 }
 
-export const APPROVED_BLOCKCHAIN_NETWORK_ID = '1'
+export const APPROVED_BLOCKCHAIN_NETWORK_ID = '765'
 
 export const MUTATION_TYPES = {
   CHANGE_CURRENT_ROUTE_TO: 'changeCurrentRouteTo',
   REGISTER_WEB3_INSTANCE: 'registerWeb3Instance',
   UPDATE_USER_BLOCKCHAIN_STATUS: 'updateUserBlockchainStatus',
-  UPDATE_CURRENT_VIEW: 'updateCurrentView'
+  UPDATE_CURRENT_VIEW: 'updateCurrentView',
+  UPDATE_USER_AVATAR_CANVAS: 'updateUserAvatarCanvas'
 }
 
 export const ACTION_TYPES = MUTATION_TYPES

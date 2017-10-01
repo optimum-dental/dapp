@@ -5,6 +5,7 @@
       :user="user"
       :avatar-canvas="avatarCanvas"
       :set-current-view="setCurrentView"
+      @updateAvatarCanvas="updateAvatarCanvas"
     >
     </router-view>
   </div>
@@ -28,7 +29,7 @@
         this.$store.dispatch(ACTION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS)
       })
       .catch((result) => {
-        console.log("We've encountered problems with your Web3 connection")
+        console.log(result, "We've encountered problems with your Web3 connection")
       })
     },
     components: {
@@ -68,10 +69,14 @@
       ...mapActions([
         ACTION_TYPES.CHANGE_CURRENT_ROUTE_TO,
         ACTION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS,
-        ACTION_TYPES.UPDATE_CURRENT_VIEW
+        ACTION_TYPES.UPDATE_CURRENT_VIEW,
+        ACTION_TYPES.UPDATE_USER_AVATAR_CANVAS
       ]),
       setCurrentView (currentView) {
         this[ACTION_TYPES.UPDATE_CURRENT_VIEW](currentView)
+      },
+      updateAvatarCanvas (email) {
+        this[ACTION_TYPES.UPDATE_USER_AVATAR_CANVAS](email)
       }
     },
     watch: {

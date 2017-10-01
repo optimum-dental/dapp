@@ -6,6 +6,7 @@
       :avatar-canvas="avatarCanvas"
       :current-view='currentView'
       :user="user"
+      @updateAvatarCanvas="updateAvatarCanvas"
     />
   </div>
 </template>
@@ -18,6 +19,11 @@
       HeaderTemplate,
       MainViewTemplate,
       SideBarTemplate
+    },
+    methods: {
+      updateAvatarCanvas (email = '') {
+        this.$emit('updateAvatarCanvas', email)
+      }
     }
   }
 

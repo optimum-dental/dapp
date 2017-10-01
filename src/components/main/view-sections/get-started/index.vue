@@ -5,6 +5,7 @@
         <user
           :avatar-canvas="avatarCanvas"
           :user="user"
+          @updateAvatarCanvas="updateAvatarCanvas"
         />
       </div>
 
@@ -45,6 +46,11 @@
             answer: ''
           }
         ]
+      }
+    },
+    methods: {
+      updateAvatarCanvas (email = '') {
+        this.$emit('updateAvatarCanvas', email)
       }
     },
     props: [ 'avatarCanvas', 'setCurrentView', 'user' ]

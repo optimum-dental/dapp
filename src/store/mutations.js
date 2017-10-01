@@ -1,14 +1,24 @@
 import ethereumBlockies from 'ethereum-blockies'
+import { avatarCanvasElement } from '../util/DOMManipulator'
 import { MUTATION_TYPES, APPROVED_BLOCKCHAIN_NETWORK_ID, IDENTICON_COLORS } from '../util/constants'
 
-function resetUser (state) {
+function resetUser (state, web3Status) {
   const user = {
-    firstName: '',
-    lastName: '',
-    fullName: '',
     email: '',
+    lastName: '',
+    firstName: '',
+    middleName: '',
+    fullName: '',
+    street: '',
+    city: '',
+    state: '',
+    zipCode: '',
+    country: '',
     phoneNumber: '',
-    residentialAddress: '',
+    socialSecurityNumber: '',
+    areaNumber: '',
+    groupNumber: '',
+    sequenceNumber: '',
     day: '',
     month: '',
     year: '',
@@ -17,6 +27,7 @@ function resetUser (state) {
     isValid: false
   }
 
+  Object.assign(user, web3Status)
   state.user = user
 }
 
@@ -35,6 +46,35 @@ function getHash (stringValue) {
   return hash
 }
 
+function updateUserAvatarCanvas (state, userCopy, email = '') {
+  const colorPosition = Math.abs(getHash(state.web3.coinbase) % IDENTICON_COLORS.length)
+  const identiconColor = IDENTICON_COLORS[colorPosition]
+
+  if (email && email.trim() !== '') {
+    avatarCanvasElement(email)
+    .then((avatarCanvas) => {
+      Object.assign(userCopy, {
+        avatarCanvas
+      })
+
+      state.user = userCopy
+    })
+  } else {
+    Object.assign(userCopy, {
+      avatarCanvas: ethereumBlockies.create({
+        seed: state.web3.coinbase,
+        color: identiconColor.color,
+        bgcolor: identiconColor.bgColor,
+        size: 8,
+        scale: 13,
+        spotcolor: identiconColor.spotColor
+      })
+    })
+
+    state.user = userCopy
+  }
+}
+
 export default {
   [MUTATION_TYPES.REGISTER_WEB3_INSTANCE] (state, payload) {
     const result = payload.result
@@ -48,42 +88,38 @@ export default {
 
     state.web3 = web3Copy
 
-    if (payload.callback) payload.callback(result)
+    if (payload.callback) payload.callback(state)
   },
   [MUTATION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS] (state) {
     const hasWeb3InjectedBrowser = state.web3.isInjected
     const hasCoinbase = !!(state.web3.coinbase && state.web3.coinbase !== '')
     const isConnectedToODLLNetwork = !!(state.web3.networkId && state.web3.networkId !== '' && state.web3.networkId === APPROVED_BLOCKCHAIN_NETWORK_ID)
+    const web3Status = {
+      hasWeb3InjectedBrowser,
+      hasCoinbase,
+      isConnectedToODLLNetwork
+    }
+
     if (hasWeb3InjectedBrowser && hasCoinbase && isConnectedToODLLNetwork) {
       const userCopy = state.user
-      const colorPosition = Math.abs(getHash(state.web3.coinbase) % IDENTICON_COLORS.length)
-      const identiconColor = IDENTICON_COLORS[colorPosition]
 
-      Object.assign(userCopy, {
-        hasWeb3InjectedBrowser,
-        hasCoinbase,
-        isConnectedToODLLNetwork,
-        isValid: true,
-        avatarCanvas: ethereumBlockies.create({
-          seed: state.web3.coinbase,
-          color: identiconColor.color,
-          bgcolor: identiconColor.bgColor,
-          size: 8,
-          scale: 13,
-          spotcolor: identiconColor.spotColor
-        })
+      Object.assign(userCopy, web3Status, {
+        isValid: true
       })
 
-      state.user = userCopy
+      updateUserAvatarCanvas(state, userCopy, userCopy.email)
     } else {
-      resetUser(state)
+      resetUser(state, web3Status)
     }
   },
   [MUTATION_TYPES.CHANGE_CURRENT_ROUTE_TO] (state, newRoute) {
     state.currentRoute = newRoute
   },
-
   [MUTATION_TYPES.UPDATE_CURRENT_VIEW] (state, newView) {
     state.currentView = newView
+  },
+  [MUTATION_TYPES.UPDATE_USER_AVATAR_CANVAS] (state, email) {
+    const userCopy = state.user
+    updateUserAvatarCanvas(state, userCopy, email)
   }
 }
