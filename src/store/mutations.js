@@ -84,11 +84,11 @@ export default {
     const result = payload.result
     const web3Copy = state.web3
     web3Copy.instance = () => result.web3
-    web3Copy.address = result.address
-    web3Copy.coinbase = result.coinbase
-    web3Copy.networkId = result.networkId
-    web3Copy.error = result.web3Error
-    web3Copy.isInjected = result.hasInjectedWeb3
+    web3Copy.address = result.address ? result.address : web3Copy.address
+    web3Copy.coinbase = result.coinbase ? result.coinbase : web3Copy.coinbase
+    web3Copy.networkId = result.networkId ? result.networkId : web3Copy.networkId
+    web3Copy.error = result.web3Error ? result.web3Error : web3Copy.error
+    web3Copy.isInjected = result.hasInjectedWeb3 ? result.hasInjectedWeb3 : web3Copy.isInjected
 
     state.web3 = web3Copy
 

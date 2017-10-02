@@ -17,20 +17,18 @@ export default {
         })
       })
       .catch((e) => {
-        if (e.result) {
-          const result = e.result
-          commit(MUTATION_TYPES.REGISTER_WEB3_INSTANCE, {
-            result: {
-              web3: (result.hasInjectedWeb3 ? () => result.web3 : null),
-              hasInjectedWeb3: (result.hasInjectedWeb3 ? result.hasInjectedWeb3 : false),
-              web3Error: e.err
-            },
-            callback: (state) => {
-              monitorWeb3(state)
-              resolve(result)
-            }
-          })
-        }
+        const result = e.result
+        commit(MUTATION_TYPES.REGISTER_WEB3_INSTANCE, {
+          result: {
+            web3: (result && result.hasInjectedWeb3 ? () => result.web3 : null),
+            hasInjectedWeb3: (result && result.hasInjectedWeb3 ? result.hasInjectedWeb3 : false),
+            web3Error: e.err
+          },
+          callback: (state) => {
+            monitorWeb3(state)
+            resolve(result)
+          }
+        })
       })
     })
   },
