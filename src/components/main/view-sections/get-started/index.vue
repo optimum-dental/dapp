@@ -1,20 +1,23 @@
 <template>
   <div id="get-started">
     <section class="content">
-      <div v-if="user && user.isValid">
-        <user
-          :avatar-canvas="avatarCanvas"
-          :user="user"
-          @updateAvatarCanvas="updateAvatarCanvas"
-        />
+      <div v-if="isDAppReady">
+        <div v-if="user && user.isValid">
+          <user
+            :avatar-canvas="avatarCanvas"
+            :user="user"
+            @updateAvatarCanvas="updateAvatarCanvas"
+          />
+        </div>
+
+        <div v-else>
+          <guest-introduction
+            :set-current-view="setCurrentView"
+          />
+        </div>
       </div>
 
-      <div v-else>
-        <GuestIntroduction
-          :faqs="faqs"
-          :set-current-view="setCurrentView"
-        />
-      </div>
+      <div v-else></div>
     </section>
   </div>
 </template>
@@ -26,37 +29,14 @@
       User,
       GuestIntroduction
     },
-    data: function () {
-      return {
-        approvedNetworkName: NETWORKS[APPROVED_BLOCKCHAIN_NETWORK_ID],
-        faqs: [
-          {
-            id: 1,
-            question: 'How do I get Ether Cryptocurrency?',
-            answer: ''
-          },
-          {
-            id: 2,
-            question: 'Why do I have to pay Ethereum gas fees?',
-            answer: ''
-          },
-          {
-            id: 3,
-            question: 'How can I find a dentist?',
-            answer: ''
-          }
-        ]
-      }
-    },
     methods: {
-      updateAvatarCanvas (email = '') {
-        this.$emit('updateAvatarCanvas', email)
+      updateAvatarCanvas (payload = null) {
+        this.$emit('updateAvatarCanvas', payload)
       }
     },
-    props: [ 'avatarCanvas', 'setCurrentView', 'user' ]
+    props: [ 'avatarCanvas', 'setCurrentView', 'user', 'isDAppReady' ]
   }
 
-  import { NETWORKS, APPROVED_BLOCKCHAIN_NETWORK_ID } from '../../../../util/constants'
   import User from './User.vue'
   import GuestIntroduction from './Guest.vue'
 </script>

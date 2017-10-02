@@ -46,32 +46,36 @@ function getHash (stringValue) {
   return hash
 }
 
-function updateUserAvatarCanvas (state, userCopy, email = '') {
+function assignPropertyTo (hashObject, key, value) {
+  Object.assign(hashObject, {
+    [key]: value
+  })
+}
+
+function updateUserAvatarCanvas (state, userCopy, payload = null) {
   const colorPosition = Math.abs(getHash(state.web3.coinbase) % IDENTICON_COLORS.length)
   const identiconColor = IDENTICON_COLORS[colorPosition]
+  const email = payload && payload.email ? payload.email : ''
 
   if (email && email.trim() !== '') {
     avatarCanvasElement(email)
     .then((avatarCanvas) => {
-      Object.assign(userCopy, {
-        avatarCanvas
-      })
-
+      assignPropertyTo(userCopy, 'avatarCanvas', avatarCanvas)
       state.user = userCopy
+      if (payload.callback) payload.callback(avatarCanvas)
     })
   } else {
-    Object.assign(userCopy, {
-      avatarCanvas: ethereumBlockies.create({
-        seed: state.web3.coinbase,
-        color: identiconColor.color,
-        bgcolor: identiconColor.bgColor,
-        size: 8,
-        scale: 13,
-        spotcolor: identiconColor.spotColor
-      })
+    const avatarCanvas = ethereumBlockies.create({
+      seed: state.web3.coinbase,
+      color: identiconColor.color,
+      bgcolor: identiconColor.bgColor,
+      size: 8,
+      scale: 13,
+      spotcolor: identiconColor.spotColor
     })
-
+    assignPropertyTo(userCopy, 'avatarCanvas', avatarCanvas)
     state.user = userCopy
+    if (payload.callback) payload.callback(avatarCanvas)
   }
 }
 
@@ -109,7 +113,7 @@ export default {
         isValid: true
       })
 
-      updateUserAvatarCanvas(state, userCopy, userCopy.email)
+      state.user = userCopy
     } else {
       resetUser(state, web3Status)
     }
@@ -120,8 +124,11 @@ export default {
   [MUTATION_TYPES.UPDATE_CURRENT_VIEW] (state, newView) {
     state.currentView = newView
   },
-  [MUTATION_TYPES.UPDATE_USER_AVATAR_CANVAS] (state, email) {
+  [MUTATION_TYPES.UPDATE_USER_AVATAR_CANVAS] (state, payload) {
     const userCopy = state.user
-    updateUserAvatarCanvas(state, userCopy, email)
+    updateUserAvatarCanvas(state, userCopy, payload)
+  },
+  [MUTATION_TYPES.UPDATE_DAPP_READINESS] (state, isReady) {
+    state.isDAppReady = isReady
   }
 }

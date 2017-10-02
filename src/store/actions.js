@@ -43,7 +43,10 @@ export default {
   [ACTION_TYPES.UPDATE_CURRENT_VIEW] ({ commit }, newView) {
     commit(MUTATION_TYPES.UPDATE_CURRENT_VIEW, newView)
   },
-  [ACTION_TYPES.UPDATE_USER_AVATAR_CANVAS] ({ commit }, email) {
-    commit(MUTATION_TYPES.UPDATE_USER_AVATAR_CANVAS, email)
+  [ACTION_TYPES.UPDATE_USER_AVATAR_CANVAS] ({ commit }, payload) {
+    commit(MUTATION_TYPES.UPDATE_USER_AVATAR_CANVAS, payload)
+  },
+  [ACTION_TYPES.UPDATE_DAPP_READINESS] ({ commit }, isReady) {
+    commit(MUTATION_TYPES.UPDATE_DAPP_READINESS, isReady)
   }
 }

@@ -6,6 +6,7 @@
       :avatar-canvas="avatarCanvas"
       :current-view='currentView'
       :user="user"
+      :is-d-app-ready="isDAppReady"
       @updateAvatarCanvas="updateAvatarCanvas"
     />
   </div>
@@ -14,15 +15,15 @@
 <script>
   export default {
     name: 'main-page',
-    props: ['avatarCanvas', 'currentView', 'setCurrentView', 'user'],
+    props: [ 'avatarCanvas', 'currentView', 'setCurrentView', 'user', 'isDAppReady' ],
     components: {
       HeaderTemplate,
       MainViewTemplate,
       SideBarTemplate
     },
     methods: {
-      updateAvatarCanvas (email = '') {
-        this.$emit('updateAvatarCanvas', email)
+      updateAvatarCanvas (payload = null) {
+        this.$emit('updateAvatarCanvas', payload)
       }
     }
   }

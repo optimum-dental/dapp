@@ -22,7 +22,7 @@
       }
     },
     name: 'header-template',
-    props: [ 'user' ]
+    props: [ 'user', 'isDAppReady' ]
   }
 
   import { truncate } from '../../../util/StringManager'

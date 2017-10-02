@@ -3,6 +3,7 @@
     :is="currentView"
     :avatar-canvas="avatarCanvas"
     :user="user"
+    :is-d-app-ready="isDAppReady"
     @updateAvatarCanvas="updateAvatarCanvas"
   >
   </component>
@@ -11,10 +12,10 @@
 <script type="text/javascript">
   export default {
     name: 'main-view-template',
-    props: [ 'avatarCanvas', 'currentView', 'user' ],
+    props: [ 'avatarCanvas', 'currentView', 'user', 'isDAppReady' ],
     methods: {
-      updateAvatarCanvas (email = '') {
-        this.$emit('updateAvatarCanvas', email)
+      updateAvatarCanvas (payload = null) {
+        this.$emit('updateAvatarCanvas', payload)
       }
     }
   }

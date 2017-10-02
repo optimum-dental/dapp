@@ -5,6 +5,7 @@
       :user="user"
       :avatar-canvas="avatarCanvas"
       :set-current-view="setCurrentView"
+      :is-d-app-ready="isDAppReady"
       @updateAvatarCanvas="updateAvatarCanvas"
     >
     </router-view>
@@ -12,21 +13,15 @@
 </template>
 
 <script>
-  const APP_VIEWS = {
-    'get-started': GetStarted,
-    'find-dentist': GetStarted,
-    'view-services': GetStarted,
-    'request-appointment': GetStarted,
-    'view-scans': GetStarted,
-    'view-treatments': GetStarted
-  }
-
   export default {
     name: 'app',
     beforeCreate: function () {
       this.$store.dispatch(ACTION_TYPES.REGISTER_WEB3_INSTANCE)
       .then(() => {
         this.$store.dispatch(ACTION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS)
+      })
+      .then(() => {
+        this[ACTION_TYPES.UPDATE_DAPP_READINESS](true)
       })
       .catch((result) => {
         console.log(result, "We've encountered problems with your Web3 connection")
@@ -45,9 +40,8 @@
         networkId: state => state.web3.networkId,
         coinbase: state => state.web3.coinbase,
         currentRoute: state => state.currentRoute,
-        currentView: state => APP_VIEWS[state.currentView],
         user: state => state.user,
-        avatarCanvas: state => state.user.avatarCanvas
+        isDAppReady: state => state.isDAppReady
       }),
       currentView () {
         switch (this.$route.path) {
@@ -70,15 +64,17 @@
         ACTION_TYPES.CHANGE_CURRENT_ROUTE_TO,
         ACTION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS,
         ACTION_TYPES.UPDATE_CURRENT_VIEW,
-        ACTION_TYPES.UPDATE_USER_AVATAR_CANVAS
+        ACTION_TYPES.UPDATE_USER_AVATAR_CANVAS,
+        ACTION_TYPES.UPDATE_DAPP_READINESS
       ]),
       setCurrentView (currentView) {
         this[ACTION_TYPES.UPDATE_CURRENT_VIEW](currentView)
       },
-      updateAvatarCanvas (email) {
-        this[ACTION_TYPES.UPDATE_USER_AVATAR_CANVAS](email)
+      updateAvatarCanvas (payload = null) {
+        this[ACTION_TYPES.UPDATE_USER_AVATAR_CANVAS](payload)
       }
     },
+    props: [ 'avatarCanvas' ],
     watch: {
       hasInjectedWeb3 (web3ConnectionValue) {
         console.log('hasInjectedWeb3: ', web3ConnectionValue)
@@ -88,6 +84,9 @@
       },
       coinbase (coinbase) {
         console.log('coinbase: ', coinbase)
+      },
+      isDAppReady (isDAppReady) {
+        console.log('isDAppReady: ', isDAppReady)
       },
       $route (newRoute) {
         this[ACTION_TYPES.CHANGE_CURRENT_ROUTE_TO](newRoute)

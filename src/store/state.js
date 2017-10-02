@@ -9,6 +9,7 @@ export default {
     networkId: null
   },
   user: {
+    avatarCanvas: null,
     email: '',
     lastName: '',
     firstName: '',
@@ -35,6 +36,6 @@ export default {
     isValid: false,
     coinbase: null
   },
-
-  currentView: 'gettingStarted'
+  currentView: 'gettingStarted',
+  isDAppReady: false
 }

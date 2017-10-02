@@ -100,13 +100,13 @@
         })
       },
       setAvatar (evt = null) {
-        if (evt) {
-          const email = evt.target.value.trim()
-          this.$emit('updateAvatarCanvas', email)
-        } else {
-          const avatarCanvas = this.avatarCanvas
-          this.styleAndAddAvatarCanvasToPage(avatarCanvas)
-        }
+        const email = evt && evt.target && evt.target.value ? evt.target.value.trim() : this.user.email.trim()
+        this.$emit('updateAvatarCanvas', {
+          email: email,
+          callback: (avatarCanvas) => {
+            this.styleAndAddAvatarCanvasToPage(avatarCanvas)
+          }
+        })
       },
       styleAvatarCanvas (avatarCanvas) {
         if (avatarCanvas && avatarCanvas.style) {
@@ -236,11 +236,6 @@
       this.populateCountries()
       this.populateStates()
       this.populateOtherInputs()
-    },
-    watch: {
-      avatarCanvas () {
-        this.setAvatar()
-      }
     }
   }
 

@@ -4,7 +4,7 @@ export const NETWORKS = {
   '3': 'Ropsten test network',
   '4': 'Rinkeby test network',
   '42': 'Kovan test network',
-  '765': 'DanielNet test network'
+  '666': 'DanielNet test network'
 }
 
 export const APPROVED_BLOCKCHAIN_NETWORK_ID = '1'
@@ -14,7 +14,8 @@ export const MUTATION_TYPES = {
   REGISTER_WEB3_INSTANCE: 'registerWeb3Instance',
   UPDATE_USER_BLOCKCHAIN_STATUS: 'updateUserBlockchainStatus',
   UPDATE_CURRENT_VIEW: 'updateCurrentView',
-  UPDATE_USER_AVATAR_CANVAS: 'updateUserAvatarCanvas'
+  UPDATE_USER_AVATAR_CANVAS: 'updateUserAvatarCanvas',
+  UPDATE_DAPP_READINESS: 'updateDAppReadiness'
 }
 
 export const ACTION_TYPES = MUTATION_TYPES

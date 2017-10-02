@@ -35,6 +35,23 @@
     data: function () {
       return {
         metamaskUrl: 'https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en',
+        faqs: [
+          {
+            id: 1,
+            question: 'How do I get Ether Cryptocurrency?',
+            answer: ''
+          },
+          {
+            id: 2,
+            question: 'Why do I have to pay Ethereum gas fees?',
+            answer: ''
+          },
+          {
+            id: 3,
+            question: 'How can I find a dentist?',
+            answer: ''
+          }
+        ],
         tutorials: [
           {
             id: 1,
@@ -59,7 +76,7 @@
         ]
       }
     },
-    props: ['item', 'faqs'],
+    props: ['item'],
     components: {
       VideoTutorial
     },
