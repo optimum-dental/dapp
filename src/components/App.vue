@@ -24,6 +24,10 @@
         this[ACTION_TYPES.UPDATE_DAPP_READINESS](true)
       })
       .catch((result) => {
+        if (!(this.isDAppReady)) {
+          this[ACTION_TYPES.UPDATE_DAPP_READINESS](true)
+        }
+
         console.log(result, "We've encountered problems with your Web3 connection")
       })
     },
