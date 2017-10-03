@@ -91,6 +91,7 @@
   .wrapper {
     background: #ffffff;
     height: 100%;
+    min-height: 80vh;
     width: 100%;
     display: flex;
     flex-direction: column;

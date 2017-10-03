@@ -26,8 +26,32 @@ export default new Router({
     },
     {
       mode: 'history',
-      path: '/faq',
-      name: 'FAQ',
+      path: '/find-dentist',
+      name: 'FindDentist',
+      component: MainPage
+    },
+    {
+      mode: 'history',
+      path: '/view-services',
+      name: 'ViewServices',
+      component: MainPage
+    },
+    {
+      mode: 'history',
+      path: '/request-appointment',
+      name: 'RequestAppointment',
+      component: MainPage
+    },
+    {
+      mode: 'history',
+      path: '/view-scan-applications',
+      name: 'ViewScanApplications',
+      component: MainPage
+    },
+    {
+      mode: 'history',
+      path: '/view-treatment-applications',
+      name: 'ViewTreatmentApplications',
       component: MainPage
     }
   ]

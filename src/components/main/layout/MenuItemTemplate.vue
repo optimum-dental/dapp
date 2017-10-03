@@ -1,6 +1,5 @@
 <template>
-  <router-link :to="item.key" id="menu-item-template" :class="{ 'menu-item': true, active: item.isActive }">
-    <span v-if="item.isActive" class='active-indicator'/>
+  <router-link :to="item.key" id="menu-item-template" class="menu-item">
     <div class="menu-icon" :style="{ background: 'url(' + item.icon + ') no-repeat' }"></div>
     <div class="menu-title">{{ item.text }}</div>
   </router-link>
@@ -16,8 +15,21 @@
 
 
 <style scoped>
-  .menu-item.active, .menu-item:hover {
+  .menu-item.router-link-active.router-link-exact-active, .menu-item:hover {
     background-color: #296d92;
+  }
+
+  .menu-item.router-link-active.router-link-exact-active:after {
+    content: '';
+    display: inline-block;
+    position: absolute;
+    right: 0;
+    margin-top: 17px;
+    width: 0;
+    height: 0;
+    border-top: 7px solid transparent;
+    border-bottom: 7px solid transparent;
+    border-right: 10px solid  #eef0ef;
   }
 
   .menu-item {
@@ -47,18 +59,6 @@
     font-weight: 400;
     float: left;
     border-bottom: 1px #2a7197 solid;
-  }
-
-  .active-indicator {
-    display: inline-block;
-    position: absolute;
-    right: 0;
-    margin-top: 17px;
-    width: 0;
-    height: 0;
-    border-top: 7px solid transparent;
-    border-bottom: 7px solid transparent;
-    border-right: 10px solid  #eef0ef;
   }
 
 </style>

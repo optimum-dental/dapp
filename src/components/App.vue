@@ -52,8 +52,16 @@
             return Home
           case '/get-started':
             return GetStarted
-          case '/faq':
-            return FAQ
+          case '/find-dentist':
+            return FindDentist
+          case '/view-services':
+            return ViewServices
+          case '/request-appointment':
+            return RequestAppointment
+          case '/view-scan-applications':
+            return ViewScanApplications
+          case '/view-treatment-applications':
+            return ViewTreatmentApplications
           default:
             return Home
         }
@@ -95,7 +103,11 @@
   import Home from './home/Home.vue'
   import MainPage from './main/MainPage.vue'
   import GetStarted from './main/view-sections/get-started'
-  import FAQ from './main/view-sections/FAQ.vue'
+  import FindDentist from './main/view-sections/find-dentist'
+  import ViewServices from './main/view-sections/view-services'
+  import RequestAppointment from './main/view-sections/request-appointment'
+  import ViewScanApplications from './main/view-sections/view-scan-applications'
+  import ViewTreatmentApplications from './main/view-sections/view-treatment-applications'
   import { ACTION_TYPES } from '../util/constants'
 </script>
 

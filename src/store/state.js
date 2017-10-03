@@ -36,6 +36,5 @@ export default {
     isValid: false,
     coinbase: ''
   },
-  currentView: 'gettingStarted',
   isDAppReady: false
 }

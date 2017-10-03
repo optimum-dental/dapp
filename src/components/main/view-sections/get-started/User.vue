@@ -248,6 +248,7 @@
   .wrapper {
     background: #ffffff;
     height: 100%;
+    min-height: 80vh;
     width: 600px;
     display: flex;
     flex-direction: column;
@@ -257,7 +258,7 @@
 
   #user {
     background: #ffffff;
-    min-height: 80vh;
+    min-height: 70vh;
     width: 400px;
     font-size: 12px;
     margin: 30px auto;

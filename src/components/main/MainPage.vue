@@ -9,7 +9,7 @@
     />
     <MainViewTemplate
       :avatar-canvas="avatarCanvas"
-      :current-view='currentView'
+      :current-view="currentView"
       :user="user"
       :is-d-app-ready="isDAppReady"
       @updateAvatarCanvas="updateAvatarCanvas"

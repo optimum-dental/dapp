@@ -16,39 +16,33 @@
         menuItems: [{
           key: 'get-started',
           text: 'Get Started',
-          icon: '/static/images/person.png',
-          isActive: true
+          icon: '/static/images/person.png'
         },
         {
           key: 'find-dentist',
           text: 'Find Dentist',
-          icon: '/static/images/search.png',
-          isActive: false
+          icon: '/static/images/search.png'
         },
         {
           key: 'view-services',
           text: 'View Services',
-          icon: '/static/images/teeth.png',
-          isActive: false
+          icon: '/static/images/teeth.png'
         },
         {
           key: 'request-appointment',
           text: 'Request Appointment',
-          icon: '/static/images/calendar.png',
-          isActive: false
+          icon: '/static/images/calendar.png'
         },
 
         {
-          key: 'view-scans',
+          key: 'view-scan-applications',
           text: 'View Scans Applications',
-          icon: '/static/images/scan-application.png',
-          isActive: false
+          icon: '/static/images/scan-application.png'
         },
         {
-          key: 'view-treatments',
+          key: 'view-treatment-applications',
           text: 'View Treatment Applications',
-          icon: '/static/images/file.png',
-          isActive: false
+          icon: '/static/images/file.png'
         }]
       }
     }
