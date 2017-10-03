@@ -6,6 +6,7 @@ const monitorWeb3 = function (state) {
   const networkId = state && state.web3 ? state.web3.networkId : ''
   const coinbase = state && state.web3 ? state.web3.coinbase : ''
   let web3 = window.web3
+  let isLocalWeb3 = false
 
   // Checking if browser is Web3-injected (Mist/MetaMask)
   if (typeof web3 !== 'undefined' && web3) {
@@ -14,6 +15,7 @@ const monitorWeb3 = function (state) {
   } else {
     console.log('monitorWeb3: No web3 in browser')
     web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
+    isLocalWeb3 = true
   }
 
   if (web3) {
@@ -31,14 +33,15 @@ const monitorWeb3 = function (state) {
   }
 
   setInterval(() => {
-    if (web3) {
+    if (web3 && !isLocalWeb3) {
       web3.version.getNetwork((err, newNetworkId) => {
         newNetworkId = !err && newNetworkId ? newNetworkId.toString() : ''
-        if (!err && networkId && networkId !== '' && newNetworkId && newNetworkId !== '' && newNetworkId !== networkId) {
+        if (!err && newNetworkId && newNetworkId !== '' && newNetworkId !== networkId) {
           window.location.reload()
         } else {
           web3.eth.getCoinbase((err, newCoinbase) => {
-            if (!err && coinbase && coinbase !== '' && newCoinbase && newCoinbase !== '' && newCoinbase !== coinbase && newNetworkId === APPROVED_BLOCKCHAIN_NETWORK_ID) {
+            newCoinbase = !err && newCoinbase ? newCoinbase.toString() : ''
+            if (!err && newCoinbase && newCoinbase !== '' && newCoinbase !== coinbase && newNetworkId === APPROVED_BLOCKCHAIN_NETWORK_ID) {
               window.location.reload()
             }
           })
