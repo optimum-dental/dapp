@@ -1,7 +1,7 @@
 <template>
   <section>
     <div v-for="item in menuItems" :key="item.key">
-      <MenuItemTemplate :item="item" :setCurrentView="triggerUpdateView"/>
+      <MenuItemTemplate :item="item" />
     </div>
   </section>
 </template>
@@ -11,56 +11,45 @@
     components: {
       MenuItemTemplate
     },
-    props: ['updateCurrentView'],
     data: function () {
       return {
         menuItems: [{
           key: 'get-started',
           text: 'Get Started',
-          icon: '',
+          icon: '/static/images/person.png',
           isActive: true
         },
         {
           key: 'find-dentist',
           text: 'Find Dentist',
-          icon: '',
+          icon: '/static/images/search.png',
           isActive: false
         },
         {
           key: 'view-services',
           text: 'View Services',
-          icon: '',
+          icon: '/static/images/teeth.png',
           isActive: false
         },
         {
           key: 'request-appointment',
           text: 'Request Appointment',
-          icon: '',
+          icon: '/static/images/calendar.png',
           isActive: false
         },
 
         {
           key: 'view-scans',
           text: 'View Scans Applications',
-          icon: '',
+          icon: '/static/images/scan-application.png',
           isActive: false
         },
         {
           key: 'view-treatments',
           text: 'View Treatment Applications',
-          icon: '',
+          icon: '/static/images/file.png',
           isActive: false
         }]
-      }
-    },
-
-    methods: {
-      triggerUpdateView: function (viewKey) {
-        this.menuItems.map(item => {
-          if (item.isActive) item.isActive = false
-          if (item.key === viewKey) item.isActive = true
-        })
-        this.updateCurrentView(viewKey)
       }
     }
   }

@@ -1,12 +1,12 @@
 export default {
   currentRoute: null,
   web3: {
-    address: null,
-    coinbase: null,
+    address: '',
+    coinbase: '',
     error: null,
     instance: null,
     isInjected: false,
-    networkId: null
+    networkId: ''
   },
   user: {
     avatarCanvas: null,
@@ -34,7 +34,7 @@ export default {
     hasCoinbase: false,
     isConnectedToODLLNetwork: false,
     isValid: false,
-    coinbase: null
+    coinbase: ''
   },
   currentView: 'gettingStarted',
   isDAppReady: false

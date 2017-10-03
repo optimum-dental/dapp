@@ -38,9 +38,6 @@ export default {
   [ACTION_TYPES.CHANGE_CURRENT_ROUTE_TO] ({ commit }, newRoute) {
     commit(MUTATION_TYPES.CHANGE_CURRENT_ROUTE_TO, newRoute)
   },
-  [ACTION_TYPES.UPDATE_CURRENT_VIEW] ({ commit }, newView) {
-    commit(MUTATION_TYPES.UPDATE_CURRENT_VIEW, newView)
-  },
   [ACTION_TYPES.UPDATE_USER_AVATAR_CANVAS] ({ commit }, payload) {
     commit(MUTATION_TYPES.UPDATE_USER_AVATAR_CANVAS, payload)
   },

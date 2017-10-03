@@ -1,29 +1,31 @@
 <template>
-  <div id="getstarted-guest-template">
-    <div class="container">
-      <section class='header-group'>
-        <p class='header-1 header-main'>How to get started</p>
-        <div class='header-body'>
-          <p class='header-3'>Install Metamask Chrome Extension.</p>
-          <div>
-            <p>To get started, visit <a :href="metamaskUrl">Metamask</a> to download and install <a :href="metamaskUrl">Metamask</a> chrome extension.<br/>See videos to learn more.</p>
+  <div class="wrapper">
+    <div id="getstarted-guest-template">
+      <div class="container">
+        <section class='header-group'>
+          <p class='header-1 header-main'>How to get started</p>
+          <div class='header-body'>
+            <p class='header-3'>Install Metamask Chrome Extension.</p>
+            <div>
+              <p>To get started, visit <a :href="metamaskUrl">Metamask</a> to download and install <a :href="metamaskUrl">Metamask</a> chrome extension.<br/>See videos to learn more.</p>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section class='tutorial-list'>
-        <VideoTutorial :tutorial="tutorial" v-for="tutorial in tutorials" :key="tutorial.id" />
-      </section>
+        <section class='tutorial-list'>
+          <VideoTutorial :tutorial="tutorial" v-for="tutorial in tutorials" :key="tutorial.id" />
+        </section>
 
-      <section class='faq-section'>
-        <p class='header-2 faq-title'>Frequently Asked Questions</p>
-        <div class='faq-list'>
-          <div class='faq-container' v-for="item in faqs" :key="item.id">
-            <p class='question'>{{ item.question }}</p>
-            <p class='answer'>{{ item.answer }}</p>
+        <section class='faq-section'>
+          <p class='header-2 faq-title'>Frequently Asked Questions</p>
+          <div class='faq-list'>
+            <div class='faq-container' v-for="item in faqs" :key="item.id">
+              <p class='question'>{{ item.question }}</p>
+              <p class='answer'>{{ item.answer }}</p>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </div>
   </div>
 </template>
@@ -79,11 +81,6 @@
     props: ['item'],
     components: {
       VideoTutorial
-    },
-    mounted: function () {
-      let contentElement = document.querySelector('#getstarted-guest-template').closest('.content')
-      contentElement.style.width = '100%'
-      contentElement.style.borderTop = 'none'
     }
   }
 
@@ -91,6 +88,20 @@
 </script>
 
 <style scoped>
+  .wrapper {
+    background: #ffffff;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #getstarted-guest-template {
+    width: 80%;
+  }
+
   .header-main {
     text-align: center;
   }
@@ -105,7 +116,7 @@
   }
 
   .container {
-    width: 560px;
+    width: 100%;
     margin: auto;
   }
   .header-2 {

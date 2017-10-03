@@ -1,30 +1,16 @@
 <template>
-  <div id="menu-item-template" :class="{ 'menu-item': true, active: item.isActive }">
-    <div class="container" @click="setCurrentView(item.key)">
-      <span v-if="item.isActive" class='active-indicator'/>
-      <section class='content'>
-        <div class="menu-icon">
-          <img v-if="item.icon" src="item.icon">
-        </div>
-        <div class="menu-title">
-          <span>{{ item.text }}</span>
-        </div>
-      </section>
-    </div>
-  </div>
+  <router-link :to="item.key" id="menu-item-template" :class="{ 'menu-item': true, active: item.isActive }">
+    <span v-if="item.isActive" class='active-indicator'/>
+    <div class="menu-icon" :style="{ background: 'url(' + item.icon + ') no-repeat' }"></div>
+    <div class="menu-title">{{ item.text }}</div>
+  </router-link>
 </template>
 
 
 <script type="text/javascript">
   export default {
     name: 'menu-item-template',
-    props: ['item', 'setCurrentView'],
-    methods: {
-      setActiveView: function (viewKey) {
-        this.switchView(viewKey)
-      }
-
-    }
+    props: [ 'item' ]
   }
 </script>
 
@@ -34,36 +20,33 @@
     background-color: #296d92;
   }
 
-  .menu-item .content {
+  .menu-item {
+    width: 100%;
     height: 50px;
-    display: flex;
-    flex-direction: column;
     cursor: pointer;
+    display: block;
   }
 
   .menu-icon {
-    height: 100%;
-    flex: 0.25;
-    margin-right: -20px;
+    height: 30px;
+    width: 30px;
+    margin: 10px 10px;
+    display: inline-block;
+    background-size: contain !important;
+    float: left;
   }
 
   .menu-title {
-    display: flex;
-    justify-content: flex-start;
-    flex: 1;
-    align-items: center;
-    border-bottom: 1px #296d92 solid;
-    border-top: 1px transparent solid;
-    height: 100%;
-    width: 100%;
-    font-size: 14px;
-    padding-left: 25px;
-    color: #efefef;
+    height: 50px;
+    line-height: 50px;
+    width: 207px;
+    margin: 0px;
+    display: inline-block;
+    font-size: 13px;
+    color: #f5f9f8;
     font-weight: 400;
-  }
-
-  .menu-title:hover {
-    cursor: pointer;
+    float: left;
+    border-bottom: 1px #2a7197 solid;
   }
 
   .active-indicator {

@@ -4,7 +4,6 @@
       :current-view="currentView"
       :user="user"
       :avatar-canvas="avatarCanvas"
-      :set-current-view="setCurrentView"
       :is-d-app-ready="isDAppReady"
       @updateAvatarCanvas="updateAvatarCanvas"
     >
@@ -21,11 +20,11 @@
         this.$store.dispatch(ACTION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS)
       })
       .then(() => {
-        this[ACTION_TYPES.UPDATE_DAPP_READINESS](true)
+        this.$store.dispatch(ACTION_TYPES.UPDATE_DAPP_READINESS, true)
       })
       .catch((result) => {
         if (!(this.isDAppReady)) {
-          this[ACTION_TYPES.UPDATE_DAPP_READINESS](true)
+          this.$store.dispatch(ACTION_TYPES.UPDATE_DAPP_READINESS, true)
         }
 
         console.log(result, "We've encountered problems with your Web3 connection")
@@ -66,14 +65,8 @@
     methods: {
       ...mapActions([
         ACTION_TYPES.CHANGE_CURRENT_ROUTE_TO,
-        ACTION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS,
-        ACTION_TYPES.UPDATE_CURRENT_VIEW,
-        ACTION_TYPES.UPDATE_USER_AVATAR_CANVAS,
-        ACTION_TYPES.UPDATE_DAPP_READINESS
+        ACTION_TYPES.UPDATE_USER_AVATAR_CANVAS
       ]),
-      setCurrentView (currentView) {
-        this[ACTION_TYPES.UPDATE_CURRENT_VIEW](currentView)
-      },
       updateAvatarCanvas (payload = null) {
         this[ACTION_TYPES.UPDATE_USER_AVATAR_CANVAS](payload)
       }

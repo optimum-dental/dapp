@@ -1,78 +1,80 @@
 <template>
-  <div id="user">
-    <div class="title">Register as Patient</div>
-    <div class="field">
-      <label for="name" class="field-key">Last Name   First Name   Middle Name</label>
-      <input type="text" class="field-value has-tip" id="name" placeholder="Last Name   First Name   Middle Name" @input="displayLabel" data-name="fullName">
-      <div class="tip">Write between 5 to 32 characters</div>
-    </div>
-
-    <div class="field">
-      <label for="email" class="field-key">Your Email</label>
-      <input type="email" class="field-value has-tip" id="email" placeholder="Your Email" @input="displayLabel" @blur="setAvatar" data-name="email">
-      <div class="tip">Write between 5 to 32 characters</div>
-    </div>
-
-    <div class="field avatar"></div>
-
-    <div class="field">
-      <label for="street" class="field-key">Street</label>
-      <input type="text" class="field-value has-tip" id="street" placeholder="Street" @input="displayLabel" data-name="street">
-      <div class="tip">Write between 5 to 32 characters</div>
-    </div>
-
-
-    <div class="field">
-      <label for="city" class="field-key">City</label>
-      <input type="text" class="field-value" id="city" placeholder="City" @input="displayLabel" data-name="city">
-    </div>
-
-    <div class="field">
-      <label for="state" class="field-key">State</label>
-      <select id='state' class="field-value" @input="displayLabel" data-name="state"><option value=''>State</option></select>
-    </div>
-
-    <div class="field">
-      <label for="zip-code" class="field-key">Zip Code</label>
-      <input type="text" class="field-value has-tip" id="zip-code" placeholder="Zip Code" @input="displayLabel" data-name="zipCode">
-      <div class="tip">Write between 5 to 32 characters</div>
-    </div>
-
-    <div class="field">
-      <label for="country" class="field-key">Country</label>
-      <select id='country' class="field-value" @input="displayLabel" data-name="country"><option value=''>Country</option></select>
-    </div>
-
-    <div class="field">
-      <label for="phone-number" class="field-key">Phone Number</label>
-      <input type="text" class="field-value" id="phone-number" placeholder="Phone Number" @input="displayLabel" data-name="phoneNumber">
-    </div>
-
-    <div class="field">
-      <label class="field-key show">Social Security Number</label>
-      <input type="text" id='area-number' data-next="group-number" class="field-value special social-security-number" maxlength="3" size="3" required placeholder="XXX" @input="decideIfNext" data-name="areaNumber"><span class="hyphen"></span>
-      <input type="text" id='group-number' data-next="sequence-number" class="field-value special social-security-number" maxlength="2" size="2" required placeholder="XX" @input="decideIfNext" data-name="groupNumber"><span class="hyphen"></span>
-      <input type="text" id='sequence-number' class="field-value special social-security-number" maxlength="4" size="4" required placeholder="XXXX" @input="decideIfNext" data-name="sequenceNumber">
-    </div>
-
-    <div class="field">
-      <label class="field-key show">Birthday</label>
-      <div class='date-holder'>
-        <select id='day' data-name="day"><option value=''>Day</option></select>
-        <select id='month' data-name="month"><option value=''>Month</option></select>
-        <select id='year' data-name="year"><option value=''>Year</option></select>
+  <div class="wrapper">
+    <div id="user">
+      <div class="title">Register as Patient</div>
+      <div class="field">
+        <label for="name" class="field-key">Last Name   First Name   Middle Name</label>
+        <input type="text" class="field-value has-tip" id="name" placeholder="Last Name   First Name   Middle Name" @input="displayLabel" data-name="fullName">
+        <div class="tip">Write between 5 to 32 characters</div>
       </div>
-    </div>
 
-    <div class="field">
-      <label class="field-key">Gender</label>
-      <input type="checkbox" class="field-value gender" name="gender" id="female" value="1" @click="resetCheckeBoxValues" :checked="user.gender === '1'"><label for="female" class="side-key">Female</label>
-      <input type="checkbox" class="field-value gender" name="gender" id="male" value="2" @click="resetCheckeBoxValues" :checked="user.gender === '2'"><label for="male" class="side-key">Male</label>
-      <input type="checkbox" class="field-value gender" name="gender" id="others" value="3" @click="resetCheckeBoxValues" :checked="user.gender === '3'"><label for="others" class="side-key">Others</label>
-    </div>
+      <div class="field">
+        <label for="email" class="field-key">Your Email</label>
+        <input type="email" class="field-value has-tip" id="email" placeholder="Your Email" @input="displayLabel" @blur="setAvatar" data-name="email">
+        <div class="tip">Write between 5 to 32 characters</div>
+      </div>
 
-    <div class="field">
-      <input type="button" class='submit-button' value="Register">
+      <div class="field avatar"></div>
+
+      <div class="field">
+        <label for="street" class="field-key">Street</label>
+        <input type="text" class="field-value has-tip" id="street" placeholder="Street" @input="displayLabel" data-name="street">
+        <div class="tip">Write between 5 to 32 characters</div>
+      </div>
+
+
+      <div class="field">
+        <label for="city" class="field-key">City</label>
+        <input type="text" class="field-value" id="city" placeholder="City" @input="displayLabel" data-name="city">
+      </div>
+
+      <div class="field">
+        <label for="state" class="field-key">State</label>
+        <select id='state' class="field-value" @input="displayLabel" data-name="state"><option value=''>State</option></select>
+      </div>
+
+      <div class="field">
+        <label for="zip-code" class="field-key">Zip Code</label>
+        <input type="text" class="field-value has-tip" id="zip-code" placeholder="Zip Code" @input="displayLabel" data-name="zipCode">
+        <div class="tip">Write between 5 to 32 characters</div>
+      </div>
+
+      <div class="field">
+        <label for="country" class="field-key">Country</label>
+        <select id='country' class="field-value" @input="displayLabel" data-name="country"><option value=''>Country</option></select>
+      </div>
+
+      <div class="field">
+        <label for="phone-number" class="field-key">Phone Number</label>
+        <input type="text" class="field-value" id="phone-number" placeholder="Phone Number" @input="displayLabel" data-name="phoneNumber">
+      </div>
+
+      <div class="field">
+        <label class="field-key show">Social Security Number</label>
+        <input type="text" id='area-number' data-next="group-number" class="field-value special social-security-number" maxlength="3" size="3" required placeholder="XXX" @input="decideIfNext" data-name="areaNumber"><span class="hyphen"></span>
+        <input type="text" id='group-number' data-next="sequence-number" class="field-value special social-security-number" maxlength="2" size="2" required placeholder="XX" @input="decideIfNext" data-name="groupNumber"><span class="hyphen"></span>
+        <input type="text" id='sequence-number' class="field-value special social-security-number" maxlength="4" size="4" required placeholder="XXXX" @input="decideIfNext" data-name="sequenceNumber">
+      </div>
+
+      <div class="field">
+        <label class="field-key show">Birthday</label>
+        <div class='date-holder'>
+          <select id='day' data-name="day"><option value=''>Day</option></select>
+          <select id='month' data-name="month"><option value=''>Month</option></select>
+          <select id='year' data-name="year"><option value=''>Year</option></select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-key">Gender</label>
+        <input type="checkbox" class="field-value gender" name="gender" id="female" value="1" @click="resetCheckeBoxValues" :checked="user.gender === '1'"><label for="female" class="side-key">Female</label>
+        <input type="checkbox" class="field-value gender" name="gender" id="male" value="2" @click="resetCheckeBoxValues" :checked="user.gender === '2'"><label for="male" class="side-key">Male</label>
+        <input type="checkbox" class="field-value gender" name="gender" id="others" value="3" @click="resetCheckeBoxValues" :checked="user.gender === '3'"><label for="others" class="side-key">Others</label>
+      </div>
+
+      <div class="field">
+        <input type="button" class='submit-button' value="Register">
+      </div>
     </div>
   </div>
 </template>
@@ -229,9 +231,6 @@
         monthDefaultValue: this.user.month,
         yearDefaultValue: this.user.year
       })
-      let contentElement = document.querySelector('#user').closest('.content')
-      contentElement.style.width = '600px'
-      contentElement.style.borderTop = 'none'
       this.setAvatar()
       this.populateCountries()
       this.populateStates()
@@ -246,6 +245,16 @@
 </script>
 
 <style scoped>
+  .wrapper {
+    background: #ffffff;
+    height: 100%;
+    width: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
   #user {
     background: #ffffff;
     min-height: 80vh;

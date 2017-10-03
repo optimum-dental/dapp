@@ -1,7 +1,12 @@
 <template>
   <div class="main-page">
-    <SideBarTemplate :set-current-view='setCurrentView'/>
-    <HeaderTemplate :user="user" />
+    <SideBarTemplate
+      :is-d-app-ready="isDAppReady"
+    />
+    <HeaderTemplate
+      :user="user"
+      :is-d-app-ready="isDAppReady"
+    />
     <MainViewTemplate
       :avatar-canvas="avatarCanvas"
       :current-view='currentView'
@@ -15,7 +20,7 @@
 <script>
   export default {
     name: 'main-page',
-    props: [ 'avatarCanvas', 'currentView', 'setCurrentView', 'user', 'isDAppReady' ],
+    props: [ 'avatarCanvas', 'currentView', 'user', 'isDAppReady' ],
     components: {
       HeaderTemplate,
       MainViewTemplate,

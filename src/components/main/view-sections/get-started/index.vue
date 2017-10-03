@@ -1,24 +1,16 @@
 <template>
   <div id="get-started">
-    <section class="content">
-      <div v-if="isDAppReady">
-        <div v-if="user && user.isValid">
-          <user
-            :avatar-canvas="avatarCanvas"
-            :user="user"
-            @updateAvatarCanvas="updateAvatarCanvas"
-          />
-        </div>
+    <section class="content" v-if="isDAppReady">
+      <user v-if="user && user.isValid"
+        :avatar-canvas="avatarCanvas"
+        :user="user"
+        @updateAvatarCanvas="updateAvatarCanvas"
+      />
 
-        <div v-else>
-          <guest-introduction
-            :set-current-view="setCurrentView"
-          />
-        </div>
-      </div>
-
-      <div v-else></div>
+      <guest-introduction v-else />
     </section>
+
+    <section class="loader content" v-else></section>
   </div>
 </template>
 
@@ -34,7 +26,7 @@
         this.$emit('updateAvatarCanvas', payload)
       }
     },
-    props: [ 'avatarCanvas', 'setCurrentView', 'user', 'isDAppReady' ]
+    props: [ 'avatarCanvas', 'user', 'isDAppReady' ]
   }
 
   import User from './User.vue'
@@ -49,9 +41,6 @@
 
   .content {
     border: none;
-    border-top: 5px solid #dd5b21;
-    background-color: #fff;
-    /*text-align: center;*/
     width: 100%;
     min-height: 80vh;
     margin: auto;
@@ -59,5 +48,27 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    background: #eef0ef;
+  }
+
+  .loader.content {
+    animation: odll-loading-animation 1.2s infinite;
+  }
+
+  @keyframes odll-loading-animation {
+    0% {
+      border-top: 5px solid #f16f35;
+      background-color: #ffffff;
+    }
+
+    50% {
+      border-top: 5px solid #e56329;
+      background-color: #fcfcfc;
+    }
+
+    100% {
+      border-top: 5px solid #dd5b21;
+      background-color: #f9f9f9;
+    }
   }
 </style>

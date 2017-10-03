@@ -1,10 +1,10 @@
 import Web3 from 'web3'
 import store from '../../store/'
-import { ACTION_TYPES } from '../../util/constants.js'
+import { ACTION_TYPES, APPROVED_BLOCKCHAIN_NETWORK_ID } from '../../util/constants.js'
 
 const monitorWeb3 = function (state) {
-  const networkId = state && state.web3 ? state.web3.networkId : null
-  const coinbase = state && state.web3 ? state.web3.coinbase : null
+  const networkId = state && state.web3 ? state.web3.networkId : ''
+  const coinbase = state && state.web3 ? state.web3.coinbase : ''
   let web3 = window.web3
 
   // Checking if browser is Web3-injected (Mist/MetaMask)
@@ -33,11 +33,12 @@ const monitorWeb3 = function (state) {
   setInterval(() => {
     if (web3) {
       web3.version.getNetwork((err, newNetworkId) => {
+        newNetworkId = !err && newNetworkId ? newNetworkId.toString() : ''
         if (!err && networkId && networkId !== '' && newNetworkId && newNetworkId !== '' && newNetworkId !== networkId) {
           window.location.reload()
         } else {
           web3.eth.getCoinbase((err, newCoinbase) => {
-            if (!err && coinbase && coinbase !== '' && newCoinbase && newCoinbase !== '' && newCoinbase !== coinbase) {
+            if (!err && coinbase && coinbase !== '' && newCoinbase && newCoinbase !== '' && newCoinbase !== coinbase && newNetworkId === APPROVED_BLOCKCHAIN_NETWORK_ID) {
               window.location.reload()
             }
           })

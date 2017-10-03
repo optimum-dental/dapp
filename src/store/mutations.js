@@ -84,9 +84,9 @@ export default {
     const result = payload.result
     const web3Copy = state.web3
     web3Copy.instance = () => result.web3
-    web3Copy.address = result.address ? result.address : web3Copy.address
-    web3Copy.coinbase = result.coinbase ? result.coinbase : web3Copy.coinbase
-    web3Copy.networkId = result.networkId ? result.networkId : web3Copy.networkId
+    web3Copy.address = result.address ? result.address.toString() : web3Copy.address
+    web3Copy.coinbase = result.coinbase ? result.coinbase.toString() : web3Copy.coinbase
+    web3Copy.networkId = result.networkId ? result.networkId.toString() : web3Copy.networkId
     web3Copy.error = result.web3Error ? result.web3Error : web3Copy.error
     web3Copy.isInjected = result.hasInjectedWeb3 ? result.hasInjectedWeb3 : web3Copy.isInjected
 
@@ -120,9 +120,6 @@ export default {
   },
   [MUTATION_TYPES.CHANGE_CURRENT_ROUTE_TO] (state, newRoute) {
     state.currentRoute = newRoute
-  },
-  [MUTATION_TYPES.UPDATE_CURRENT_VIEW] (state, newView) {
-    state.currentView = newView
   },
   [MUTATION_TYPES.UPDATE_USER_AVATAR_CANVAS] (state, payload) {
     const userCopy = state.user
