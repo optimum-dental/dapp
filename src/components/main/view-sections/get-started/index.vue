@@ -10,7 +10,7 @@
       <guest-introduction v-else />
     </section>
 
-    <section class="loader content" v-else></section>
+    <loading v-else />
   </div>
 </template>
 
@@ -19,7 +19,8 @@
     name: 'get-started',
     components: {
       User,
-      GuestIntroduction
+      GuestIntroduction,
+      Loading
     },
     methods: {
       updateAvatarCanvas (payload = null) {
@@ -31,6 +32,7 @@
 
   import User from './User.vue'
   import GuestIntroduction from './Guest.vue'
+  import Loading from '../loading'
 </script>
 
 <style scoped>
@@ -49,26 +51,5 @@
     align-items: center;
     justify-content: center;
     background: #eef0ef;
-  }
-
-  .loader.content {
-    animation: odll-loading-animation 1.2s infinite;
-  }
-
-  @keyframes odll-loading-animation {
-    0% {
-      border-top: 5px solid #f16f35;
-      background-color: #ffffff;
-    }
-
-    50% {
-      border-top: 5px solid #e56329;
-      background-color: #fcfcfc;
-    }
-
-    100% {
-      border-top: 5px solid #dd5b21;
-      background-color: #f9f9f9;
-    }
   }
 </style>

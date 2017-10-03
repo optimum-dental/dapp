@@ -8,7 +8,7 @@
       <guest-introduction v-else />
     </section>
 
-    <section class="loader content" v-else></section>
+    <loading v-else />
   </div>
 </template>
 
@@ -17,13 +17,15 @@
     name: 'view-scan-applications',
     components: {
       ScanApplications,
-      GuestIntroduction
+      GuestIntroduction,
+      Loading
     },
     props: [ 'user', 'isDAppReady' ]
   }
 
   import ScanApplications from './ScanApplications.vue'
   import GuestIntroduction from '../get-started/Guest.vue'
+  import Loading from '../loading'
 </script>
 
 <style scoped>
@@ -42,26 +44,5 @@
     align-items: center;
     justify-content: center;
     background: #eef0ef;
-  }
-
-  .loader.content {
-    animation: odll-loading-animation 1.2s infinite;
-  }
-
-  @keyframes odll-loading-animation {
-    0% {
-      border-top: 5px solid #f16f35;
-      background-color: #ffffff;
-    }
-
-    50% {
-      border-top: 5px solid #e56329;
-      background-color: #fcfcfc;
-    }
-
-    100% {
-      border-top: 5px solid #dd5b21;
-      background-color: #f9f9f9;
-    }
   }
 </style>
