@@ -4,27 +4,38 @@ import { MUTATION_TYPES, APPROVED_BLOCKCHAIN_NETWORK_ID, IDENTICON_COLORS } from
 
 function resetUser (state, web3Status) {
   const user = {
+    // lastName: '',
+    // firstName: '',
+    // middleName: '',
+    // fullName: '',
+    // street: '',
+    // city: '',
+    // state: '',
+    // zipCode: '',
+    // country: '',
+    // phoneNumber: '',
+    // socialSecurityNumber: '',
+    // areaNumber: '',
+    // groupNumber: '',
+    // sequenceNumber: '',
+    // day: '',
+    // month: '',
+    // year: '',
+    // gender: '',
     email: '',
-    lastName: '',
-    firstName: '',
-    middleName: '',
-    fullName: '',
-    street: '',
-    city: '',
-    state: '',
-    zipCode: '',
-    country: '',
-    phoneNumber: '',
-    socialSecurityNumber: '',
-    areaNumber: '',
-    groupNumber: '',
-    sequenceNumber: '',
-    day: '',
-    month: '',
-    year: '',
-    gender: '',
     type: '',
-    isValid: false
+    avatarCanvas: null,
+    hasWeb3InjectedBrowser: false,
+    hasCoinbase: false,
+    isConnectedToODLLNetwork: false,
+    coinbase: '',
+    isValid: false,
+    isPatient: false,
+    canBeNewPatient: false,
+    patientable: false,
+    isDentist: false,
+    isODLLAdmin: false,
+    isODLLManager: false
   }
 
   Object.assign(user, web3Status)
@@ -91,10 +102,10 @@ export default {
     web3Copy.isInjected = result.hasInjectedWeb3 ? result.hasInjectedWeb3 : web3Copy.isInjected
 
     state.web3 = web3Copy
-
     if (payload.callback) payload.callback(state)
   },
-  [MUTATION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS] (state) {
+  [MUTATION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS] (state, payload) {
+    const userObject = payload.userObject
     const hasWeb3InjectedBrowser = state.web3.isInjected
     const hasCoinbase = !!(state.web3.coinbase && state.web3.coinbase !== '')
     const coinbase = state.web3.coinbase
@@ -109,11 +120,18 @@ export default {
     if (hasWeb3InjectedBrowser && hasCoinbase && isConnectedToODLLNetwork) {
       const userCopy = state.user
 
-      Object.assign(userCopy, web3Status, {
-        isValid: true
+      Object.assign(userCopy, web3Status, userObject, {
+        isValid: true,
+        patientable: userObject.type === '0' || userObject.type === '1',
+        canBeNewPatient: userObject.type === '0',
+        isPatient: userObject.type === '1',
+        isDentist: userObject.type === '2',
+        isODLLAdmin: userObject.type === '3',
+        isODLLManager: userObject.type === '4'
       })
 
       state.user = userCopy
+      if (payload.callback) payload.callback()
     } else {
       resetUser(state, web3Status)
     }

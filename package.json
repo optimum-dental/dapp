@@ -17,6 +17,7 @@
     "date-selection-manager": "^5.2.0",
     "ethereum-blockies": "^0.1.1",
     "gravatar-api": "^1.5.0",
+    "solidity-sha3": "^0.4.1",
     "vue": "^2.4.2",
     "vue-router": "^2.7.0",
     "vuex": "^2.4.0",

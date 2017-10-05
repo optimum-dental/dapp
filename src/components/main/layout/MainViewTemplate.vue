@@ -4,7 +4,10 @@
     :avatar-canvas="avatarCanvas"
     :user="user"
     :is-d-app-ready="isDAppReady"
+    :countries="countries"
+    :states="states"
     @updateAvatarCanvas="updateAvatarCanvas"
+    @callToWriteUser="callToWriteUser"
   >
   </component>
 </template>
@@ -12,12 +15,15 @@
 <script type="text/javascript">
   export default {
     name: 'main-view-template',
-    props: [ 'avatarCanvas', 'currentView', 'user', 'isDAppReady' ],
     methods: {
       updateAvatarCanvas (payload = null) {
         this.$emit('updateAvatarCanvas', payload)
+      },
+      callToWriteUser (payload = null) {
+        this.$emit('callToWriteUser', payload)
       }
-    }
+    },
+    props: [ 'avatarCanvas', 'currentView', 'user', 'isDAppReady', 'countries', 'states' ]
   }
 </script>
 

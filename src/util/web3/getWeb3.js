@@ -16,19 +16,19 @@ let getWeb3 = new Promise(function (resolve, reject) {
     } else {
       reject({
         result: null,
-        err: 'Unable to connect to Web3'
+        error: 'Unable to connect to Web3'
       })
     }
   })
 })
 .then((result) => { // get blockchain network Id
   return new Promise(function (resolve, reject) {
-    result.web3.version.getNetwork((err, networkId) => {
-      if (err) {
+    result.web3.version.getNetwork((error, networkId) => {
+      if (error) {
         result = Object.assign({}, result)
         reject({
           result,
-          err
+          error
         })
       } else {
         networkId = networkId.toString()
@@ -40,13 +40,13 @@ let getWeb3 = new Promise(function (resolve, reject) {
 })
 .then((networkIdResult) => { // get coinbase
   return new Promise(function (resolve, reject) {
-    networkIdResult.web3.eth.getCoinbase((err, coinbase) => {
+    networkIdResult.web3.eth.getCoinbase((error, coinbase) => {
       let result
-      if (err) {
+      if (error) {
         result = Object.assign({}, networkIdResult)
         reject({
           result,
-          err
+          error
         })
       } else {
         result = Object.assign({}, networkIdResult, { coinbase })
@@ -55,12 +55,12 @@ let getWeb3 = new Promise(function (resolve, reject) {
     })
   })
 })
-.then((coinbaseResult) => {
-  return new Promise(function (resolve, reject) {
-    let address = coinbaseResult.web3.eth.defaultAccount
-    let result = Object.assign({}, coinbaseResult, { address })
-    resolve(result)
-  })
-})
+// .then((coinbaseResult) => {
+//   return new Promise(function (resolve, reject) {
+//     let address = coinbaseResult.web3.eth.defaultAccount
+//     let result = Object.assign({}, coinbaseResult, { address })
+//     resolve(result)
+//   })
+// })
 
 export default getWeb3
