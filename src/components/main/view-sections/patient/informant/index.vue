@@ -1,7 +1,7 @@
 <template>
   <section id="informant">
     <div class="message">
-      {{ user.warningMessage }}
+      {{  user.warningMessage }}
     </div>
     <router-link :to="{ path: 'get-started', query: { 'isValidUserBut': '0' } }" class="how-it-works"s
     >How To Get Started
@@ -43,6 +43,7 @@
     width: 80%;
     margin-bottom: 40px;
     line-height: 24px;
+    text-align: center;
   }
 
   .how-it-works {
