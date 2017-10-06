@@ -4,9 +4,9 @@
       <div class="title">Our Services</div>
       <div class="row" v-for="i in totalRows">
         <div class="column" v-for="j in 3">
-          <div class="item" v-for="k in 4">
+          <div class="item" v-for="k in 4" v-if="services[(k - 1) + (4 * (j - 1)) + (12 * (i - 1))]">
             <div class="item-bullet"></div>
-            <div class="item-text"></div>
+            <div class="item-text">{{services[(k - 1) + (4 * (j - 1)) + (12 * (i - 1))]}}</div>
           </div>
         </div>
       </div>
@@ -24,7 +24,6 @@
     data: function () {
       return {
         services: [
-          '',
           'Anti-Snoring Treatment',
           'Bonding',
           'Crown and Bridgework',
@@ -87,36 +86,32 @@
     display: flex;
     flex-direction: row;
     justify-content: center;
-    align-items: center;
+    margin-bottom: 40px;
   }
 
   .column {
-    /*width: 31%;*/
-    /*display: inline-block;*/
-    /*margin-right: 2%;*/
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    width: 31%;
+    display: inline-block;
+    margin-right: 2%;
+    display: inline-block;
   }
 
   .item {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 40px;
+    display: block;
+    height: 30px;
+    line-height: 30px;
   }
 
   .item-bullet {
-    height: 10px;
-    width: 10px;
+    height: 7px;
+    width: 7px;
     background: #3384b2;
+    display: inline-block;
   }
 
   .item-text {
-    height: 10px;
-    width: 10px;
-    background: #3384b2;
+    display: inline-block;
+    margin-left: 5px;
+    font-size: 14px;
   }
 </style>
