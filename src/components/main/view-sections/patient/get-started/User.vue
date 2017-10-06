@@ -89,9 +89,14 @@
         if (areaNumber && groupNumber && sequenceNumber) {
           return `${areaNumber}-${groupNumber}-${sequenceNumber}`
         }
+      },
+      user () {
+        return this.$root.user
+      },
+      gravatarURL () {
+        return this.$root.gravatarURL
       }
     },
-    props: [ 'avatarCanvas', 'user', 'countries', 'states' ],
     name: 'user',
     methods: {
       resetCheckeBoxValues (evt) {
@@ -104,7 +109,7 @@
       setAvatar (evt = null) {
         if (evt) this.displayLabel(evt)
         const email = evt && evt.target && evt.target.value ? evt.target.value.trim() : this.user.email.trim()
-        this.$emit('updateAvatarCanvas', {
+        this.$root.updateUserGravatar({
           email: email,
           callback: (avatarCanvas) => {
             this.styleAndAddAvatarCanvasToPage(avatarCanvas)
@@ -134,7 +139,6 @@
       },
       populateCountries () {
         const countriesElement = document.getElementById('country')
-        const countries = this.countries
         const userCountryIndex = this.user.country || countries.findIndex((country) => country.code === 'US')
         countries.forEach((country, index) => {
           const optionElement = document.createElement('option')
@@ -149,7 +153,6 @@
       },
       populateStates () {
         const statesElement = document.getElementById('state')
-        const states = this.states
         const userStateIndex = this.user.state
         states.forEach((state, index) => {
           const optionElement = document.createElement('option')
@@ -190,7 +193,7 @@
             const phoneNumberElement = document.getElementById('phone-number')
             if (phoneNumberElement) {
               console.log(this.selectedIndex)
-              phoneNumberElement.value = `${_this.countries[this.selectedIndex].dial} `
+              phoneNumberElement.value = `${countries[this.selectedIndex].dial} `
               _this.displayLabel(null, phoneNumberElement)
               phoneNumberElement.focus()
             }
@@ -289,6 +292,8 @@
     }
   }
 
+  import countries from '../../../../../../static/json/countries/countries.json'
+  import states from '../../../../../../static/json/states/states.json'
   import dateSelectionManager from 'date-selection-manager'
   import { validateFor } from '../../../../../util/ssnValidator'
 </script>

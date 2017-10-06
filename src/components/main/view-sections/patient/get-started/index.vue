@@ -1,16 +1,11 @@
 <template>
   <div id="get-started">
     <section class="content" v-if="isDAppReady">
-      <user v-if="user && user.isValid"
-        :avatar-canvas="avatarCanvas"
-        :user="user"
-        :countries="countries"
-        :states="states"
-        @updateAvatarCanvas="updateAvatarCanvas"
-        @callToWriteUser="callToWriteUser"
-      />
+      <user v-if="user && user.isValid && isValidUserBut === '0'" />
 
-      <guest-introduction v-else />
+      <guest-introduction v-else-if="isValidUserBut === '0'" />
+
+      <informant v-else-if="isValidUserBut !== '0'" />
     </section>
 
     <loading v-else />
@@ -23,22 +18,21 @@
     components: {
       User,
       GuestIntroduction,
-      Loading
+      Loading,
+      Informant
     },
-    methods: {
-      updateAvatarCanvas (payload = null) {
-        this.$emit('updateAvatarCanvas', payload)
-      },
-      callToWriteUser (payload = null) {
-        this.$emit('callToWriteUser', payload)
+    computed: {
+      user () {
+        return this.$root.user
       }
     },
-    props: [ 'avatarCanvas', 'user', 'isDAppReady', 'countries', 'states' ]
+    props: [ 'isDAppReady', 'isValidUserBut' ]
   }
 
   import User from './User.vue'
   import GuestIntroduction from './Guest.vue'
   import Loading from '../loading'
+  import Informant from '../informant'
 </script>
 
 <style scoped>

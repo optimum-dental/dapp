@@ -1,5 +1,6 @@
 export default {
   currentRoute: null,
+  currentView: null,
   web3: {
     address: '',
     coinbase: '',
@@ -29,7 +30,7 @@ export default {
     // gender: '',
     type: '',
     email: '',
-    avatarCanvas: null,
+    gravatarURL: '',
     hasWeb3InjectedBrowser: false,
     hasCoinbase: false,
     isConnectedToODLLNetwork: false,
@@ -40,7 +41,10 @@ export default {
     patientable: false,
     isDentist: false,
     isODLLAdmin: false,
-    isODLLManager: false
+    isODLLManager: false,
+    warningMessage: ''
   },
-  isDAppReady: false
+  isDAppReady: false,
+  isValidUserBut: '0',
+  originalIsValidUserBut: '0'
 }

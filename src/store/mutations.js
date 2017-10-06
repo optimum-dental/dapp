@@ -1,46 +1,46 @@
 import ethereumBlockies from 'ethereum-blockies'
 import { avatarCanvasElement } from '../util/DOMManipulator'
-import { MUTATION_TYPES, APPROVED_BLOCKCHAIN_NETWORK_ID, IDENTICON_COLORS } from '../util/constants'
+import { MUTATION_TYPES, APPROVED_BLOCKCHAIN_NETWORK_ID, IDENTICON_COLORS, NETWORKS } from '../util/constants'
 
-function resetUser (state, web3Status) {
-  const user = {
-    // lastName: '',
-    // firstName: '',
-    // middleName: '',
-    // fullName: '',
-    // street: '',
-    // city: '',
-    // state: '',
-    // zipCode: '',
-    // country: '',
-    // phoneNumber: '',
-    // socialSecurityNumber: '',
-    // areaNumber: '',
-    // groupNumber: '',
-    // sequenceNumber: '',
-    // day: '',
-    // month: '',
-    // year: '',
-    // gender: '',
-    email: '',
-    type: '',
-    avatarCanvas: null,
-    hasWeb3InjectedBrowser: false,
-    hasCoinbase: false,
-    isConnectedToODLLNetwork: false,
-    coinbase: '',
-    isValid: false,
-    isPatient: false,
-    canBeNewPatient: false,
-    patientable: false,
-    isDentist: false,
-    isODLLAdmin: false,
-    isODLLManager: false
-  }
+// function resetUser (state, web3Status) {
+//   const user = {
+//     // lastName: '',
+//     // firstName: '',
+//     // middleName: '',
+//     // fullName: '',
+//     // street: '',
+//     // city: '',
+//     // state: '',
+//     // zipCode: '',
+//     // country: '',
+//     // phoneNumber: '',
+//     // socialSecurityNumber: '',
+//     // areaNumber: '',
+//     // groupNumber: '',
+//     // sequenceNumber: '',
+//     // day: '',
+//     // month: '',
+//     // year: '',
+//     // gender: '',
+//     email: '',
+//     type: '',
+//     avatarCanvas: null,
+//     hasWeb3InjectedBrowser: false,
+//     hasCoinbase: false,
+//     isConnectedToODLLNetwork: false,
+//     coinbase: '',
+//     isValid: false,
+//     isPatient: false,
+//     canBeNewPatient: false,
+//     patientable: false,
+//     isDentist: false,
+//     isODLLAdmin: false,
+//     isODLLManager: false
+//   }
 
-  Object.assign(user, web3Status)
-  state.user = user
-}
+//   Object.assign(user, web3Status)
+//   state.user = user
+// }
 
 function getHash (stringValue) {
   let hash = 0
@@ -63,14 +63,15 @@ function assignPropertyTo (hashObject, key, value) {
   })
 }
 
-function updateUserAvatarCanvas (state, userCopy, payload = null) {
+function updateUserGravatar (state, userCopy, payload = null) {
   const colorPosition = Math.abs(getHash(state.web3.coinbase) % IDENTICON_COLORS.length)
   const identiconColor = IDENTICON_COLORS[colorPosition]
   const email = payload && payload.email ? payload.email : ''
 
   if (email && email.trim() !== '') {
     avatarCanvasElement(email)
-    .then((avatarCanvas) => {
+    .then((avatarCanvas, gravatarURL) => {
+      assignPropertyTo(userCopy, 'gravatarURL', gravatarURL)
       assignPropertyTo(userCopy, 'avatarCanvas', avatarCanvas)
       state.user = userCopy
       if (payload.callback) payload.callback(avatarCanvas)
@@ -105,7 +106,6 @@ export default {
     if (payload.callback) payload.callback(state)
   },
   [MUTATION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS] (state, payload) {
-    const userObject = payload.userObject
     const hasWeb3InjectedBrowser = state.web3.isInjected
     const hasCoinbase = !!(state.web3.coinbase && state.web3.coinbase !== '')
     const coinbase = state.web3.coinbase
@@ -117,33 +117,72 @@ export default {
       coinbase
     }
 
-    if (hasWeb3InjectedBrowser && hasCoinbase && isConnectedToODLLNetwork) {
-      const userCopy = state.user
-
-      Object.assign(userCopy, web3Status, userObject, {
-        isValid: true,
-        patientable: userObject.type === '0' || userObject.type === '1',
-        canBeNewPatient: userObject.type === '0',
-        isPatient: userObject.type === '1',
-        isDentist: userObject.type === '2',
-        isODLLAdmin: userObject.type === '3',
-        isODLLManager: userObject.type === '4'
-      })
-
-      state.user = userCopy
-      if (payload.callback) payload.callback()
+    let warningMessage = null
+    if (hasWeb3InjectedBrowser) {
+      if (hasCoinbase) {
+        if (!isConnectedToODLLNetwork) {
+          warningMessage = `You're not on the same blockchain as us. Please connect to the ${NETWORKS[APPROVED_BLOCKCHAIN_NETWORK_ID]}`
+        }
+      } else {
+        warningMessage = "Looks like you haven't logged into your Web3 injector. If you're using Metamask, please log in."
+      }
     } else {
-      resetUser(state, web3Status)
+      warningMessage = 'Your browser is not Web3-enabled. Click the link below to see how to use the ODLL dApp.'
     }
+    const userCopy = state.user
+
+    Object.assign(userCopy, web3Status)
+    state.user = userCopy
+    if (payload.callback) payload.callback({status: !warningMessage, warningMessage})
+  },
+  [MUTATION_TYPES.UPDATE_USER_STATE] (state, payload) {
+    const userObject = payload.userObject
+    const userCopy = state.user
+    console.log(userObject)
+    Object.assign(userCopy, userObject, {
+      isValid: true,
+      patientable: userObject.type === '0' || userObject.type === '1',
+      canBeNewPatient: userObject.type === '0',
+      isPatient: userObject.type === '1',
+      isDentist: userObject.type === '2',
+      isODLLAdmin: userObject.type === '3',
+      isODLLManager: userObject.type === '4'
+    })
+
+    state.user = userCopy
+    if (payload.callback) payload.callback(true)
   },
   [MUTATION_TYPES.CHANGE_CURRENT_ROUTE_TO] (state, newRoute) {
     state.currentRoute = newRoute
   },
-  [MUTATION_TYPES.UPDATE_USER_AVATAR_CANVAS] (state, payload) {
+  [MUTATION_TYPES.SET_CURRENT_VIEW] (state, newRoute) {
+    state.currentView = newRoute.meta.view
+  },
+  [MUTATION_TYPES.UPDATE_USER_GRAVATAR] (state, payload) {
     const userCopy = state.user
-    updateUserAvatarCanvas(state, userCopy, payload)
+    updateUserGravatar(state, userCopy, payload)
   },
   [MUTATION_TYPES.UPDATE_DAPP_READINESS] (state, isReady) {
     state.isDAppReady = isReady
+  },
+  [MUTATION_TYPES.INITIALISE_IS_VALID_USER_BUT] (state, payload) {
+    state.isValidUserBut = payload.value ? '1' : '0'
+    state.originalIsValidUserBut = payload.value ? '1' : '0'
+    const userCopy = state.user
+    userCopy.warningMessage = payload.value ? payload.value : ''
+    state.user = userCopy
+    if (payload.callback) payload.callback()
+  },
+  [MUTATION_TYPES.SET_IS_VALID_USER_BUT] (state, newValue) {
+    state.isValidUserBut = newValue
+  },
+  [MUTATION_TYPES.RESET_IS_VALID_USER_BUT] (state) {
+    state.isValidUserBut = state.originalIsValidUserBut
+  },
+  [MUTATION_TYPES.UPDATE_WEB3_PROPERTIES] (state, payload) {
+    for (var i = payload.properties.length - 1; i >= 0; i--) {
+      state.web3[payload.properties[i]] = payload.values[i]
+      if (state.user[payload.properties[i]]) state.user[payload.properties[i]] = payload.values[i]
+    }
   }
 }

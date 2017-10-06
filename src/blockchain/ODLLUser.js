@@ -65,15 +65,14 @@ class ODLLUser {
     const state = dataObject.state
     return new Promise((resolve, reject) => {
       if (!state || !state.web3 || !(state.web3.instance)) {
-        reject('Web3 is not initialised. Use a Web3 injector')
+        reject({ error: true, warningMessage: 'Web3 is not initialised. Use a Web3 injector' })
       } else {
         if (state.web3.networkId === APPROVED_BLOCKCHAIN_NETWORK_ID) {
           let odllUserContract = contract(ODLLUserContract)
           odllUserContract.setProvider(state.web3.instance().currentProvider)
           state.web3.instance().eth.getCoinbase((error, coinbase) => {
             if (error) {
-              console.error(':::Unable to get coinbase for this operation')
-              reject(error)
+              reject({ error, warningMessage: 'Unable to get coinbase for this operation' })
             } else {
               odllUserContract.deployed()
               .then((contractInstance) => {
@@ -82,16 +81,16 @@ class ODLLUser {
                   resolve(result)
                 })
                 .catch((error) => {
-                  reject(error)
+                  reject({ error, isValid: true, warningMessage: "We've encountered a problem fetching your information from the blockchain. Please do try again in a few minutes." })
                 })
               })
               .catch((error) => {
-                reject(error)
+                reject({ error, isValid: true, warningMessage: "We couldn't find Oral Data Link Smart Contracts on your detected network. This is because the Smart Contracts aren't deployed there. Contact Support to know why this is the case." })
               })
             }
           })
         } else {
-          reject(`You are NOT connected to the ${NETWORKS[APPROVED_BLOCKCHAIN_NETWORK_ID]} on which this dApp runs.`)
+          reject({ error: true, warningMessage: `You're not on the same blockchain as us. Please connect to the ${NETWORKS[APPROVED_BLOCKCHAIN_NETWORK_ID]}` })
         }
       }
     })

@@ -19,6 +19,9 @@ export default {
     vectors () {
       return vectorStyle
     }
+  },
+  mounted: function () {
+    this.$emit('resetIsValidUserBut')
   }
 }
 

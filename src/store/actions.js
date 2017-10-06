@@ -31,16 +31,52 @@ export default {
       })
     })
   },
-  [ACTION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS] ({ commit }, payload) {
-    commit(MUTATION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS, payload)
+  [ACTION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS] ({ commit }) {
+    return new Promise(function (resolve, reject) {
+      commit(MUTATION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS, {
+        callback: (result) => {
+          result.status ? resolve() : reject(result)
+        }
+      })
+    })
+  },
+  [ACTION_TYPES.UPDATE_USER_STATE] ({ commit }, userObject) {
+    return new Promise(function (resolve, reject) {
+      commit(MUTATION_TYPES.UPDATE_USER_STATE, {
+        userObject,
+        callback: (status) => {
+          status ? resolve() : reject()
+        }
+      })
+    })
   },
   [ACTION_TYPES.CHANGE_CURRENT_ROUTE_TO] ({ commit }, newRoute) {
     commit(MUTATION_TYPES.CHANGE_CURRENT_ROUTE_TO, newRoute)
   },
-  [ACTION_TYPES.UPDATE_USER_AVATAR_CANVAS] ({ commit }, payload) {
-    commit(MUTATION_TYPES.UPDATE_USER_AVATAR_CANVAS, payload)
+  [ACTION_TYPES.SET_CURRENT_VIEW] ({ commit }, newRoute) {
+    commit(MUTATION_TYPES.SET_CURRENT_VIEW, newRoute)
+  },
+  [ACTION_TYPES.UPDATE_USER_GRAVATAR] ({ commit }, payload) {
+    commit(MUTATION_TYPES.UPDATE_USER_GRAVATAR, payload)
   },
   [ACTION_TYPES.UPDATE_DAPP_READINESS] ({ commit }, isReady) {
     commit(MUTATION_TYPES.UPDATE_DAPP_READINESS, isReady)
+  },
+  [ACTION_TYPES.INITIALISE_IS_VALID_USER_BUT] ({ commit }, value) {
+    return new Promise(function (resolve, reject) {
+      commit(MUTATION_TYPES.INITIALISE_IS_VALID_USER_BUT, {
+        value,
+        callback: () => resolve()
+      })
+    })
+  },
+  [ACTION_TYPES.SET_IS_VALID_USER_BUT] ({ commit }, newValue) {
+    commit(MUTATION_TYPES.SET_IS_VALID_USER_BUT, newValue)
+  },
+  [ACTION_TYPES.RESET_IS_VALID_USER_BUT] ({ commit }) {
+    commit(MUTATION_TYPES.RESET_IS_VALID_USER_BUT)
+  },
+  [ACTION_TYPES.UPDATE_WEB3_PROPERTIES] ({ commit }, payload) {
+    commit(MUTATION_TYPES.UPDATE_WEB3_PROPERTIES, payload)
   }
 }

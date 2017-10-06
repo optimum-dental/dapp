@@ -3,8 +3,8 @@ import store from '../../store/'
 import { ACTION_TYPES, APPROVED_BLOCKCHAIN_NETWORK_ID } from '../../util/constants.js'
 
 const monitorWeb3 = function (state) {
-  const networkId = state && state.web3 ? state.web3.networkId : ''
-  const coinbase = state && state.web3 ? state.web3.coinbase : ''
+  let networkId = state && state.web3 ? state.web3.networkId : ''
+  let coinbase = state && state.web3 ? state.web3.coinbase : ''
   let web3 = window.web3
   let isLocalWeb3 = false
 
@@ -36,15 +36,21 @@ const monitorWeb3 = function (state) {
     if (web3 && !isLocalWeb3) {
       web3.version.getNetwork((err, newNetworkId) => {
         newNetworkId = !err && newNetworkId ? newNetworkId.toString() : ''
-        if (!err && newNetworkId && newNetworkId !== '' && newNetworkId !== networkId) {
-        // if (!err && networkId && networkId !== '' && newNetworkId && newNetworkId !== '' && newNetworkId !== networkId) {
+        // console.log(111111, newNetworkId, networkId, 222222)
+        if ((!err && newNetworkId && newNetworkId !== '' && newNetworkId !== networkId) || (!newNetworkId && networkId)) {
           window.location.reload()
         } else {
           web3.eth.getCoinbase((err, newCoinbase) => {
             newCoinbase = !err && newCoinbase ? newCoinbase.toString() : ''
-            if (!err && newCoinbase && newCoinbase !== '' && newCoinbase !== coinbase && newNetworkId === APPROVED_BLOCKCHAIN_NETWORK_ID) {
-              // if (!err && coinbase && coinbase !== '' && newCoinbase && newCoinbase !== '' && newCoinbase !== coinbase && newNetworkId === APPROVED_BLOCKCHAIN_NETWORK_ID) {
+            // console.log(999999, newCoinbase, coinbase, 888888)
+            if ((!err && newCoinbase && newCoinbase !== '' && newCoinbase !== coinbase && newNetworkId === APPROVED_BLOCKCHAIN_NETWORK_ID) || (!newCoinbase && coinbase)) {
               window.location.reload()
+            } else if (!err && newCoinbase && newCoinbase !== '' && newCoinbase !== coinbase) {
+              coinbase = newCoinbase
+              store.dispatch(ACTION_TYPES.UPDATE_WEB3_PROPERTIES, {
+                properties: ['coinbase'],
+                values: [ newCoinbase ]
+              })
             }
           })
         }

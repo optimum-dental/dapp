@@ -1,29 +1,21 @@
 <template>
   <component class="main-view-template"
     :is="currentView"
-    :avatar-canvas="avatarCanvas"
-    :user="user"
     :is-d-app-ready="isDAppReady"
-    :countries="countries"
-    :states="states"
-    @updateAvatarCanvas="updateAvatarCanvas"
-    @callToWriteUser="callToWriteUser"
+    :is-valid-user-but="isValidUserBut"
   >
   </component>
 </template>
 
 <script type="text/javascript">
   export default {
-    name: 'main-view-template',
-    methods: {
-      updateAvatarCanvas (payload = null) {
-        this.$emit('updateAvatarCanvas', payload)
-      },
-      callToWriteUser (payload = null) {
-        this.$emit('callToWriteUser', payload)
+    computed: {
+      user () {
+        return this.$root.user
       }
     },
-    props: [ 'avatarCanvas', 'currentView', 'user', 'isDAppReady', 'countries', 'states' ]
+    name: 'main-view-template',
+    props: [ 'currentView', 'isDAppReady', 'isValidUserBut' ]
   }
 </script>
 

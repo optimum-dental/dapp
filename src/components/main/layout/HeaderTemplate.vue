@@ -22,14 +22,17 @@
   export default {
     computed: {
       coinbase () {
-        return this.user.coinbase
+        return this.$root.coinbase
       },
       truncatedCoinbase () {
-        return this.user.isValid ? truncate(this.user.coinbase, 22) : 'No account connected'
+        return this.user.hasCoinbase ? truncate(this.$root.coinbase, 22) : 'No account connected'
+      },
+      user () {
+        return this.$root.user
       }
     },
     name: 'header-template',
-    props: [ 'user', 'isDAppReady' ]
+    props: [ 'isDAppReady' ]
   }
 
   import { truncate } from '../../../util/StringManager'

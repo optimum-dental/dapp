@@ -15,11 +15,11 @@
 
 
 <style scoped>
-  .menu-item.router-link-active.router-link-exact-active, .menu-item:hover {
+  .menu-item.router-link-active, .menu-item:hover {
     background-color: #296d92;
   }
 
-  .menu-item.router-link-active.router-link-exact-active:after {
+  .menu-item.router-link-active:after {
     content: '';
     display: inline-block;
     position: absolute;

@@ -4,38 +4,29 @@
       :is-d-app-ready="isDAppReady"
     />
     <HeaderTemplate
-      :user="user"
       :is-d-app-ready="isDAppReady"
     />
     <MainViewTemplate
-      :avatar-canvas="avatarCanvas"
       :current-view="currentView"
-      :user="user"
       :is-d-app-ready="isDAppReady"
-      :countries="countries"
-      :states="states"
-      @updateAvatarCanvas="updateAvatarCanvas"
-      @callToWriteUser="callToWriteUser"
+      :is-valid-user-but="isValidUserBut"
     />
   </div>
 </template>
 
 <script>
   export default {
+    computed: {
+      user () {
+        return this.$root.user
+      }
+    },
     name: 'main-page',
-    props: [ 'avatarCanvas', 'currentView', 'user', 'isDAppReady', 'countries', 'states' ],
+    props: [ 'currentView', 'isDAppReady', 'isValidUserBut' ],
     components: {
       HeaderTemplate,
       MainViewTemplate,
       SideBarTemplate
-    },
-    methods: {
-      updateAvatarCanvas (payload = null) {
-        this.$emit('updateAvatarCanvas', payload)
-      },
-      callToWriteUser (payload = null) {
-        this.$emit('callToWriteUser', payload)
-      }
     }
   }
 

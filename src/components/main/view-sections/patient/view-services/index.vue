@@ -1,9 +1,7 @@
 <template>
   <div id="view-services">
     <section class="content" v-if="isDAppReady">
-      <services
-        :user="user"
-      />
+      <services />
     </section>
 
     <loading v-else />
@@ -12,12 +10,17 @@
 
 <script type="text/javascript">
   export default {
+    computed: {
+      user () {
+        return this.$root.user
+      }
+    },
     name: 'view-services',
     components: {
       Services,
       Loading
     },
-    props: [ 'user', 'isDAppReady' ]
+    props: [ 'isDAppReady' ]
   }
 
   import Services from './Services.vue'

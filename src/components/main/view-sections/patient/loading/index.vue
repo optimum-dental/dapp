@@ -1,12 +1,12 @@
 <template>
   <section id="loading">
-  <div class="logo"></div>
-   <div class="tip-title" v-if="message.title">{{ message.title }}</div>
-   <div class="tip-body" v-if="message.main || message.cite">
-     <div class="tip-main" v-if="message.main">{{ message.main }}</div>
-     <div class="tip-cite" v-if="message.cite">{{ message.cite }}</div>
+    <div class="logo"></div>
+    <div class="tip-title" v-if="message.title">{{ message.title }}</div>
+    <div class="tip-body" v-if="message.main || message.cite">
+      <div class="tip-main" v-if="message.main">{{ message.main }}</div>
+      <div class="tip-cite" v-if="message.cite">{{ message.cite }}</div>
     </div>
-   <div class="spin"></div>
+    <div class="spin"></div>
   </section>
 </template>
 

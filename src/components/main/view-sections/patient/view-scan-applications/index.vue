@@ -1,11 +1,11 @@
 <template>
   <div id="view-scan-applications">
     <section class="content" v-if="isDAppReady">
-      <scan-applications v-if="user && user.isValid && user.patientable"
-        :user="user"
-      />
+      <scan-applications v-if="user && user.isValid && user.patientable && isValidUserBut === '0'" />
 
-      <guest-introduction v-else />
+      <guest-introduction v-else-if="isValidUserBut === '0'" />
+
+      <informant v-else-if="isValidUserBut !== '0'" />
     </section>
 
     <loading v-else />
@@ -14,18 +14,25 @@
 
 <script type="text/javascript">
   export default {
+    computed: {
+      user () {
+        return this.$root.user
+      }
+    },
     name: 'view-scan-applications',
     components: {
       ScanApplications,
       GuestIntroduction,
-      Loading
+      Loading,
+      Informant
     },
-    props: [ 'user', 'isDAppReady' ]
+    props: [ 'isDAppReady', 'isValidUserBut' ]
   }
 
   import ScanApplications from './ScanApplications.vue'
   import GuestIntroduction from '../get-started/Guest.vue'
   import Loading from '../loading'
+  import Informant from '../informant'
 </script>
 
 <style scoped>

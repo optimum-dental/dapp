@@ -1,11 +1,11 @@
 <template>
   <div id="find-dentist">
     <section class="content" v-if="isDAppReady">
-      <dentists v-if="user && user.isValid"
-        :user="user"
-      />
+      <dentists v-if="user && user.isValid && isValidUserBut === '0'" />
 
-      <guest-introduction v-else />
+      <guest-introduction v-else-if="isValidUserBut === '0'" />
+
+      <informant v-else-if="isValidUserBut !== '0'" />
     </section>
 
     <loading v-else />
@@ -18,14 +18,21 @@
     components: {
       Dentists,
       GuestIntroduction,
-      Loading
+      Loading,
+      Informant
     },
-    props: [ 'user', 'isDAppReady' ]
+    computed: {
+      user () {
+        return this.$root.user
+      }
+    },
+    props: [ 'isDAppReady', 'isValidUserBut' ]
   }
 
   import Dentists from './Dentists.vue'
   import GuestIntroduction from '../get-started/Guest.vue'
   import Loading from '../loading'
+  import Informant from '../informant'
 </script>
 
 <style scoped>
