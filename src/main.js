@@ -82,6 +82,7 @@ new Vue({
     })
     .catch((result) => {
       let state = result.state
+      this.forcedIsValidUserBut = '0'
       monitorWeb3(state)
       if (!(this.isDAppReady)) {
         this.$store.dispatch(ACTION_TYPES.UPDATE_DAPP_READINESS, true)
@@ -152,7 +153,7 @@ new Vue({
     },
     isDAppReady (isDAppReady) {
       console.log('isDAppReady: ', isDAppReady)
-      this.callSetIsValidUserBut(this.$route.query.isValidUserBut)
+      this.callSetIsValidUserBut(this.$route.query.isValidUserBut || this.forcedIsValidUserBut)
     },
     $route (newRoute) {
       this[ACTION_TYPES.CHANGE_CURRENT_ROUTE_TO](newRoute)
