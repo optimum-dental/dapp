@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper">
-    <div id="services">{{totalRows}}
+    <div id="services">
       <div class="title">Our Services</div>
       <div class="row" v-for="i in totalRows">
         <div class="column" v-for="j in 3">
