@@ -1,3 +1,5 @@
+pragma solidity ^0.4.11;
+
 /*
  * @title String & slice utility library for Solidity contracts.
  * @author Nick Johnson <arachnid@notdot.net>
@@ -39,9 +41,9 @@ library strings {
         uint _ptr;
     }
 
-    function memcpy(uint dest, uint src, uint len) private {
+    function memcpy(uint dest, uint src, uint strLen) private {
         // Copy word-length chunks while possible
-        for(; len >= 32; len -= 32) {
+        for(; strLen >= 32; strLen -= 32) {
             assembly {
                 mstore(dest, mload(src))
             }
@@ -50,7 +52,7 @@ library strings {
         }
 
         // Copy remaining bytes
-        uint mask = 256 ** (32 - len) - 1;
+        uint mask = 256 ** (32 - strLen) - 1;
         assembly {
             let srcpart := and(mload(src), not(mask))
             let destpart := and(mload(dest), mask)
@@ -155,7 +157,7 @@ library strings {
         // Starting at ptr-31 means the LSB will be the byte we care about
         var ptr = self._ptr - 31;
         var end = ptr + self._len;
-        for (uint len = 0; ptr < end; len++) {
+        for (uint strLen = 0; ptr < end; strLen++) {
             uint8 b;
             assembly { b := and(mload(ptr), 0xFF) }
             if (b < 0x80) {
@@ -172,7 +174,7 @@ library strings {
                 ptr += 6;
             }
         }
-        return len;
+        return strLen;
     }
 
     /*
@@ -245,31 +247,31 @@ library strings {
             return rune;
         }
 
-        uint len;
+        uint strLen;
         uint b;
         // Load the first byte of the rune into the LSBs of b
         assembly { b := and(mload(sub(mload(add(self, 32)), 31)), 0xFF) }
         if (b < 0x80) {
-            len = 1;
+            strLen = 1;
         } else if(b < 0xE0) {
-            len = 2;
+            strLen = 2;
         } else if(b < 0xF0) {
-            len = 3;
+            strLen = 3;
         } else {
-            len = 4;
+            strLen = 4;
         }
 
         // Check for truncated codepoints
-        if (len > self._len) {
+        if (strLen > self._len) {
             rune._len = self._len;
             self._ptr += self._len;
             self._len = 0;
             return rune;
         }
 
-        self._ptr += len;
-        self._len -= len;
-        rune._len = len;
+        self._ptr += strLen;
+        self._len -= strLen;
+        rune._len = strLen;
         return rune;
     }
 
@@ -294,34 +296,34 @@ library strings {
         }
 
         uint word;
-        uint len;
-        uint div = 2 ** 248;
+        uint strLen;
+        uint _div = 2 ** 248;
 
         // Load the rune into the MSBs of b
         assembly { word:= mload(mload(add(self, 32))) }
-        var b = word / div;
+        var b = word / _div;
         if (b < 0x80) {
             ret = b;
-            len = 1;
+            strLen = 1;
         } else if(b < 0xE0) {
             ret = b & 0x1F;
-            len = 2;
+            strLen = 2;
         } else if(b < 0xF0) {
             ret = b & 0x0F;
-            len = 3;
+            strLen = 3;
         } else {
             ret = b & 0x07;
-            len = 4;
+            strLen = 4;
         }
 
         // Check for truncated codepoints
-        if (len > self._len) {
+        if (strLen > self._len) {
             return 0;
         }
 
-        for (uint i = 1; i < len; i++) {
-            div = div / 256;
-            b = (word / div) & 0xFF;
+        for (uint i = 1; i < strLen; i++) {
+            _div = _div / 256;
+            b = (word / _div) & 0xFF;
             if (b & 0xC0 != 0x80) {
                 // Invalid UTF-8 sequence
                 return 0;
@@ -360,10 +362,10 @@ library strings {
 
         bool equal;
         assembly {
-            let len := mload(needle)
+            let strLen := mload(needle)
             let selfptr := mload(add(self, 0x20))
             let needleptr := mload(add(needle, 0x20))
-            equal := eq(sha3(selfptr, len), sha3(needleptr, len))
+            equal := eq(sha3(selfptr, strLen), sha3(needleptr, strLen))
         }
         return equal;
     }
@@ -383,10 +385,10 @@ library strings {
         bool equal = true;
         if (self._ptr != needle._ptr) {
             assembly {
-                let len := mload(needle)
+                let strLen := mload(needle)
                 let selfptr := mload(add(self, 0x20))
                 let needleptr := mload(add(needle, 0x20))
-                equal := eq(sha3(selfptr, len), sha3(needleptr, len))
+                equal := eq(sha3(selfptr, strLen), sha3(needleptr, strLen))
             }
         }
 
@@ -417,9 +419,9 @@ library strings {
 
         bool equal;
         assembly {
-            let len := mload(needle)
+            let strLen := mload(needle)
             let needleptr := mload(add(needle, 0x20))
-            equal := eq(sha3(selfptr, len), sha3(needleptr, len))
+            equal := eq(sha3(selfptr, strLen), sha3(needleptr, strLen))
         }
 
         return equal;
@@ -441,9 +443,9 @@ library strings {
         bool equal = true;
         if (selfptr != needle._ptr) {
             assembly {
-                let len := mload(needle)
+                let strLen := mload(needle)
                 let needleptr := mload(add(needle, 0x20))
-                equal := eq(sha3(selfptr, len), sha3(needleptr, len))
+                equal := eq(sha3(selfptr, strLen), sha3(needleptr, strLen))
             }
         }
 
@@ -641,10 +643,10 @@ library strings {
      * @param needle The text to search for in `self`.
      * @return The number of occurrences of `needle` found in `self`.
      */
-    function count(slice self, slice needle) internal returns (uint count) {
+    function count(slice self, slice needle) internal returns (uint _count) {
         uint ptr = findPtr(self._len, self._ptr, needle._len, needle._ptr) + needle._len;
         while (ptr <= self._ptr + self._len) {
-            count++;
+            _count++;
             ptr = findPtr(self._len - (ptr - self._ptr), ptr, needle._len, needle._ptr) + needle._len;
         }
     }
@@ -687,11 +689,11 @@ library strings {
         if (parts.length == 0)
             return "";
 
-        uint len = self._len * (parts.length - 1);
+        uint strLen = self._len * (parts.length - 1);
         for(uint i = 0; i < parts.length; i++)
-            len += parts[i]._len;
+            strLen += parts[i]._len;
 
-        var ret = new string(len);
+        var ret = new string(strLen);
         uint retptr;
         assembly { retptr := add(ret, 32) }
 

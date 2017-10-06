@@ -37,11 +37,13 @@ const monitorWeb3 = function (state) {
       web3.version.getNetwork((err, newNetworkId) => {
         newNetworkId = !err && newNetworkId ? newNetworkId.toString() : ''
         if (!err && newNetworkId && newNetworkId !== '' && newNetworkId !== networkId) {
+        // if (!err && networkId && networkId !== '' && newNetworkId && newNetworkId !== '' && newNetworkId !== networkId) {
           window.location.reload()
         } else {
           web3.eth.getCoinbase((err, newCoinbase) => {
             newCoinbase = !err && newCoinbase ? newCoinbase.toString() : ''
             if (!err && newCoinbase && newCoinbase !== '' && newCoinbase !== coinbase && newNetworkId === APPROVED_BLOCKCHAIN_NETWORK_ID) {
+              // if (!err && coinbase && coinbase !== '' && newCoinbase && newCoinbase !== '' && newCoinbase !== coinbase && newNetworkId === APPROVED_BLOCKCHAIN_NETWORK_ID) {
               window.location.reload()
             }
           })

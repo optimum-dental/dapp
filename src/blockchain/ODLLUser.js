@@ -102,53 +102,38 @@ class ODLLUser {
     const type = utf8Results[0]
     switch (type) {
       case '1':
-        return {
-          type: type,
-          lastName: utf8Results[1],
-          firstName: utf8Results[2],
-          middleName: utf8Results[3],
-          email: utf8Results[4],
-          fullName: `${utf8Results[1]} ${utf8Results[2]} ${utf8Results[3]}`,
-          street: utf8Results[5],
-          city: utf8Results[6],
-          state: utf8Results[7],
-          zipCode: utf8Results[8],
-          country: utf8Results[9],
-          phoneNumber: utf8Results[10],
-          areaNumber: utf8Results[11],
-          groupNumber: utf8Results[12],
-          sequenceNumber: utf8Results[13],
-          socialSecurityNumber: `${utf8Results[11]}-${utf8Results[12]}-${utf8Results[13]}`,
-          day: utf8Results[14],
-          month: utf8Results[15],
-          year: utf8Results[16],
-          gender: utf8Results[17]
-        }
+        return this.generalUserObject
       case '2':
-        return {
-          type: type,
-          firstName: utf8Results[1],
-          lastName: utf8Results[2],
-          email: utf8Results[3]
-        }
+        return Object.assign(this.generalUserObject(utf8Results), {
+          isODLLDentist: utf8Results[13],
+          isAvailable: utf8Results[14]
+        })
       case '3':
-        return {
-          type: type,
-          firstName: utf8Results[1],
-          lastName: utf8Results[2],
-          email: utf8Results[3]
-        }
+        return this.generalUserObject
       case '4':
-        return {
-          type: type,
-          firstName: utf8Results[1],
-          lastName: utf8Results[2],
-          email: utf8Results[3]
-        }
+        return this.generalUserObject
       default:
         return {
           type: '0'
         }
+    }
+  }
+
+  generalUserObject (utf8Results) {
+    return {
+      type: utf8Results[0],
+      name: utf8Results[1],
+      email: utf8Results[2],
+      gravatar: utf8Results[3],
+      street: utf8Results[4],
+      city: utf8Results[5],
+      state: utf8Results[6],
+      zipCode: utf8Results[7],
+      country: utf8Results[8],
+      phoneNumber: utf8Results[9],
+      socialSecurityNumber: utf8Results[10],
+      birthday: utf8Results[11],
+      gender: utf8Results[12]
     }
   }
 }

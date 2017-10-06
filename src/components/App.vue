@@ -22,15 +22,15 @@
       .then((result) => {
         let state = result.state
         monitorWeb3(state)
-        // ODLLUser.getUserDataFromTheBlockchain(state)
-        // .then((userObject) => {
-        //   this.$store.dispatch(ACTION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS, {
-        //     userObject,
-        //     callback: () => {
-        //       this.$store.dispatch(ACTION_TYPES.UPDATE_DAPP_READINESS, true)
-        //     }
-        //   })
-        // })
+        ODLLUser.getUserDataFromTheBlockchain(state)
+        .then((userObject) => {
+          this.$store.dispatch(ACTION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS, {
+            userObject,
+            callback: () => {
+              this.$store.dispatch(ACTION_TYPES.UPDATE_DAPP_READINESS, true)
+            }
+          })
+        })
         .catch((result) => {
           console.error(result)
           if (!(this.isDAppReady)) {
@@ -142,14 +142,14 @@
         this[ACTION_TYPES.UPDATE_USER_AVATAR_CANVAS](payload)
       },
       callToWriteUser (payload = null) {
-        // ODLLUser.writeUser(this.$store.state, payload)
-        // .then((userData) => {
-        //   if (payload.callback) payload.callback(userData)
-        // })
-        // .catch((err) => {
-        //   if (payload.callback) payload.callback()
-        //   console.error(err)
-        // })
+        ODLLUser.writeUser(this.$store.state, payload)
+        .then((userData) => {
+          if (payload.callback) payload.callback(userData)
+        })
+        .catch((err) => {
+          if (payload.callback) payload.callback()
+          console.error(err)
+        })
       }
     },
     props: [ 'avatarCanvas' ],
@@ -174,7 +174,7 @@
 
   import { mapState, mapActions } from 'vuex'
   import { ACTION_TYPES } from '../util/constants'
-  // import ODLLUser from '../blockchain/ODLLUser'
+  import ODLLUser from '../blockchain/ODLLUser'
   import monitorWeb3 from '../util/web3/monitorWeb3'
   import countries from '../../static/json/countries/countries.json'
   import states from '../../static/json/states/states.json'

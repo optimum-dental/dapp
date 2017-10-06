@@ -1,7 +1,8 @@
 pragma solidity ^0.4.11;
 
 import "../zeppelin/ownership/Ownable.sol";
-import "../zeppelin/math/safeMath.sol";
+import "../zeppelin/math/SafeMath.sol";
+// import "../abstract/strings.sol";
 import "../lib/arachnid/solidity-stringutils/strings.sol";
 
 contract ODLLDB is Ownable {
@@ -73,13 +74,13 @@ contract ODLLDB is Ownable {
   }
 
   function setUInt8Value(bytes32 record, uint8 value)
-  onlyPermittedContractOrOwner
+    onlyPermittedContractOrOwner
   {
     UInt8Storage[record] = value;
   }
 
   function deleteUInt8Value(bytes32 record)
-  onlyPermittedContractOrOwner
+    onlyPermittedContractOrOwner
   {
     delete UInt8Storage[record];
   }
@@ -91,25 +92,25 @@ contract ODLLDB is Ownable {
   }
 
   function setUIntValue(bytes32 record, uint value)
-  onlyPermittedContractOrOwner
+    onlyPermittedContractOrOwner
   {
     UIntStorage[record] = value;
   }
 
   function addUIntValue(bytes32 record, uint value)
-  onlyPermittedContractOrOwner
+    onlyPermittedContractOrOwner
   {
-    UIntStorage[record] = SafeMath.safeAdd(UIntStorage[record], value);
+    UIntStorage[record] = SafeMath.add(UIntStorage[record], value);
   }
 
   function subUIntValue(bytes32 record, uint value)
-  onlyPermittedContractOrOwner
+    onlyPermittedContractOrOwner
   {
-    UIntStorage[record] = SafeMath.safeSub(UIntStorage[record], value);
+    UIntStorage[record] = SafeMath.sub(UIntStorage[record], value);
   }
 
   function deleteUIntValue(bytes32 record)
-  onlyPermittedContractOrOwner
+    onlyPermittedContractOrOwner
   {
     delete UIntStorage[record];
   }
@@ -121,13 +122,13 @@ contract ODLLDB is Ownable {
   }
 
   function setStringValue(bytes32 record, string value)
-  onlyPermittedContractOrOwner
+    onlyPermittedContractOrOwner
   {
     StringStorage[record] = "^".toSlice().concat(value.toSlice());
   }
 
   function deleteStringValue(bytes32 record)
-  onlyPermittedContractOrOwner
+    onlyPermittedContractOrOwner
   {
     delete StringStorage[record];
   }
@@ -139,13 +140,13 @@ contract ODLLDB is Ownable {
   }
 
   function setAddressValue(bytes32 record, address value)
-  onlyPermittedContractOrOwner
+    onlyPermittedContractOrOwner
   {
     AddressStorage[record] = value;
   }
 
   function deleteAddressValue(bytes32 record)
-  onlyPermittedContractOrOwner
+    onlyPermittedContractOrOwner
   {
     delete AddressStorage[record];
   }
@@ -157,13 +158,13 @@ contract ODLLDB is Ownable {
   }
 
   function setBytesValue(bytes32 record, bytes value)
-  onlyPermittedContractOrOwner
+    onlyPermittedContractOrOwner
   {
     BytesStorage[record] = value;
   }
 
   function deleteBytesValue(bytes32 record)
-  onlyPermittedContractOrOwner
+    onlyPermittedContractOrOwner
   {
     delete BytesStorage[record];
   }
@@ -175,13 +176,13 @@ contract ODLLDB is Ownable {
   }
 
   function setBytes32Value(bytes32 record, bytes32 value)
-  onlyPermittedContractOrOwner
+    onlyPermittedContractOrOwner
   {
     Bytes32Storage[record] = value;
   }
 
   function deleteBytes32Value(bytes32 record)
-  onlyPermittedContractOrOwner
+    onlyPermittedContractOrOwner
   {
     delete Bytes32Storage[record];
   }
@@ -193,13 +194,13 @@ contract ODLLDB is Ownable {
   }
 
   function setBooleanValue(bytes32 record, bool value)
-  onlyPermittedContractOrOwner
+    onlyPermittedContractOrOwner
   {
     BooleanStorage[record] = value;
   }
 
   function deleteBooleanValue(bytes32 record)
-  onlyPermittedContractOrOwner
+    onlyPermittedContractOrOwner
   {
     delete BooleanStorage[record];
   }
@@ -211,13 +212,13 @@ contract ODLLDB is Ownable {
   }
 
   function setIntValue(bytes32 record, int value)
-  onlyPermittedContractOrOwner
+    onlyPermittedContractOrOwner
   {
     IntStorage[record] = value;
   }
 
   function deleteIntValue(bytes32 record)
-  onlyPermittedContractOrOwner
+    onlyPermittedContractOrOwner
   {
     delete IntStorage[record];
   }
