@@ -14,15 +14,15 @@ function getGravatarImage (email = '') {
 export const avatarCanvasElement = function (email) {
   return new Promise(function (resolve, reject) {
     const image = new Image()
-    const gravatarURL = getGravatarImage(email)
-    image.src = gravatarURL
+    const gravatar = getGravatarImage(email)
+    image.src = gravatar
     image.addEventListener('load', function () {
       const avatarCanvas = document.createElement('canvas')
       const avatarContext = avatarCanvas.getContext('2d')
       avatarCanvas.height = this.height
       avatarCanvas.width = this.width
       avatarContext.drawImage(this, 0, 0, this.width, this.height)
-      resolve(avatarCanvas, gravatarURL)
+      resolve(avatarCanvas, gravatar)
     })
   })
 }

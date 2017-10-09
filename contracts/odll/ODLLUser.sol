@@ -71,7 +71,7 @@ contract ODLLUser is ODLLRestrictor {
     OnDentistAdded(msg.sender);
   }
 
-  function getUserData(address dbAddress, address userId) constant returns (
+  function getUserData(address userId) constant returns (
     bool[] bools,
     bytes32[] bytes32s,
     uint[] uints,

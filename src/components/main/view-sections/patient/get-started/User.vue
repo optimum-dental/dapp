@@ -51,8 +51,8 @@
 
       <div class="field">
         <label class="field-key show">Social Security Number</label>
-        <input type="text" id='area-number' data-next="group-number" class="field-value special social-security-number" maxlength="3" size="3" required placeholder="XXX" @input="decideIfNext" data-name="areaNumber"><span class="hyphen"></span>
-        <input type="text" id='group-number' data-next="sequence-number" class="field-value special social-security-number" maxlength="2" size="2" required placeholder="XX" @input="decideIfNext" data-name="groupNumber"><span class="hyphen"></span>
+        <input type="text" id='area-number' data-next="group-number" class="field-value special social-security-number" maxlength="3" size="3" required placeholder="XXX" @input="decideIfNext" data-name="areaNumber"></span>
+        <input type="text" id='group-number' data-next="sequence-number" class="field-value special social-security-number" maxlength="2" size="2" required placeholder="XX" @input="decideIfNext" data-name="groupNumber"></span>
         <input type="text" id='sequence-number' class="field-value special social-security-number" maxlength="4" size="4" required placeholder="XXXX" @input="decideIfNext" data-name="sequenceNumber">
       </div>
 
@@ -93,8 +93,11 @@
       user () {
         return this.$root.user
       },
-      gravatarURL () {
-        return this.$root.gravatarURL
+      birthday () {
+        const day = this.user.day
+        const month = this.user.month
+        const year = this.user.year
+        return `${year}/${month}/${day}`
       }
     },
     name: 'user',
@@ -109,7 +112,7 @@
       setAvatar (evt = null) {
         if (evt) this.displayLabel(evt)
         const email = evt && evt.target && evt.target.value ? evt.target.value.trim() : this.user.email.trim()
-        this.$root.updateUserGravatar({
+        this.$root.callUpdateUserGravatar({
           email: email,
           callback: (avatarCanvas) => {
             this.styleAndAddAvatarCanvasToPage(avatarCanvas)
@@ -192,7 +195,6 @@
           countriesElement.addEventListener('change', function () {
             const phoneNumberElement = document.getElementById('phone-number')
             if (phoneNumberElement) {
-              console.log(this.selectedIndex)
               phoneNumberElement.value = `${countries[this.selectedIndex].dial} `
               _this.displayLabel(null, phoneNumberElement)
               phoneNumberElement.focus()
@@ -233,30 +235,47 @@
       },
       registerPatient (evt) {
         evt.target.disabled = true
+        evt.target.style.cursor = 'not-allowed'
         const [ lastName, firstName, middleName ] = document.getElementById('name').value.split(/\s+/)
         const fullName = [ lastName, firstName, middleName ]
         const email = document.querySelector('#email:invalid') ? '' : document.getElementById('email').value
-        const gender = document.querySelector('.gender:checked') ? document.querySelector('.gender:checked').value : ''
+        const gender = document.querySelector('.gender:checked') ? document.querySelector('.gender:checked').value : 0
+        const street = document.getElementById('street')
+        const city = document.getElementById(city)
+        const areaNumber = document.getElementById('area-number')
+        const groupNumber = document.getElementById('group-number')
+        const sequenceNumber = document.getElementById('sequence-number')
+        const socialSecurityNumber = `${areaNumber}-${groupNumber}-${sequenceNumber}`
+        const day = document.getElementById('day').options[document.getElementById('day').selectedIndex].value
+        const month = document.getElementById('month').options[document.getElementById('month').selectedIndex].value
+        const year = document.getElementById('year').options[document.getElementById('year').selectedIndex].value
+        const birthday = `${year}/${month}/${day}`
+
         const userObject = {
-          type: '1',
-          lastName: lastName,
-          firstName: firstName,
-          middleName: middleName,
+          type: 1,
+          name: fullName,
           email: email,
-          street: document.getElementById('street'),
-          city: document.getElementById('city'),
-          state: document.getElementById('state').selectedIndex,
-          zipCode: document.getElementById('zip-code'),
-          country: document.getElementById('country').selectedIndex,
+          gravatar: this.user.gravatar,
+          street: street,
+          city: city,
+          state: Number(document.getElementById('state').selectedIndex),
+          zipCode: Number(document.getElementById('zip-code')),
+          country: Number(document.getElementById('country').selectedIndex),
           phoneNumber: document.getElementById('phone-number'),
-          areaNumber: document.getElementById('area-number'),
-          groupNumber: document.getElementById('group-number'),
-          sequenceNumber: document.getElementById('sequence-number'),
-          day: document.getElementById('day').options[document.getElementById('day').selectedIndex].value,
-          month: document.getElementById('month').options[document.getElementById('month').selectedIndex].value,
-          year: document.getElementById('year').options[document.getElementById('year').selectedIndex].value,
-          gender: gender
+          socialSecurityNumber: socialSecurityNumber,
+          birthday: birthday,
+          gender: Number(gender)
         }
+
+        const vueUserObject = Object.assign({}, userObject, {
+          areaNumber,
+          groupNumber,
+          sequenceNumber,
+          day,
+          month,
+          year
+        })
+
         let errors = [fullName.length < 2 ? document.getElementById('name') : undefined, email === '' ? document.getElementById('email') : undefined]
         errors = errors.filter(entry => entry !== undefined)
         if (errors.length > 0) {
@@ -266,10 +285,12 @@
             tip.classList.add('error')
           })
         } else {
-          this.$emit('callToWriteUser', {
+          this.$root.callToWriteUser({
             userObject,
+            vueUserObject,
             callback: (userData = null) => {
               evt.target.disabled = false
+              evt.target.style.cursor = 'pointer'
               console.log(555555, userData)
             }
           })
@@ -426,5 +447,6 @@
     float: right;
     outline: 0px;
     border: 0px;
+    cursor: pointer;
   }
 </style>

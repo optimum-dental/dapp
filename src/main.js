@@ -33,6 +33,7 @@ new Vue({
           })
           .then(() => {
             if (!(this.isDAppReady)) {
+              this.forcedIsValidUserBut = '0'
               this.$store.dispatch(ACTION_TYPES.UPDATE_DAPP_READINESS, true)
             }
           })
@@ -119,15 +120,21 @@ new Vue({
       ACTION_TYPES.UPDATE_USER_GRAVATAR,
       ACTION_TYPES.SET_IS_VALID_USER_BUT,
       ACTION_TYPES.RESET_IS_VALID_USER_BUT,
-      ACTION_TYPES.SET_CURRENT_VIEW
+      ACTION_TYPES.SET_CURRENT_VIEW,
+      ACTION_TYPES.UPDATE_USER_STATE
     ]),
-    updateUserGravatar (payload = null) {
+    callUpdateUserGravatar (payload = null) {
       this[ACTION_TYPES.UPDATE_USER_GRAVATAR](payload)
     },
-    writeUser (payload = null) {
+    callToWriteUser (payload = null) {
       ODLLUser.writeUser(this.$store.state, payload)
       .then((userData) => {
-        if (payload.callback) payload.callback(userData)
+        this[ACTION_TYPES.UPDATE_USER_STATE]({
+          userObject: payload.vueUserObject
+        })
+        .then(() => {
+          if (payload.callback) payload.callback(userData)
+        })
       })
       .catch((err) => {
         if (payload.callback) payload.callback()

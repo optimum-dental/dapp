@@ -2,46 +2,6 @@ import ethereumBlockies from 'ethereum-blockies'
 import { avatarCanvasElement } from '../util/DOMManipulator'
 import { MUTATION_TYPES, APPROVED_BLOCKCHAIN_NETWORK_ID, IDENTICON_COLORS, NETWORKS } from '../util/constants'
 
-// function resetUser (state, web3Status) {
-//   const user = {
-//     // lastName: '',
-//     // firstName: '',
-//     // middleName: '',
-//     // fullName: '',
-//     // street: '',
-//     // city: '',
-//     // state: '',
-//     // zipCode: '',
-//     // country: '',
-//     // phoneNumber: '',
-//     // socialSecurityNumber: '',
-//     // areaNumber: '',
-//     // groupNumber: '',
-//     // sequenceNumber: '',
-//     // day: '',
-//     // month: '',
-//     // year: '',
-//     // gender: '',
-//     email: '',
-//     type: '',
-//     avatarCanvas: null,
-//     hasWeb3InjectedBrowser: false,
-//     hasCoinbase: false,
-//     isConnectedToODLLNetwork: false,
-//     coinbase: '',
-//     isValid: false,
-//     isPatient: false,
-//     canBeNewPatient: false,
-//     patientable: false,
-//     isDentist: false,
-//     isODLLAdmin: false,
-//     isODLLManager: false
-//   }
-
-//   Object.assign(user, web3Status)
-//   state.user = user
-// }
-
 function getHash (stringValue) {
   let hash = 0
   let characterCode
@@ -70,8 +30,8 @@ function updateUserGravatar (state, userCopy, payload = null) {
 
   if (email && email.trim() !== '') {
     avatarCanvasElement(email)
-    .then((avatarCanvas, gravatarURL) => {
-      assignPropertyTo(userCopy, 'gravatarURL', gravatarURL)
+    .then((avatarCanvas, gravatar) => {
+      assignPropertyTo(userCopy, 'gravatar', gravatar)
       assignPropertyTo(userCopy, 'avatarCanvas', avatarCanvas)
       state.user = userCopy
       if (payload.callback) payload.callback(avatarCanvas)
@@ -138,7 +98,6 @@ export default {
   [MUTATION_TYPES.UPDATE_USER_STATE] (state, payload) {
     const userObject = payload.userObject
     const userCopy = state.user
-    console.log(userObject)
     Object.assign(userCopy, userObject, {
       isValid: true,
       patientable: userObject.type === '0' || userObject.type === '1',
