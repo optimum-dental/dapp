@@ -12,7 +12,7 @@ contract ODLLDB is Ownable {
   mapping(address => bool) public permissionStatusForContract;
 
   modifier onlyPermittedContractOrOwner {
-    require(permissionStatusForContract[msg.sender] && msg.sender == owner);
+    require(permissionStatusForContract[msg.sender] || msg.sender == owner);
     _;
   }
 
@@ -20,10 +20,10 @@ contract ODLLDB is Ownable {
 
   }
 
-  function addPermittedContract(address addresses)
+  function addPermittedContract(address contractAddress)
   onlyOwner {
-    permissionStatusForContract[addresses] = true;
-    permittedContractsAddresses.push(addresses);
+    permissionStatusForContract[contractAddress] = true;
+    permittedContractsAddresses.push(contractAddress);
   }
 
   function addPermittedContracts(address[] addresses)
@@ -275,13 +275,13 @@ contract ODLLDB is Ownable {
         uint r_i = (i * types.length) + j;
         if (types[j] == 7) {
           strs = strs.toSlice().concat(getStringValue(records[r_i]).toSlice());
-          strs = strs.toSlice().concat("99--DELIMITER--11".toSlice());
+          strs = strs.toSlice().concat("99--ODLL--11".toSlice());
         } else {
           items[k] = getUIntValueConverted(records[r_i], types[j]);
           k++;
         }
       }
-      strs = strs.toSlice().concat("99--DELIMITER-LIST--11".toSlice());
+      strs = strs.toSlice().concat("99--ODLL-LIST--11".toSlice());
     }
 
     return (items, strs);

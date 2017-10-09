@@ -2,10 +2,10 @@ pragma solidity ^0.4.11;
 
 import "../zeppelin/ownership/Ownable.sol";
 import "./ODLLDB.sol";
-// import "../abstract/odll/userManager.sol";
 import "../lib/odll/userManager.sol";
 
 contract ODLLRestrictor is Ownable {
+
   address public dbAddress;
   uint8 public smartContractStatus;
   event OnSmartContractStatusSet(uint8 status);
@@ -15,9 +15,10 @@ contract ODLLRestrictor is Ownable {
     _;
   }
 
-  modifier onlyOwnerCanCall(address ownerAddress)
+  // Just to double-check ownership
+  modifier onlyOwnerCanCall(address senderAddress)
   {
-    require(ownerAddress == ODLLDB(dbAddress).getAddressValue(sha3('odll/owner')));
+    require(senderAddress == owner && senderAddress == ODLLDB(dbAddress).getAddressValue(sha3('odll/owner')));
     _;
   }
 

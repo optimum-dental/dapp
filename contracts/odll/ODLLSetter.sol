@@ -1,50 +1,68 @@
 pragma solidity ^0.4.11;
 
 import "./ODLLRestrictor.sol";
-import "./ODLLDB.sol";
 import "./ODLLUser.sol";
 
 contract ODLLSetter is ODLLRestrictor {
-  event ODLLUserContractSet(address ODLLUserContractAddress, uint settingTime);
+  event ContractSet(address ContractAddress, bytes32 record, uint settingTime);
 
-  function ODLLSetter(address dbAddress) {
-    require(dbAddress != 0x0);
-    dbAddress = dbAddress;
-    setODLLConfig();
+  function ODLLSetter(address _dbAddress) {
+    require(_dbAddress != 0x0);
+    dbAddress = _dbAddress;
   }
 
   function setODLLConfig()
     onlyOwner
-    internal
   {
-    ODLLDB(dbAddress).setAddressValue(sha3('odll/owner'), owner);
     ODLLDB(dbAddress).setUIntValue(sha3('config/max-user-name-length'), 32);
     ODLLDB(dbAddress).setUIntValue(sha3('config/min-user-name-length'), 5);
   }
 
-  function setODLLUserContract(address dbAddress, address newODLLUserContractAddress)
+  function setOwner()
     onlyOwner
   {
-    address oldODLLUserContractAddress = ODLLDB(dbAddress).getAddressValue(sha3('contract/odll-user', owner));
-    if(oldODLLUserContractAddress != 0x0) {
-      destroyODLLUserContract(oldODLLUserContractAddress, newODLLUserContractAddress);
-    }
-
-    ODLLDB(dbAddress).setAddressValue(sha3('contract/odll-user', owner), newODLLUserContractAddress);
-    ODLLUserContractSet(newODLLUserContractAddress, now);
+    ODLLDB(dbAddress).setAddressValue(sha3('odll/owner'), owner);
   }
 
-  function getODLLUserContractAddress()
-    onlyOwner
+  function setContract(string dbKey, address newContractAddress)
+    onlyOwnerCanCall(msg.sender)
+  {
+    // record: { ODLLUser: sha3('contract/odll-user') }
+    bytes32 record = sha3(dbKey);
+    address oldContractAddress = ODLLDB(dbAddress).getAddressValue(record);
+    setNewContractAddressToKey(record, newContractAddress);
+    ContractSet(newContractAddress, record, now);
+  }
+
+  function setNewContractAddressToKey(bytes32 record, address newContractAddress)
+    internal
+    onlyOwnerCanCall(msg.sender)
+  {
+    require(newContractAddress != 0x0);
+    ODLLDB(dbAddress).setAddressValue(record, newContractAddress);
+  }
+
+  function selfDestructOldContractToNewContract(bytes32 record, address oldContractAddress, address newContractAddress)
+    onlyOwnerCanCall(msg.sender)
+  {
+    if (oldContractAddress != 0x0 && ODLLDB(dbAddress).permissionStatusForContract(oldContractAddress) && ODLLDB(dbAddress).permissionStatusForContract(newContractAddress)) {
+      destroyOldContract(record, oldContractAddress, newContractAddress);
+    }
+  }
+
+  function getContractAddress(bytes32 record)
+    onlyOwnerCanCall(msg.sender)
     constant returns (address)
   {
-    ODLLDB(dbAddress).getAddressValue(sha3('contract/odll-user', owner));
+    ODLLDB(dbAddress).getAddressValue(record);
   }
 
-  function destroyODLLUserContract(address oldODLLUserContractAddress, address newODLLUserContractAddress)
-    onlyOwnerCanCall(owner)
+  function destroyOldContract(bytes32 record, address oldContractAddress, address newContractAddress)
+    onlyOwnerCanCall(msg.sender)
     internal
   {
-    ODLLUser(oldODLLUserContractAddress).destroySelf(owner, newODLLUserContractAddress);
+    if (record == sha3('contract/odll-user')) {
+      ODLLUser(oldContractAddress).destroySelf(msg.sender, newContractAddress);
+    }
   }
 }

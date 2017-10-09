@@ -24,11 +24,15 @@ library userManager {
   }
 
   function getManagersCount(address dbAddress) internal returns(uint) {
-    return ODLLDB(dbAddress).getUIntValue(sha3("dentists/count"));
+    return ODLLDB(dbAddress).getUIntValue(sha3("managers/count"));
   }
 
   function getPatientsCount(address dbAddress) internal returns(uint) {
-    return ODLLDB(dbAddress).getUIntValue(sha3("dentists/count"));
+    return ODLLDB(dbAddress).getUIntValue(sha3("patients/count"));
+  }
+
+  function isActiveUser(address dbAddress, address userId) internal returns(bool) {
+    return hasStatus(dbAddress, userId, 1);
   }
 
   function userExists(address dbAddress, address userId) internal returns(bool) {
@@ -51,13 +55,42 @@ library userManager {
     return utilities.getAddressArray(dbAddress, "patient/ids", "patients/count");
   }
 
-  function setUser(
+  function setUserIdentity(
     address dbAddress,
     address userId,
     uint8 userType,
-    string name,
-    string email,
-    bytes32 gravatar,
+    bytes32 name,
+    bytes32 email,
+    bytes32 gravatar
+  )
+    internal
+  {
+    // var nameLen = name.toSlice().len();
+    // require(nameLen <= getConfig(dbAddress, "max-user-name-length") && nameLen >= getConfig(dbAddress, "min-user-name-length"));
+    // require(email.toSlice().len() >= 5 && email.toSlice().len() <= 254);
+
+    if (!userExists(dbAddress, userId)) {
+      ODLLDB(dbAddress).setUIntValue(sha3("user/created-on", userId), now);
+      ODLLDB(dbAddress).setUInt8Value(sha3("user/status", userId), 1);
+      utilities.addArrayItem(dbAddress, "user/ids", "users/count", userId);
+    }
+
+    string memory userTypeKey;
+    string memory userTypeIdsKey;
+    string memory userTypeCountKey;
+    (userTypeKey, userTypeIdsKey, userTypeCountKey) = getUserTypeKey(userType);
+    ODLLDB(dbAddress).setBooleanValue(sha3(userTypeKey, userId), true);
+    utilities.addArrayItem(dbAddress, userTypeIdsKey, userTypeCountKey, userId);
+
+    ODLLDB(dbAddress).setUInt8Value(sha3("user/type", userId), userType);
+    ODLLDB(dbAddress).setBytes32Value(sha3("user/name", userId), name);
+    ODLLDB(dbAddress).setBytes32Value(sha3("user/email", userId), email);
+    ODLLDB(dbAddress).setBytes32Value(sha3("user/gravatar", userId), gravatar);
+  }
+
+  function setUserLocation(
+    address dbAddress,
+    address userId,
     bytes32 street,
     bytes32 city,
     uint state,
@@ -66,21 +99,9 @@ library userManager {
   )
     internal
   {
-    var nameLen = name.toSlice().len();
-    require(nameLen <= getConfig(dbAddress, "max-user-name-length") && nameLen >= getConfig(dbAddress, "min-user-name-length"));
-    require(email.toSlice().len() >= 5 && email.toSlice().len() <= 254);
-    require(state != 0 && zipCode != 0 && country != 0);
+    require(userExists(dbAddress, userId));
+    require(isActiveUser(dbAddress, userId));
 
-    if (!userExists(dbAddress, userId)) {
-      ODLLDB(dbAddress).setUIntValue(sha3("user/created-on", userId), now);
-      ODLLDB(dbAddress).setUInt8Value(sha3("user/status", userId), 1);
-      utilities.addArrayItem(dbAddress, "user/ids", "users/count", userId);
-    }
-
-    ODLLDB(dbAddress).setUInt8Value(sha3("user/type", userId), userType);
-    ODLLDB(dbAddress).setStringValue(sha3("user/name", userId), name);
-    ODLLDB(dbAddress).setStringValue(sha3("user/email", userId), email);
-    ODLLDB(dbAddress).setBytes32Value(sha3("user/gravatar", userId), gravatar);
     ODLLDB(dbAddress).setBytes32Value(sha3("user/street", userId), street);
     ODLLDB(dbAddress).setBytes32Value(sha3("user/city", userId), city);
     ODLLDB(dbAddress).setUIntValue(sha3("user/state", userId), state);
@@ -88,7 +109,7 @@ library userManager {
     ODLLDB(dbAddress).setUIntValue(sha3("user/country", userId), country);
   }
 
-  function setAdmin(
+  function setUserOptionalValues(
     address dbAddress,
     address userId,
     bytes32 phoneNumber,
@@ -99,72 +120,45 @@ library userManager {
     internal
   {
     require(userExists(dbAddress, userId));
-    ODLLDB(dbAddress).setBooleanValue(sha3("user/is-admin?", userId), true);
+    require(isActiveUser(dbAddress, userId));
     ODLLDB(dbAddress).setBytes32Value(sha3("user/phone-number", userId), phoneNumber);
     ODLLDB(dbAddress).setBytes32Value(sha3("user/social-security-number", userId), socialSecurityNumber);
     ODLLDB(dbAddress).setBytes32Value(sha3("user/birthday", userId), birthday);
     ODLLDB(dbAddress).setUInt8Value(sha3("user/gender", userId), gender);
   }
 
-  function setPatient(
-    address dbAddress,
-    address userId,
-    bytes32 phoneNumber,
-    bytes32 socialSecurityNumber,
-    bytes32 birthday,
-    uint8 gender
-  )
-    internal
-  {
-    require(userExists(dbAddress, userId));
-    ODLLDB(dbAddress).setBooleanValue(sha3("user/is-patient?", userId), true);
-    utilities.addArrayItem(dbAddress, "patient/ids", "patients/count", userId);
-    ODLLDB(dbAddress).setBytes32Value(sha3("user/phone-number", userId), phoneNumber);
-    ODLLDB(dbAddress).setBytes32Value(sha3("user/social-security-number", userId), socialSecurityNumber);
-    ODLLDB(dbAddress).setBytes32Value(sha3("user/birthday", userId), birthday);
-    ODLLDB(dbAddress).setUInt8Value(sha3("user/gender", userId), gender);
+  function getUserTypeKey(uint8 userType) internal returns (string memory userTypeKey, string memory userTypeIdsKey, string memory userTypeCountKey) {
+    if (userType == 1) {
+      userTypeKey = "user/is-patient?";
+      userTypeIdsKey = "patient/ids";
+      userTypeCountKey = "patients/count";
+    } else if (userType == 2) {
+      userTypeKey = "user/is-dentist?";
+      userTypeIdsKey = "dentist/ids";
+      userTypeCountKey = "dentists/count";
+    } else if (userType == 3) {
+      userTypeKey = "user/is-manager?";
+      userTypeIdsKey = "manager/ids";
+      userTypeCountKey = "managers/count";
+    } else if (userType == 4) {
+      userTypeKey = "user/is-admin?";
+      userTypeIdsKey = "admin/ids";
+      userTypeCountKey = "admins/count";
+    }
   }
 
   function setDentist(
     address dbAddress,
     address userId,
-    bytes32 phoneNumber,
-    bytes32 socialSecurityNumber,
-    bytes32 birthday,
-    uint8 gender,
     bool isODLLDentist,
     bool isAvailable
   )
     internal
   {
     require(userExists(dbAddress, userId));
-    ODLLDB(dbAddress).setBooleanValue(sha3("user/is-dentist?", userId), true);
-    utilities.addArrayItem(dbAddress, "dentist/ids", "dentists/count", userId);
-    ODLLDB(dbAddress).setBytes32Value(sha3("user/phone-number", userId), phoneNumber);
-    ODLLDB(dbAddress).setBytes32Value(sha3("user/social-security-number", userId), socialSecurityNumber);
-    ODLLDB(dbAddress).setBytes32Value(sha3("user/birthday", userId), birthday);
-    ODLLDB(dbAddress).setUInt8Value(sha3("user/gender", userId), gender);
+    require(isActiveUser(dbAddress, userId));
     ODLLDB(dbAddress).setBooleanValue(sha3("user/is-odll-dentist?", userId), isODLLDentist);
     ODLLDB(dbAddress).setBooleanValue(sha3("user/is-available?", userId), isAvailable);
-  }
-
-  function setManager(
-    address dbAddress,
-    address userId,
-    bytes32 phoneNumber,
-    bytes32 socialSecurityNumber,
-    bytes32 birthday,
-    uint8 gender
-  )
-    internal
-  {
-    require(userExists(dbAddress, userId));
-    ODLLDB(dbAddress).setBooleanValue(sha3("user/is-manager?", userId), true);
-    utilities.addArrayItem(dbAddress, "manager/ids", "managers/count", userId);
-    ODLLDB(dbAddress).setBytes32Value(sha3("user/phone-number", userId), phoneNumber);
-    ODLLDB(dbAddress).setBytes32Value(sha3("user/social-security-number", userId), socialSecurityNumber);
-    ODLLDB(dbAddress).setBytes32Value(sha3("user/birthday", userId), birthday);
-    ODLLDB(dbAddress).setUInt8Value(sha3("user/gender", userId), gender);
   }
 
   function isActiveDentist(address dbAddress, address userId) internal returns(bool) {
@@ -176,7 +170,7 @@ library userManager {
   }
 
   function hasStatus(address dbAddress, address userId, uint8 status) internal returns(bool) {
-    return status == ODLLDB(dbAddress).getUInt8Value(sha3("user/status", userId));
+    return status == getStatus(dbAddress, userId);
   }
 
   function getStatus(address dbAddress, address userId) internal returns(uint8) {
@@ -334,40 +328,4 @@ library userManager {
 
   //   return utilities.take(j, userIds);
   // }
-
-  function getUserData(address dbAddress, address userId) constant returns (
-    uint8,
-    // string,
-    // string,
-    // bytes32,
-    // bytes32,
-    // bytes32,
-    // uint,
-    // uint,
-    // uint,
-    bytes32,
-    bytes32,
-    bytes32,
-    uint8
-    // bool,
-    // bool
-  ) {
-    uint8 userType = ODLLDB(dbAddress).getUInt8Value(sha3("user/type", userId));
-    // string name = ODLLDB(dbAddress).getStringValue(sha3("user/name", userId));
-    // string email = ODLLDB(dbAddress).getStringValue(sha3("user/email", userId));
-    // bytes32 gravatar = ODLLDB(dbAddress).getBytes32Value(sha3("user/gravatar", userId));
-    // bytes32 street = ODLLDB(dbAddress).getBytes32Value(sha3("user/street", userId));
-    // bytes32 city = ODLLDB(dbAddress).getBytes32Value(sha3("user/city", userId));
-    // uint state = ODLLDB(dbAddress).getUIntValue(sha3("user/state", userId));
-    // uint zipCode = ODLLDB(dbAddress).getUIntValue(sha3("user/zip-code", userId));
-    // uint country = ODLLDB(dbAddress).getUIntValue(sha3("user/country", userId));
-    bytes32 phoneNumber = ODLLDB(dbAddress).getBytes32Value(sha3("user/phone-number", userId));
-    bytes32 socialSecurityNumber = ODLLDB(dbAddress).getBytes32Value(sha3("user/social-security-number", userId));
-    bytes32 birthday = ODLLDB(dbAddress).getBytes32Value(sha3("user/birthday", userId));
-    uint8 gender = ODLLDB(dbAddress).getUInt8Value(sha3("user/gender", userId));
-    // bool isODLLDentist = ODLLDB(dbAddress).getBooleanValue(sha3("user/is-odll-dentist?", userId));
-    // bool isAvailable = ODLLDB(dbAddress).getBooleanValue(sha3("user/is-available?", userId));
-    return (userType, phoneNumber, socialSecurityNumber, birthday, gender);
-    // return (userType, gravatar, street, city, state, zipCode, country, phoneNumber, socialSecurityNumber, birthday, gender, isODLLDentist, isAvailable);
-  }
 }
