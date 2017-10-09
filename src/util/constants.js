@@ -7,7 +7,7 @@ export const NETWORKS = {
   '666': 'DanielNet test network'
 }
 
-export const APPROVED_BLOCKCHAIN_NETWORK_ID = '1'
+export const APPROVED_BLOCKCHAIN_NETWORK_ID = '666'
 
 export const MUTATION_TYPES = {
   CHANGE_CURRENT_ROUTE_TO: 'changeCurrentRouteTo',

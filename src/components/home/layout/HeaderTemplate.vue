@@ -61,6 +61,7 @@
     height: 20px;
     line-height: 20px;
     top: 40px;
+    transform: rotate(90deg);
   }
 
   .links:hover a {
