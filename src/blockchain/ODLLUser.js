@@ -22,7 +22,7 @@ class ODLLUser {
     return new Promise((resolve, reject) => {
       const ODLLDBContract = contract(ODLLDB)
       ODLLDBContract.setProvider(state.web3.instance().currentProvider)
-      ODLLDBContract.at(odllUser.ODLLDBContractAddress)
+      ODLLDBContract.deployed()
       .then((contractInstance) => {
         contractInstance.getAddressValue(soliditySha3(dbContractKey), { from: coinbase })
         .then((result) => {
@@ -30,8 +30,11 @@ class ODLLUser {
           resolve(result)
         })
         .catch((error) => {
-          reject(error)
+          reject({ error, isValid: true, warningMessage: "We're unable to get the current contract address from the blockchain. Please do try again in a few minutes." })
         })
+      })
+      .catch((error) => {
+        reject({ error, isValid: true, warningMessage: "We couldn't find Oral Data Link Smart Contracts on your detected network. This is because the Smart Contracts aren't deployed there. Contact Support to know why this is the case." })
       })
     })
   }
@@ -111,7 +114,7 @@ class ODLLUser {
                 odllUser.runBlockchainPromise(resolve, reject, { odllContract, addressToUse, method: dataObject.method, coinbase })
               })
               .catch((error) => {
-                reject({ error, isValid: true, warningMessage: "We're unable to get the current contract address from the blockchain. Please do try again in a few minutes." })
+                reject(error)
               })
             }
           })

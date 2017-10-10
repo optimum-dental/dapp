@@ -44,7 +44,7 @@ new Vue({
             }
           })
         })
-        .catch((result) => {
+        .catch((result = {}) => {
           console.error(result, 'Unable to getUserDataFromTheBlockchain')
           if (result.isValid) {
             this.$store.dispatch(ACTION_TYPES.INITIALISE_IS_VALID_USER_BUT, result.warningMessage)
@@ -66,7 +66,7 @@ new Vue({
           }
         })
       })
-      .catch((result) => {
+      .catch((result = {}) => {
         console.error('Unable to UPDATE_USER_BLOCKCHAIN_STATUS')
         this.$store.dispatch(ACTION_TYPES.INITIALISE_IS_VALID_USER_BUT, result.warningMessage)
         .then(() => {
@@ -81,7 +81,7 @@ new Vue({
         })
       })
     })
-    .catch((result) => {
+    .catch((result = {}) => {
       let state = result.state
       this.forcedIsValidUserBut = '0'
       monitorWeb3(state)
