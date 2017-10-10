@@ -23,6 +23,21 @@ function assignPropertyTo (hashObject, key, value) {
   })
 }
 
+function stringifyBytesUserData (state, userObject) {
+  // Remove the guard in front of the bytes32 encoding strings
+  let name, email, gravatar, socialSecurityNumber, birthday, phoneNumber, city, street
+  try { name = state.web3.instance().toUtf8(userObject.name).toString().slice(1) } catch (e) { name = '' }
+  try { email = state.web3.instance().toUtf8(userObject.email).toString().slice(1) } catch (e) { email = '' }
+  try { gravatar = state.web3.instance().toUtf8(userObject.gravatar).toString().slice(1) } catch (e) { gravatar = '' }
+  try { socialSecurityNumber = state.web3.instance().toUtf8(userObject.socialSecurityNumber).toString().slice(1) } catch (e) { socialSecurityNumber = '' }
+  try { birthday = state.web3.instance().toUtf8(userObject.birthday).toString().slice(1) } catch (e) { birthday = '' }
+  try { phoneNumber = state.web3.instance().toUtf8(userObject.phoneNumber).toString().slice(1) } catch (e) { phoneNumber = '' }
+  try { city = state.web3.instance().toUtf8(userObject.city).toString().slice(1) } catch (e) { city = '' }
+  try { street = state.web3.instance().toUtf8(userObject.street).toString().slice(1) } catch (e) { street = '' }
+
+  return [name, email, gravatar, socialSecurityNumber, birthday, phoneNumber, city, street]
+}
+
 function updateUserGravatar (state, userCopy, payload = null) {
   const colorPosition = Math.abs(getHash(state.web3.coinbase) % IDENTICON_COLORS.length)
   const identiconColor = IDENTICON_COLORS[colorPosition]
@@ -98,6 +113,14 @@ export default {
   [MUTATION_TYPES.UPDATE_USER_STATE] (state, payload) {
     const userObject = payload.userObject
     const userCopy = state.user
+    const [name, email, gravatar, socialSecurityNumber, birthday, phoneNumber, city, street] = stringifyBytesUserData(state, userObject)
+    const [lastName, firstName, middleName] = name.split(' ')
+    const [areaNumber, groupNumber, sequenceNumber] = socialSecurityNumber.split('-')
+    const [year, month, day] = birthday.split('/')
+
+    const zipCode = Number(userObject.zipCode) === 0 ? '' : userObject.zipCode
+    const gender = Number(userObject.gender) === 0 ? '' : userObject.gender
+
     Object.assign(userCopy, userObject, {
       isValid: true,
       patientable: userObject.type === '0' || userObject.type === '1',
@@ -105,7 +128,26 @@ export default {
       isPatient: userObject.type === '1',
       isDentist: userObject.type === '2',
       isODLLAdmin: userObject.type === '3',
-      isODLLManager: userObject.type === '4'
+      isODLLManager: userObject.type === '4',
+      name,
+      lastName,
+      firstName,
+      middleName,
+      email,
+      gravatar,
+      street,
+      city,
+      zipCode,
+      phoneNumber,
+      socialSecurityNumber,
+      areaNumber,
+      groupNumber,
+      sequenceNumber,
+      birthday,
+      day,
+      month,
+      year,
+      gender
     })
 
     state.user = userCopy

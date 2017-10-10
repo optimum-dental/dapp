@@ -71,7 +71,7 @@ contract ODLLUser is ODLLRestrictor {
     OnDentistAdded(msg.sender);
   }
 
-  function getUserData(address userId) constant returns (
+  function getUserData() constant returns (
     bool[] bools,
     bytes32[] bytes32s,
     uint[] uints,
@@ -82,15 +82,16 @@ contract ODLLUser is ODLLRestrictor {
     uints = new uint[](3);
     uint8s = new uint8[](2);
 
+    address userId = msg.sender;
     uint8s[0] = ODLLDB(dbAddress).getUInt8Value(sha3("user/type", userId));
     uint8s[1] = ODLLDB(dbAddress).getUInt8Value(sha3("user/gender", userId));
     bytes32s[0] = ODLLDB(dbAddress).getBytes32Value(sha3("user/name", userId));
     bytes32s[1] = ODLLDB(dbAddress).getBytes32Value(sha3("user/email", userId));
-    bytes32s[2] = ODLLDB(dbAddress).getBytes32Value(sha3("user/city", userId));
+    bytes32s[2] = ODLLDB(dbAddress).getBytes32Value(sha3("user/gravatar", userId));
     bytes32s[3] = ODLLDB(dbAddress).getBytes32Value(sha3("user/street", userId));
-    bytes32s[4] = ODLLDB(dbAddress).getBytes32Value(sha3("user/phone-number", userId));
-    bytes32s[5] = ODLLDB(dbAddress).getBytes32Value(sha3("user/social-security-number", userId));
-    bytes32s[6] = ODLLDB(dbAddress).getBytes32Value(sha3("user/gravatar", userId));
+    bytes32s[4] = ODLLDB(dbAddress).getBytes32Value(sha3("user/city", userId));
+    bytes32s[5] = ODLLDB(dbAddress).getBytes32Value(sha3("user/phone-number", userId));
+    bytes32s[6] = ODLLDB(dbAddress).getBytes32Value(sha3("user/social-security-number", userId));
     bytes32s[7] = ODLLDB(dbAddress).getBytes32Value(sha3("user/birthday", userId));
     uints[0] = ODLLDB(dbAddress).getUIntValue(sha3("user/state", userId));
     uints[1] = ODLLDB(dbAddress).getUIntValue(sha3("user/zip-code", userId));

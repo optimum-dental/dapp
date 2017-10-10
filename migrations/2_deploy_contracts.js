@@ -20,44 +20,64 @@ module.exports = function (deployer) {
   deployer.link(strings, ODLLDB);
   deployer.deploy(ODLLDB)
   .then(function () {
-    console.log('Outside return')
-    return function () {
-      console.log('Inside return')
-      deployer.link(ODLLDB, utilities);
-      deployer.deploy(utilities);
+    deployer.link(ODLLDB, utilities);
+    deployer.deploy(utilities);
 
-      deployer.link(ODLLDB, userManager);
-      deployer.link(SafeMath, userManager);
-      deployer.link(utilities, userManager);
-      deployer.link(strings, userManager);
-      deployer.deploy(userManager);
+    ODLLDB.deployed()
+    .then(function (instance) {
+      var dbAddress = instance.address;
+      console.log(111111, dbAddress)
 
-      deployer.link(Ownable, ODLLRestrictor);
-      deployer.link(ODLLDB, ODLLRestrictor);
-      deployer.link(userManager, ODLLRestrictor);
-      ODLLDB.deployed()
-      .then(function (instance) {
-        return function () {
-          var dbAddress = instance.address;
-          console.log(12345, dbAddress)
-          deployer.deploy(ODLLRestrictor, dbAddress)
+      utilities.deployed()
+      .then(function (utilitiesInstance) {
+        console.log(222222, utilitiesInstance.address)
 
-          deployer.link(ODLLRestrictor, ODLLUser);
-          deployer.link(userManager, ODLLUser);
-          deployer.link(strings, ODLLUser);
-          deployer.deploy(ODLLUser);
+        deployer.link(ODLLDB, userManager);
+        deployer.link(SafeMath, userManager);
+        deployer.link(utilities, userManager);
+        deployer.link(strings, userManager);
+        deployer.deploy(userManager);
 
-          deployer.link(ODLLRestrictor, ODLLSetter);
-          deployer.link(ODLLDB, ODLLSetter);
-          deployer.link(ODLLUser, ODLLSetter);
-          deployer.deploy(ODLLSetter);
-        }
+        userManager.deployed()
+        .then(function (userMangerInstance) {
+          console.log(333333, userMangerInstance.address)
+
+          deployer.link(Ownable, ODLLRestrictor);
+          deployer.link(ODLLDB, ODLLRestrictor);
+          deployer.link(userManager, ODLLRestrictor);
+          deployer.deploy(ODLLRestrictor)
+
+          ODLLRestrictor.deployed()
+          .then(function (ODLLRestrictorInstance) {
+            console.log(444444, ODLLRestrictorInstance.address)
+
+            deployer.link(ODLLRestrictor, ODLLUser);
+            deployer.link(userManager, ODLLUser);
+            deployer.link(strings, ODLLUser);
+            deployer.deploy(ODLLUser, dbAddress);
+
+            deployer.link(ODLLRestrictor, ODLLSetter);
+            deployer.link(ODLLDB, ODLLSetter);
+            deployer.link(ODLLUser, ODLLSetter);
+            deployer.deploy(ODLLSetter, dbAddress);
+          })
+          .catch(function (error) {
+            console.log(':::ODLLRestrictor has not been deployed!')
+          })
+        })
+        .catch(function (error) {
+          console.log(':::userManager has not been deployed!')
+        })
       })
       .catch(function (error) {
-        console.log(':::ODLLDB has not been deployed!')
-      });
-    }
-  }).catch(function (error) {
+        console.log(':::utilities has not been deployed!')
+      })
+    })
+    .catch(function (error) {
+      console.log(':::ODLLDB has not been deployed!')
+    });
+  })
+  .catch(function (error) {
     console.log(':::Unable to deploy ODLLDB!')
   });
 };

@@ -8,7 +8,7 @@ let odllUser = null
 class ODLLUser {
   constructor () {
     odllUser = odllUser || this
-    odllUser.ODLLDBContractAddress = '0xb53d4efe7b5816c038fa116a61625fca9c6af5aa'
+    odllUser.ODLLDBContractAddress = '0x3599fb7676a98ade73fc7bff96ae51cbce59e268'
     return odllUser
   }
 
@@ -37,7 +37,6 @@ class ODLLUser {
   }
 
   writeUser (state = null, data = {}) {
-    console.log(data)
     return new Promise((resolve, reject) => {
       odllUser.accessBlockChainWith({
         state,
@@ -45,10 +44,9 @@ class ODLLUser {
         dbContractKey: 'contract/odll-user',
         method: (contractInstance, coinbase) => {
           return new Promise((resolve, reject) => {
-            contractInstance.writeUser(odllUser.ODLLDBContractAddress, ...(Object.values(data)), { from: coinbase })
+            contractInstance.writeUser(...(Object.values(data.userObject)), { from: coinbase })
             .then((result) => {
               // Successful Sign-up
-              console.log(1111122222, result)
               resolve(data)
             })
             .catch((e) => {
@@ -74,7 +72,7 @@ class ODLLUser {
         dbContractKey: 'contract/odll-user',
         method: (contractInstance, coinbase) => {
           return new Promise((resolve, reject) => {
-            contractInstance.getUserData(odllUser.ODLLDBContractAddress, coinbase, { from: coinbase })
+            contractInstance.getUserData({ from: coinbase })
             .then((result) => {
               // Successful Fetch
               resolve(odllUser.getUserObject(state, result))
@@ -171,17 +169,17 @@ class ODLLUser {
     if (arrayResult.length > 0) {
       userObject = {
         type: uint8s && uint8s.length > 0 ? uint8s[0].toString() : '0',
-        name: bytes32s && bytes32s.length > 0 ? state.web3.instance().toUtf8(bytes32s[0].toString()) : '',
-        email: bytes32s && bytes32s.length > 0 ? state.web3.instance().toUtf8(bytes32s[1].toString()) : '',
-        gravatar: bytes32s && bytes32s.length > 0 ? state.web3.instance().toUtf8(bytes32s[2].toString()) : '',
-        street: bytes32s && bytes32s.length > 0 ? state.web3.instance().toUtf8(bytes32s[3].toString()) : '',
-        city: bytes32s && bytes32s.length > 0 ? state.web3.instance().toUtf8(bytes32s[4].toString()) : '',
-        state: uints && uints.length > 0 ? uints[0].toString() : '',
+        name: bytes32s && bytes32s.length > 0 ? bytes32s[0] : '',
+        email: bytes32s && bytes32s.length > 0 ? bytes32s[1] : '',
+        gravatar: bytes32s && bytes32s.length > 0 ? bytes32s[2] : '',
+        street: bytes32s && bytes32s.length > 0 ? bytes32s[3] : '',
+        city: bytes32s && bytes32s.length > 0 ? bytes32s[4] : '',
+        state: uints && uints.length > 0 ? uints[0].toString() : 0,
         zipCode: uints && uints.length > 0 ? uints[1].toString() : '',
-        country: uints && uints.length > 0 ? uints[2].toString() : '',
-        phoneNumber: bytes32s && bytes32s.length > 0 ? state.web3.instance().toUtf8(bytes32s[5].toString()) : '',
-        socialSecurityNumber: bytes32s && bytes32s.length > 0 ? state.web3.instance().toUtf8(bytes32s[6].toString()) : '',
-        birthday: bytes32s && bytes32s.length > 0 ? state.web3.instance().toUtf8(bytes32s[7].toString()) : '',
+        country: uints && uints.length > 0 ? uints[2].toString() : 0,
+        phoneNumber: bytes32s && bytes32s.length > 0 ? bytes32s[5] : '',
+        socialSecurityNumber: bytes32s && bytes32s.length > 0 ? bytes32s[6] : '',
+        birthday: bytes32s && bytes32s.length > 0 ? bytes32s[7] : '',
         gender: uint8s && uint8s.length > 0 ? uint8s[1].toString() : '0'
       }
     } else {
@@ -194,14 +192,17 @@ class ODLLUser {
   defaultUserObject () {
     return {
       type: '0',
+      lastName: '',
+      firstName: '',
+      middleName: '',
       name: '',
       email: '',
       gravatar: '',
       street: '',
       city: '',
-      state: '',
+      state: 0,
       zipCode: '',
-      country: '',
+      country: 0,
       phoneNumber: '',
       socialSecurityNumber: '',
       areaNumber: '',

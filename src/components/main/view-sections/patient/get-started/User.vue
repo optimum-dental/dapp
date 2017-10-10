@@ -1,10 +1,10 @@
 <template>
   <div class="wrapper">
     <div id="user">
-      <div class="title">Register as Patient</div>
+      <div class="title">{{ user.type > 0 ? 'Patient Profile' : 'Register as Patient' }}</div>
       <div class="field">
         <label for="name" class="field-key">Last Name   First Name   Middle Name</label>
-        <input type="text" class="field-value has-tip" id="name" placeholder="Last Name   First Name   Middle Name" @input="displayLabel" data-name="fullName">
+        <input type="text" class="field-value has-tip" id="name" placeholder="Last Name   First Name   Middle Name" @input="displayLabel" data-name="name">
         <div class="tip">Write between 5 to 32 characters</div>
       </div>
 
@@ -30,7 +30,7 @@
 
       <div class="field">
         <label for="state" class="field-key">State</label>
-        <select id='state' class="field-value" @input="displayLabel" data-name="state"><option value=''>State</option></select>
+        <select id='state' class="field-value" @input="displayLabel" data-name="state"></select>
       </div>
 
       <div class="field">
@@ -41,7 +41,7 @@
 
       <div class="field">
         <label for="country" class="field-key">Country</label>
-        <select id='country' class="field-value" @input="displayLabel" data-name="country"><option value=''>Country</option></select>
+        <select id='country' class="field-value" @input="displayLabel" data-name="country"></select>
       </div>
 
       <div class="field">
@@ -67,13 +67,13 @@
 
       <div class="field">
         <label class="field-key">Gender</label>
-        <input type="checkbox" class="field-value gender" name="gender" id="female" value="1" @click="resetCheckeBoxValues" :checked="user.gender === '1'"><label for="female" class="side-key">Female</label>
-        <input type="checkbox" class="field-value gender" name="gender" id="male" value="2" @click="resetCheckeBoxValues" :checked="user.gender === '2'"><label for="male" class="side-key">Male</label>
-        <input type="checkbox" class="field-value gender" name="gender" id="others" value="3" @click="resetCheckeBoxValues" :checked="user.gender === '3'"><label for="others" class="side-key">Others</label>
+        <input type="checkbox" class="field-value gender" name="gender" id="female" value="1" @click="resetCheckeBoxValues" :checked="user.gender.toString() === '1'"><label for="female" class="side-key">Female</label>
+        <input type="checkbox" class="field-value gender" name="gender" id="male" value="2" @click="resetCheckeBoxValues" :checked="user.gender.toString() === '2'"><label for="male" class="side-key">Male</label>
+        <input type="checkbox" class="field-value gender" name="gender" id="others" value="3" @click="resetCheckeBoxValues" :checked="user.gender.toString() === '3'"><label for="others" class="side-key">Others</label>
       </div>
 
       <div class="field">
-        <input type="button" class='submit-button' value="Register" @click="registerPatient">
+        <input type="button" class='submit-button' :value="user.type > 0 ? 'Update Profile' : 'Register'" @click="registerPatient">
       </div>
     </div>
   </div>
@@ -92,12 +92,6 @@
       },
       user () {
         return this.$root.user
-      },
-      birthday () {
-        const day = this.user.day
-        const month = this.user.month
-        const year = this.user.year
-        return `${year}/${month}/${day}`
       }
     },
     name: 'user',
@@ -142,7 +136,7 @@
       },
       populateCountries () {
         const countriesElement = document.getElementById('country')
-        const userCountryIndex = this.user.country || countries.findIndex((country) => country.code === 'US')
+        const userCountryIndex = this.user.country ? Number(this.user.country) : countries.findIndex((country) => country.code === 'US')
         countries.forEach((country, index) => {
           const optionElement = document.createElement('option')
           optionElement.text = country.name
@@ -156,7 +150,7 @@
       },
       populateStates () {
         const statesElement = document.getElementById('state')
-        const userStateIndex = this.user.state
+        const userStateIndex = Number(this.user.state)
         states.forEach((state, index) => {
           const optionElement = document.createElement('option')
           optionElement.text = state.name
@@ -234,40 +228,46 @@
         }
       },
       registerPatient (evt) {
-        evt.target.disabled = true
-        evt.target.style.cursor = 'not-allowed'
-        const [ lastName, firstName, middleName ] = document.getElementById('name').value.split(/\s+/)
+        let target = evt.target
+        target.disabled = true
+        target.style.cursor = 'not-allowed'
+        target.style.background = '#adcddf'
+        const name = `b${document.getElementById('name').value}`
+        const [ lastName, firstName, middleName ] = name.split(/\s+/)
         const fullName = [ lastName, firstName, middleName ]
-        const email = document.querySelector('#email:invalid') ? '' : document.getElementById('email').value
+        const email = document.querySelector('#email:invalid') ? '' : `b${document.getElementById('email').value}`
         const gender = document.querySelector('.gender:checked') ? document.querySelector('.gender:checked').value : 0
-        const street = document.getElementById('street')
-        const city = document.getElementById(city)
-        const areaNumber = document.getElementById('area-number')
-        const groupNumber = document.getElementById('group-number')
-        const sequenceNumber = document.getElementById('sequence-number')
-        const socialSecurityNumber = `${areaNumber}-${groupNumber}-${sequenceNumber}`
+        const street = `b${document.getElementById('street').value}`
+        const city = `b${document.getElementById('city').value}`
+        const areaNumber = document.getElementById('area-number').value
+        const groupNumber = document.getElementById('group-number').value
+        const sequenceNumber = document.getElementById('sequence-number').value
+        const socialSecurityNumber = `b${areaNumber}-${groupNumber}-${sequenceNumber}`
         const day = document.getElementById('day').options[document.getElementById('day').selectedIndex].value
-        const month = document.getElementById('month').options[document.getElementById('month').selectedIndex].value
+        const month = document.getElementById('month').selectedIndex - 1
         const year = document.getElementById('year').options[document.getElementById('year').selectedIndex].value
-        const birthday = `${year}/${month}/${day}`
+        const birthday = `b${year}/${month}/${day}`
 
         const userObject = {
           type: 1,
-          name: fullName,
+          name,
           email: email,
-          gravatar: this.user.gravatar,
+          gravatar: `b${this.user.gravatar || ''}`,
           street: street,
           city: city,
           state: Number(document.getElementById('state').selectedIndex),
-          zipCode: Number(document.getElementById('zip-code')),
+          zipCode: Number(document.getElementById('zip-code').value),
           country: Number(document.getElementById('country').selectedIndex),
-          phoneNumber: document.getElementById('phone-number'),
+          phoneNumber: `b${document.getElementById('phone-number').value}`,
           socialSecurityNumber: socialSecurityNumber,
           birthday: birthday,
           gender: Number(gender)
         }
 
         const vueUserObject = Object.assign({}, userObject, {
+          lastName,
+          firstName,
+          middleName,
           areaNumber,
           groupNumber,
           sequenceNumber,
@@ -289,9 +289,9 @@
             userObject,
             vueUserObject,
             callback: (userData = null) => {
-              evt.target.disabled = false
-              evt.target.style.cursor = 'pointer'
-              console.log(555555, userData)
+              target.disabled = false
+              target.style.cursor = 'pointer'
+              target.style.background = '#296d92'
             }
           })
         }
@@ -302,7 +302,7 @@
         yearEndDigit: 2000,
         yearStartDigit: 1920,
         dayDefaultValue: this.user.day,
-        monthDefaultValue: this.user.month,
+        monthDefaultValue: dateSelectionManager.getMonthNames()[Number(this.user.month)],
         yearDefaultValue: this.user.year
       })
       this.setAvatar()
@@ -440,7 +440,7 @@
   }
 
   .submit-button {
-    background: #adcddf;
+    background: #296d92;
     color: #ffffff;
     height: 30px;
     width: 100px;

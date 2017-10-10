@@ -11,6 +11,9 @@ export default {
   },
   user: {
     type: '0',
+    lastName: '',
+    firstName: '',
+    middleName: '',
     name: '',
     email: '',
     gravatar: '',

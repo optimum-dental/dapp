@@ -138,7 +138,7 @@ new Vue({
       })
       .catch((err) => {
         if (payload.callback) payload.callback()
-        console.error(err)
+        console.error(err, 'Unable to write user data')
       })
     },
     callSetIsValidUserBut (newValue) {

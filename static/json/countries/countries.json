@@ -1,4 +1,10 @@
-[{
+[
+    {
+      "name": "Country",
+      "code": "",
+      "dial": ""
+    },
+    {
       "name": "Afghanistan",
       "code": "AF",
       "dial": "+93"
