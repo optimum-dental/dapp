@@ -23,19 +23,14 @@ function assignPropertyTo (hashObject, key, value) {
   })
 }
 
-function stringifyBytesUserData (state, userObject) {
+function stringifyBytesData (state, dataObject, datakeys) {
   // Remove the guard in front of the bytes32 encoding strings
-  let name, email, gravatar, socialSecurityNumber, birthday, phoneNumber, city, street
-  try { name = state.web3.instance().toUtf8(userObject.name).toString().slice(1) } catch (e) { name = '' }
-  try { email = state.web3.instance().toUtf8(userObject.email).toString().slice(1) } catch (e) { email = '' }
-  try { gravatar = state.web3.instance().toUtf8(userObject.gravatar).toString().slice(1) } catch (e) { gravatar = '' }
-  try { socialSecurityNumber = state.web3.instance().toUtf8(userObject.socialSecurityNumber).toString().slice(1) } catch (e) { socialSecurityNumber = '' }
-  try { birthday = state.web3.instance().toUtf8(userObject.birthday).toString().slice(1) } catch (e) { birthday = '' }
-  try { phoneNumber = state.web3.instance().toUtf8(userObject.phoneNumber).toString().slice(1) } catch (e) { phoneNumber = '' }
-  try { city = state.web3.instance().toUtf8(userObject.city).toString().slice(1) } catch (e) { city = '' }
-  try { street = state.web3.instance().toUtf8(userObject.street).toString().slice(1) } catch (e) { street = '' }
+  let result = []
+  for (var i = datakeys.length - 1; i >= 0; i--) {
+    try { result[i] = state.web3.instance().toUtf8(dataObject[datakeys[i]]).toString().slice(1) } catch (e) { result[i] = '' }
+  }
 
-  return [name, email, gravatar, socialSecurityNumber, birthday, phoneNumber, city, street]
+  return result
 }
 
 function updateUserGravatar (state, userCopy, payload = null) {
@@ -113,7 +108,7 @@ export default {
   [MUTATION_TYPES.UPDATE_USER_STATE] (state, payload) {
     const userObject = payload.userObject
     const userCopy = state.user
-    const [name, email, gravatar, socialSecurityNumber, birthday, phoneNumber, city, street] = stringifyBytesUserData(state, userObject)
+    const [ name, email, gravatar, socialSecurityNumber, birthday, phoneNumber, city, street ] = stringifyBytesData(state, userObject, [ 'name', 'email', 'gravatar', 'socialSecurityNumber', 'birthday', 'phoneNumber', 'city', 'street' ])
     const [lastName, firstName, middleName] = name.split(' ')
     const [areaNumber, groupNumber, sequenceNumber] = socialSecurityNumber.split('-')
     const [year, month, day] = birthday.split('/')
@@ -185,5 +180,27 @@ export default {
       state.web3[payload.properties[i]] = payload.values[i]
       if (state.user[payload.properties[i]]) state.user[payload.properties[i]] = payload.values[i]
     }
+  },
+  [MUTATION_TYPES.SAVE_SEARCH_RESULT] (state, payload) {
+    const searchResult = payload.searchResult
+    const searchResultCopy = state.searchResult
+    const results = searchResult.results
+
+    for (let i = 0; i < results; i++) {
+      let result = results[i]
+      let [ gravatar, name, companyName, searchQuery, fee, rating, address ] = stringifyBytesData(state, result, [ 'gravatar', 'name', 'companyName', 'searchQuery', 'fee', 'rating', 'address' ])
+      Object.assign(searchResult.results[i], {
+        gravatar, name, companyName, searchQuery, fee, rating, address
+      })
+    }
+    Object.assign(searchResultCopy, {
+      [searchResult.type]: {
+        page: searchResult.page,
+        results: searchResult.results
+      }
+    })
+
+    state.searchResult = searchResultCopy
+    if (payload.callback) payload.callback(true)
   }
 }

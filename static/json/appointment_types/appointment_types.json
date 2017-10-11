@@ -1,0 +1,23 @@
+[
+  {
+    "name": "Choose Type",
+    "subTypes": []
+  },
+  {
+    "name": "Scan Appointment",
+    "subTypes": [
+      "Scan",
+      "Intraoral Radiographs",
+      "Extraoral Radiographs",
+      "Panoramic X-rays",
+      "Cephalometric Projections",
+      "Cone-beam computed tomograph"
+    ]
+  },
+  {
+    "name": "Treatment Appointment",
+    "subTypes": [
+      "Treatment"
+    ]
+  }
+]

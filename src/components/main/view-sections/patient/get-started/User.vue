@@ -189,7 +189,7 @@
           countriesElement.addEventListener('change', function () {
             const phoneNumberElement = document.getElementById('phone-number')
             if (phoneNumberElement) {
-              phoneNumberElement.value = `${countries[this.selectedIndex].dial} `
+              phoneNumberElement.value = `${countries[this.selectedIndex].dial}`
               _this.displayLabel(null, phoneNumberElement)
               phoneNumberElement.focus()
             }

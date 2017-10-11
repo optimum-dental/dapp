@@ -6,6 +6,7 @@ import store from './store'
 import { mapState, mapActions } from 'vuex'
 import { ACTION_TYPES } from './util/constants'
 import ODLLUser from './blockchain/ODLLUser'
+import DentistFinder from './blockchain/search/DentistFinder'
 import monitorWeb3 from './util/web3/monitorWeb3'
 
 Vue.config.devtools = true
@@ -121,7 +122,8 @@ new Vue({
       ACTION_TYPES.SET_IS_VALID_USER_BUT,
       ACTION_TYPES.RESET_IS_VALID_USER_BUT,
       ACTION_TYPES.SET_CURRENT_VIEW,
-      ACTION_TYPES.UPDATE_USER_STATE
+      ACTION_TYPES.UPDATE_USER_STATE,
+      ACTION_TYPES.SAVE_SEARCH_RESULT
     ]),
     callUpdateUserGravatar (payload = null) {
       this[ACTION_TYPES.UPDATE_USER_GRAVATAR](payload)
@@ -134,6 +136,21 @@ new Vue({
         })
         .then(() => {
           if (payload.callback) payload.callback(userData)
+        })
+      })
+      .catch((err) => {
+        if (payload.callback) payload.callback()
+        console.error(err, 'Unable to write user data')
+      })
+    },
+    callToFindDentists (payload = null) {
+      DentistFinder.findDentist(this.$store.state, payload)
+      .then((dentists) => {
+        this[ACTION_TYPES.SAVE_SEARCH_RESULT]({
+          searchResult: dentists
+        })
+        .then(() => {
+          if (payload.callback) payload.callback(dentists)
         })
       })
       .catch((err) => {

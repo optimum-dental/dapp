@@ -78,5 +78,15 @@ export default {
   },
   [ACTION_TYPES.UPDATE_WEB3_PROPERTIES] ({ commit }, payload) {
     commit(MUTATION_TYPES.UPDATE_WEB3_PROPERTIES, payload)
+  },
+  [ACTION_TYPES.SAVE_SEARCH_RESULT] ({ commit }, payload) {
+    return new Promise(function (resolve, reject) {
+      commit(MUTATION_TYPES.SAVE_SEARCH_RESULT, {
+        searchResult: payload.searchResult,
+        callback: (status) => {
+          status ? resolve() : reject()
+        }
+      })
+    })
   }
 }

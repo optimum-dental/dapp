@@ -20,7 +20,8 @@ export const MUTATION_TYPES = {
   INITIALISE_IS_VALID_USER_BUT: 'initialiseIsValidUserBut',
   SET_IS_VALID_USER_BUT: 'setIsValidUserBut',
   RESET_IS_VALID_USER_BUT: 'resetIsValidUserBut',
-  UPDATE_WEB3_PROPERTIES: 'updateWeb3Properties'
+  UPDATE_WEB3_PROPERTIES: 'updateWeb3Properties',
+  SAVE_SEARCH_RESULT: 'saveSearchResult'
 }
 
 export const ACTION_TYPES = MUTATION_TYPES

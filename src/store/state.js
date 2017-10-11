@@ -47,5 +47,6 @@ export default {
   },
   isDAppReady: false,
   isValidUserBut: '0',
-  originalIsValidUserBut: '0'
+  originalIsValidUserBut: '0',
+  searchResult: {}
 }

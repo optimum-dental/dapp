@@ -15,17 +15,18 @@
       <div class="search-item">
         <div class="search-param">Appointment Type</div>
         <div class="search-value">
-          <select id="appointment-type" class="list">
-            <option>Choose Type</option>
-            <option value="1">Scan Appointment</option>
-            <option value="2">Treatment Appointment</option>
-          </select>
+          <select id="appointment-type" class="list"></select>
+          <div class="tip"></div>
         </div>
       </div>
 
       <div class="search-item">
         <div class="search-param">Budget <span class="small-text">[optional]</span></div>
         <div id="budget-range" class="noUiSlider"></div>
+      </div>
+
+      <div class="search-item submit">
+        <input type="button" class='submit-button' value="Find" @click="findDentist">
       </div>
     </div>
   </div>
@@ -35,6 +36,29 @@
   require('../../../../../../static/css/nouislider.css')
 
   export default {
+    computed: {
+      budgetRange () {
+        var budgetRange = document.getElementById('budget-range')
+        rangeSlider.create(budgetRange, {
+          start: [50, 150],
+          connect: true,
+          range: {
+            'min': [0],
+            'max': [200]
+          },
+          pips: {
+            mode: 'count',
+            density: 9,
+            values: 9,
+            format: wnumb({
+              prefix: '$'
+            })
+          }
+        })
+
+        return rangeSlider
+      }
+    },
     methods: {
       populateStates () {
         const statesElement = document.getElementById('state')
@@ -45,34 +69,120 @@
             statesElement.appendChild(optionElement)
           }
         })
+      },
+      populateAppointmentTypes () {
+        const appointmentTypesElement = document.getElementById('appointment-type')
+        appointmentTypes.forEach((appointmentType, index) => {
+          const optionElement = document.createElement('option')
+          optionElement.text = appointmentType.name
+          if (appointmentTypesElement) {
+            appointmentTypesElement.appendChild(optionElement)
+          }
+        })
+      },
+      setEventListeners () {
+        const appointmentTypesElement = document.getElementById('appointment-type')
+        if (appointmentTypesElement) {
+          const _this = this
+          appointmentTypesElement.addEventListener('change', function () {
+            let appointmentSubtypesElement
+            if (document.getElementById('appointment-sub-type')) {
+              appointmentSubtypesElement = document.getElementById('appointment-sub-type')
+            } else {
+              appointmentSubtypesElement = _this.createAppointmentSubTypeDOMElement(appointmentTypes[this.selectedIndex].subTypes[0])
+              document.querySelector('#search-page').insertBefore(appointmentSubtypesElement, this.closest('.search-item').nextElementSibling)
+            }
+
+            _this.populateAppointmentSubTypes(this.selectedIndex)
+            appointmentSubtypesElement.focus()
+          })
+        }
+      },
+      createAppointmentSubTypeDOMElement (title = '') {
+        const DOMELement = new DOMParser().parseFromString(`
+          <div class="search-item">
+            <div class="search-param">${title}</div>
+            <div class="search-value">
+              <select id="appointment-sub-type" class="list"></select>
+              <div class="tip"></div>
+            </div>
+          </div>
+        `, 'text/html')
+
+        return DOMELement.body.firstChild
+      },
+      populateAppointmentSubTypes (appointmentTypeIndex) {
+        const appointmentSubtypesElement = document.getElementById('appointment-sub-type')
+        if (appointmentTypeIndex === 0) {
+          appointmentSubtypesElement.closest('.search-item').remove()
+        } else {
+          appointmentSubtypesElement.closest('.search-item').querySelector('.search-param').innerHTML = appointmentTypes[appointmentTypeIndex].subTypes[0]
+          while (appointmentSubtypesElement.firstChild) {
+            appointmentSubtypesElement.removeChild(appointmentSubtypesElement.firstChild)
+          }
+
+          const appointmentSubtypes = appointmentTypes[appointmentTypeIndex].subTypes
+          appointmentSubtypes.forEach((appointmentSubtype) => {
+            const optionElement = document.createElement('option')
+            optionElement.text = appointmentSubtype
+            if (appointmentSubtypesElement) {
+              appointmentSubtypesElement.appendChild(optionElement)
+            }
+          })
+        }
+      },
+      findDentist (evt) {
+        if (document.getElementById('appointment-sub-type')) {
+          let target = evt.target
+          target.disabled = true
+          target.style.cursor = 'not-allowed'
+          target.style.background = '#adcddf'
+
+          const appointmentType = Number(document.getElementById('appointment-type').selectedIndex)
+          const appointmentSubtype = Number(document.getElementById('appointment-sub-type').selectedIndex)
+          const searchQuery = {
+            state: Number(document.getElementById('state').selectedIndex),
+            appointmentType,
+            appointmentSubtype,
+            budget: this.budget,
+            page: 1
+          }
+
+          let errors = [appointmentType === 0 ? document.getElementById('appointment-type') : undefined, appointmentSubtype === 0 ? document.getElementById('appointment-sub-type') : undefined]
+          errors = errors.filter(entry => entry !== undefined)
+          if (errors.length > 0) {
+            errors.forEach((item) => {
+              let tip = item.nextElementSibling
+              tip.innerHTML = `Please check your ${item.id}`
+              tip.classList.add('error')
+            })
+          } else {
+            this.$root.callToFindDentists({
+              searchQuery,
+              callback: (searchResult = null) => {
+                target.disabled = false
+                target.style.cursor = 'pointer'
+                target.style.background = '#296d92'
+              }
+            })
+          }
+        } else {
+          console.log('Choose Appointment Type')
+        }
       }
     },
     mounted: function () {
-      var budgetRange = document.getElementById('budget-range')
-      rangeSlider.create(budgetRange, {
-        start: [50, 150],
-        connect: true,
-        range: {
-          'min': [0],
-          'max': [200]
-        },
-        pips: {
-          mode: 'count',
-          density: 9,
-          values: 9,
-          format: wnumb({
-            prefix: '$'
-          })
-        }
-      })
-
+      this.budgetRange
       this.populateStates()
+      this.populateAppointmentTypes()
+      this.setEventListeners()
     }
   }
 
   import wnumb from 'wnumb'
   import rangeSlider from 'nouislider'
   import states from '../../../../../../static/json/states/states.json'
+  import appointmentTypes from '../../../../../../static/json/appointment_types/appointment_types.json'
 </script>
 
 <style scoped>
@@ -140,14 +250,20 @@
 
   .search-item {
     width: 80%;
-    height: 60px;
+    height: 80px;
     line-height: 30px;
-    font-size: 18px;
+  }
+
+  .search-item:not(.submit) {
     margin-bottom: 30px;
   }
 
   .search-param {
     color: #4d4c49;
+    margin-bottom: 20px;
+    height: 20px;
+    font-size: 16px;
+    line-height: 20px;
   }
 
   .list {
@@ -164,5 +280,40 @@
     position: relative;
     top: -3px;
     left: 10px;
+  }
+
+  .submit-button {
+    background: #296d92;
+    color: #ffffff;
+    height: 30px;
+    width: 100px;
+    float: right;
+    outline: 0px;
+    border: 0px;
+    cursor: pointer;
+  }
+</style>
+
+<style>
+  .search-item {
+    width: 80%;
+    height: 80px;
+    line-height: 30px;
+  }
+
+  .search-param {
+    color: #4d4c49;
+    margin-bottom: 20px;
+    height: 20px;
+    font-size: 16px;
+    line-height: 20px;
+  }
+
+  .list {
+    height: 30px;
+    width: 200px;
+    color: #4d4c49;
+    background: #ffffff;
+    outline: none;
   }
 </style>
