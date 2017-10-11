@@ -53,7 +53,8 @@
             format: wnumb({
               prefix: '$'
             })
-          }
+          },
+          tooltips: true
         })
 
         return budgetRangeElement.noUiSlider
@@ -82,7 +83,8 @@
       },
       setEventListeners () {
         const _this = this
-        document.querySelector('#search-page').addEventListener('change', function (evt) {
+        const searchPage = document.querySelector('#search-page')
+        searchPage.addEventListener('change', function (evt) {
           let target = evt.target
           switch (target.id) {
             case 'appointment-type':
@@ -107,8 +109,9 @@
         })
 
         this.budgetRange.on('change', function (values, handle, unencodedValues) {
+          const tooltips = [searchPage.querySelector('.noUi-handle-lower'), searchPage.querySelector('.noUi-handle-upper')]
+          $(tooltips[handle]).find('.noUi-tooltip').slideUp(100)
           let range = values[0] === '0.00' && values[1] === '200.00' ? undefined : values.map(value => '$' + Math.ceil(Number(value))).join(' - ')
-          console.log(this.tooltip)
           _this.addToSearchQuery({
             target: {
               id: 'budget-range',
@@ -116,6 +119,11 @@
               range
             }
           })
+        })
+
+        this.budgetRange.on('slide', function (values, handle, unencodedValues) {
+          const tooltips = [searchPage.querySelector('.noUi-handle-lower'), searchPage.querySelector('.noUi-handle-upper')]
+          $(tooltips[handle]).find('.noUi-tooltip').slideDown(100)
         })
       },
       createAppointmentSubTypeDOMElement (title = '') {
@@ -134,7 +142,9 @@
       populateAppointmentSubTypes (appointmentTypeIndex) {
         const appointmentSubtypesElement = document.getElementById('appointment-sub-type')
         if (appointmentTypeIndex === 0) {
-          appointmentSubtypesElement.closest('.search-item').remove()
+          $(appointmentSubtypesElement).fadeOut(500, function () {
+            appointmentSubtypesElement.closest('.search-item').remove()
+          })
         } else {
           appointmentSubtypesElement.closest('.search-item').querySelector('.search-param').innerHTML = appointmentTypes[appointmentTypeIndex].subTypes[0]
           while (appointmentSubtypesElement.firstChild) {
@@ -158,7 +168,10 @@
         if (target.tagName === 'SELECT') {
           if (target.selectedIndex === 0) {
             if (document.getElementById(`query-${idToWatch}`)) {
-              document.getElementById(`query-${idToWatch}`).remove()
+              $(`#query-${idToWatch}`).fadeOut(500, function () {
+                $(this).remove()
+              })
+
               queryItem = null
             }
           } else {
@@ -182,8 +195,10 @@
         } else {
           [ id, value, queryItem ] = target.range ? [ `query-${target.id}`, target.range, document.getElementById(`query-${target.id}`) || this.createQueryItemElement(`query-${target.id}`) ] : [ undefined, undefined, undefined ]
           if (!queryItem) {
-            if (document.getElementById(`query-${idToWatch}`)) {
-              document.getElementById(`query-${idToWatch}`).remove()
+            if ($(`#query-${idToWatch}`)) {
+              $(`#query-${idToWatch}`).fadeOut(500, function () {
+                $(this).remove()
+              })
             }
           } else {
             queryItem.innerHTML = value
@@ -192,7 +207,9 @@
 
         let searchQueryElement = document.getElementById('search-query')
         if (queryItem && !searchQueryElement.querySelector(`#${id}`)) {
+          $(queryItem).hide()
           searchQueryElement.appendChild(queryItem)
+          $(queryItem).fadeIn(500)
         }
       },
       createQueryItemElement (id) {
@@ -233,7 +250,7 @@
               callback: (searchResult = null) => {
                 target.disabled = false
                 target.style.cursor = 'pointer'
-                target.style.background = '#296d92'
+                target.style.background = '#29aae1'
               }
             })
           }
@@ -254,6 +271,7 @@
   import rangeSlider from 'nouislider'
   import states from '../../../../../../static/json/states/states.json'
   import appointmentTypes from '../../../../../../static/json/appointment_types/appointment_types.json'
+  import $ from 'jquery'
 </script>
 
 <style scoped>
@@ -331,7 +349,7 @@
   }
 
   .search-param {
-    color: #4d4c49;
+    color: #7f7f7f;
     margin-bottom: 20px;
     height: 20px;
     font-size: 16px;
@@ -341,9 +359,10 @@
   .list {
     height: 30px;
     width: 200px;
-    color: #4d4c49;
     background: #ffffff;
     outline: none;
+    border: 1px solid #d3d3d3;
+    color: #7f7f7f;
   }
 
   .small-text {
@@ -355,7 +374,7 @@
   }
 
   .submit-button {
-    background: #296d92;
+    background: #29aae1;
     color: #ffffff;
     height: 30px;
     width: 100px;
@@ -387,6 +406,8 @@
     color: #4d4c49;
     background: #ffffff;
     outline: none;
+    border: 1px solid #d3d3d3;
+    color: #7f7f7f;
   }
 
   .query-item {

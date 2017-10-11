@@ -291,7 +291,7 @@
             callback: (userData = null) => {
               target.disabled = false
               target.style.cursor = 'pointer'
-              target.style.background = '#296d92'
+              target.style.background = '#29aae1'
             }
           })
         }
@@ -440,7 +440,7 @@
   }
 
   .submit-button {
-    background: #296d92;
+    background: #29aae1;
     color: #ffffff;
     height: 30px;
     width: 100px;
