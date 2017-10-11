@@ -2,20 +2,20 @@
   <div class="wrapper">
     <div id="search-page">
       <div class="title">Find Dentists</div>
-      <div class="choices">
+      <div class="choices" id="search-query">
         <div class="search-icon"></div>
       </div>
 
       <div class="instruction">Choose by location, appointment type, and budget</div>
       <div class="search-item">
         <div class="search-param">Locations</div>
-        <div class="search-value"><select id="state" class="list"></select></div>
+        <div class="search-value"><select id="state" class="list" @input="addToSearchQuery"></select></div>
       </div>
 
       <div class="search-item">
         <div class="search-param">Appointment Type</div>
         <div class="search-value">
-          <select id="appointment-type" class="list"></select>
+          <select id="appointment-type" class="list" @input="addToSearchQuery"></select>
           <div class="tip"></div>
         </div>
       </div>
@@ -38,9 +38,9 @@
   export default {
     computed: {
       budgetRange () {
-        var budgetRange = document.getElementById('budget-range')
-        rangeSlider.create(budgetRange, {
-          start: [50, 150],
+        var budgetRangeElement = document.getElementById('budget-range')
+        rangeSlider.create(budgetRangeElement, {
+          start: [0, 200],
           connect: true,
           range: {
             'min': [0],
@@ -56,7 +56,7 @@
           }
         })
 
-        return rangeSlider
+        return budgetRangeElement.noUiSlider
       }
     },
     methods: {
@@ -81,22 +81,42 @@
         })
       },
       setEventListeners () {
-        const appointmentTypesElement = document.getElementById('appointment-type')
-        if (appointmentTypesElement) {
-          const _this = this
-          appointmentTypesElement.addEventListener('change', function () {
-            let appointmentSubtypesElement
-            if (document.getElementById('appointment-sub-type')) {
-              appointmentSubtypesElement = document.getElementById('appointment-sub-type')
-            } else {
-              appointmentSubtypesElement = _this.createAppointmentSubTypeDOMElement(appointmentTypes[this.selectedIndex].subTypes[0])
-              document.querySelector('#search-page').insertBefore(appointmentSubtypesElement, this.closest('.search-item').nextElementSibling)
-            }
+        const _this = this
+        document.querySelector('#search-page').addEventListener('change', function (evt) {
+          let target = evt.target
+          switch (target.id) {
+            case 'appointment-type':
+              let appointmentSubtypesElement
+              if (document.getElementById('appointment-sub-type')) {
+                appointmentSubtypesElement = document.getElementById('appointment-sub-type')
+              } else {
+                appointmentSubtypesElement = _this.createAppointmentSubTypeDOMElement(appointmentTypes[target.selectedIndex].subTypes[0])
+                document.querySelector('#search-page').insertBefore(appointmentSubtypesElement, target.closest('.search-item').nextElementSibling)
+              }
 
-            _this.populateAppointmentSubTypes(this.selectedIndex)
-            appointmentSubtypesElement.focus()
+              _this.populateAppointmentSubTypes(target.selectedIndex)
+              let eventObject = document.createEvent('HTMLEvents')
+              eventObject.initEvent('change', true, true)
+              appointmentSubtypesElement.dispatchEvent(eventObject)
+              appointmentSubtypesElement.focus()
+              break
+            case 'appointment-sub-type':
+              _this.addToSearchQuery(evt)
+              break
+          }
+        })
+
+        this.budgetRange.on('change', function (values, handle, unencodedValues) {
+          let range = values[0] === '0.00' && values[1] === '200.00' ? undefined : values.map(value => '$' + Math.ceil(Number(value))).join(' - ')
+          console.log(this.tooltip)
+          _this.addToSearchQuery({
+            target: {
+              id: 'budget-range',
+              tagName: 'budgetRangeElement',
+              range
+            }
           })
-        }
+        })
       },
       createAppointmentSubTypeDOMElement (title = '') {
         const DOMELement = new DOMParser().parseFromString(`
@@ -130,6 +150,57 @@
             }
           })
         }
+      },
+      addToSearchQuery (evt) {
+        let target = evt.target
+        let id, value, queryItem
+        let idToWatch = target.id === 'appointment-type' ? 'appointment-sub-type' : target.id
+        if (target.tagName === 'SELECT') {
+          if (target.selectedIndex === 0) {
+            if (document.getElementById(`query-${idToWatch}`)) {
+              document.getElementById(`query-${idToWatch}`).remove()
+              queryItem = null
+            }
+          } else {
+            switch (target.id) {
+              case 'appointment-sub-type':
+                id = `query-${target.id}`
+                let appointmentTypeIndex = document.getElementById('appointment-type').selectedIndex
+                value = appointmentTypes[appointmentTypeIndex].subTypes[target.selectedIndex]
+                queryItem = document.getElementById(id) || this.createQueryItemElement(id)
+                queryItem.innerHTML = value
+
+                break
+              case 'state':
+                value = states[target.selectedIndex].name
+                id = `query-${target.id}`
+                queryItem = document.getElementById(id) || this.createQueryItemElement(id)
+                queryItem.innerHTML = value
+                break
+            }
+          }
+        } else {
+          [ id, value, queryItem ] = target.range ? [ `query-${target.id}`, target.range, document.getElementById(`query-${target.id}`) || this.createQueryItemElement(`query-${target.id}`) ] : [ undefined, undefined, undefined ]
+          if (!queryItem) {
+            if (document.getElementById(`query-${idToWatch}`)) {
+              document.getElementById(`query-${idToWatch}`).remove()
+            }
+          } else {
+            queryItem.innerHTML = value
+          }
+        }
+
+        let searchQueryElement = document.getElementById('search-query')
+        if (queryItem && !searchQueryElement.querySelector(`#${id}`)) {
+          searchQueryElement.appendChild(queryItem)
+        }
+      },
+      createQueryItemElement (id) {
+        const DOMELement = new DOMParser().parseFromString(`
+          <div class="query-item" id='${id}'></div>
+        `, 'text/html')
+
+        return DOMELement.body.firstChild
       },
       findDentist (evt) {
         if (document.getElementById('appointment-sub-type')) {
@@ -230,6 +301,7 @@
     background-size: contain;
     display: inline-block;
     margin-top: 5px;
+    float: left;
   }
 
   .choice {
@@ -315,5 +387,16 @@
     color: #4d4c49;
     background: #ffffff;
     outline: none;
+  }
+
+  .query-item {
+    display: inline-block;
+    background: #29aae3;
+    color: #ffffff;
+    height: 30px;
+    line-height: 30px;
+    float: left;
+    margin-right: 10px;
+    padding: 0px 10px;
   }
 </style>

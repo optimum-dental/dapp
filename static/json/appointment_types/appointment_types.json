@@ -17,7 +17,9 @@
   {
     "name": "Treatment Appointment",
     "subTypes": [
-      "Treatment"
+      "Treatment",
+      "Teeth Whitening",
+      "Fluoride Treatment"
     ]
   }
 ]

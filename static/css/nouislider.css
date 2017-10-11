@@ -197,7 +197,7 @@
  */
 .noUi-pips-horizontal {
   padding: 10px 0;
-  height: 80px;
+  height: 53px;
   top: 100%;
   left: 0;
   width: 100%;
@@ -247,7 +247,7 @@
   position: absolute;
   border: 1px solid #D9D9D9;
   border-radius: 3px;
-  background: #fff;
+  background: #28aae1;
   color: #000;
   padding: 5px;
   text-align: center;
@@ -258,6 +258,25 @@
   transform: translate(-50%, 0);
   left: 50%;
   bottom: 120%;
+  top: 25px;
+  padding: 0px 5px;
+  height: 25px;
+  line-height: 25px;
+  z-index: 999999 !important;
+  color: #ffffff;
+}
+.noUi-horizontal .noUi-tooltip:before {
+  content: '';
+  /* border-top: transparent; */
+  border-right: 5px solid transparent;
+  border-bottom: 9px solid #28aae1;
+  border-left: 5px solid transparent;
+  display: block;
+  width: 0px;
+  height: 3px;
+  position: absolute;
+  top: -10px;
+  left: 38%;
 }
 .noUi-vertical .noUi-tooltip {
   -webkit-transform: translate(0, -50%);
