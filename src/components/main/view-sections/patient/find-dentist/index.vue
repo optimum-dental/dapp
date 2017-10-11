@@ -1,7 +1,7 @@
 <template>
   <div id="find-dentist">
     <section class="content" v-if="isDAppReady">
-      <dentists v-if="user && user.isValid && isValidUserBut === '0'" />
+      <component :is="dentistPageState" v-if="user && user.isValid && isValidUserBut === '0'" />
 
       <guest-introduction v-else-if="isValidUserBut === '0'" />
 
@@ -19,11 +19,20 @@
       Dentists,
       GuestIntroduction,
       Loading,
-      Informant
+      Informant,
+      SearchPage
     },
     computed: {
       user () {
         return this.$root.user
+      },
+      dentistPageState () {
+        switch (this.$route.query.p) {
+          case 'dentists':
+            return Dentists
+          default:
+            return SearchPage
+        }
       }
     },
     props: [ 'isDAppReady', 'isValidUserBut' ]
@@ -33,6 +42,7 @@
   import GuestIntroduction from '../get-started/Guest.vue'
   import Loading from '../loading'
   import Informant from '../informant'
+  import SearchPage from './SearchPage'
 </script>
 
 <style scoped>
