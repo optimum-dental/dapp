@@ -23,29 +23,12 @@
     },
     data: function () {
       return {
-        services: [
-          'Anti-Snoring Treatment',
-          'Bonding',
-          'Crown and Bridgework',
-          'Custom Mouth Guards',
-          'Dentures',
-          'Fillings',
-          'Fluoride Treatments',
-          'Implants',
-          'Oral Surgery',
-          'Orthodontics',
-          'Periodontics',
-          'Root Canal Treatments',
-          'Routine Care',
-          'Sealants',
-          'Sedation',
-          'Veneers',
-          'Whitening',
-          'X-Rays'
-        ]
+        services: services
       }
     }
   }
+
+  import services from '../../../../../../static/json/services/services.json'
 </script>
 
 <style scoped>
