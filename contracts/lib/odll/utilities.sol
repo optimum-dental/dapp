@@ -670,7 +670,6 @@ library utilities {
     internal returns (address[] result)
   {
     var maxCount = ODLLDB(dbAddress).getUIntValue(sha3("dentists/count"));
-    uint i;
     if (maxCount == 0) {
       return result;
     }

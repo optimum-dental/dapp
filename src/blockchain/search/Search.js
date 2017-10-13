@@ -1,15 +1,18 @@
-// import contract from 'truffle-contract'
-// import ODLLDB from '../../../build/contracts/ODLLDB.json'
+import odllUser from '../odll/ODLLUser'
 import ODLLUserContract from '../../../build/contracts/ODLLUser.json'
-// import { APPROVED_BLOCKCHAIN_NETWORK_ID, NETWORKS } from '../../util/constants'
-// import soliditySha3 from 'solidity-sha3'
-import odllUser from '../ODLLUser'
+import blockchainManager from '../BlockchainManager'
+
+let search = null
 
 class Search {
+  constructor () {
+    search = search || this
+    return search
+  }
+
   findDentists (state = null, dataObject = {}) {
-    console.log(dataObject)
     return new Promise((resolve, reject) => {
-      odllUser.accessBlockChainWith({
+      blockchainManager.accessBlockChainWith({
         state,
         contractToUse: ODLLUserContract,
         dbContractKey: 'contract/odll-user',
@@ -19,6 +22,7 @@ class Search {
             .then((result) => {
               // Successful Fetch
               resolve(odllUser.getUserObject(state, result))
+              console.log(result)
             })
             .catch((error) => {
               reject({ error, isValid: true, warningMessage: "We've encountered a problem fetching dentists from the blockchain. Please do try again in a few minutes." })
@@ -36,4 +40,5 @@ class Search {
   }
 }
 
-export default new Search()
+search = new Search()
+export default search

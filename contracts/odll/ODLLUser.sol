@@ -105,27 +105,18 @@ contract ODLLUser is ODLLRestrictor {
     uint stateId,
     uint serviceTypeId,
     uint serviceId,
-    uint budget, // within budget range
+    uint[] budget, // within budget range
     uint offset, // starting from offset: 0-based
     uint limit, // not more than limit
-    uint seed
+    uint seed // seed value to give the illusion of randomisation
     )
       returns (
-        address[] foundDentistsIds,
-        uint offset,
-        uint limit,
+        address[] foundDentistsIds
       )
   {
-    uint j = 0;
-    if (serviceTypeId == 1) {
-      address[] budgetBasedDentistsIds = searchLibrary.getServiceDentistsByBudget(dbAddress, serviceId, budget);
-      address[] stateBasedDentistsIds = searchLibrary.getServiceDentistsByState(dbAddress, serviceId, stateId);
-      foundDentistsIds = utilities.intersectBudgetAndStateBasedDentists(dbAddress, budgetBasedDentistsIds, stateBasedDentistsIds);
-    } else if (serviceTypeId == 2) {
-      address[] budgetBasedDentistsIds = searchLibrary.getServiceDentistsByBudget(dbAddress, serviceId, budget);
-      address[] stateBasedDentistsIds = searchLibrary.getServiceDentistsByState(dbAddress, serviceId, stateId);
-      foundDentistsIds = utilities.intersectBudgetAndStateBasedDentists(dbAddress, budgetBasedDentistsIds, stateBasedDentistsIds);
-    }
+    address[] memory budgetBasedDentistsIds = searchLibrary.getServiceDentistsByBudget(dbAddress, serviceTypeId, serviceId, budget);
+    address[] memory stateBasedDentistsIds = searchLibrary.getServiceDentistsByState(dbAddress, serviceTypeId, serviceId, stateId);
+    foundDentistsIds = utilities.intersectBudgetAndStateBasedDentists(dbAddress, budgetBasedDentistsIds, stateBasedDentistsIds);
 
     if (foundDentistsIds.length > 0) {
       if (offset > foundDentistsIds.length) {
@@ -140,9 +131,7 @@ contract ODLLUser is ODLLRestrictor {
 
   function getDentistDataFromFind(uint serviceTypeId, uint serviceId, address dentistId) returns (
     bytes32[] bytes32s,
-    uint fee,
-    uint stateId,
-    uint8 averageRating
+    uint[] uints
   ) {
     bytes32s = new bytes32[](8);
     uints = new uint[](3);
@@ -153,9 +142,9 @@ contract ODLLUser is ODLLRestrictor {
     bytes32s[2] = ODLLDB(dbAddress).getBytes32Value(sha3("user/gravatar", dentistId));
     bytes32s[3] = ODLLDB(dbAddress).getBytes32Value(sha3("user/street", dentistId));
     bytes32s[4] = ODLLDB(dbAddress).getBytes32Value(sha3("user/city", dentistId));
-    fee = searchLibrary.getServiceDentistFee(dbAddress, serviceTypeId, serviceId, dentistId);
-    stateId = ODLLDB(dbAddress).getUIntValue(sha3("user/state", dentistId));
-    averageRating = userManager.getDentistAverageRating(dbAddress, dentistId);
+    uints[0] = searchLibrary.getServiceDentistFee(dbAddress, serviceTypeId, serviceId, dentistId);
+    uints[1] = ODLLDB(dbAddress).getUIntValue(sha3("user/state", dentistId));
+    uints[2] = userManager.getDentistAverageRating(dbAddress, dentistId);
   }
 
   function addOfficialToODLL(address officialId, uint8 userType)

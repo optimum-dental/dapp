@@ -1,15 +1,15 @@
 pragma solidity ^0.4.11;
 
-import "../../odll/ODLLDB.sol";
-import "../../zeppelin/math/SafeMath.sol";
 import "./utilities.sol";
-import "../arachnid/solidity-stringutils/strings.sol";
 
 library userManager {
   using strings for *;
 
   //    status:
-  //    { 0 => not regiistered, 1 => active, 2 => blocked }
+  //    { 0 => not registered, 1 => active, 2 => blocked }
+
+  //    userType:
+  //    { 1 => patient, 2 => dentist, 3 => manager, 4 => admin }
 
   function getConfig(address dbAddress, bytes32 key) constant returns(uint) {
     return ODLLDB(dbAddress).getUIntValue(sha3("config/", key));

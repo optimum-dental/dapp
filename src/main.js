@@ -5,7 +5,7 @@ import store from './store'
 
 import { mapState, mapActions } from 'vuex'
 import { ACTION_TYPES } from './util/constants'
-import ODLLUser from './blockchain/ODLLUser'
+import ODLLUser from './blockchain/odll/ODLLUser'
 import Search from './blockchain/search/Search'
 import monitorWeb3 from './util/web3/monitorWeb3'
 

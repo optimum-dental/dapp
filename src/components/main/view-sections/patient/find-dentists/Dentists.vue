@@ -36,6 +36,12 @@
         </div>
       </div>
 
+      <div class="tip-to-submit">
+        <div class="tip-content">
+          <span class="text">Press Enter</span><span class="enter-icon"></span>
+        </div>
+      </div>
+
       <div class="result-section">
         <div class="result" v-for="dentist in searchResult">
           <div class="gravatar-section"></div>
@@ -69,6 +75,15 @@
       },
       searchResult () {
         return this.$store.state.searchResult.findDentist
+      },
+      pageNumber () {
+        return (Number(this.$route.query.o) / this.perPage) + 1
+      },
+      nextOffset () {
+        return (this.pageNumber - 1) * this.perPage
+      },
+      perPage () {
+        return 5
       }
     },
     methods: {
@@ -137,7 +152,7 @@
         const budgetRangeElement = document.getElementById('budget-range')
         const budgetRange = [Number(this.$route.query.bl), Number(this.$route.query.br)]
         for (let i = 0; i < 5; i++) {
-          let budgetRangeText = `${(i * 50)} - ${(((i + 1) * 50) - 1)}`
+          let budgetRangeText = '$' + (i * 50) + ' - $' + (((i + 1) * 50) - 1)
           const optionElement = document.createElement('option')
           optionElement.text = budgetRangeText
           if (budgetRangeElement) {
@@ -156,8 +171,8 @@
             appointmentTypeId,
             appointmentSubtypeId,
             budget: this.budget,
-            offset: this.$route.query.o ? Number(this.$route.query.o) : 0,
-            limit: this.$route.query.l ? Number(this.$route.query.l) : 0,
+            offset: this.nextOffset,
+            limit: this.perPage,
             seed: this.$store.state.searchSeed.findDentists || Math.ceil(Number(this.$route.query.sd) * 113)
           }
 
@@ -210,7 +225,7 @@
   #dentists {
     background: #ffffff;
     min-height: 70vh;
-    width: 80%;
+    width: 90%;
     font-size: 12px;
     margin: 30px auto;
     color: #adadad;
@@ -228,11 +243,12 @@
   }
 
   .query-section {
-    width: 80%;
-    height: 40px;
-    border-bottom: 1px solid #dcdede;
-    margin-bottom: 50px;
+    width: 100%;
+    height: 70px;
+    margin-bottom: 30px;
     background: #ffffff;
+    display: flex;
+    flex-direction: row;
   }
 
   .search-icon {
@@ -246,24 +262,23 @@
   }
 
   .search-item {
-    width: 20%;
     height: 50px;
     display: inline-block;
-    margin-right: 10px;
+    /*margin-right: 10px;*/
     margin-bottom: 30px;
   }
 
   .search-param {
     color: #7f7f7f;
-    margin-bottom: 20px;
+    margin-bottom: 5px;
     height: 20px;
-    font-size: 16px;
+    font-size: 14px;
     line-height: 20px;
   }
 
   .list {
     height: 30px;
-    width: 200px;
+    width: 95%;
     background: #ffffff;
     outline: none;
     border: 1px solid #d3d3d3;
@@ -297,5 +312,23 @@
     line-height: 40px;
     color: #ffffff;
     background: #29aae3;
+  }
+
+  .tip-to-submit {
+    position: relative;
+    top: -35px;
+    width: 100%;
+    float: right;
+    height: 15px;
+  }
+
+  .tip-content {
+    margin-right: 7px;
+    background: #bbb;
+    width: 120px;
+    height: 20px;
+    padding: 2px;
+    text-align: center;
+    float: right;
   }
 </style>

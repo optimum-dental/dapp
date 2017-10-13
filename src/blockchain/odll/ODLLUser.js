@@ -1,47 +1,17 @@
-import contract from 'truffle-contract'
-import ODLLDB from '../../build/contracts/ODLLDB.json'
-import ODLLUserContract from '../../build/contracts/ODLLUser.json'
-import { APPROVED_BLOCKCHAIN_NETWORK_ID, NETWORKS } from '../util/constants'
-import soliditySha3 from 'solidity-sha3'
+import ODLLUserContract from '../../../build/contracts/ODLLUser.json'
+import blockchainManager from '../BlockchainManager'
 
 let odllUser = null
+
 class ODLLUser {
   constructor () {
     odllUser = odllUser || this
-    odllUser.ODLLDBContractAddress = '0x3599fb7676a98ade73fc7bff96ae51cbce59e268'
     return odllUser
-  }
-
-  // setBlockchain (state = null) {
-  //   this.state = state
-  //   this.web3Instance = state.web3.instance()
-  //   this.provider = this.web3Instance.currentProvider
-  // }
-
-  getCurrentContractAddressForKey (dbContractKey, state, coinbase) {
-    return new Promise((resolve, reject) => {
-      const ODLLDBContract = contract(ODLLDB)
-      ODLLDBContract.setProvider(state.web3.instance().currentProvider)
-      ODLLDBContract.deployed()
-      .then((contractInstance) => {
-        contractInstance.getAddressValue(soliditySha3(dbContractKey), { from: coinbase })
-        .then((result) => {
-          // Successful Fetch
-          resolve(result)
-        })
-        .catch((error) => {
-          reject({ error, isValid: true, warningMessage: "We're unable to get the current contract address from the blockchain. Please do try again in a few minutes." })
-        })
-      })
-      .catch((error) => {
-        reject({ error, isValid: true, warningMessage: "We couldn't find Oral Data Link Smart Contracts on your detected network. This is because the Smart Contracts aren't deployed there. Contact Support to know why this is the case." })
-      })
-    })
   }
 
   writeUser (state = null, data = {}) {
     return new Promise((resolve, reject) => {
-      odllUser.accessBlockChainWith({
+      blockchainManager.accessBlockChainWith({
         state,
         contractToUse: ODLLUserContract,
         dbContractKey: 'contract/odll-user',
@@ -69,7 +39,7 @@ class ODLLUser {
 
   getUserDataFromTheBlockchain (state = null) {
     return new Promise((resolve, reject) => {
-      odllUser.accessBlockChainWith({
+      blockchainManager.accessBlockChainWith({
         state,
         contractToUse: ODLLUserContract,
         dbContractKey: 'contract/odll-user',
@@ -92,52 +62,6 @@ class ODLLUser {
       .catch((error) => {
         reject(error)
       })
-    })
-  }
-
-  accessBlockChainWith (dataObject = {}) {
-    const state = dataObject.state
-    return new Promise((resolve, reject) => {
-      if (!state || !state.web3 || !(state.web3.instance)) {
-        reject({ error: true, warningMessage: 'Web3 is not initialised. Use a Web3 injector' })
-      } else {
-        if (state.web3.networkId === APPROVED_BLOCKCHAIN_NETWORK_ID) {
-          const contractToUse = dataObject.contractToUse
-          let odllContract = contract(contractToUse)
-          odllContract.setProvider(state.web3.instance().currentProvider)
-          state.web3.instance().eth.getCoinbase((error, coinbase) => {
-            if (error) {
-              reject({ error, warningMessage: 'Unable to get coinbase for this operation' })
-            } else {
-              odllUser.getCurrentContractAddressForKey(dataObject.dbContractKey, state, coinbase)
-              .then((addressToUse) => {
-                odllUser.runBlockchainPromise(resolve, reject, { odllContract, addressToUse, method: dataObject.method, coinbase })
-              })
-              .catch((error) => {
-                reject(error)
-              })
-            }
-          })
-        } else {
-          reject({ error: true, warningMessage: `You're not on the same blockchain as us. Please connect to the ${NETWORKS[APPROVED_BLOCKCHAIN_NETWORK_ID]}` })
-        }
-      }
-    })
-  }
-
-  runBlockchainPromise (resolve, reject, dataObject) {
-    dataObject.odllContract.at(dataObject.addressToUse)
-    .then((contractInstance) => {
-      dataObject.method(contractInstance, dataObject.coinbase)
-      .then((result) => {
-        resolve(result)
-      })
-      .catch((error) => {
-        reject(error)
-      })
-    })
-    .catch((error) => {
-      reject({ error, isValid: true, warningMessage: "We couldn't find Oral Data Link Smart Contracts on your detected network. This is because the Smart Contracts aren't deployed there. Contact Support to know why this is the case." })
     })
   }
 
@@ -232,4 +156,5 @@ class ODLLUser {
   }
 }
 
-export default new ODLLUser()
+odllUser = new ODLLUser()
+export default odllUser

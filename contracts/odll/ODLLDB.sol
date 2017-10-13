@@ -2,7 +2,6 @@ pragma solidity ^0.4.11;
 
 import "../zeppelin/ownership/Ownable.sol";
 import "../zeppelin/math/SafeMath.sol";
-// import "../abstract/strings.sol";
 import "../lib/arachnid/solidity-stringutils/strings.sol";
 
 contract ODLLDB is Ownable {

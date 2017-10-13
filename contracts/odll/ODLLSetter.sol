@@ -25,12 +25,12 @@ contract ODLLSetter is ODLLRestrictor {
   }
 
   function setFirstAdmin(address firstAdminAdress)
-    onlyOwnerCanCall
+    onlyOwnerCanCall(msg.sender)
   {
     ODLLDB(dbAddress).setAddressValue(sha3('odll/first-admin'), firstAdminAdress);
-    ODLLDB(dbAddress).setBoolValue(sha3('odll/is-admin?', firstAdminAdress), true);
-    ODLLDB(dbAddress).setUIntValue(sha3("user/created-on", userId), now);
-    ODLLDB(dbAddress).setUInt8Value(sha3("user/status", userId), 1);
+    ODLLDB(dbAddress).setBooleanValue(sha3('odll/is-admin?', firstAdminAdress), true);
+    ODLLDB(dbAddress).setUIntValue(sha3("user/created-on", firstAdminAdress), now);
+    ODLLDB(dbAddress).setUInt8Value(sha3("user/status", firstAdminAdress), 1);
     utilities.addArrayItem(dbAddress, "users/ids", "users/count", firstAdminAdress);
     utilities.addArrayItem(dbAddress, "admins/ids", "admins/count", firstAdminAdress);
   }
@@ -40,7 +40,6 @@ contract ODLLSetter is ODLLRestrictor {
   {
     // record: { ODLLUser: sha3('contract/odll-user') }
     bytes32 record = sha3(dbKey);
-    address oldContractAddress = ODLLDB(dbAddress).getAddressValue(record);
     setNewContractAddressToKey(record, newContractAddress);
     ContractSet(newContractAddress, record, now);
   }

@@ -5,6 +5,7 @@ import "./userManager.sol";
 library searchLibrary {
   function getDentists(address dbAddress)
     internal
+    constant
     returns (address[])
   {
     return utilities.getAddressArray(dbAddress, "dentists/ids", "dentists/count");
@@ -29,12 +30,12 @@ library searchLibrary {
     returns (
       address[] foundDentists
     ) {
-    address[] allDentistsRenderingService = getDentistsByService(dbAddress, serviceTypeId, serviceId);
-    address[] foundDentists = new address[](allDentistsRenderingService.length);
+    address[] memory allDentistsRenderingService = getDentistsByService(dbAddress, serviceTypeId, serviceId);
+    foundDentists = new address[](allDentistsRenderingService.length);
     uint j = 0;
     for (uint i = 0; i < allDentistsRenderingService.length; i++) {
       address dentistId = allDentistsRenderingService[i];
-      uint dentistFee = getFee(dbAddress, serviceId, dentistId)
+      uint dentistFee = getServiceDentistFee(dbAddress, serviceTypeId, serviceId, dentistId);
       if (dentistFee >= budget[0] && dentistFee <= budget[1]) {
         foundDentists[j] = dentistId;
         j++;
@@ -49,8 +50,8 @@ library searchLibrary {
     returns (
       address[] foundDentists
   ) {
-    address[] allDentistsRenderingService = getDentistsByService(dbAddress, serviceTypeId, serviceId);
-    address[] foundDentists = new address[](allDentistsRenderingService.length);
+    address[] memory allDentistsRenderingService = getDentistsByService(dbAddress, serviceTypeId, serviceId);
+    foundDentists = new address[](allDentistsRenderingService.length);
     uint j = 0;
     for (uint i = 0; i < allDentistsRenderingService.length; i++) {
       address dentistId = allDentistsRenderingService[i];
@@ -65,6 +66,7 @@ library searchLibrary {
 
   function getDentistsByService(address dbAddress, uint serviceTypeId, uint serviceId)
     internal
+    constant
     returns (
       address[] foundDentists
   ) {

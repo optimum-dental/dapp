@@ -15,7 +15,7 @@ library servicesLibrary {
     if (serviceTypeId == 1) {
       utilities.removeIdArrayItem(dbAddress, serviceIds, "scan-services/dentists", userId);
     } else if (serviceTypeId == 2){
-      return utilities.getRemovableIdArrayAddressItems(dbAddress, serviceId, "scan-services/dentists", "scan-services/dentists-count", "scan-services/dentists-keys");
+      utilities.removeIdArrayItem(dbAddress, serviceIds, "treatment-services/dentists", userId);
     }
   }
 
