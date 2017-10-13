@@ -1,7 +1,9 @@
 <template>
   <div id="find-dentist">
     <section class="content" v-if="isDAppReady">
-      <component :is="dentistPageState" v-if="user && user.isValid && isValidUserBut === '0'" />
+      <dentists v-if="user && user.isValid && isValidUserBut === '0' && isSearching" />
+
+      <search-page v-else-if="user && user.isValid && isValidUserBut === '0'  && !isSearching" />
 
       <guest-introduction v-else-if="isValidUserBut === '0'" />
 
@@ -26,12 +28,11 @@
       user () {
         return this.$root.user
       },
-      dentistPageState () {
-        switch (this.$route.query.p) {
-          case 'dentists':
-            return Dentists
-          default:
-            return SearchPage
+      isSearching () {
+        if (this.$route.query.o !== undefined) {
+          return true
+        } else {
+          return false
         }
       }
     },

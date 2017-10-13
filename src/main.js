@@ -6,7 +6,7 @@ import store from './store'
 import { mapState, mapActions } from 'vuex'
 import { ACTION_TYPES } from './util/constants'
 import ODLLUser from './blockchain/ODLLUser'
-import DentistFinder from './blockchain/search/DentistFinder'
+import Search from './blockchain/search/Search'
 import monitorWeb3 from './util/web3/monitorWeb3'
 
 Vue.config.devtools = true
@@ -123,7 +123,8 @@ new Vue({
       ACTION_TYPES.RESET_IS_VALID_USER_BUT,
       ACTION_TYPES.SET_CURRENT_VIEW,
       ACTION_TYPES.UPDATE_USER_STATE,
-      ACTION_TYPES.SAVE_SEARCH_RESULT
+      ACTION_TYPES.SAVE_SEARCH_RESULT,
+      ACTION_TYPES.SAVE_CURRENT_SEARCH_SEED
     ]),
     callUpdateUserGravatar (payload = null) {
       this[ACTION_TYPES.UPDATE_USER_GRAVATAR](payload)
@@ -144,13 +145,21 @@ new Vue({
       })
     },
     callToFindDentists (payload = null) {
-      DentistFinder.findDentist(this.$store.state, payload)
-      .then((dentists) => {
+      const searchQuery = payload.searchQuery
+      const blockchainParams = Object.assign({}, searchQuery)
+      delete blockchainParams.for
+      Search.findDentists(this.$store.state, blockchainParams)
+      .then((searchResult) => {
         this[ACTION_TYPES.SAVE_SEARCH_RESULT]({
-          searchResult: dentists
+          searchResult
         })
         .then(() => {
-          if (payload.callback) payload.callback(dentists)
+          this[ACTION_TYPES.SAVE_CURRENT_SEARCH_SEED]({
+            for: searchQuery.for,
+            seed: searchQuery.seed
+          })
+
+          if (payload.callback) payload.callback(searchResult)
         })
       })
       .catch((err) => {

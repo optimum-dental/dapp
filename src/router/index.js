@@ -3,7 +3,7 @@ import Router from 'vue-router'
 import Home from '@/components/home/Home.vue'
 import MainPage from '@/components/main/MainPage.vue'
 import GetStarted from '@/components/main/view-sections/patient/get-started'
-import FindDentist from '@/components/main/view-sections/patient/find-dentist'
+import FindDentists from '@/components/main/view-sections/patient/find-dentists'
 import ViewServices from '@/components/main/view-sections/patient/view-services'
 import RequestAppointment from '@/components/main/view-sections/patient/request-appointment'
 import ViewScanApplications from '@/components/main/view-sections/patient/view-scan-applications'
@@ -35,10 +35,10 @@ export default new Router({
     },
     {
       mode: 'history',
-      path: '/find-dentist',
-      name: 'FindDentist',
+      path: '/find-dentists',
+      name: 'FindDentists',
       component: MainPage,
-      meta: { view: FindDentist }
+      meta: { view: FindDentists }
     },
     {
       mode: 'history',

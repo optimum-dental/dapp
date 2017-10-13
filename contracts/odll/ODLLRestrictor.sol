@@ -1,7 +1,5 @@
 pragma solidity ^0.4.11;
 
-import "../zeppelin/ownership/Ownable.sol";
-import "./ODLLDB.sol";
 import "../lib/odll/userManager.sol";
 
 contract ODLLRestrictor is Ownable {
@@ -19,6 +17,26 @@ contract ODLLRestrictor is Ownable {
   modifier onlyOwnerCanCall(address senderAddress)
   {
     require(senderAddress == owner && senderAddress == ODLLDB(dbAddress).getAddressValue(sha3('odll/owner')));
+    _;
+  }
+
+  modifier onlyActiveAdmin {
+    require(userManager.isActiveAdmin(dbAddress, msg.sender));
+    _;
+  }
+
+  modifier onlyActiveManager {
+    require(userManager.isActiveManager(dbAddress, msg.sender));
+    _;
+  }
+
+  modifier onlyOwnerOrActiveAdminOrActiveManager {
+    require(msg.sender == owner || userManager.isActiveAdmin(dbAddress, msg.sender) || userManager.isActiveManager(dbAddress, msg.sender));
+    _;
+  }
+
+  modifier onlyOwnerOrActiveAdmin {
+    require(msg.sender == owner || userManager.isActiveAdmin(dbAddress, msg.sender));
     _;
   }
 

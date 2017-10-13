@@ -24,6 +24,17 @@ contract ODLLSetter is ODLLRestrictor {
     ODLLDB(dbAddress).setAddressValue(sha3('odll/owner'), owner);
   }
 
+  function setFirstAdmin(address firstAdminAdress)
+    onlyOwnerCanCall
+  {
+    ODLLDB(dbAddress).setAddressValue(sha3('odll/first-admin'), firstAdminAdress);
+    ODLLDB(dbAddress).setBoolValue(sha3('odll/is-admin?', firstAdminAdress), true);
+    ODLLDB(dbAddress).setUIntValue(sha3("user/created-on", userId), now);
+    ODLLDB(dbAddress).setUInt8Value(sha3("user/status", userId), 1);
+    utilities.addArrayItem(dbAddress, "users/ids", "users/count", firstAdminAdress);
+    utilities.addArrayItem(dbAddress, "admins/ids", "admins/count", firstAdminAdress);
+  }
+
   function setContract(string dbKey, address newContractAddress)
     onlyOwnerCanCall(msg.sender)
   {

@@ -652,11 +652,98 @@ library utilities {
         charCount++;
       }
     }
+
     bytes memory bytesStringTrimmed = new bytes(charCount);
     for (j = 0; j < charCount; j++) {
       bytesStringTrimmed[j] = bytesString[j];
     }
 
     return string(bytesStringTrimmed);
+  }
+
+  function intersectBudgetAndStateBasedDentists
+  (
+    address dbAddress,
+    address[] budgetBasedDentistsIds,
+    address[] stateBasedDentistsIds
+  )
+    internal returns (address[] result)
+  {
+    var maxCount = ODLLDB(dbAddress).getUIntValue(sha3("dentists/count"));
+    uint i;
+    if (maxCount == 0) {
+      return result;
+    }
+
+    budgetBasedDentistsIds = sort(budgetBasedDentistsIds);
+    stateBasedDentistsIds = sort(stateBasedDentistsIds);
+
+    return intersect(budgetBasedDentistsIds, stateBasedDentistsIds);
+  }
+
+  function unionSkills
+  (
+    address db,
+    uint[] skillsOr,
+    function(address, uint) returns (uint[] memory) getFromSkills,
+    uint[] fromItems
+  )
+    internal returns (uint[] result)
+  {
+    result = intersect(fromItems, sort(getFromSkills(db, skillsOr[0])));
+    for (uint i = 1; i < skillsOr.length ; i++) {
+      result = union(result, intersect(fromItems, sort(getFromSkills(db, skillsOr[i]))));
+    }
+
+    return result;
+  }
+
+  function unionSkills
+  (
+    address db,
+    uint[] skillsOr,
+    function(address, uint) returns (uint[] memory) getFromSkills
+  )
+    internal returns (uint[] result)
+  {
+    result = sort(getFromSkills(db, skillsOr[0]));
+    for (uint i = 1; i < skillsOr.length ; i++) {
+      result = union(result, sort(getFromSkills(db, skillsOr[i])));
+    }
+
+    return result;
+  }
+
+  function unionSkills
+  (
+    address db,
+    uint[] skillsOr,
+    function(address, uint) returns (address[] memory) getFromSkills,
+    address[] fromItems
+  )
+    internal returns (address[] result)
+  {
+    result = intersect(fromItems, sort(getFromSkills(db, skillsOr[0])));
+    for (uint i = 1; i < skillsOr.length ; i++) {
+      result = union(result, intersect(fromItems, sort(getFromSkills(db, skillsOr[i]))));
+    }
+
+    return result;
+  }
+
+  function unionSkills
+  (
+    address db,
+    uint[] skillsOr,
+    function(address, uint) returns (address[] memory) getFromSkills
+  )
+    internal returns (address[] result)
+  {
+    result = sort(getFromSkills(db, skillsOr[0]));
+    for (uint i = 1; i < skillsOr.length ; i++) {
+      result = union(result, sort(getFromSkills(db, skillsOr[i])));
+    }
+
+    return result;
   }
 }

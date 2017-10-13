@@ -19,6 +19,10 @@ library userManager {
     return ODLLDB(dbAddress).getUIntValue(sha3("users/count"));
   }
 
+  function getAdminsCount(address dbAddress) internal returns(uint) {
+    return ODLLDB(dbAddress).getUIntValue(sha3("admins/count"));
+  }
+
   function getDentistsCount(address dbAddress) internal returns(uint) {
     return ODLLDB(dbAddress).getUIntValue(sha3("dentists/count"));
   }
@@ -35,24 +39,44 @@ library userManager {
     return hasStatus(dbAddress, userId, 1);
   }
 
+  function isActiveAdmin(address dbAddress, address userId) internal returns(bool) {
+    return isUserType(dbAddress, userId, 4) && hasStatus(dbAddress, userId, 1);
+  }
+
+  function isActiveManager(address dbAddress, address userId) internal returns(bool) {
+    return isUserType(dbAddress, userId, 3) && hasStatus(dbAddress, userId, 1);
+  }
+
+  function isActiveDentist(address dbAddress, address userId) internal returns(bool) {
+    return isUserType(dbAddress, userId, 2) && hasStatus(dbAddress, userId, 1);
+  }
+
+  function isActivePatient(address dbAddress, address userId) internal returns(bool) {
+    return isUserType(dbAddress, userId, 1) && hasStatus(dbAddress, userId, 1);
+  }
+
   function userExists(address dbAddress, address userId) internal returns(bool) {
     return getStatus(dbAddress, userId) > 0;
   }
 
   function getAllUsers(address dbAddress) internal returns(address[]) {
-    return utilities.getAddressArray(dbAddress, "user/ids", "users/count");
+    return utilities.getAddressArray(dbAddress, "users/ids", "users/count");
+  }
+
+  function getAllAdmins (address dbAddress) internal returns(address[]) {
+    return utilities.getAddressArray(dbAddress, "admins/ids", "admins/count");
   }
 
   function getAllDentists (address dbAddress) internal returns(address[]) {
-    return utilities.getAddressArray(dbAddress, "dentist/ids", "dentists/count");
+    return utilities.getAddressArray(dbAddress, "dentists/ids", "dentists/count");
   }
 
   function getAllManagers(address dbAddress) internal returns(address[]) {
-    return utilities.getAddressArray(dbAddress, "manager/ids", "managers/count");
+    return utilities.getAddressArray(dbAddress, "managers/ids", "managers/count");
   }
 
   function getAllPatients(address dbAddress) internal returns(address[]) {
-    return utilities.getAddressArray(dbAddress, "patient/ids", "patients/count");
+    return utilities.getAddressArray(dbAddress, "patients/ids", "patients/count");
   }
 
   function setUserIdentity(
@@ -72,7 +96,7 @@ library userManager {
     if (!userExists(dbAddress, userId)) {
       ODLLDB(dbAddress).setUIntValue(sha3("user/created-on", userId), now);
       ODLLDB(dbAddress).setUInt8Value(sha3("user/status", userId), 1);
-      utilities.addArrayItem(dbAddress, "user/ids", "users/count", userId);
+      utilities.addArrayItem(dbAddress, "users/ids", "users/count", userId);
     }
 
     string memory userTypeKey;
@@ -130,19 +154,19 @@ library userManager {
   function getUserTypeKey(uint8 userType) internal returns (string memory userTypeKey, string memory userTypeIdsKey, string memory userTypeCountKey) {
     if (userType == 1) {
       userTypeKey = "user/is-patient?";
-      userTypeIdsKey = "patient/ids";
+      userTypeIdsKey = "patients/ids";
       userTypeCountKey = "patients/count";
     } else if (userType == 2) {
       userTypeKey = "user/is-dentist?";
-      userTypeIdsKey = "dentist/ids";
+      userTypeIdsKey = "dentists/ids";
       userTypeCountKey = "dentists/count";
     } else if (userType == 3) {
       userTypeKey = "user/is-manager?";
-      userTypeIdsKey = "manager/ids";
+      userTypeIdsKey = "managers/ids";
       userTypeCountKey = "managers/count";
     } else if (userType == 4) {
       userTypeKey = "user/is-admin?";
-      userTypeIdsKey = "admin/ids";
+      userTypeIdsKey = "admins/ids";
       userTypeCountKey = "admins/count";
     }
   }
@@ -159,14 +183,6 @@ library userManager {
     require(isActiveUser(dbAddress, userId));
     ODLLDB(dbAddress).setBooleanValue(sha3("user/is-odll-dentist?", userId), isODLLDentist);
     ODLLDB(dbAddress).setBooleanValue(sha3("user/is-available?", userId), isAvailable);
-  }
-
-  function isActiveDentist(address dbAddress, address userId) internal returns(bool) {
-    return isUserType(dbAddress, userId, 2) && hasStatus(dbAddress, userId, 1);
-  }
-
-  function isActivePatient(address dbAddress, address userId) internal returns(bool) {
-    return isUserType(dbAddress, userId, 1) && hasStatus(dbAddress, userId, 1);
   }
 
   function hasStatus(address dbAddress, address userId, uint8 status) internal returns(bool) {
@@ -210,28 +226,28 @@ library userManager {
     utilities.addIdArrayItem(dbAddress, userId, "user/sent-messages", "user/sent-messages-count", messageId);
   }
 
-  function addToAvgRating(address dbAddress, address userId, string countKey, string key, uint8 rating) internal {
+  function addToAverageRating(address dbAddress, address userId, string countKey, string key, uint8 rating) internal {
     var ratingsCount = ODLLDB(dbAddress).getUIntValue(sha3(countKey, userId));
-    var currentAvgRating = ODLLDB(dbAddress).getUInt8Value(sha3(key, userId));
+    var currentAverageRating = ODLLDB(dbAddress).getUInt8Value(sha3(key, userId));
     var newRatingsCount = SafeMath.add(ratingsCount, 1);
-    uint newAvgRating;
+    uint newAverageRating;
     if (ratingsCount == 0) {
-      newAvgRating = rating;
+      newAverageRating = rating;
     } else {
-      var newTotalRating = SafeMath.add(SafeMath.mul(currentAvgRating, ratingsCount), rating);
-      newAvgRating = newTotalRating / newRatingsCount;
+      var newTotalRating = SafeMath.add(SafeMath.mul(currentAverageRating, ratingsCount), rating);
+      newAverageRating = newTotalRating / newRatingsCount;
     }
 
     ODLLDB(dbAddress).setUIntValue(sha3(countKey, userId), newRatingsCount);
-    ODLLDB(dbAddress).setUInt8Value(sha3(key, userId), uint8(newAvgRating));
+    ODLLDB(dbAddress).setUInt8Value(sha3(key, userId), uint8(newAverageRating));
   }
 
-  function addToDentistAvgRating(address dbAddress, address userId, uint8 rating) internal {
-    addToAvgRating(dbAddress, userId, "dentist/avg-rating-count", "dentist/avg-rating", rating);
+  function addToDentistAverageRating(address dbAddress, address userId, uint8 rating) internal {
+    addToAverageRating(dbAddress, userId, "dentist/average-rating-count", "dentist/average-rating", rating);
   }
 
-  function getDentistAvgRating(address dbAddress, address userId) internal returns (uint8) {
-    return ODLLDB(dbAddress).getUInt8Value(sha3("dentist/avg-rating", userId));
+  function getDentistAverageRating(address dbAddress, address userId) internal returns (uint8) {
+    return ODLLDB(dbAddress).getUInt8Value(sha3("dentist/average-rating", userId));
   }
 
   function addToDentistTotalEarned(address dbAddress, address userId, uint amount) internal {
@@ -258,12 +274,12 @@ library userManager {
     return stateId == ODLLDB(dbAddress).getUIntValue(sha3("user/state", userId));
   }
 
-  function hasMinRating(address dbAddress, address userId, uint8 minAvgRating) internal returns(bool) {
-    if (minAvgRating == 0) {
+  function hasMinRating(address dbAddress, address userId, uint8 minAverageRating) internal returns(bool) {
+    if (minAverageRating == 0) {
       return true;
     }
 
-    return minAvgRating <= ODLLDB(dbAddress).getUInt8Value(sha3("dentist/avg-rating", userId));
+    return minAverageRating <= ODLLDB(dbAddress).getUInt8Value(sha3("dentist/average-rating", userId));
   }
 
   function hasDentistMinRatingsCount(address dbAddress, address userId, uint minRatingsCount) internal returns(bool) {
@@ -294,7 +310,7 @@ library userManager {
     return ODLLDB(dbAddress).getBooleanValue(sha3("dentist/is-available?", userId));
   }
 
-  // function searchDentists(
+  // function findDentists(
   //   address dbAddress,
   //   uint scanCategoryId,
   //   uint treatmentCategoryId,
@@ -315,7 +331,7 @@ library userManager {
   //   for (uint i = 0; i < allDentistIds.length ; i++) {
   //     var userId = allDentistIds[i];
   //     if (isDentistAvailable(dbAddress, userId) &&
-  //       hasMinRating(dbAddress, userId, minAvgRating) &&
+  //       hasMinRating(dbAddress, userId, minAverageRating) &&
   //       hasDentistMinRatingsCount(dbAddress, userId, minRatingsCount) &&
   //       isFromCountry(dbAddress, userId, uintArgs[0]) &&
   //       isFromState(dbAddress, userId, uintArgs[1]) &&

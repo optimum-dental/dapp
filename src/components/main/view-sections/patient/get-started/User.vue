@@ -283,6 +283,9 @@
             let tip = item.nextElementSibling
             tip.innerHTML = `Please check your ${item.id}`
             tip.classList.add('error')
+            target.disabled = false
+            target.style.cursor = 'pointer'
+            target.style.background = '#29aae1'
           })
         } else {
           this.$root.callToWriteUser({

@@ -19,8 +19,8 @@
           icon: '/static/images/person.png'
         },
         {
-          key: 'find-dentist',
-          text: 'Find Dentist',
+          key: 'find-dentists',
+          text: 'Find Dentists',
           icon: '/static/images/search.png'
         },
         {

@@ -181,6 +181,12 @@ export default {
       if (state.user[payload.properties[i]]) state.user[payload.properties[i]] = payload.values[i]
     }
   },
+  [MUTATION_TYPES.SAVE_CURRENT_SEARCH_SEED] (state, payload) {
+    let searchSeedCopy = state.searchSeed
+    searchSeedCopy[payload.for] = payload.value
+    state.searchSeed = searchSeedCopy
+    if (payload.callback) payload.callback()
+  },
   [MUTATION_TYPES.SAVE_SEARCH_RESULT] (state, payload) {
     const searchResult = payload.searchResult
     const searchResultCopy = state.searchResult

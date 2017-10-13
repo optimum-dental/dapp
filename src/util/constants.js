@@ -21,6 +21,7 @@ export const MUTATION_TYPES = {
   SET_IS_VALID_USER_BUT: 'setIsValidUserBut',
   RESET_IS_VALID_USER_BUT: 'resetIsValidUserBut',
   UPDATE_WEB3_PROPERTIES: 'updateWeb3Properties',
+  SAVE_SEARCH_QUERY_PARAMS: 'saveSearchQueryParams',
   SAVE_SEARCH_RESULT: 'saveSearchResult'
 }
 
@@ -108,3 +109,5 @@ export const IDENTICON_COLORS = [
     spotColor: '#d4bc4e'
   }
 ]
+
+export const EXCHANGE_RATE_API = 'https://api.coinmarketcap.com/v1/ticker/ethereum'

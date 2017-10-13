@@ -48,5 +48,8 @@ export default {
   isDAppReady: false,
   isValidUserBut: '0',
   originalIsValidUserBut: '0',
+  searchSeed: {
+    findDentists: null
+  },
   searchResult: {}
 }

@@ -1,6 +1,7 @@
 pragma solidity ^0.4.11;
 
 import "./ODLLRestrictor.sol";
+import "../lib/odll/servicesLibrary.sol";
 
 contract ODLLUser is ODLLRestrictor {
   event OnAdminAdded(address userId);
@@ -20,9 +21,9 @@ contract ODLLUser is ODLLRestrictor {
     bytes32 gravatar,
     bytes32 street,
     bytes32 city,
-    uint state,
+    uint stateId,
     uint zipCode,
-    uint country,
+    uint countryId,
     bytes32 phoneNumber,
     bytes32 socialSecurityNumber,
     bytes32 birthday,
@@ -31,10 +32,10 @@ contract ODLLUser is ODLLRestrictor {
     onlyPermittedSmartContract
   {
     // require the last compulsories first
-    require(state != 0 && zipCode != 0 && country != 0);
+    require(stateId != 0 && zipCode != 0 && countryId != 0);
 
     writeUserIdentity(userType, name, email, gravatar);
-    writeUserLocation(street, city, state, zipCode, country);
+    writeUserLocation(street, city, stateId, zipCode, countryId);
     writeUserOptionalValues(phoneNumber, socialSecurityNumber, birthday, gender);
     determineEvent(userType);
   }
@@ -43,8 +44,8 @@ contract ODLLUser is ODLLRestrictor {
     userManager.setUserIdentity(dbAddress, msg.sender, userType, name, email, gravatar);
   }
 
-  function writeUserLocation(bytes32 street, bytes32 city, uint state, uint zipCode, uint country) {
-    userManager.setUserLocation(dbAddress, msg.sender, street, city, state, zipCode, country);
+  function writeUserLocation(bytes32 street, bytes32 city, uint stateId, uint zipCode, uint countryId) {
+    userManager.setUserLocation(dbAddress, msg.sender, street, city, stateId, zipCode, countryId);
   }
 
   function writeUserOptionalValues(bytes32 phoneNumber, bytes32 socialSecurityNumber, bytes32 birthday, uint8 gender) {
@@ -98,6 +99,75 @@ contract ODLLUser is ODLLRestrictor {
     uints[2] = ODLLDB(dbAddress).getUIntValue(sha3("user/country", userId));
     bools[0] = ODLLDB(dbAddress).getBooleanValue(sha3("user/is-odll-dentist?", userId));
     bools[1] = ODLLDB(dbAddress).getBooleanValue(sha3("user/is-available?", userId));
+  }
+
+  function findDentists(
+    uint stateId,
+    uint serviceTypeId,
+    uint serviceId,
+    uint budget, // within budget range
+    uint offset, // starting from offset: 0-based
+    uint limit, // not more than limit
+    uint seed
+    )
+      returns (
+        address[] foundDentistsIds,
+        uint offset,
+        uint limit,
+      )
+  {
+    uint j = 0;
+    if (serviceTypeId == 1) {
+      address[] budgetBasedDentistsIds = searchLibrary.getServiceDentistsByBudget(dbAddress, serviceId, budget);
+      address[] stateBasedDentistsIds = searchLibrary.getServiceDentistsByState(dbAddress, serviceId, stateId);
+      foundDentistsIds = utilities.intersectBudgetAndStateBasedDentists(dbAddress, budgetBasedDentistsIds, stateBasedDentistsIds);
+    } else if (serviceTypeId == 2) {
+      address[] budgetBasedDentistsIds = searchLibrary.getServiceDentistsByBudget(dbAddress, serviceId, budget);
+      address[] stateBasedDentistsIds = searchLibrary.getServiceDentistsByState(dbAddress, serviceId, stateId);
+      foundDentistsIds = utilities.intersectBudgetAndStateBasedDentists(dbAddress, budgetBasedDentistsIds, stateBasedDentistsIds);
+    }
+
+    if (foundDentistsIds.length > 0) {
+      if (offset > foundDentistsIds.length) {
+        return utilities.take(0, foundDentistsIds);
+      } else if (offset + limit > foundDentistsIds.length) {
+        limit = foundDentistsIds.length - offset;
+      }
+
+      foundDentistsIds = utilities.getPage(foundDentistsIds, (seed + offset) % foundDentistsIds.length, limit, true);
+    }
+  }
+
+  function getDentistDataFromFind(uint serviceTypeId, uint serviceId, address dentistId) returns (
+    bytes32[] bytes32s,
+    uint fee,
+    uint stateId,
+    uint8 averageRating
+  ) {
+    bytes32s = new bytes32[](8);
+    uints = new uint[](3);
+
+    address userId = msg.sender;
+    bytes32s[0] = ODLLDB(dbAddress).getBytes32Value(sha3("user/name", dentistId));
+    bytes32s[1] = ODLLDB(dbAddress).getBytes32Value(sha3("user/email", userId));
+    bytes32s[2] = ODLLDB(dbAddress).getBytes32Value(sha3("user/gravatar", dentistId));
+    bytes32s[3] = ODLLDB(dbAddress).getBytes32Value(sha3("user/street", dentistId));
+    bytes32s[4] = ODLLDB(dbAddress).getBytes32Value(sha3("user/city", dentistId));
+    fee = searchLibrary.getServiceDentistFee(dbAddress, serviceTypeId, serviceId, dentistId);
+    stateId = ODLLDB(dbAddress).getUIntValue(sha3("user/state", dentistId));
+    averageRating = userManager.getDentistAverageRating(dbAddress, dentistId);
+  }
+
+  function addOfficialToODLL(address officialId, uint8 userType)
+    onlyOwnerOrActiveAdminOrActiveManager
+  {
+    userManager.setUserIdentity(dbAddress, officialId, userType, "", "", "");
+  }
+
+  function blockUser(address userId)
+    onlyOwnerOrActiveAdmin
+  {
+    ODLLDB(dbAddress).setUInt8Value(sha3("user/status", userId), 1);
   }
 
   function destroySelf(address callerAddress, address newContractAddress)

@@ -26,7 +26,7 @@
       </div>
 
       <div class="search-item submit">
-        <input type="button" class='submit-button' value="Find" @click="findDentist">
+        <input type="button" class='submit-button' value="Find" @click="findDentists">
       </div>
     </div>
   </div>
@@ -34,6 +34,7 @@
 
 <script type="text/javascript">
   require('../../../../../../static/css/nouislider.css')
+  let budgetRangeArray = [0, 200]
 
   export default {
     computed: {
@@ -58,6 +59,9 @@
         })
 
         return budgetRangeElement.noUiSlider
+      },
+      budget () {
+        return budgetRangeArray
       }
     },
     methods: {
@@ -111,7 +115,8 @@
         this.budgetRange.on('change', function (values, handle, unencodedValues) {
           const tooltips = [searchPage.querySelector('.noUi-handle-lower'), searchPage.querySelector('.noUi-handle-upper')]
           $(tooltips[handle]).find('.noUi-tooltip').slideUp(100)
-          let range = values[0] === '0.00' && values[1] === '200.00' ? undefined : values.map(value => '$' + Math.ceil(Number(value))).join(' - ')
+          budgetRangeArray = values.map(value => Math.ceil(Number(value)))
+          let range = budgetRangeArray[0] === 0 && budgetRangeArray[1] === 200 ? undefined : budgetRangeArray.map(value => '$' + value).join(' - ')
           _this.addToSearchQuery({
             target: {
               id: 'budget-range',
@@ -219,38 +224,52 @@
 
         return DOMELement.body.firstChild
       },
-      findDentist (evt) {
+      findDentists (evt) {
         if (document.getElementById('appointment-sub-type')) {
           let target = evt.target
           target.disabled = true
           target.style.cursor = 'not-allowed'
           target.style.background = '#adcddf'
 
-          const appointmentType = Number(document.getElementById('appointment-type').selectedIndex)
-          const appointmentSubtype = Number(document.getElementById('appointment-sub-type').selectedIndex)
+          const appointmentTypeId = Number(document.getElementById('appointment-type').selectedIndex)
+          const appointmentSubtypeId = Number(document.getElementById('appointment-sub-type').selectedIndex)
           const searchQuery = {
+            type: 'findDentists',
             state: Number(document.getElementById('state').selectedIndex),
-            appointmentType,
-            appointmentSubtype,
-            budget: this.budget,
-            page: 1
+            appointmentTypeId,
+            appointmentSubtypeId,
+            budget: this.budget
+            // offset: 0,
+            // limit: 5,
+            // seed: Math.ceil(Math.random() * 113)
           }
 
-          let errors = [appointmentType === 0 ? document.getElementById('appointment-type') : undefined, appointmentSubtype === 0 ? document.getElementById('appointment-sub-type') : undefined]
+          let errors = [appointmentTypeId === 0 ? document.getElementById('appointment-type') : undefined, appointmentSubtypeId === 0 ? document.getElementById('appointment-sub-type') : undefined]
           errors = errors.filter(entry => entry !== undefined)
           if (errors.length > 0) {
             errors.forEach((item) => {
               let tip = item.nextElementSibling
               tip.innerHTML = `Please check your ${item.id}`
               tip.classList.add('error')
+              target.disabled = false
+              target.style.cursor = 'pointer'
+              target.style.background = '#29aae1'
             })
           } else {
-            this.$root.callToFindDentists({
-              searchQuery,
-              callback: (searchResult = null) => {
-                target.disabled = false
-                target.style.cursor = 'pointer'
-                target.style.background = '#29aae1'
+            target.disabled = false
+            target.style.cursor = 'pointer'
+            target.style.background = '#29aae1'
+            this.$router.push({
+              path: '/find-dentists',
+              query: {
+                o: 0,
+                l: 5,
+                sd: Math.random(),
+                st: searchQuery.state,
+                aTI: searchQuery.appointmentTypeId,
+                aSI: searchQuery.appointmentSubtypeId,
+                bl: searchQuery.budget[0],
+                br: searchQuery.budget[1]
               }
             })
           }
@@ -320,14 +339,6 @@
     display: inline-block;
     margin-top: 5px;
     float: left;
-  }
-
-  .choice {
-    width: auto;
-    height: 30px;
-    background-size: contain;
-    display: inline-block;
-    margin-top: 5px;
   }
 
   .instruction {
