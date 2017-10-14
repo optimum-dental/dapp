@@ -239,9 +239,6 @@
             appointmentTypeId,
             appointmentSubtypeId,
             budget: this.budget
-            // offset: 0,
-            // limit: 5,
-            // seed: Math.ceil(Math.random() * 113)
           }
 
           let errors = [appointmentTypeId === 0 ? document.getElementById('appointment-type') : undefined, appointmentSubtypeId === 0 ? document.getElementById('appointment-sub-type') : undefined]

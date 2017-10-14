@@ -124,6 +124,7 @@ new Vue({
       ACTION_TYPES.SET_CURRENT_VIEW,
       ACTION_TYPES.UPDATE_USER_STATE,
       ACTION_TYPES.SAVE_SEARCH_RESULT,
+      ACTION_TYPES.CLEAR_SEARCH_RESULT,
       ACTION_TYPES.SAVE_CURRENT_SEARCH_SEED
     ]),
     callUpdateUserGravatar (payload = null) {
@@ -147,24 +148,44 @@ new Vue({
     callToFindDentists (payload = null) {
       const searchQuery = payload.searchQuery
       const blockchainParams = Object.assign({}, searchQuery)
-      delete blockchainParams.for
+      delete blockchainParams.type
       Search.findDentists(this.$store.state, blockchainParams)
-      .then((searchResult) => {
-        this[ACTION_TYPES.SAVE_SEARCH_RESULT]({
-          searchResult
+      .then((searchResults) => {
+        this[ACTION_TYPES.SAVE_CURRENT_SEARCH_SEED]({
+          type: searchQuery.type,
+          seed: searchQuery.seed
+        })
+
+        this[ACTION_TYPES.CLEAR_SEARCH_RESULT]({
+          type: searchQuery.type
         })
         .then(() => {
-          this[ACTION_TYPES.SAVE_CURRENT_SEARCH_SEED]({
-            for: searchQuery.for,
-            seed: searchQuery.seed
-          })
-
-          if (payload.callback) payload.callback(searchResult)
+          if (payload.callback) payload.callback(searchResults)
+        })
+        .catch((error) => {
+          console.error('Unable to clear search result state', error)
         })
       })
       .catch((err) => {
         if (payload.callback) payload.callback()
-        console.error(err, 'Unable to write user data')
+        console.error(err, 'Unable to find dentists')
+      })
+    },
+    callToGetDentist (payload = null) {
+      const blockchainParams = Object.assign({}, payload)
+      delete blockchainParams.type
+      Search.getDentistDataFromFind(this.$store.state, blockchainParams)
+      .then((searchResult) => {
+        this[ACTION_TYPES.SAVE_SEARCH_RESULT]({
+          searchResult,
+          type: payload.type
+        })
+
+        if (payload.callback) payload.callback(searchResult)
+      })
+      .catch((err) => {
+        if (payload.callback) payload.callback()
+        console.error(err, 'Unable to find dentists')
       })
     },
     callSetIsValidUserBut (newValue) {

@@ -21,8 +21,8 @@ export const MUTATION_TYPES = {
   SET_IS_VALID_USER_BUT: 'setIsValidUserBut',
   RESET_IS_VALID_USER_BUT: 'resetIsValidUserBut',
   UPDATE_WEB3_PROPERTIES: 'updateWeb3Properties',
-  SAVE_SEARCH_QUERY_PARAMS: 'saveSearchQueryParams',
-  SAVE_SEARCH_RESULT: 'saveSearchResult'
+  SAVE_CURRENT_SEARCH_SEED: 'saveCurrentSearchSeed',
+  CLEAR_SEARCH_RESULT: 'clearSearchResult'
 }
 
 export const ACTION_TYPES = MUTATION_TYPES

@@ -72,7 +72,9 @@ contract ODLLUser is ODLLRestrictor {
     OnDentistAdded(msg.sender);
   }
 
-  function getUserData() constant returns (
+  function getUserData()
+  constant
+  returns (
     bool[] bools,
     bytes32[] bytes32s,
     uint[] uints,
@@ -110,13 +112,16 @@ contract ODLLUser is ODLLRestrictor {
     uint limit, // not more than limit
     uint seed // seed value to give the illusion of randomisation
     )
+      constant
       returns (
+        uint totalNumberFound,
         address[] foundDentistsIds
       )
   {
-    address[] memory budgetBasedDentistsIds = searchLibrary.getServiceDentistsByBudget(dbAddress, serviceTypeId, serviceId, budget);
-    address[] memory stateBasedDentistsIds = searchLibrary.getServiceDentistsByState(dbAddress, serviceTypeId, serviceId, stateId);
+    var budgetBasedDentistsIds = searchLibrary.getServiceDentistsByBudget(dbAddress, serviceTypeId, serviceId, budget);
+    var stateBasedDentistsIds = searchLibrary.getServiceDentistsByState(dbAddress, serviceTypeId, serviceId, stateId);
     foundDentistsIds = utilities.intersectBudgetAndStateBasedDentists(dbAddress, budgetBasedDentistsIds, stateBasedDentistsIds);
+    totalNumberFound = foundDentistsIds.length;
 
     if (foundDentistsIds.length > 0) {
       if (offset > foundDentistsIds.length) {
@@ -129,7 +134,9 @@ contract ODLLUser is ODLLRestrictor {
     }
   }
 
-  function getDentistDataFromFind(uint serviceTypeId, uint serviceId, address dentistId) returns (
+  function getDentistDataFromFind(uint serviceTypeId, uint serviceId, address dentistId)
+    constant
+    returns (
     bytes32[] bytes32s,
     uint[] uints
   ) {

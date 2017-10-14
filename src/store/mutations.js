@@ -124,25 +124,25 @@ export default {
       isDentist: userObject.type === '2',
       isODLLAdmin: userObject.type === '3',
       isODLLManager: userObject.type === '4',
-      name,
-      lastName,
-      firstName,
-      middleName,
-      email,
-      gravatar,
-      street,
-      city,
-      zipCode,
-      phoneNumber,
-      socialSecurityNumber,
-      areaNumber,
-      groupNumber,
-      sequenceNumber,
-      birthday,
-      day,
-      month,
-      year,
-      gender
+      name: name || '',
+      lastName: lastName || '',
+      firstName: firstName || '',
+      middleName: middleName || '',
+      email: email || '',
+      gravatar: gravatar || '',
+      street: street || '',
+      city: city || '',
+      zipCode: zipCode || '',
+      phoneNumber: phoneNumber || '',
+      socialSecurityNumber: socialSecurityNumber || '',
+      areaNumber: areaNumber || '',
+      groupNumber: groupNumber || '',
+      sequenceNumber: sequenceNumber || '',
+      birthday: birthday || '',
+      day: day || '',
+      month: month || '',
+      year: year || '',
+      gender: gender || ''
     })
 
     state.user = userCopy
@@ -183,28 +183,25 @@ export default {
   },
   [MUTATION_TYPES.SAVE_CURRENT_SEARCH_SEED] (state, payload) {
     let searchSeedCopy = state.searchSeed
-    searchSeedCopy[payload.for] = payload.value
+    searchSeedCopy[payload.type] = payload.value
     state.searchSeed = searchSeedCopy
     if (payload.callback) payload.callback()
   },
+  [MUTATION_TYPES.CLEAR_SEARCH_RESULT] (state, payload) {
+    let searchResultCopy = state.searchResult
+    searchResultCopy[payload.type] = []
+    state.searchResult = searchResultCopy
+    if (payload.callback) payload.callback()
+  },
   [MUTATION_TYPES.SAVE_SEARCH_RESULT] (state, payload) {
-    const searchResult = payload.searchResult
+    const searchResult = payload.searchResult || {}
     const searchResultCopy = state.searchResult
-    const results = searchResult.results
-
-    for (let i = 0; i < results; i++) {
-      let result = results[i]
-      let [ gravatar, name, companyName, searchQuery, fee, rating, address ] = stringifyBytesData(state, result, [ 'gravatar', 'name', 'companyName', 'searchQuery', 'fee', 'rating', 'address' ])
-      Object.assign(searchResult.results[i], {
-        gravatar, name, companyName, searchQuery, fee, rating, address
-      })
-    }
-    Object.assign(searchResultCopy, {
-      [searchResult.type]: {
-        page: searchResult.page,
-        results: searchResult.results
-      }
+    searchResultCopy[searchResult.type] = searchResultCopy[payload.type] ? searchResultCopy[payload.type] : []
+    let [ gravatar, name, companyName, address ] = stringifyBytesData(state, searchResult, [ 'gravatar', 'name', 'companyName', 'address' ])
+    Object.assign(searchResult, {
+      gravatar, name, companyName, address
     })
+    searchResultCopy[searchResult.type].push(searchResult)
 
     state.searchResult = searchResultCopy
     if (payload.callback) payload.callback(true)

@@ -82,8 +82,16 @@ export default {
   [ACTION_TYPES.SAVE_CURRENT_SEARCH_SEED] ({ commit }, payload) {
     return new Promise(function (resolve, reject) {
       commit(MUTATION_TYPES.SAVE_CURRENT_SEARCH_SEED, {
-        for: payload.for,
+        type: payload.type,
         value: payload.value,
+        callback: () => resolve()
+      })
+    })
+  },
+  [ACTION_TYPES.CLEAR_SEARCH_RESULT] ({ commit }, payload) {
+    return new Promise(function (resolve, reject) {
+      commit(MUTATION_TYPES.CLEAR_SEARCH_RESULT, {
+        type: payload.type,
         callback: () => resolve()
       })
     })
@@ -92,6 +100,7 @@ export default {
     return new Promise(function (resolve, reject) {
       commit(MUTATION_TYPES.SAVE_SEARCH_RESULT, {
         searchResult: payload.searchResult,
+        type: payload.type,
         callback: (status) => {
           status ? resolve() : reject()
         }

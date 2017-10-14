@@ -43,7 +43,11 @@
       </div>
 
       <div class="result-section">
-        <div class="result" v-for="dentist in searchResult">
+        <div class="wait-overlay">
+          <div class="wait-message">Please Wait, we're searching the blockchain for dentists matching your choices.</div>
+          <div class="spin"></div>
+        </div>
+        <div class="result" v-for="dentist in searchResults">
           <div class="gravatar-section"></div>
           <div class="about-section">
             <div class="name">{{ dentist.name }}</div>
@@ -70,10 +74,7 @@
         const index = document.getElementById('budget-range').selectedIndex
         return [(index * 50), (((index + 1) * 50) - 1)]
       },
-      searchQuery () {
-        return this.$store.state.searchQuery.findDentist
-      },
-      searchResult () {
+      searchResults () {
         return this.$store.state.searchResult.findDentist
       },
       pageNumber () {
@@ -151,8 +152,8 @@
       populateBudgets () {
         const budgetRangeElement = document.getElementById('budget-range')
         const budgetRange = [Number(this.$route.query.bl), Number(this.$route.query.br)]
-        for (let i = 0; i < 5; i++) {
-          let budgetRangeText = '$' + (i * 50) + ' - $' + (((i + 1) * 50) - 1)
+        for (let i = 0; i < 4; i++) {
+          let budgetRangeText = '$' + (i * 50) + ' - $' + ((i + 1) * 50)
           const optionElement = document.createElement('option')
           optionElement.text = budgetRangeText
           if (budgetRangeElement) {
@@ -166,7 +167,7 @@
           const appointmentTypeId = Number(document.getElementById('appointment-type').selectedIndex)
           const appointmentSubtypeId = Number(document.getElementById('appointment-sub-type').selectedIndex)
           const searchQuery = {
-            for: 'findDentists',
+            type: 'findDentists',
             state: Number(document.getElementById('state').selectedIndex),
             appointmentTypeId,
             appointmentSubtypeId,
@@ -187,9 +188,24 @@
           } else {
             this.$root.callToFindDentists({
               searchQuery,
-              callback: (searchResult = null) => {
-                console.log(searchResult)
+              callback: (searchResults = null) => {
+                console.log(searchResults)
                 // update result view
+                if (searchResults && searchResults.length > 0) {
+                  searchResults.forEach((result) => {
+                    this.$root.callToGetDentist({
+                      type: 'findDentists',
+                      serviceTypeId: appointmentTypeId,
+                      serviceId: appointmentSubtypeId,
+                      dentistId: result,
+                      callback: () => {
+                        if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
+                      }
+                    })
+                  })
+                } else {
+                  if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
+                }
               }
             })
           }
@@ -324,11 +340,49 @@
 
   .tip-content {
     margin-right: 7px;
-    background: #bbb;
+    background: #efefef;
     width: 120px;
     height: 20px;
     padding: 2px;
     text-align: center;
     float: right;
+  }
+
+  .wait-overlay {
+    position: relative;
+    width: 100%;
+    min-height: 300px;
+    text-align: center;
+    font-size: 16px;
+  }
+
+  .wait-message {
+    height: 30px;
+    position: relative;
+    top: 110px;
+  }
+
+  .spin {
+    height: 45px;
+    width: 45px;
+    border-radius: 45px;
+    border-top: 3px solid #3286b0;
+    border-right: 3px solid #3286b0;
+    border-bottom: 3px solid #ffffff;
+    border-left: transparent;
+    animation: odll-spin 1.2s cubic-bezier(0.2, 0.92, 0.94, 0.9) infinite;
+    position: relative;
+    top: 110px;
+    left: 50%;
+  }
+
+  @keyframes odll-spin {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
   }
 </style>

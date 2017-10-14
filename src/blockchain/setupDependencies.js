@@ -61,21 +61,41 @@ module.exports = function setup (err) {
 
 
   // // Remove permission from old ODLLUser contract
-  // ODLLDB.at('0x6c2ed43575fdd78f6e834a1593dd1d431d95f81a').removePermittedContract("0xa55f456cea5326579970d49951eeb0c1be474710")
+  // ODLLDB.at('0xbc54d16a8e38012bcb017f6b40033ca6f27f375e').removePermittedContract("0xa55f456cea5326579970d49951eeb0c1be474710")
 
   // // Add permission for ODLLUser contract
-  // ODLLDB.at('0x6c2ed43575fdd78f6e834a1593dd1d431d95f81a').addPermittedContract("0x99897a800f0591e211c1eb71a8f6b7c9bbfa1b0c")
+  // ODLLDB.at('0xbc54d16a8e38012bcb017f6b40033ca6f27f375e').addPermittedContract("0x27fdc3b4cf18ed2ce4b20de479b4e979b2eadb69")
 
   // // Check permission status
-  // ODLLDB.at('0x6c2ed43575fdd78f6e834a1593dd1d431d95f81a').permissionStatusForContract("0x99897a800f0591e211c1eb71a8f6b7c9bbfa1b0c")
+  // ODLLDB.at('0xbc54d16a8e38012bcb017f6b40033ca6f27f375e').permissionStatusForContract("0x27fdc3b4cf18ed2ce4b20de479b4e979b2eadb69")
+
+
+  ODLLDB.deployed()
+  .then((i) => {
+    console.log('ODLLDB::::::', i.address)
+  })
+
+  ODLLUser.deployed()
+  .then((i) => {
+    console.log('ODLLUser::::::', i.address)
+  })
+
+  ODLLSetter.deployed()
+  .then((i) => {
+    console.log('ODLLSetter::::::', i.address)
+  })
+
 
 
   // Add ODLLSetter and ODLLUser as permitted contracts
-  ODLLDB.at('0x6c2ed43575fdd78f6e834a1593dd1d431d95f81a').addPermittedContracts(["0xf3c54f879cf466cb4b89f4c0e9b875f90160774d", "0x99897a800f0591e211c1eb71a8f6b7c9bbfa1b0c"], { from: web3.eth.coinbase })
+  ODLLDB.at('0xbc54d16a8e38012bcb017f6b40033ca6f27f375e').addPermittedContracts([
+    "0x1bf988c179c09077a69e2e3f84d794e4db81419b", // ODLLSetter
+    "0x27fdc3b4cf18ed2ce4b20de479b4e979b2eadb69" // ODLLUser
+  ], { from: web3.eth.coinbase })
 
-  ODLLSetter.at('0xf3c54f879cf466cb4b89f4c0e9b875f90160774d').setOwner({ from: web3.eth.coinbase })
-  ODLLSetter.at('0xf3c54f879cf466cb4b89f4c0e9b875f90160774d').setODLLConfig({ from: web3.eth.coinbase })
-  ODLLSetter.at('0xf3c54f879cf466cb4b89f4c0e9b875f90160774d').setContract("contract/odll-user", "0x99897a800f0591e211c1eb71a8f6b7c9bbfa1b0c", { from: web3.eth.coinbase })
+  ODLLSetter.at('0x1bf988c179c09077a69e2e3f84d794e4db81419b').setOwner({ from: web3.eth.coinbase })
+  ODLLSetter.at('0x1bf988c179c09077a69e2e3f84d794e4db81419b').setODLLConfig({ from: web3.eth.coinbase })
+  ODLLSetter.at('0x1bf988c179c09077a69e2e3f84d794e4db81419b').setContract("contract/odll-user", "0x27fdc3b4cf18ed2ce4b20de479b4e979b2eadb69", { from: web3.eth.coinbase })
 
-  ODLLDB.at('0x6c2ed43575fdd78f6e834a1593dd1d431d95f81a').getPermittedContracts()
+  ODLLDB.at('0xbc54d16a8e38012bcb017f6b40033ca6f27f375e').getPermittedContracts()
 }

@@ -30,7 +30,7 @@ library searchLibrary {
     returns (
       address[] foundDentists
     ) {
-    address[] memory allDentistsRenderingService = getDentistsByService(dbAddress, serviceTypeId, serviceId);
+    var allDentistsRenderingService = getDentistsByService(dbAddress, serviceTypeId, serviceId);
     foundDentists = new address[](allDentistsRenderingService.length);
     uint j = 0;
     for (uint i = 0; i < allDentistsRenderingService.length; i++) {
@@ -50,7 +50,7 @@ library searchLibrary {
     returns (
       address[] foundDentists
   ) {
-    address[] memory allDentistsRenderingService = getDentistsByService(dbAddress, serviceTypeId, serviceId);
+    var allDentistsRenderingService = getDentistsByService(dbAddress, serviceTypeId, serviceId);
     foundDentists = new address[](allDentistsRenderingService.length);
     uint j = 0;
     for (uint i = 0; i < allDentistsRenderingService.length; i++) {

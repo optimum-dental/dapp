@@ -1,4 +1,4 @@
-import odllUser from '../odll/ODLLUser'
+// import odllUser from '../odll/ODLLUser'
 import ODLLUserContract from '../../../build/contracts/ODLLUser.json'
 import blockchainManager from '../BlockchainManager'
 
@@ -21,8 +21,35 @@ class Search {
             contractInstance.findDentists(...(Object.values(dataObject)), { from: coinbase })
             .then((result) => {
               // Successful Fetch
-              resolve(odllUser.getUserObject(state, result))
-              console.log(result)
+              resolve(result)
+            })
+            .catch((error) => {
+              reject({ error, isValid: true, warningMessage: "We've encountered a problem fetching dentists from the blockchain. Please do try again in a few minutes." })
+            })
+          })
+        }
+      })
+      .then((result) => {
+        resolve(result)
+      })
+      .catch((error) => {
+        reject(error)
+      })
+    })
+  }
+
+  getDentistDataFromFind (state = null, dataObject = {}) {
+    return new Promise((resolve, reject) => {
+      blockchainManager.accessBlockChainWith({
+        state,
+        contractToUse: ODLLUserContract,
+        dbContractKey: 'contract/odll-user',
+        method: (contractInstance, coinbase) => {
+          return new Promise((resolve, reject) => {
+            contractInstance.getDentistDataFromFind(...(Object.values(dataObject)), { from: coinbase })
+            .then((result) => {
+              // Successful Fetch
+              resolve(result)
             })
             .catch((error) => {
               reject({ error, isValid: true, warningMessage: "We've encountered a problem fetching dentists from the blockchain. Please do try again in a few minutes." })
