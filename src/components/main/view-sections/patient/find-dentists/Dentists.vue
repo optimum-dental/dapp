@@ -36,17 +36,11 @@
         </div>
       </div>
 
-      <div class="tip-to-submit">
-        <div class="tip-content">
-          <span class="text">Press Enter</span><span class="enter-icon"></span>
-        </div>
+      <div class="submit">
+        <input type="button" class='submit-button' value="Find" @click="findDentists">
       </div>
 
       <div class="result-section">
-        <div class="wait-overlay">
-          <div class="wait-message">Please Wait, we're searching the blockchain for dentists matching your choices.</div>
-          <div class="spin"></div>
-        </div>
         <div class="result" v-for="dentist in searchResults">
           <div class="gravatar-section"></div>
           <div class="about-section">
@@ -70,10 +64,6 @@
 <script type="text/javascript">
   export default {
     computed: {
-      budget () {
-        const index = document.getElementById('budget-range').selectedIndex
-        return [(index * 50), (((index + 1) * 50) - 1)]
-      },
       searchResults () {
         return this.$store.state.searchResult.findDentist
       },
@@ -162,19 +152,23 @@
           }
         }
       },
-      findDentists () {
+      findDentists (evt, offset = 0, seed = null) {
+        const target = evt.target
         if (document.getElementById('appointment-sub-type')) {
+          target.disabled = true
+          target.style.cursor = 'not-allowed'
+          target.style.background = '#adcddf'
           const appointmentTypeId = Number(document.getElementById('appointment-type').selectedIndex)
           const appointmentSubtypeId = Number(document.getElementById('appointment-sub-type').selectedIndex)
           const searchQuery = {
-            type: 'findDentists',
             state: Number(document.getElementById('state').selectedIndex),
             appointmentTypeId,
             appointmentSubtypeId,
-            budget: this.budget,
-            offset: this.nextOffset,
+            budget: this.getBudget(),
+            offset,
             limit: this.perPage,
-            seed: this.$store.state.searchSeed.findDentists || Math.ceil(Number(this.$route.query.sd) * 113)
+            seed: seed || Math.random()
+            // seed: this.$store.state.searchSeed.findDentists || Math.ceil(Number(this.$route.query.sd) * 113)
           }
 
           let errors = [appointmentTypeId === 0 ? document.getElementById('appointment-type') : undefined, appointmentSubtypeId === 0 ? document.getElementById('appointment-sub-type') : undefined]
@@ -184,34 +178,100 @@
               let tip = item.nextElementSibling
               tip.innerHTML = `Please check your ${item.id}`
               tip.classList.add('error')
+              target.disabled = false
+              target.style.cursor = 'pointer'
+              target.style.background = '#29aae1'
             })
           } else {
-            this.$root.callToFindDentists({
-              searchQuery,
-              callback: (searchResults = null) => {
-                console.log(searchResults)
-                // update result view
-                if (searchResults && searchResults.length > 0) {
-                  searchResults.forEach((result) => {
-                    this.$root.callToGetDentist({
-                      type: 'findDentists',
-                      serviceTypeId: appointmentTypeId,
-                      serviceId: appointmentSubtypeId,
-                      dentistId: result,
-                      callback: () => {
-                        if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
-                      }
-                    })
-                  })
-                } else {
-                  if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
-                }
+            this.$router.push({
+              path: '/find-dentists',
+              query: {
+                o: searchQuery.offset,
+                l: searchQuery.limit,
+                sd: searchQuery.seed,
+                st: searchQuery.state,
+                aTI: searchQuery.appointmentTypeId,
+                aSI: searchQuery.appointmentSubtypeId,
+                bl: searchQuery.budget[0],
+                br: searchQuery.budget[1]
               }
             })
+
+            this.getDentists(searchQuery)
           }
         } else {
           console.log('Choose Appointment Type')
         }
+      },
+      getBudget () {
+        const index = document.getElementById('budget-range').selectedIndex
+        return [(index * 50), ((index + 1) * 50)]
+      },
+      getDentists (searchQuery) {
+        const target = document.querySelector('.submit-button')
+        this.askUserToWaitWhileWeSearch()
+        this.$root.callToFindDentists({
+          searchQuery,
+          callback: (searchResults = null) => {
+            console.log(searchResults)
+            // update result view
+            if (searchResults && searchResults.length > 0) {
+              searchResults.forEach((result) => {
+                this.$root.callToGetDentist({
+                  type: 'findDentists',
+                  serviceTypeId: searchQuery.appointmentTypeId,
+                  serviceId: searchQuery.appointmentSubtypeId,
+                  dentistId: result,
+                  callback: (searchResult, numberRetrieved) => {
+                    console.log(searchResult, numberRetrieved)
+                    if (numberRetrieved === searchResults.length && document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
+                    target.disabled = false
+                    target.style.cursor = 'pointer'
+                    target.style.background = '#29aae1'
+                  }
+                })
+              })
+            } else {
+              if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
+              target.disabled = false
+              target.style.cursor = 'pointer'
+              target.style.background = '#29aae1'
+              this.informOfNoDentist()
+            }
+          }
+        })
+      },
+      askUserToWaitWhileWeSearch () {
+        if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
+        if (document.querySelector('.no-dentist')) document.querySelector('.no-dentist').remove()
+        let waitOverlayDOMElement = this.createWaitOverlayDOMElement()
+        document.querySelector('.result-section').insertBefore(waitOverlayDOMElement, document.querySelector('.result'))
+      },
+      informOfNoDentist () {
+        if (document.querySelector('.no-dentist')) document.querySelector('.no-dentist').remove()
+        let noDentistDOMElement = this.createNoDentistDOMElement()
+        document.querySelector('.result-section').insertBefore(noDentistDOMElement, document.querySelector('.result'))
+      },
+      createWaitOverlayDOMElement () {
+        const DOMELement = new DOMParser().parseFromString(`
+          <div class="wait-overlay">
+            <div class="wait-message">Please Wait, we're searching the blockchain for dentists matching your choices.</div>
+            <div class="spin"></div>
+          </div>
+        `, 'text/html')
+
+        return DOMELement.body.firstChild
+      },
+      createNoDentistDOMElement () {
+        const DOMELement = new DOMParser().parseFromString(`
+          <div class="no-dentist">
+            <div class="no-dentist-message">
+              No Dentist matching your choices was found. Modify your search parameters above and try again.
+            </div>
+          </div>
+        `, 'text/html')
+
+        return DOMELement.body.firstChild
       }
     },
     mounted: function () {
@@ -220,7 +280,15 @@
       this.populateAppointmentSubTypes(Number(this.$route.query.aTI))
       this.populateBudgets(Number(this.$route.query.bl), Number(this.$route.query.br))
       this.setEventListeners()
-      this.findDentists()
+      this.getDentists({
+        state: Number(this.$route.query.st),
+        appointmentTypeId: Number(this.$route.query.aTI),
+        appointmentSubtypeId: Number(this.$route.query.aSI),
+        budget: [Number(this.$route.query.bl), Number(this.$route.query.br)],
+        offset: Number(this.$route.query.o),
+        limit: Number(this.$route.query.l),
+        seed: Math.ceil(Number(this.$route.query.sd) * 113)
+      })
     }
   }
 
@@ -269,19 +337,23 @@
 
   .search-icon {
     background: url('/static/images/search.png') no-repeat;
-    width: 30px;
+    min-width: 4%;
     height: 30px;
     background-size: contain;
     display: inline-block;
     margin-top: 5px;
     float: left;
+    position: relative;
+    top: 20px;
   }
 
   .search-item {
-    height: 50px;
+    height: 60px;
     display: inline-block;
     /*margin-right: 10px;*/
     margin-bottom: 30px;
+    justify-content: center;
+    min-width: 24%;
   }
 
   .search-param {
@@ -330,22 +402,41 @@
     background: #29aae3;
   }
 
-  .tip-to-submit {
+  .submit {
     position: relative;
     top: -35px;
     width: 100%;
-    float: right;
-    height: 15px;
+    height: 30px;
   }
 
-  .tip-content {
+  .submit-button {
     margin-right: 7px;
-    background: #efefef;
-    width: 120px;
-    height: 20px;
     padding: 2px;
     text-align: center;
     float: right;
+    outline: 0px;
+    border: 0px;
+    cursor: pointer;
+    height: 30px;
+    width: 100px;
+    background: #29aae1;
+    color: #ffffff;
+  }
+</style>
+
+<style>
+  .no-dentist {
+    position: relative;
+    width: 100%;
+    min-height: 300px;
+    text-align: center;
+    font-size: 16px;
+  }
+
+  .no-dentist-message {
+    height: 30px;
+    position: relative;
+    top: 110px;
   }
 
   .wait-overlay {

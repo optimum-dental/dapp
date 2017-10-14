@@ -101,8 +101,8 @@ export default {
       commit(MUTATION_TYPES.SAVE_SEARCH_RESULT, {
         searchResult: payload.searchResult,
         type: payload.type,
-        callback: (status) => {
-          status ? resolve() : reject()
+        callback: (numberRetrieved) => {
+          resolve(numberRetrieved)
         }
       })
     })

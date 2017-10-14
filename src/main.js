@@ -174,14 +174,16 @@ new Vue({
     callToGetDentist (payload = null) {
       const blockchainParams = Object.assign({}, payload)
       delete blockchainParams.type
+      delete blockchainParams.callback
       Search.getDentistDataFromFind(this.$store.state, blockchainParams)
       .then((searchResult) => {
         this[ACTION_TYPES.SAVE_SEARCH_RESULT]({
           searchResult,
           type: payload.type
         })
-
-        if (payload.callback) payload.callback(searchResult)
+        .then((numberRetrieved) => {
+          if (payload.callback) payload.callback(searchResult, numberRetrieved)
+        })
       })
       .catch((err) => {
         if (payload.callback) payload.callback()

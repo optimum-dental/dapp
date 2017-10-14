@@ -86,12 +86,13 @@ module.exports = function setup (err) {
   })
 
 
-
   // Add ODLLSetter and ODLLUser as permitted contracts
   ODLLDB.at('0xbc54d16a8e38012bcb017f6b40033ca6f27f375e').addPermittedContracts([
     "0x1bf988c179c09077a69e2e3f84d794e4db81419b", // ODLLSetter
     "0x27fdc3b4cf18ed2ce4b20de479b4e979b2eadb69" // ODLLUser
   ], { from: web3.eth.coinbase })
+
+ODLLDB.at('0xbc54d16a8e38012bcb017f6b40033ca6f27f375e').addPermittedContracts(["0x1bf988c179c09077a69e2e3f84d794e4db81419b", "0x27fdc3b4cf18ed2ce4b20de479b4e979b2eadb69"], { from: web3.eth.coinbase })
 
   ODLLSetter.at('0x1bf988c179c09077a69e2e3f84d794e4db81419b').setOwner({ from: web3.eth.coinbase })
   ODLLSetter.at('0x1bf988c179c09077a69e2e3f84d794e4db81419b').setODLLConfig({ from: web3.eth.coinbase })

@@ -201,9 +201,10 @@ export default {
     Object.assign(searchResult, {
       gravatar, name, companyName, address
     })
+
     searchResultCopy[searchResult.type].push(searchResult)
 
     state.searchResult = searchResultCopy
-    if (payload.callback) payload.callback(true)
+    if (payload.callback) payload.callback(searchResultCopy[searchResult.type].length)
   }
 }
