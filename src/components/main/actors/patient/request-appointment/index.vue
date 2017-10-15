@@ -1,7 +1,7 @@
 <template>
-  <div id="get-started">
+  <div id="request-appointment">
     <section class="content" v-if="isDAppReady">
-      <user v-if="user && user.isValid && isValidUserBut === '0'" />
+      <appointment v-if="user && user.isValid && isValidUserBut === '0'" />
 
       <guest-introduction v-else-if="isValidUserBut === '0'" />
 
@@ -14,29 +14,29 @@
 
 <script type="text/javascript">
   export default {
-    name: 'get-started',
-    components: {
-      User,
-      GuestIntroduction,
-      Loading,
-      Informant
-    },
     computed: {
       user () {
         return this.$root.user
       }
     },
+    name: 'request-appointment',
+    components: {
+      Appointment,
+      GuestIntroduction,
+      Loading,
+      Informant
+    },
     props: [ 'isDAppReady', 'isValidUserBut' ]
   }
 
-  import User from './User.vue'
-  import GuestIntroduction from './Guest.vue'
-  import Loading from '../loading'
-  import Informant from '../informant'
+  import Appointment from './Appointment.vue'
+  import GuestIntroduction from '../../../odll-user/get-started/Guest.vue'
+  import Loading from '../../../utilities/loading'
+  import Informant from '../../../utilities/informant'
 </script>
 
 <style scoped>
-  #get-started {
+  #request-appointment {
     padding: 20px 50px;
     background: #eef0ef;
   }

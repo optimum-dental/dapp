@@ -23,8 +23,8 @@
     props: [ 'isDAppReady' ]
   }
 
-  import Services from './Services.vue'
-  import Loading from '../loading'
+  import Loading from '../../utilities/loading'
+  import Services from './Services'
 </script>
 
 <style scoped>

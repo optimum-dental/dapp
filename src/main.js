@@ -171,7 +171,7 @@ new Vue({
         console.error(err, 'Unable to find dentists')
       })
     },
-    callToGetDentist (payload = null) {
+    callToGetDentistDataFromFind (payload = null) {
       const blockchainParams = Object.assign({}, payload)
       delete blockchainParams.type
       delete blockchainParams.callback
@@ -195,6 +195,96 @@ new Vue({
     },
     callResetIsValidUserBut () {
       this[ACTION_TYPES.RESET_IS_VALID_USER_BUT]()
+    },
+    callToFetchManagers (payload) {
+      const fetchQuery = payload.fetchQuery
+      const blockchainParams = Object.assign({}, fetchQuery)
+      delete blockchainParams.type
+      Search.fetchManagers(this.$store.state, blockchainParams)
+      .then((fetchResults) => {
+        this[ACTION_TYPES.SAVE_CURRENT_SEARCH_SEED]({
+          type: fetchQuery.type,
+          seed: fetchQuery.seed
+        })
+
+        this[ACTION_TYPES.CLEAR_SEARCH_RESULT]({
+          type: fetchQuery.type
+        })
+        .then(() => {
+          if (payload.callback) payload.callback(fetchResults)
+        })
+        .catch((error) => {
+          console.error('Unable to clear search result state', error)
+        })
+      })
+      .catch((err) => {
+        if (payload.callback) payload.callback()
+        console.error(err, 'Unable to find dentists')
+      })
+    },
+    callToGetManager (payload = null) {
+      const blockchainParams = Object.assign({}, payload)
+      delete blockchainParams.type
+      delete blockchainParams.callback
+      Search.getManager(this.$store.state, blockchainParams)
+      .then((searchResult) => {
+        this[ACTION_TYPES.SAVE_SEARCH_RESULT]({
+          searchResult,
+          type: payload.type
+        })
+        .then((numberRetrieved) => {
+          if (payload.callback) payload.callback(searchResult, numberRetrieved)
+        })
+      })
+      .catch((err) => {
+        if (payload.callback) payload.callback()
+        console.error(err, 'Unable to find dentists')
+      })
+    },
+    callToFetchDentists (payload) {
+      const fetchQuery = payload.fetchQuery
+      const blockchainParams = Object.assign({}, fetchQuery)
+      delete blockchainParams.type
+      Search.fetchDentists(this.$store.state, blockchainParams)
+      .then((fetchResults) => {
+        this[ACTION_TYPES.SAVE_CURRENT_SEARCH_SEED]({
+          type: fetchQuery.type,
+          seed: fetchQuery.seed
+        })
+
+        this[ACTION_TYPES.CLEAR_SEARCH_RESULT]({
+          type: fetchQuery.type
+        })
+        .then(() => {
+          if (payload.callback) payload.callback(fetchResults)
+        })
+        .catch((error) => {
+          console.error('Unable to clear search result state', error)
+        })
+      })
+      .catch((err) => {
+        if (payload.callback) payload.callback()
+        console.error(err, 'Unable to find dentists')
+      })
+    },
+    callToGetDentist (payload = null) {
+      const blockchainParams = Object.assign({}, payload)
+      delete blockchainParams.type
+      delete blockchainParams.callback
+      Search.getDentist(this.$store.state, blockchainParams)
+      .then((searchResult) => {
+        this[ACTION_TYPES.SAVE_SEARCH_RESULT]({
+          searchResult,
+          type: payload.type
+        })
+        .then((numberRetrieved) => {
+          if (payload.callback) payload.callback(searchResult, numberRetrieved)
+        })
+      })
+      .catch((err) => {
+        if (payload.callback) payload.callback()
+        console.error(err, 'Unable to find dentists')
+      })
     }
   },
   watch: {

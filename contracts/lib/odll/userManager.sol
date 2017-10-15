@@ -175,7 +175,8 @@ library userManager {
     address dbAddress,
     address userId,
     bool isODLLDentist,
-    bool isAvailable
+    bool isAvailable,
+    bytes32 companyName
   )
     internal
   {
@@ -183,6 +184,7 @@ library userManager {
     require(isActiveUser(dbAddress, userId));
     ODLLDB(dbAddress).setBooleanValue(sha3("user/is-odll-dentist?", userId), isODLLDentist);
     ODLLDB(dbAddress).setBooleanValue(sha3("user/is-available?", userId), isAvailable);
+    ODLLDB(dbAddress).setBytes32Value(sha3("dentist/company-name", userId), companyName);
   }
 
   function hasStatus(address dbAddress, address userId, uint8 status) internal returns(bool) {

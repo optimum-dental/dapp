@@ -1,7 +1,7 @@
 <template>
-  <div id="view-treatment-applications">
+  <div id="manage-managers">
     <section class="content" v-if="isDAppReady">
-      <treatment-applications v-if="user && user.isValid && isValidUserBut === '0'" />
+      <managers v-if="user && user.isValid && isValidUserBut === '0'" />
 
       <guest-introduction v-else-if="isValidUserBut === '0'" />
 
@@ -14,29 +14,29 @@
 
 <script type="text/javascript">
   export default {
+    name: 'manage-managers',
+    components: {
+      Managers,
+      GuestIntroduction,
+      Informant,
+      Loading
+    },
     computed: {
       user () {
         return this.$root.user
       }
     },
-    name: 'view-treatment-applications',
-    components: {
-      TreatmentApplications,
-      GuestIntroduction,
-      Loading,
-      Informant
-    },
     props: [ 'isDAppReady', 'isValidUserBut' ]
   }
 
-  import TreatmentApplications from './TreatmentApplications.vue'
-  import GuestIntroduction from '../get-started/Guest.vue'
-  import Loading from '../loading'
-  import Informant from '../informant'
+  import Managers from './Managers.vue'
+  import GuestIntroduction from '../../../odll-user/get-started/Guest.vue'
+  import Informant from '../../../utilities/informant'
+  import Loading from '../../../utilities/loading'
 </script>
 
 <style scoped>
-  #view-treatment-applications {
+  #manage-managers {
     padding: 20px 50px;
     background: #eef0ef;
   }

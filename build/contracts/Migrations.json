@@ -64,10 +64,10 @@
     "666": {
       "events": {},
       "links": {},
-      "address": "0x2eae2aec72863c353a5abec989de5727d57124e8",
-      "updated_at": 1508071007198
+      "address": "0xa233deeffc3a35f42f1184817b7463dfb1fff78c",
+      "updated_at": 1508109327311
     }
   },
   "schema_version": "0.0.5",
-  "updated_at": 1508071007198
+  "updated_at": 1508109327311
 }

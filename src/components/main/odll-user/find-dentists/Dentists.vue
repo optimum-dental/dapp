@@ -161,6 +161,7 @@
           const appointmentTypeId = Number(document.getElementById('appointment-type').selectedIndex)
           const appointmentSubtypeId = Number(document.getElementById('appointment-sub-type').selectedIndex)
           const searchQuery = {
+            type: 'findDentists',
             state: Number(document.getElementById('state').selectedIndex),
             appointmentTypeId,
             appointmentSubtypeId,
@@ -212,15 +213,15 @@
         this.askUserToWaitWhileWeSearch()
         this.$root.callToFindDentists({
           searchQuery,
-          callback: (searchResults = null) => {
+          callback: (searchResults = []) => {
             const totalNumber = searchResults[0]
             const ids = searchResults[1]
             console.log(totalNumber)
             // update result view
             if (ids && ids.length > 0) {
               ids.forEach((result) => {
-                this.$root.callToGetDentist({
-                  type: 'findDentists',
+                this.$root.callToGetDentistDataFromFind({
+                  type: searchQuery.type,
                   serviceTypeId: searchQuery.appointmentTypeId,
                   serviceId: searchQuery.appointmentSubtypeId,
                   dentistId: result,
@@ -257,7 +258,7 @@
       createWaitOverlayDOMElement () {
         const DOMELement = new DOMParser().parseFromString(`
           <div class="wait-overlay">
-            <div class="wait-message">Please Wait, we're searching the blockchain for dentists matching your choices.</div>
+            <div class="wait-message">Please Wait... We're searching the blockchain for dentists matching your choices.</div>
             <div class="spin"></div>
           </div>
         `, 'text/html')
@@ -294,8 +295,8 @@
     }
   }
 
-  import states from '../../../../../../static/json/states/states.json'
-  import appointmentTypes from '../../../../../../static/json/appointment_types/appointment_types.json'
+  import states from '../../../../../static/json/states/states.json'
+  import appointmentTypes from '../../../../../static/json/appointment_types/appointment_types.json'
 </script>
 
 <style scoped>

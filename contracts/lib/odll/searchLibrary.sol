@@ -11,6 +11,14 @@ library searchLibrary {
     return utilities.getAddressArray(dbAddress, "dentists/ids", "dentists/count");
   }
 
+  function getManagers(address dbAddress)
+    internal
+    constant
+    returns (address[])
+  {
+    return utilities.getAddressArray(dbAddress, "managers/ids", "managers/count");
+  }
+
   function getServiceDentistFee(address dbAddress, uint serviceTypeId, uint serviceId, address userId)
     internal
     constant

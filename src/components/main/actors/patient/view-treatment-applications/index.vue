@@ -1,7 +1,7 @@
 <template>
-  <div id="request-appointment">
+  <div id="view-treatment-applications">
     <section class="content" v-if="isDAppReady">
-      <appointment v-if="user && user.isValid && isValidUserBut === '0'" />
+      <treatment-applications v-if="user && user.isValid && isValidUserBut === '0'" />
 
       <guest-introduction v-else-if="isValidUserBut === '0'" />
 
@@ -19,9 +19,9 @@
         return this.$root.user
       }
     },
-    name: 'request-appointment',
+    name: 'view-treatment-applications',
     components: {
-      Appointment,
+      TreatmentApplications,
       GuestIntroduction,
       Loading,
       Informant
@@ -29,14 +29,14 @@
     props: [ 'isDAppReady', 'isValidUserBut' ]
   }
 
-  import Appointment from './Appointment.vue'
-  import GuestIntroduction from '../get-started/Guest.vue'
-  import Loading from '../loading'
-  import Informant from '../informant'
+  import TreatmentApplications from './TreatmentApplications.vue'
+  import GuestIntroduction from '../../../odll-user/get-started/Guest.vue'
+  import Loading from '../../../utilities/loading'
+  import Informant from '../../../utilities/informant'
 </script>
 
 <style scoped>
-  #request-appointment {
+  #view-treatment-applications {
     padding: 20px 50px;
     background: #eef0ef;
   }

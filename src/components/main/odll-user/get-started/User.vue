@@ -344,10 +344,10 @@
     }
   }
 
-  import countries from '../../../../../../static/json/countries/countries.json'
-  import states from '../../../../../../static/json/states/states.json'
+  import countries from '../../../../../static/json/countries/countries.json'
+  import states from '../../../../../static/json/states/states.json'
   import dateSelectionManager from 'date-selection-manager'
-  import { validateFor } from '../../../../../util/ssnValidator'
+  import { validateFor } from '../../../../util/ssnValidator'
 </script>
 
 <style scoped>

@@ -28,7 +28,7 @@
     }
   }
 
-  import services from '../../../../../../static/json/services/services.json'
+  import services from '../../../../../static/json/services/services.json'
 </script>
 
 <style scoped>

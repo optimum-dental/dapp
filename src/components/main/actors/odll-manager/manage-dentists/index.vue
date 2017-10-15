@@ -1,9 +1,7 @@
 <template>
-  <div id="find-dentist">
+  <div id="manage-dentists">
     <section class="content" v-if="isDAppReady">
-      <dentists v-if="user && user.isValid && isValidUserBut === '0' && isSearching" />
-
-      <search-page v-else-if="user && user.isValid && isValidUserBut === '0'  && !isSearching" />
+      <dentists v-if="user && user.isValid && isValidUserBut === '0'" />
 
       <guest-introduction v-else-if="isValidUserBut === '0'" />
 
@@ -16,38 +14,29 @@
 
 <script type="text/javascript">
   export default {
-    name: 'find-dentist',
+    name: 'manage-dentists',
     components: {
       Dentists,
       GuestIntroduction,
-      Loading,
       Informant,
-      SearchPage
+      Loading
     },
     computed: {
       user () {
         return this.$root.user
-      },
-      isSearching () {
-        if (this.$route.query.o !== undefined) {
-          return true
-        } else {
-          return false
-        }
       }
     },
     props: [ 'isDAppReady', 'isValidUserBut' ]
   }
 
   import Dentists from './Dentists.vue'
-  import GuestIntroduction from '../get-started/Guest.vue'
-  import Loading from '../loading'
-  import Informant from '../informant'
-  import SearchPage from './SearchPage'
+  import GuestIntroduction from '../../../odll-user/get-started/Guest.vue'
+  import Informant from '../../../utilities/informant'
+  import Loading from '../../../utilities/loading'
 </script>
 
 <style scoped>
-  #find-dentist {
+  #manage-dentists {
     padding: 20px 50px;
     background: #eef0ef;
   }

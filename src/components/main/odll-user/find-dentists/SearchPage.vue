@@ -33,7 +33,7 @@
 </template>
 
 <script type="text/javascript">
-  require('../../../../../../static/css/nouislider.css')
+  require('../../../../../static/css/nouislider.css')
   let budgetRangeArray = [0, 200]
 
   export default {
@@ -285,8 +285,8 @@
 
   import wnumb from 'wnumb'
   import rangeSlider from 'nouislider'
-  import states from '../../../../../../static/json/states/states.json'
-  import appointmentTypes from '../../../../../../static/json/appointment_types/appointment_types.json'
+  import states from '../../../../../static/json/states/states.json'
+  import appointmentTypes from '../../../../../static/json/appointment_types/appointment_types.json'
   import $ from 'jquery'
 </script>
 

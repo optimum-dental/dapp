@@ -1,7 +1,9 @@
 <template>
-  <div id="view-scan-applications">
+  <div id="find-dentist">
     <section class="content" v-if="isDAppReady">
-      <scan-applications v-if="user && user.isValid && user.patientable && isValidUserBut === '0'" />
+      <dentists v-if="user && user.isValid && isValidUserBut === '0' && isSearching" />
+
+      <search-page v-else-if="user && user.isValid && isValidUserBut === '0'  && !isSearching" />
 
       <guest-introduction v-else-if="isValidUserBut === '0'" />
 
@@ -14,29 +16,38 @@
 
 <script type="text/javascript">
   export default {
+    name: 'find-dentist',
+    components: {
+      Dentists,
+      GuestIntroduction,
+      Loading,
+      Informant,
+      SearchPage
+    },
     computed: {
       user () {
         return this.$root.user
+      },
+      isSearching () {
+        if (this.$route.query.o !== undefined) {
+          return true
+        } else {
+          return false
+        }
       }
-    },
-    name: 'view-scan-applications',
-    components: {
-      ScanApplications,
-      GuestIntroduction,
-      Loading,
-      Informant
     },
     props: [ 'isDAppReady', 'isValidUserBut' ]
   }
 
-  import ScanApplications from './ScanApplications.vue'
+  import Dentists from './Dentists.vue'
   import GuestIntroduction from '../get-started/Guest.vue'
-  import Loading from '../loading'
-  import Informant from '../informant'
+  import Loading from '../../utilities/loading'
+  import Informant from '../../utilities/informant'
+  import SearchPage from './SearchPage'
 </script>
 
 <style scoped>
-  #view-scan-applications {
+  #find-dentist {
     padding: 20px 50px;
     background: #eef0ef;
   }

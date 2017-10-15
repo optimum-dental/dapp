@@ -2,12 +2,15 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '@/components/home/Home.vue'
 import MainPage from '@/components/main/MainPage.vue'
-import GetStarted from '@/components/main/view-sections/odll-user/get-started'
-import FindDentists from '@/components/main/view-sections/odll-user/find-dentists'
-import ViewServices from '@/components/main/view-sections/odll-user/view-services'
-import RequestAppointment from '@/components/main/view-sections/odll-user/request-appointment'
-import ViewScanApplications from '@/components/main/view-sections/odll-user/view-scan-applications'
-import ViewTreatmentApplications from '@/components/main/view-sections/odll-user/view-treatment-applications'
+import GetStarted from '@/components/main/odll-user/get-started'
+import FindDentists from '@/components/main/odll-user/find-dentists'
+import ViewServices from '@/components/main/odll-user/view-services'
+import RequestAppointment from '@/components/main/actors/patient/request-appointment'
+import ViewScanApplications from '@/components/main/actors/patient/view-scan-applications'
+import ViewTreatmentApplications from '@/components/main/actors/patient/view-treatment-applications'
+
+import Managers from '@/components/main/actors/odll-admin/managers'
+import Dentists from '@/components/main/actors/odll-manager/manage-dentists'
 
 Vue.use(Router)
 
@@ -67,6 +70,20 @@ export default new Router({
       name: 'ViewTreatmentApplications',
       component: MainPage,
       meta: { view: ViewTreatmentApplications }
+    },
+    {
+      mode: 'history',
+      path: '/managers',
+      name: 'Managers',
+      component: MainPage,
+      meta: { view: Managers }
+    },
+    {
+      mode: 'history',
+      path: '/manage-dentists',
+      name: 'Dentists',
+      component: MainPage,
+      meta: { view: Dentists }
     }
   ]
 })
