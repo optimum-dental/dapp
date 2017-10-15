@@ -125,7 +125,7 @@ contract ODLLUser is ODLLRestrictor {
 
     if (foundDentistsIds.length > 0) {
       if (offset > foundDentistsIds.length) {
-        return utilities.take(0, foundDentistsIds);
+        return (totalNumberFound, utilities.take(0, foundDentistsIds));
       } else if (offset + limit > foundDentistsIds.length) {
         limit = foundDentistsIds.length - offset;
       }

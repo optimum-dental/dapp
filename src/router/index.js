@@ -2,12 +2,12 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '@/components/home/Home.vue'
 import MainPage from '@/components/main/MainPage.vue'
-import GetStarted from '@/components/main/view-sections/patient/get-started'
-import FindDentists from '@/components/main/view-sections/patient/find-dentists'
-import ViewServices from '@/components/main/view-sections/patient/view-services'
-import RequestAppointment from '@/components/main/view-sections/patient/request-appointment'
-import ViewScanApplications from '@/components/main/view-sections/patient/view-scan-applications'
-import ViewTreatmentApplications from '@/components/main/view-sections/patient/view-treatment-applications'
+import GetStarted from '@/components/main/view-sections/odll-user/get-started'
+import FindDentists from '@/components/main/view-sections/odll-user/find-dentists'
+import ViewServices from '@/components/main/view-sections/odll-user/view-services'
+import RequestAppointment from '@/components/main/view-sections/odll-user/request-appointment'
+import ViewScanApplications from '@/components/main/view-sections/odll-user/view-scan-applications'
+import ViewTreatmentApplications from '@/components/main/view-sections/odll-user/view-treatment-applications'
 
 Vue.use(Router)
 

@@ -213,10 +213,12 @@
         this.$root.callToFindDentists({
           searchQuery,
           callback: (searchResults = null) => {
-            console.log(searchResults)
+            const totalNumber = searchResults[0]
+            const ids = searchResults[1]
+            console.log(totalNumber)
             // update result view
-            if (searchResults && searchResults.length > 0) {
-              searchResults.forEach((result) => {
+            if (ids && ids.length > 0) {
+              ids.forEach((result) => {
                 this.$root.callToGetDentist({
                   type: 'findDentists',
                   serviceTypeId: searchQuery.appointmentTypeId,
@@ -224,7 +226,7 @@
                   dentistId: result,
                   callback: (searchResult, numberRetrieved) => {
                     console.log(searchResult, numberRetrieved)
-                    if (numberRetrieved === searchResults.length && document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
+                    if (numberRetrieved === ids.length && document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
                     target.disabled = false
                     target.style.cursor = 'pointer'
                     target.style.background = '#29aae1'

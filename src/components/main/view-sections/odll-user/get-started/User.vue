@@ -1,7 +1,7 @@
 <template>
   <div class="wrapper">
     <div id="user">
-      <div class="title">{{ user.type > 0 ? 'Patient Profile' : 'Register as Patient' }}</div>
+      <div class="title">{{ title }}</div>
       <div class="field">
         <label for="name" class="field-key">Last Name   First Name   Middle Name</label>
         <input type="text" class="field-value has-tip" id="name" placeholder="Last Name   First Name   Middle Name" @input="displayLabel" data-name="name">
@@ -73,7 +73,7 @@
       </div>
 
       <div class="field">
-        <input type="button" class='submit-button' :value="user.type > 0 ? 'Update Profile' : 'Register'" @click="registerPatient">
+        <input type="button" class='submit-button' :value="user.type > 0 ? 'Update Profile' : 'Register'" @click="writeUser">
       </div>
     </div>
   </div>
@@ -92,6 +92,28 @@
       },
       user () {
         return this.$root.user
+      },
+      title () {
+        switch (this.user.type) {
+          case '1':
+            return 'Patient Profile'
+          case '2':
+            return 'Dentist Profile'
+          case '3':
+            return 'Manager Profile'
+          case '4':
+            return 'Admin Profile'
+          default:
+            return 'Register As Patient'
+        }
+      },
+      type () {
+        switch (this.user.type) {
+          case '0':
+            return '1'
+          default:
+            return this.user.type
+        }
       }
     },
     name: 'user',
@@ -144,6 +166,7 @@
             countriesElement.appendChild(optionElement)
             if (userCountryIndex === index) {
               optionElement.selected = true
+              if (index !== 0) this.displayLabel(null, countriesElement)
             }
           }
         })
@@ -158,6 +181,7 @@
             statesElement.appendChild(optionElement)
             if (userStateIndex === index) {
               optionElement.selected = true
+              if (index !== 0) this.displayLabel(null, statesElement)
             }
           }
         })
@@ -165,7 +189,7 @@
       displayLabel (evt, target = null) {
         target = target || evt.target
         const id = target.id
-        document.querySelector(`label[for=${id}]`).style.display = target.value === '' ? 'none' : 'block'
+        if (document.querySelector(`label[for=${id}]`)) document.querySelector(`label[for=${id}]`).style.display = target.value === '' || target.selectedIndex === 0 ? 'none' : 'block'
         if (target.classList.contains('has-tip')) this.warnOfInputLength(target)
       },
       warnOfInputLength (target) {
@@ -219,6 +243,7 @@
         elements.forEach((element) => {
           if (element) {
             element.value = this.user[element.dataset.name] || ''
+            if (element.value.trim() !== '') this.displayLabel(null, element)
           }
         })
 
@@ -232,51 +257,23 @@
         target.disabled = true
         target.style.cursor = 'not-allowed'
         target.style.background = '#adcddf'
-        const name = `b${document.getElementById('name').value}`
+        const name = document.getElementById('name').value
         const [ lastName, firstName, middleName ] = name.split(/\s+/)
-        const fullName = [ lastName, firstName, middleName ]
-        const email = document.querySelector('#email:invalid') ? '' : `b${document.getElementById('email').value}`
+        const fullName = [ lastName, firstName, middleName ].filter((item) => item !== undefined)
+        const email = document.querySelector('#email:invalid') ? '' : document.getElementById('email').value
         const gender = document.querySelector('.gender:checked') ? document.querySelector('.gender:checked').value : 0
-        const street = `b${document.getElementById('street').value}`
-        const city = `b${document.getElementById('city').value}`
+        const street = document.getElementById('street').value
+        const city = document.getElementById('city').value
         const areaNumber = document.getElementById('area-number').value
         const groupNumber = document.getElementById('group-number').value
         const sequenceNumber = document.getElementById('sequence-number').value
-        const socialSecurityNumber = `b${areaNumber}-${groupNumber}-${sequenceNumber}`
+        const socialSecurityNumber = `${areaNumber}-${groupNumber}-${sequenceNumber}`
         const day = document.getElementById('day').options[document.getElementById('day').selectedIndex].value
         const month = document.getElementById('month').selectedIndex - 1
         const year = document.getElementById('year').options[document.getElementById('year').selectedIndex].value
-        const birthday = `b${year}/${month}/${day}`
+        const birthday = `${year}/${month}/${day}`
 
-        const userObject = {
-          type: 1,
-          name,
-          email: email,
-          gravatar: `b${this.user.gravatar || ''}`,
-          street: street,
-          city: city,
-          state: Number(document.getElementById('state').selectedIndex),
-          zipCode: Number(document.getElementById('zip-code').value),
-          country: Number(document.getElementById('country').selectedIndex),
-          phoneNumber: `b${document.getElementById('phone-number').value}`,
-          socialSecurityNumber: socialSecurityNumber,
-          birthday: birthday,
-          gender: Number(gender)
-        }
-
-        const vueUserObject = Object.assign({}, userObject, {
-          lastName,
-          firstName,
-          middleName,
-          areaNumber,
-          groupNumber,
-          sequenceNumber,
-          day,
-          month,
-          year
-        })
-
-        let errors = [fullName.length < 2 ? document.getElementById('name') : undefined, email === '' ? document.getElementById('email') : undefined]
+        let errors = [fullName.length < 2 ? document.getElementById('name') : undefined]
         errors = errors.filter(entry => entry !== undefined)
         if (errors.length > 0) {
           errors.forEach((item) => {
@@ -288,6 +285,34 @@
             target.style.background = '#29aae1'
           })
         } else {
+          const userObject = {
+            type: this.type,
+            name: `b${name}`,
+            email: `b${email}`,
+            gravatar: `b${this.user.gravatar || ''}`,
+            street: `b${street}`,
+            city: `b${city}`,
+            state: Number(document.getElementById('state').selectedIndex),
+            zipCode: Number(document.getElementById('zip-code').value),
+            country: Number(document.getElementById('country').selectedIndex),
+            phoneNumber: `b${document.getElementById('phone-number').value}`,
+            socialSecurityNumber: `b${socialSecurityNumber}`,
+            birthday: `b${birthday}`,
+            gender: Number(gender)
+          }
+
+          const vueUserObject = Object.assign({}, userObject, {
+            lastName,
+            firstName,
+            middleName,
+            areaNumber,
+            groupNumber,
+            sequenceNumber,
+            day,
+            month,
+            year
+          })
+
           this.$root.callToWriteUser({
             userObject,
             vueUserObject,
@@ -298,6 +323,9 @@
             }
           })
         }
+      },
+      writeUser (evt) {
+        this.registerPatient(evt)
       }
     },
     mounted: function () {
