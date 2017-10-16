@@ -129,7 +129,7 @@
       },
       setAvatar (evt = null) {
         if (evt) this.displayLabel(evt)
-        const email = evt && evt.target && evt.target.value ? evt.target.value.trim() : this.user.email.trim()
+        const email = evt && evt.target && evt.target.value !== undefined ? evt.target.value.trim() : this.user.email.trim()
         this.$root.callUpdateUserGravatar({
           email: email,
           callback: (avatarCanvas) => {
