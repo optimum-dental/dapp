@@ -170,6 +170,8 @@ contract ODLLUser is ODLLRestrictor {
   function addOfficialToODLL(address officialId, uint8 userType)
     onlyOwnerOrActiveAdminOrActiveManager
   {
+    uint8 userTypeCheck = ODLLDB(dbAddress).getUInt8Value(sha3('user/type', officialId));
+    require(officialId != 0x0 && userType != 0 && userTypeCheck == 0);
     userManager.setUserIdentity(dbAddress, officialId, userType, "", "", "");
   }
 

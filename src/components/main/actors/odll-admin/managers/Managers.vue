@@ -4,8 +4,8 @@
       <div class="title">Manage Managers</div>
 
       <div class="data-entry-section">
-        <input type="text" class="entry" placeholder="Enter the Ethereum address of a Manager to add to the platform">
-        <input type="button" class="add" value="Add Manager">
+        <input type="text" id="entry" class="entry" placeholder="Enter the Ethereum address of a Manager to add to the platform" @input="clearError">
+        <input type="button" class="add" value="Add Manager" @click="addManager">
       </div>
 
       <div class="result-section">
@@ -28,13 +28,13 @@
   export default {
     computed: {
       fetchResults () {
-        return this.$store.state.searchResult.findDentist
+        return this.$store.state.searchResult.fetchManagers
       },
       pageNumber () {
-        return (Number(this.$route.query.o) / this.perPage) + 1
+        return (Number(this.$route.query.o || 0) / this.perPage) + 1
       },
       nextOffset () {
-        return (this.pageNumber - 1) * this.perPage
+        return this.pageNumber * this.perPage
       },
       perPage () {
         return 5
@@ -44,7 +44,7 @@
       }
     },
     methods: {
-      fetchManagers (evt, offset = 0, seed = null) {
+      fetchManagers (offset = 0, seed = undefined) {
         const fetchQuery = {
           type: 'fetchManagers',
           offset,
@@ -63,14 +63,37 @@
 
         this.getManagers(fetchQuery)
       },
+      clearError (evt) {
+        const target = evt.target
+        if (target.classList.contains('error')) target.classList.remove('error')
+      },
+      addManager (evt) {
+        const target = evt.target
+        this.disableButton(target)
+        const addressDOMElement = document.getElementById('entry')
+        const addressPattern = /0x[0-9a-fA-F]{40}/
+        if (addressDOMElement.value.trim() !== '' && addressPattern.test(addressDOMElement.value.trim())) {
+          this.$root.callToAddOfficialToODLL({
+            address: addressDOMElement.value,
+            userType: 3,
+            callback: (status = false) => {
+              this.enableButton(target)
+              this.notify(status ? 'Manager Successfully added' : 'Unable to add Manager')
+            }
+          })
+        } else {
+          this.enableButton(target)
+          addressDOMElement.classList.add('error')
+        }
+      },
       getManagers (fetchQuery) {
         this.askUserToWaitWhileWeSearch()
         this.$root.callToFetchManagers({
           fetchQuery,
           callback: (fetchResults = []) => {
             const totalNumber = fetchResults[0]
+            if (totalNumber > (fetchResults.length + fetchQuery.offset)) this.showNextPageButton()
             const ids = fetchResults[1]
-            console.log(totalNumber)
             // update result view
             if (ids && ids.length > 0) {
               ids.forEach((result) => {
@@ -88,6 +111,12 @@
               this.informOfNoOfficial()
             }
           }
+        })
+      },
+      showNextPageButton () {
+        const nextPageButton = this.createNextPageButton()
+        nextPageButton.addEventListener('click', () => {
+          this.fetchManagers(this.nextOffset, this.$store.state.searchSeed.fetchManagers)
         })
       },
       askUserToWaitWhileWeSearch () {
@@ -121,6 +150,19 @@
         `, 'text/html')
 
         return DOMELement.body.firstChild
+      },
+      disableButton (target) {
+        target.disabled = true
+        target.style.cursor = 'not-allowed'
+        target.style.background = '#adcddf'
+      },
+      enableButton (target) {
+        target.disabled = false
+        target.style.cursor = 'pointer'
+        target.style.background = '#29aae1'
+      },
+      notify (message) {
+        console.log(message)
       }
     },
     mounted: function () {
@@ -182,6 +224,11 @@
     color: #9a9a9a;
     outline: none;
     border: 1px solid #dcdede;
+    padding: 0px 5px;
+  }
+
+  .entry.error {
+    border: 1px solid #f18787;
   }
 
   .result {

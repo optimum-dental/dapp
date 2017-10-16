@@ -225,8 +225,8 @@ new Vue({
     },
     callToGetManager (payload = null) {
       const blockchainParams = Object.assign({}, payload)
-      delete blockchainParams.type
       delete blockchainParams.callback
+      delete blockchainParams.type
       Search.getManager(this.$store.state, blockchainParams)
       .then((searchResult) => {
         this[ACTION_TYPES.SAVE_SEARCH_RESULT]({
@@ -270,8 +270,8 @@ new Vue({
     },
     callToGetDentist (payload = null) {
       const blockchainParams = Object.assign({}, payload)
-      delete blockchainParams.type
       delete blockchainParams.callback
+      delete blockchainParams.type
       Search.getDentist(this.$store.state, blockchainParams)
       .then((searchResult) => {
         this[ACTION_TYPES.SAVE_SEARCH_RESULT]({
@@ -285,6 +285,18 @@ new Vue({
       .catch((err) => {
         if (payload.callback) payload.callback()
         console.error(err, 'Unable to find dentists')
+      })
+    },
+    callToAddOfficialToODLL (payload = null) {
+      const blockchainParams = Object.assign({}, payload)
+      delete blockchainParams.callback
+      ODLLUser.addOfficialToODLL(this.$store.state, blockchainParams)
+      .then((userData) => {
+        if (payload.callback) payload.callback(userData)
+      })
+      .catch((err) => {
+        if (payload.callback) payload.callback(false)
+        console.error(err, 'Unable to write user data')
       })
     }
   },

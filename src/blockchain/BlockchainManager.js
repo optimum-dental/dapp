@@ -90,7 +90,6 @@ class BlockchainManager {
           return new Promise((resolve, reject) => {
             contractInstance[query.smartContractMethod](...(query.smartContractMethodParams(coinbase)))
             .then((result) => {
-              console.log(result)
               // Successful Fetch
               resolve(query.smartContractResolve(result))
             })

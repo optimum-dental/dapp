@@ -261,9 +261,7 @@
       },
       registerUser (evt) {
         let target = evt.target
-        target.disabled = true
-        target.style.cursor = 'not-allowed'
-        target.style.background = '#adcddf'
+        this.disableButton(target)
         const name = document.getElementById('name').value
         const [ lastName, firstName, middleName ] = name.split(/\s+/)
         const fullName = [ lastName, firstName, middleName ].filter((item) => item !== undefined)
@@ -291,9 +289,7 @@
             tip.innerHTML = `Please check your ${item.id}`
             tip.classList.add('error')
             tip.style.display = 'block'
-            target.disabled = false
-            target.style.cursor = 'pointer'
-            target.style.background = '#29aae1'
+            this.enableButton(target)
           })
         } else {
           const userObject = {
@@ -341,15 +337,23 @@
             userObject,
             vueUserObject,
             callback: (userData = null) => {
-              target.disabled = false
-              target.style.cursor = 'pointer'
-              target.style.background = '#29aae1'
+              this.enableButton(target)
             }
           })
         }
       },
       writeUser (evt) {
         this.registerUser(evt)
+      },
+      disableButton (target) {
+        target.disabled = true
+        target.style.cursor = 'not-allowed'
+        target.style.background = '#adcddf'
+      },
+      enableButton (target) {
+        target.disabled = false
+        target.style.cursor = 'pointer'
+        target.style.background = '#29aae1'
       }
     },
     mounted: function () {

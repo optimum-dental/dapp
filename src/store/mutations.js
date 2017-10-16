@@ -123,7 +123,6 @@ export default {
     const [year, month, day] = birthday.split('/')
 
     const gender = Number(userObject.gender) === 0 ? '' : userObject.gender
-    console.log(userObject, payload.isRaw)
 
     Object.assign(userCopy, userObject, {
       isValid: true,
