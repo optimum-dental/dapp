@@ -118,7 +118,7 @@ library userManager {
     bytes32 street,
     bytes32 city,
     uint state,
-    uint zipCode,
+    bytes32 zipCode,
     uint country
   )
     internal
@@ -129,7 +129,7 @@ library userManager {
     ODLLDB(dbAddress).setBytes32Value(sha3("user/street", userId), street);
     ODLLDB(dbAddress).setBytes32Value(sha3("user/city", userId), city);
     ODLLDB(dbAddress).setUIntValue(sha3("user/state", userId), state);
-    ODLLDB(dbAddress).setUIntValue(sha3("user/zip-code", userId), zipCode);
+    ODLLDB(dbAddress).setBytes32Value(sha3("user/zip-code", userId), zipCode);
     ODLLDB(dbAddress).setUIntValue(sha3("user/country", userId), country);
   }
 

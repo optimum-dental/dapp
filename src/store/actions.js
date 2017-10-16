@@ -43,6 +43,7 @@ export default {
   [ACTION_TYPES.UPDATE_USER_STATE] ({ commit }, payload) {
     return new Promise(function (resolve, reject) {
       commit(MUTATION_TYPES.UPDATE_USER_STATE, {
+        isRaw: payload.isRaw,
         userObject: payload.userObject,
         callback: (status) => {
           status ? resolve() : reject()

@@ -2,6 +2,7 @@ import contract from 'truffle-contract'
 import ODLLDB from '../../build/contracts/ODLLDB.json'
 import { APPROVED_BLOCKCHAIN_NETWORK_ID, NETWORKS } from '../util/constants'
 import soliditySha3 from 'solidity-sha3'
+import ODLLUserContract from '../../build/contracts/ODLLUser.json'
 
 let blockchainManager = null
 
@@ -76,6 +77,35 @@ class BlockchainManager {
     })
     .catch((error) => {
       reject({ error, isValid: true, warningMessage: "We couldn't find Oral Data Link Smart Contracts on your detected network. This is because the Smart Contracts aren't deployed there. Contact Support to know why this is the case." })
+    })
+  }
+
+  querySmartContract (query) {
+    return new Promise((resolve, reject) => {
+      blockchainManager.accessBlockChainWith({
+        state: query.state,
+        contractToUse: query.contractToUse || ODLLUserContract,
+        dbContractKey: query.dbContractKey || 'contract/odll-user',
+        method: query.method || ((contractInstance, coinbase) => {
+          return new Promise((resolve, reject) => {
+            contractInstance[query.smartContractMethod](...(query.smartContractMethodParams(coinbase)))
+            .then((result) => {
+              console.log(result)
+              // Successful Fetch
+              resolve(query.smartContractResolve(result))
+            })
+            .catch((error) => {
+              reject(query.smartContractReject(error))
+            })
+          })
+        })
+      })
+      .then((result) => {
+        resolve(result)
+      })
+      .catch((error) => {
+        reject(error)
+      })
     })
   }
 }

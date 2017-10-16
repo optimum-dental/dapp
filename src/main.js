@@ -134,6 +134,7 @@ new Vue({
       ODLLUser.writeUser(this.$store.state, payload)
       .then((userData) => {
         this[ACTION_TYPES.UPDATE_USER_STATE]({
+          isRaw: true,
           userObject: payload.vueUserObject
         })
         .then(() => {

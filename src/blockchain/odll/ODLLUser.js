@@ -1,4 +1,4 @@
-import ODLLUserContract from '../../../build/contracts/ODLLUser.json'
+// import ODLLUserContract from '../../../build/contracts/ODLLUser.json'
 import blockchainManager from '../BlockchainManager'
 
 let odllUser = null
@@ -10,108 +10,114 @@ class ODLLUser {
   }
 
   writeUser (state = null, data = {}) {
-    return new Promise((resolve, reject) => {
-      blockchainManager.accessBlockChainWith({
-        state,
-        contractToUse: ODLLUserContract,
-        dbContractKey: 'contract/odll-user',
-        method: (contractInstance, coinbase) => {
-          return new Promise((resolve, reject) => {
-            contractInstance.writeUser(...(Object.values(data.userObject)), { from: coinbase })
-            .then((result) => {
-              // Successful Sign-up
-              resolve(data)
-            })
-            .catch((e) => {
-              reject(e)
-            })
-          })
-        }
-      })
-      .then((result) => {
-        resolve(result)
-      })
-      .catch((error) => {
-        reject(error)
-      })
+    return blockchainManager.querySmartContract({
+      smartContractMethod: 'writeUser',
+      smartContractMethodParams: (coinbase) => [...(Object.values(data.userObject)), {from: coinbase}],
+      state,
+      smartContractResolve: result => data,
+      smartContractReject: error => error
     })
   }
 
   getUserDataFromTheBlockchain (state = null) {
     return new Promise((resolve, reject) => {
-      blockchainManager.accessBlockChainWith({
-        state,
-        contractToUse: ODLLUserContract,
-        dbContractKey: 'contract/odll-user',
-        method: (contractInstance, coinbase) => {
-          return new Promise((resolve, reject) => {
-            contractInstance.getUserData({ from: coinbase })
-            .then((result) => {
-              // Successful Fetch
-              resolve(odllUser.getUserObject(state, result))
-            })
-            .catch((error) => {
-              reject({ error, isValid: true, warningMessage: "We've encountered a problem fetching your information from the blockchain. Please do try again in a few minutes." })
-            })
-          })
-        }
-      })
+      const userObject = {}
+      odllUser.getUserIdentityData(state)
       .then((result) => {
-        resolve(result)
+        Object.assign(userObject, result)
+        odllUser.getUserContactData(state)
+        .then((result) => {
+          Object.assign(userObject, result)
+          odllUser.getUserPersonalData(state)
+          .then((result) => {
+            Object.assign(userObject, result)
+            resolve(userObject)
+          })
+          .catch(error => reject(error))
+        })
+        .catch(error => reject(error))
       })
-      .catch((error) => {
-        reject(error)
+      .catch(error => reject(error))
+    })
+  }
+
+  getUserIdentityData (state = null, userId = null) {
+    return blockchainManager.querySmartContract({
+      smartContractMethod: 'getUserIdentityData',
+      smartContractMethodParams: (coinbase) => [userId || coinbase, {from: coinbase}],
+      state,
+      smartContractResolve: result => odllUser.getUserObject(state, result, ['type', 'name', 'email', 'gravatar']),
+      smartContractReject: (error) => ({
+        error,
+        isValid: true,
+        warningMessage: "We've encountered a problem fetching your identity information from the blockchain. Please do try again in a few minutes."
       })
     })
   }
 
-  getUserObject (state, results) {
-    const arrayResult = state && state.web3 && state.web3.instance && results && results.length > 0 ? results : []
-    const userObject = odllUser.getGeneralUserObject(state, arrayResult)
-    const bools = arrayResult[0]
-
-    const type = userObject.type
-    switch (type) {
-      case '1':
-        return userObject
-      case '2':
-        return Object.assign(userObject, {
-          isODLLDentist: bools && bools.length > 0 ? bools[0] : false,
-          isAvailable: bools && bools.length > 0 ? bools[1] : false
-        })
-      case '3':
-        return userObject
-      case '4':
-        return userObject
-      default:
-        return userObject
-    }
+  getUserContactData (state = null, userId = null) {
+    return blockchainManager.querySmartContract({
+      smartContractMethod: 'getUserContactData',
+      smartContractMethodParams: (coinbase) => [userId || coinbase, {from: coinbase}],
+      state,
+      smartContractResolve: result => odllUser.getUserObject(state, result, ['street', 'city', 'phoneNumber', 'state', 'zipCode', 'country']),
+      smartContractReject: (error) => ({
+        error,
+        isValid: true,
+        warningMessage: "We've encountered a problem fetching your contact information from the blockchain. Please do try again in a few minutes."
+      })
+    })
   }
 
-  getGeneralUserObject (state, arrayResult) {
-    const bytes32s = arrayResult[1]
-    const uints = arrayResult[2]
-    const uint8s = arrayResult[3]
-    let userObject
-    if (arrayResult.length > 0) {
-      userObject = {
-        type: uint8s && uint8s.length > 0 ? uint8s[0].toString() : '0',
-        name: bytes32s && bytes32s.length > 0 ? bytes32s[0] : '',
-        email: bytes32s && bytes32s.length > 0 ? bytes32s[1] : '',
-        gravatar: bytes32s && bytes32s.length > 0 ? bytes32s[2] : '',
-        street: bytes32s && bytes32s.length > 0 ? bytes32s[3] : '',
-        city: bytes32s && bytes32s.length > 0 ? bytes32s[4] : '',
-        state: uints && uints.length > 0 ? uints[0].toString() : '0',
-        zipCode: uints && uints.length > 0 ? uints[1].toString() : '',
-        country: uints && uints.length > 0 ? uints[2].toString() : '',
-        phoneNumber: bytes32s && bytes32s.length > 0 ? bytes32s[5] : '',
-        socialSecurityNumber: bytes32s && bytes32s.length > 0 ? bytes32s[6] : '',
-        birthday: bytes32s && bytes32s.length > 0 ? bytes32s[7] : '',
-        gender: uint8s && uint8s.length > 0 ? uint8s[1].toString() : '0'
-      }
-    } else {
-      userObject = odllUser.defaultUserObject()
-    }
+  getUserPersonalData (state = null, userId = null) {
+    return blockchainManager.querySmartContract({
+      smartContractMethod: 'getUserPersonalData',
+      smartContractMethodParams: (coinbase) => [userId || coinbase, {from: coinbase}],
+      state,
+      smartContractResolve: result => odllUser.getUserObject(state, result, ['gender', 'socialSecurityNumber', 'birthday']),
+      smartContractReject: (error) => ({
+        error,
+        isValid: true,
+        warningMessage: "We've encountered a problem fetching your personal information from the blockchain. Please do try again in a few minutes."
+      })
+    })
+  }
+
+  getDentistFeeData (state = null, dataObject = {}) {
+    const userId = dataObject.dentistId
+    return blockchainManager.querySmartContract({
+      smartContractMethod: 'getDentistFeeData',
+      smartContractMethodParams: (coinbase) => [dataObject.serviceTypeId, dataObject.serviceId, userId || coinbase, {from: coinbase}],
+      state,
+      smartContractResolve: result => ({fee: result}),
+      smartContractReject: (error) => ({
+        error,
+        isValid: true,
+        warningMessage: "We've encountered a problem getting dentist fee from the blockchain. Please do try again in a few minutes."
+      })
+    })
+  }
+
+  getDentistRatingData (state = null, userId = null) {
+    return blockchainManager.querySmartContract({
+      smartContractMethod: 'getDentistRatingData',
+      smartContractMethodParams: (coinbase) => [userId || coinbase, {from: coinbase}],
+      state,
+      smartContractResolve: result => ({rating: result}),
+      smartContractReject: (error) => ({
+        error,
+        isValid: true,
+        warningMessage: "We've encountered a problem getting dentist ratings from the blockchain. Please do try again in a few minutes."
+      })
+    })
+  }
+
+  getUserObject (state, results, keys) {
+    const arrayResult = state && state.web3 && state.web3.instance && results && results.length > 0 ? results : []
+    const userObject = keys.reduce((hash, key, index) => {
+      hash[key] = arrayResult[index] ? arrayResult[index].toString() : ''
+      return hash
+    }, {})
 
     return userObject
   }

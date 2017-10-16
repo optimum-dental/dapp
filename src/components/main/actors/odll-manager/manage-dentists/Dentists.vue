@@ -77,7 +77,7 @@
               ids.forEach((result) => {
                 this.$root.callToGetDentist({
                   type: fetchQuery.type,
-                  managerId: result,
+                  dentistId: result,
                   callback: (searchResult, numberRetrieved) => {
                     console.log(searchResult, numberRetrieved)
                     if (numberRetrieved === ids.length && document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()

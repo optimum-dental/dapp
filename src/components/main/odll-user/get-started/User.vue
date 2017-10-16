@@ -31,17 +31,19 @@
       <div class="field">
         <label for="state" class="field-key">State</label>
         <select id='state' class="field-value" @input="displayLabel" data-name="state"></select>
+        <div class="tip"></div>
       </div>
 
       <div class="field">
         <label for="zip-code" class="field-key">Zip Code</label>
-        <input type="text" class="field-value has-tip" id="zip-code" placeholder="Zip Code" @input="displayLabel" data-name="zipCode">
-        <div class="tip">Write between 5 to 32 characters</div>
+        <input type="text" class="field-value" id="zip-code" placeholder="Zip Code" @input="displayLabel" data-name="zipCode">
+        <div class="tip"></div>
       </div>
 
       <div class="field">
         <label for="country" class="field-key">Country</label>
         <select id='country' class="field-value" @input="displayLabel" data-name="country"></select>
+        <div class="tip"></div>
       </div>
 
       <div class="field">
@@ -190,7 +192,12 @@
         target = target || evt.target
         const id = target.id
         if (document.querySelector(`label[for=${id}]`)) document.querySelector(`label[for=${id}]`).style.display = target.value === '' || target.selectedIndex === 0 ? 'none' : 'block'
-        if (target.classList.contains('has-tip')) this.warnOfInputLength(target)
+        if (target.classList.contains('has-tip')) {
+          this.warnOfInputLength(target)
+        } else {
+          let tip = target.nextElementSibling
+          if (tip && tip.classList.contains('tip')) tip.style.display = 'none'
+        }
       },
       warnOfInputLength (target) {
         const tip = target.nextElementSibling
@@ -252,7 +259,7 @@
           phoneNumberElement.value = '+1 '
         }
       },
-      registerPatient (evt) {
+      registerUser (evt) {
         let target = evt.target
         target.disabled = true
         target.style.cursor = 'not-allowed'
@@ -264,6 +271,9 @@
         const gender = document.querySelector('.gender:checked') ? document.querySelector('.gender:checked').value : 0
         const street = document.getElementById('street').value
         const city = document.getElementById('city').value
+        const state = Number(document.getElementById('state').selectedIndex)
+        const zipCode = document.getElementById('zip-code').value
+        const country = Number(document.getElementById('country').selectedIndex)
         const areaNumber = document.getElementById('area-number').value
         const groupNumber = document.getElementById('group-number').value
         const sequenceNumber = document.getElementById('sequence-number').value
@@ -273,13 +283,14 @@
         const year = document.getElementById('year').options[document.getElementById('year').selectedIndex].value
         const birthday = `${year}/${month}/${day}`
 
-        let errors = [fullName.length < 2 ? document.getElementById('name') : undefined]
+        let errors = [fullName.length < 2 ? document.getElementById('name') : undefined, state === 0 ? document.getElementById('state') : undefined, country === 0 ? document.getElementById('country') : undefined]
         errors = errors.filter(entry => entry !== undefined)
         if (errors.length > 0) {
           errors.forEach((item) => {
             let tip = item.nextElementSibling
             tip.innerHTML = `Please check your ${item.id}`
             tip.classList.add('error')
+            tip.style.display = 'block'
             target.disabled = false
             target.style.cursor = 'pointer'
             target.style.background = '#29aae1'
@@ -292,9 +303,9 @@
             gravatar: `b${this.user.gravatar || ''}`,
             street: `b${street}`,
             city: `b${city}`,
-            state: Number(document.getElementById('state').selectedIndex),
-            zipCode: Number(document.getElementById('zip-code').value),
-            country: Number(document.getElementById('country').selectedIndex),
+            state,
+            zipCode,
+            country,
             phoneNumber: `b${document.getElementById('phone-number').value}`,
             socialSecurityNumber: `b${socialSecurityNumber}`,
             birthday: `b${birthday}`,
@@ -302,6 +313,19 @@
           }
 
           const vueUserObject = Object.assign({}, userObject, {
+            type: this.type,
+            name: name,
+            email: email,
+            gravatar: this.user.gravatar || '',
+            street: street,
+            city: city,
+            state,
+            zipCode,
+            country,
+            phoneNumber: document.getElementById('phone-number').value,
+            socialSecurityNumber: socialSecurityNumber,
+            birthday: birthday,
+            gender: Number(gender),
             lastName,
             firstName,
             middleName,
@@ -325,7 +349,7 @@
         }
       },
       writeUser (evt) {
-        this.registerPatient(evt)
+        this.registerUser(evt)
       }
     },
     mounted: function () {
@@ -355,7 +379,7 @@
     background: #ffffff;
     height: 100%;
     min-height: 80vh;
-    width: 600px;
+    width: 700px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -430,7 +454,7 @@
     height: 110px;
   }
 
-  input[type=email].field-value, input[type=text].field-value, select {
+  input[type=email].field-value, input[type=text].field-value, input[type=number].field-value, select {
     outline: none;
     border-width: 0px 0px 2px 0px;
     border-color: #a0a0a0;
@@ -438,7 +462,7 @@
     background: none;
   }
 
-  input[type=text].field-value:focus {
+  input[type=text].field-value:focus, input[type=number].field-value:focus {
     background: #fafafa;
   }
 

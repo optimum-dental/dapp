@@ -22,7 +22,7 @@ contract ODLLUser is ODLLRestrictor {
     bytes32 street,
     bytes32 city,
     uint stateId,
-    uint zipCode,
+    bytes32 zipCode,
     uint countryId,
     bytes32 phoneNumber,
     bytes32 socialSecurityNumber,
@@ -32,7 +32,7 @@ contract ODLLUser is ODLLRestrictor {
     onlyPermittedSmartContract
   {
     // require the last compulsories first
-    require(stateId != 0 && zipCode != 0 && countryId != 0);
+    require(stateId != 0 && countryId != 0);
 
     writeUserIdentity(userType, name, email, gravatar);
     writeUserLocation(street, city, stateId, zipCode, countryId);
@@ -44,7 +44,7 @@ contract ODLLUser is ODLLRestrictor {
     userManager.setUserIdentity(dbAddress, msg.sender, userType, name, email, gravatar);
   }
 
-  function writeUserLocation(bytes32 street, bytes32 city, uint stateId, uint zipCode, uint countryId) {
+  function writeUserLocation(bytes32 street, bytes32 city, uint stateId, bytes32 zipCode, uint countryId) {
     userManager.setUserLocation(dbAddress, msg.sender, street, city, stateId, zipCode, countryId);
   }
 
@@ -94,14 +94,14 @@ contract ODLLUser is ODLLRestrictor {
     bytes32 city,
     bytes32 phoneNumber,
     uint state,
-    uint zipCode,
+    bytes32 zipCode,
     uint country
   ) {
     street = ODLLDB(dbAddress).getBytes32Value(sha3("user/street", userId));
     city = ODLLDB(dbAddress).getBytes32Value(sha3("user/city", userId));
     phoneNumber = ODLLDB(dbAddress).getBytes32Value(sha3("user/phone-number", userId));
     state = ODLLDB(dbAddress).getUIntValue(sha3("user/state", userId));
-    zipCode = ODLLDB(dbAddress).getUIntValue(sha3("user/zip-code", userId));
+    zipCode = ODLLDB(dbAddress).getBytes32Value(sha3("user/zip-code", userId));
     country = ODLLDB(dbAddress).getUIntValue(sha3("user/country", userId));
   }
 

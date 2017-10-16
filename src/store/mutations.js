@@ -33,6 +33,15 @@ function stringifyBytesData (state, dataObject, datakeys) {
   return result
 }
 
+function getRawData (dataObject, datakeys) {
+  let result = []
+  for (var i = datakeys.length - 1; i >= 0; i--) {
+    result[i] = dataObject[datakeys[i]]
+  }
+
+  return result
+}
+
 function updateUserGravatar (state, userCopy, payload = null) {
   const colorPosition = Math.abs(getHash(state.web3.coinbase) % IDENTICON_COLORS.length)
   const identiconColor = IDENTICON_COLORS[colorPosition]
@@ -108,13 +117,13 @@ export default {
   [MUTATION_TYPES.UPDATE_USER_STATE] (state, payload) {
     const userObject = payload.userObject
     const userCopy = state.user
-    const [ name, email, gravatar, socialSecurityNumber, birthday, phoneNumber, city, street ] = stringifyBytesData(state, userObject, [ 'name', 'email', 'gravatar', 'socialSecurityNumber', 'birthday', 'phoneNumber', 'city', 'street' ])
+    const [ name, email, gravatar, zipCode, socialSecurityNumber, birthday, phoneNumber, city, street ] = payload.isRaw ? getRawData(userObject, [ 'name', 'email', 'gravatar', 'zipCode', 'socialSecurityNumber', 'birthday', 'phoneNumber', 'city', 'street' ]) : stringifyBytesData(state, userObject, [ 'name', 'email', 'gravatar', 'zipCode', 'socialSecurityNumber', 'birthday', 'phoneNumber', 'city', 'street' ])
     const [lastName, firstName, middleName] = name.split(' ')
     const [areaNumber, groupNumber, sequenceNumber] = socialSecurityNumber.split('-')
     const [year, month, day] = birthday.split('/')
 
-    const zipCode = Number(userObject.zipCode) === 0 ? '' : userObject.zipCode
     const gender = Number(userObject.gender) === 0 ? '' : userObject.gender
+    console.log(userObject, payload.isRaw)
 
     Object.assign(userCopy, userObject, {
       isValid: true,

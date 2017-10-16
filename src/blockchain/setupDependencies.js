@@ -61,50 +61,30 @@ module.exports = function setup (err) {
 
 
   // // Remove permission from old ODLLUser contract
-  // ODLLDB.at('0x806eb0832bb16d0c408510c3515ccf15ef91481d').removePermittedContract("0xa55f456cea5326579970d49951eeb0c1be474710")
+  // ODLLDB.at('0xd3002f5adc9ddc5e21f5235b11c62f7e625f2e19').removePermittedContract("0xa55f456cea5326579970d49951eeb0c1be474710")
 
   // // Add permission for ODLLUser contract
-  // ODLLDB.at('0x806eb0832bb16d0c408510c3515ccf15ef91481d').addPermittedContract("0x715472a2430bb4c34f35a6e6927c12d78ab7b0f0")
+  // ODLLDB.at('0xd3002f5adc9ddc5e21f5235b11c62f7e625f2e19').addPermittedContract("0x7f6dd6dac43f16323b1590d96ecfb13ada7d6310")
 
   // // Check permission status
-  // ODLLDB.at('0x806eb0832bb16d0c408510c3515ccf15ef91481d').permissionStatusForContract("0x715472a2430bb4c34f35a6e6927c12d78ab7b0f0")
+  // ODLLDB.at('0xd3002f5adc9ddc5e21f5235b11c62f7e625f2e19').permissionStatusForContract("0x7f6dd6dac43f16323b1590d96ecfb13ada7d6310")
+
+  ODLLDB.at('0xd3002f5adc9ddc5e21f5235b11c62f7e625f2e19').addPermittedContracts(["0xd9a2292076554bd8a37e54e7160f37062f9cbeda", "0x7f6dd6dac43f16323b1590d96ecfb13ada7d6310"], { from: web3.eth.coinbase })
+
+  ODLLSetter.at('0xd9a2292076554bd8a37e54e7160f37062f9cbeda').setOwner({ from: web3.eth.coinbase })
+
+  ODLLSetter.at('0xd9a2292076554bd8a37e54e7160f37062f9cbeda').setODLLConfig({ from: web3.eth.coinbase })
+
+  ODLLSetter.at('0xd9a2292076554bd8a37e54e7160f37062f9cbeda').setContract("contract/odll-user", "0x7f6dd6dac43f16323b1590d96ecfb13ada7d6310", { from: web3.eth.coinbase })
+
+  ODLLSetter.at('0xd9a2292076554bd8a37e54e7160f37062f9cbeda').setFirstAdmin("0x3b26a28666a28e5037613947ac09dcf5d6caf7b9", { from: web3.eth.coinbase })
 
 
-  ODLLDB.deployed()
-  .then((i) => {
-    console.log('ODLLDB::::::', i.address)
-  })
+  ODLLDB.at('0xd3002f5adc9ddc5e21f5235b11c62f7e625f2e19').getPermittedContracts()
 
-  ODLLUser.deployed()
-  .then((i) => {
-    console.log('ODLLUser::::::', i.address)
-  })
+  ODLLDB.at('0xd3002f5adc9ddc5e21f5235b11c62f7e625f2e19').getAddressValue('0xe901f0b43f920fc0b85fb414d10fafdf40d2a0b21a6397d54c1f5c09529e47a9') // check owner
 
-  ODLLSetter.deployed()
-  .then((i) => {
-    console.log('ODLLSetter::::::', i.address)
-  })
+  ODLLDB.at('0xd3002f5adc9ddc5e21f5235b11c62f7e625f2e19').getAddressValue('0xa2a70261844f353edc399d2fe91ce30b0e72f9cddd7ddaab87a3b0b66bc7390b') // check ODLLUser Contract
 
-
-  // Add ODLLSetter and ODLLUser as permitted contracts
-  // ODLLDB.at('0x806eb0832bb16d0c408510c3515ccf15ef91481d').addPermittedContracts([
-  //   "0x44910cf5537770f7653fd76642f4ba9c39d583d1", // ODLLSetter
-  //   "0x715472a2430bb4c34f35a6e6927c12d78ab7b0f0" // ODLLUser
-  // ], { from: web3.eth.coinbase })
-
-ODLLDB.at('0x806eb0832bb16d0c408510c3515ccf15ef91481d').addPermittedContracts(["0x44910cf5537770f7653fd76642f4ba9c39d583d1", "0x715472a2430bb4c34f35a6e6927c12d78ab7b0f0"], { from: web3.eth.coinbase })
-
-  ODLLSetter.at('0x44910cf5537770f7653fd76642f4ba9c39d583d1').setOwner({ from: web3.eth.coinbase })
-  ODLLSetter.at('0x44910cf5537770f7653fd76642f4ba9c39d583d1').setODLLConfig({ from: web3.eth.coinbase })
-  ODLLSetter.at('0x44910cf5537770f7653fd76642f4ba9c39d583d1').setContract("contract/odll-user", "0x715472a2430bb4c34f35a6e6927c12d78ab7b0f0", { from: web3.eth.coinbase })
-  ODLLSetter.at('0x44910cf5537770f7653fd76642f4ba9c39d583d1').setFirstAdmin("0x3b26a28666a28e5037613947ac09dcf5d6caf7b9", { from: web3.eth.coinbase })
-
-
-  ODLLDB.at('0x806eb0832bb16d0c408510c3515ccf15ef91481d').getPermittedContracts()
-
-  ODLLDB.at('0x806eb0832bb16d0c408510c3515ccf15ef91481d').getAddressValue('0xe901f0b43f920fc0b85fb414d10fafdf40d2a0b21a6397d54c1f5c09529e47a9') // check owner
-
-  ODLLDB.at('0x806eb0832bb16d0c408510c3515ccf15ef91481d').getAddressValue('0xa2a70261844f353edc399d2fe91ce30b0e72f9cddd7ddaab87a3b0b66bc7390b') // check ODLLUser Contract
-
-  ODLLDB.at('0x806eb0832bb16d0c408510c3515ccf15ef91481d').getBooleanValue('0x9da5783d5fac595f2274074850e2937662a474b36847045d68ab208b0c23e9dc') // if 0x3b26a28666a28e5037613947ac09dcf5d6caf7b9 is admin
+  ODLLDB.at('0xd3002f5adc9ddc5e21f5235b11c62f7e625f2e19').getAddressValue('0x0f6f723d4ae6fa8d6cb219977b9c034e21574f8183956d459a70e20897c43340') // check first admin
 }
