@@ -31,7 +31,7 @@ export default {
 #why {
   width: 100%;
   height: 648px;
-  background: #ffffff;
+  background: #dfe8ef;
   margin-top: 0px;
 }
 

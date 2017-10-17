@@ -1,7 +1,7 @@
 <template>
   <div id="manage-dentists">
     <section class="content" v-if="isDAppReady">
-      <dentists v-if="user && user.isValid && isValidUserBut === '0'" />
+      <dentists v-if="user && user.isValid && user.isODLLManager && isValidUserBut === '0'" />
 
       <guest-introduction v-else-if="isValidUserBut === '0'" />
 

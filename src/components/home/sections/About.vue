@@ -7,7 +7,7 @@
           Dentistry for the modern world!
         </div>
         <div class="text">
-          Oral Data Link database of dentists around the United States is distributed on the Ethereum public blockchain. This makes it much convenient to access any of our dentists for professional dental services that are technologically modern. Our platform is accessible to everyone, without any central authority having control over it.
+          Oral Data Link database of dentists around the United States is distributed on the Ethereum public blockchain. This makes it much convenient to access any of our dentists for professional dental services that are technologically modern. Our platform is accessible to everyone.
         </div>
       </div>
     </div>
@@ -29,7 +29,7 @@ export default {
 #about {
   width: 100%;
   height: 648px;
-  background: #dfe8ef;
+  background: #ffffff;
   margin-top: 0px;
 }
 

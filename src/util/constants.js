@@ -7,7 +7,7 @@ export const NETWORKS = {
   '666': 'DanielNet test network'
 }
 
-export const APPROVED_BLOCKCHAIN_NETWORK_ID = '666'
+export const APPROVED_BLOCKCHAIN_NETWORK_ID = '3'
 
 export const MUTATION_TYPES = {
   CHANGE_CURRENT_ROUTE_TO: 'changeCurrentRouteTo',
@@ -22,7 +22,8 @@ export const MUTATION_TYPES = {
   RESET_IS_VALID_USER_BUT: 'resetIsValidUserBut',
   UPDATE_WEB3_PROPERTIES: 'updateWeb3Properties',
   SAVE_CURRENT_SEARCH_SEED: 'saveCurrentSearchSeed',
-  CLEAR_SEARCH_RESULT: 'clearSearchResult'
+  CLEAR_SEARCH_RESULT: 'clearSearchResult',
+  SAVE_SEARCH_RESULT: 'saveSearchResult'
 }
 
 export const ACTION_TYPES = MUTATION_TYPES

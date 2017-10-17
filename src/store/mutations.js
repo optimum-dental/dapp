@@ -27,7 +27,12 @@ function stringifyBytesData (state, dataObject, datakeys) {
   // Remove the guard in front of the bytes32 encoding strings
   let result = []
   for (var i = datakeys.length - 1; i >= 0; i--) {
-    try { result[i] = state.web3.instance().toUtf8(dataObject[datakeys[i]]).toString().slice(1) } catch (e) { result[i] = '' }
+    try {
+      let data = dataObject[datakeys[i]]
+      result[i] = data ? state.web3.instance().toUtf8(data).toString().slice(1) : ''
+    } catch (e) {
+      result[i] = ''
+    }
   }
 
   return result
@@ -192,7 +197,7 @@ export default {
   },
   [MUTATION_TYPES.SAVE_CURRENT_SEARCH_SEED] (state, payload) {
     let searchSeedCopy = state.searchSeed
-    searchSeedCopy[payload.type] = payload.value
+    searchSeedCopy[payload.type] = payload.seed
     state.searchSeed = searchSeedCopy
     if (payload.callback) payload.callback()
   },
@@ -205,15 +210,15 @@ export default {
   [MUTATION_TYPES.SAVE_SEARCH_RESULT] (state, payload) {
     const searchResult = payload.searchResult || {}
     const searchResultCopy = state.searchResult
-    searchResultCopy[searchResult.type] = searchResultCopy[payload.type] ? searchResultCopy[payload.type] : []
-    let [ gravatar, name, companyName, address ] = stringifyBytesData(state, searchResult, [ 'gravatar', 'name', 'companyName', 'address' ])
+    searchResultCopy[payload.type] = searchResultCopy[payload.type] ? searchResultCopy[payload.type] : []
+    let [ type, gravatar, name, companyName, email, street, city, userState, country, zipCode, phoneNumber ] = stringifyBytesData(state, searchResult, [ 'type', 'gravatar', 'name', 'companyName', 'email', 'street', 'city', 'state', 'country', 'zipCode', 'phoneNumber' ])
     Object.assign(searchResult, {
-      gravatar, name, companyName, address
+      type, gravatar, name, companyName, email, street, city, state: userState, country, zipCode, phoneNumber
     })
 
-    searchResultCopy[searchResult.type].push(searchResult)
+    searchResultCopy[payload.type].push(searchResult)
 
     state.searchResult = searchResultCopy
-    if (payload.callback) payload.callback(searchResultCopy[searchResult.type].length)
+    if (payload.callback) payload.callback(searchResultCopy[payload.type].length)
   }
 }

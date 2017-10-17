@@ -9,16 +9,16 @@
       </div>
 
       <div class="result-section">
-        <div class="result" v-for="manager in fetchResults">
+        <div class="result" v-for="dentist in fetchResults">
           <div class="gravatar-section"></div>
           <div class="about-section">
-            <div class="name">{{ manager.name }}</div>
-            <div class="company-name">{{ manager.companyName }}</div>
-            <div class="average-rating">{{ manager.averageRating }}</div>
-            <div class="address">{{ manager.address }}</div>
+            <div class="name">{{ dentist.name }}</div>
+            <div class="company-name">{{ dentist.companyName }}</div>
+            <div class="average-rating">{{ dentist.averageRating }}</div>
+            <div class="address">{{ dentist.address }}</div>
             <div class="profile-link">See more</div>
           </div>
-          <div class="action">{{ action(manager.isBlocked) }}</div>
+          <div class="action">{{ action(dentist.isBlocked) }}</div>
         </div>
       </div>
     </div>
@@ -39,12 +39,12 @@
       },
       perPage () {
         return 5
-      },
-      action (isBlocked) {
-        return isBlocked ? 'Unblock Dentist' : 'Block Dentist'
       }
     },
     methods: {
+      action (isBlocked) {
+        return isBlocked ? 'Unblock Dentist' : 'Block Dentist'
+      },
       fetchDentists (evt, offset = 0, seed = null) {
         const fetchQuery = {
           type: 'fetchDentists',
@@ -63,6 +63,27 @@
         })
 
         this.getDentists(fetchQuery)
+      },
+      addDentist (evt) {
+        const target = evt.target
+        this.disableButton(target)
+        const addressDOMElement = document.getElementById('entry')
+        const addressPattern = /0x[0-9a-fA-F]{40}/
+        if (addressDOMElement.value.trim() !== '' && addressPattern.test(addressDOMElement.value.trim())) {
+          this.$root.callToAddOfficialToODLL({
+            userObject: {
+              address: addressDOMElement.value,
+              userType: 3
+            },
+            callback: (status = false) => {
+              this.enableButton(target)
+              this.notify(status ? 'Dentist Successfully added' : 'Unable to add Dentist')
+            }
+          })
+        } else {
+          this.enableButton(target)
+          addressDOMElement.classList.add('error')
+        }
       },
       getDentists (fetchQuery) {
         this.askUserToWaitWhileWeSearch()

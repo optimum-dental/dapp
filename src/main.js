@@ -156,6 +156,7 @@ new Vue({
           type: searchQuery.type,
           seed: searchQuery.seed
         })
+        .catch(error => console.error(error))
 
         this[ACTION_TYPES.CLEAR_SEARCH_RESULT]({
           type: searchQuery.type
@@ -185,6 +186,9 @@ new Vue({
         .then((numberRetrieved) => {
           if (payload.callback) payload.callback(searchResult, numberRetrieved)
         })
+        .catch((error) => {
+          console.error(error)
+        })
       })
       .catch((err) => {
         if (payload.callback) payload.callback()
@@ -206,6 +210,9 @@ new Vue({
         this[ACTION_TYPES.SAVE_CURRENT_SEARCH_SEED]({
           type: fetchQuery.type,
           seed: fetchQuery.seed
+        })
+        .catch((error) => {
+          console.error(error)
         })
 
         this[ACTION_TYPES.CLEAR_SEARCH_RESULT]({
@@ -236,10 +243,11 @@ new Vue({
         .then((numberRetrieved) => {
           if (payload.callback) payload.callback(searchResult, numberRetrieved)
         })
+        .catch(error => console.error(error))
       })
       .catch((err) => {
         if (payload.callback) payload.callback()
-        console.error(err, 'Unable to find dentists')
+        console.error(err, 'Unable to find manager')
       })
     },
     callToFetchDentists (payload) {
@@ -252,6 +260,7 @@ new Vue({
           type: fetchQuery.type,
           seed: fetchQuery.seed
         })
+        .catch(error => console.error(error))
 
         this[ACTION_TYPES.CLEAR_SEARCH_RESULT]({
           type: fetchQuery.type
@@ -281,6 +290,7 @@ new Vue({
         .then((numberRetrieved) => {
           if (payload.callback) payload.callback(searchResult, numberRetrieved)
         })
+        .catch(error => console.error(error))
       })
       .catch((err) => {
         if (payload.callback) payload.callback()
@@ -296,7 +306,7 @@ new Vue({
       })
       .catch((err) => {
         if (payload.callback) payload.callback(false)
-        console.error(err, 'Unable to write user data')
+        console.error(err, 'Unable to add official to the blockchain')
       })
     }
   },

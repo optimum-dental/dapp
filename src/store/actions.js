@@ -84,7 +84,7 @@ export default {
     return new Promise(function (resolve, reject) {
       commit(MUTATION_TYPES.SAVE_CURRENT_SEARCH_SEED, {
         type: payload.type,
-        value: payload.value,
+        seed: payload.seed,
         callback: () => resolve()
       })
     })
@@ -102,9 +102,7 @@ export default {
       commit(MUTATION_TYPES.SAVE_SEARCH_RESULT, {
         searchResult: payload.searchResult,
         type: payload.type,
-        callback: (numberRetrieved) => {
-          resolve(numberRetrieved)
-        }
+        callback: (numberRetrieved = 0) => resolve(numberRetrieved)
       })
     })
   }

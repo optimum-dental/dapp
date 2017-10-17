@@ -6,7 +6,7 @@
         <router-link to="/about-us" class="link1">About Us</router-link> <span class="divider"></span>
         <router-link to="/our-services" class="link2">Our Services</router-link> <span class="divider"></span>
         <router-link to="/dentists" class="link3">Find Dentist</router-link> <span class="divider"></span>
-        <router-link to="/how-to-start" class="link4">How To Get Started?</router-link>
+        <router-link to="/get-started" class="link4">How To Get Started?</router-link>
       </div>
     </div>
   </div>

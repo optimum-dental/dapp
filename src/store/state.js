@@ -49,7 +49,11 @@ export default {
   isValidUserBut: '0',
   originalIsValidUserBut: '0',
   searchSeed: {
-    findDentists: null
+    findDentists: null,
+    fetchManagers: null
   },
-  searchResult: {}
+  searchResult: {
+    fetchDentists: [],
+    fetchManagers: []
+  }
 }

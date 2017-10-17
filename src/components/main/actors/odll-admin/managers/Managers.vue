@@ -38,12 +38,12 @@
       },
       perPage () {
         return 5
-      },
-      action (isBlocked) {
-        return isBlocked ? 'Unblock Manager' : 'Block Manager'
       }
     },
     methods: {
+      action (isBlocked) {
+        return isBlocked ? 'Unblock Manager' : 'Block Manager'
+      },
       fetchManagers (offset = 0, seed = undefined) {
         const fetchQuery = {
           type: 'fetchManagers',
@@ -74,8 +74,10 @@
         const addressPattern = /0x[0-9a-fA-F]{40}/
         if (addressDOMElement.value.trim() !== '' && addressPattern.test(addressDOMElement.value.trim())) {
           this.$root.callToAddOfficialToODLL({
-            address: addressDOMElement.value,
-            userType: 3,
+            userObject: {
+              address: addressDOMElement.value,
+              userType: 3
+            },
             callback: (status = false) => {
               this.enableButton(target)
               this.notify(status ? 'Manager Successfully added' : 'Unable to add Manager')

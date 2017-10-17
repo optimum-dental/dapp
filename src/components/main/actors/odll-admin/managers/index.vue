@@ -1,7 +1,7 @@
 <template>
   <div id="manage-managers">
     <section class="content" v-if="isDAppReady">
-      <managers v-if="user && user.isValid && isValidUserBut === '0'" />
+      <managers v-if="user && user.isValid && user.isODLLAdmin && isValidUserBut === '0'" />
 
       <guest-introduction v-else-if="isValidUserBut === '0'" />
 

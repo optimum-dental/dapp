@@ -1,10 +1,10 @@
 <template>
   <div id="body-template">
     <Intro />
-    <About :within-the-blockchain-vector="withinTheBlockchainVector" />
+    <Why />
     <Appointment :book-appointment-vector="bookAppointmentVector" />
     <Scan :scan-appointment-vector="scanAppointmentVector" />
-    <Why />
+    <About :within-the-blockchain-vector="withinTheBlockchainVector" />
     <HowItWorks />
     <UseApp />
   </div>
@@ -15,10 +15,10 @@ export default {
   name: 'body-template',
   components: {
     Intro,
-    About,
+    Why,
     Appointment,
     Scan,
-    Why,
+    About,
     HowItWorks,
     UseApp
   },
