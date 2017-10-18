@@ -41,7 +41,7 @@
       </div>
 
       <div class="result-section">
-        <div class="result" v-for="dentist in searchResults">
+        <div class="result" v-if="searchResults.length > 0" v-for="dentist in searchResults">
           <div class="gravatar-section"></div>
           <div class="about-section">
             <div class="name">{{ dentist.name }}</div>
@@ -52,11 +52,14 @@
             <div class="address">{{ dentist.address }}</div>
             <div class="profile-link">See more</div>
           </div>
-          <div class="request-appointment-section">
+          <div v-if="user.isPatient" class="request-appointment-section">
             <router-link :to="request-appointment" class="link-to-appointment">Request Appointment</router-link>
           </div>
         </div>
       </div>
+      
+      <div v-if="isThereMore" @click="showNextPage" class="fetch-next">Next</div>
+      <div v-if="pageNumber !== 1" @click="showPreviousPage" class="fetch-previous">Previous</div>
     </div>
   </div>
 </template>
@@ -64,14 +67,26 @@
 <script type="text/javascript">
   export default {
     computed: {
+      user () {
+        return this.$root.user
+      },
+      isThereMore () {
+        return this.$store.state.searchResult.findDentists.totalNumberAvailable > (this.pageNumber * this.perPage)
+      },
       searchResults () {
-        return this.$store.state.searchResult.findDentist
+        return this.$store.state.searchResult.findDentists.data
       },
       pageNumber () {
-        return (Number(this.$route.query.o) / this.perPage) + 1
+        return (Number(this.$route.query.o || 0) / this.perPage) + 1
       },
       nextOffset () {
-        return (this.pageNumber - 1) * this.perPage
+        return (this.pageNumber * this.perPage)
+      },
+      currentOffset () {
+        return (this.nextOffset - this.perPage)
+      },
+      previousOffset () {
+        return (this.currentOffset - this.perPage)
       },
       perPage () {
         return 5
@@ -214,19 +229,19 @@
         this.$root.callToFindDentists({
           searchQuery,
           callback: (searchResults = []) => {
-            const totalNumber = searchResults[0]
+            const totalNumberAvailable = searchResults[0] || 0
             const ids = searchResults[1]
-            console.log(totalNumber)
+            this.$root.callToSaveTotalNumberAvailable(searchQuery.type, totalNumberAvailable)
             // update result view
             if (ids && ids.length > 0) {
               ids.forEach((result) => {
                 this.$root.callToGetDentistDataFromFind({
                   type: searchQuery.type,
+                  offset: searchQuery.offset,
                   serviceTypeId: searchQuery.appointmentTypeId,
                   serviceId: searchQuery.appointmentSubtypeId,
                   dentistId: result,
                   callback: (searchResult, numberRetrieved) => {
-                    console.log(searchResult, numberRetrieved)
                     if (numberRetrieved === ids.length && document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
                     target.disabled = false
                     target.style.cursor = 'pointer'
@@ -243,6 +258,19 @@
             }
           }
         })
+      },
+      showNextPage (evt) {
+        this.findDentists(evt, this.nextOffset, this.$store.state.searchResult.findDentists.seed)
+      },
+      showPreviousPage (evt) {
+        const offsetData = this.$store.state.searchResult.findDentists.data[this.getPageIndex(this.previousOffset)]
+        if (offsetData && offsetData.length > 0) {
+        } else {
+          this.findDentists(evt, this.previousOffset, this.$store.state.searchResult.findDentists.seed)
+        }
+      },
+      getPageIndex (offset = 0) {
+        return offset / this.perPage
       },
       askUserToWaitWhileWeSearch () {
         if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
@@ -284,6 +312,7 @@
       this.populateBudgets(Number(this.$route.query.bl), Number(this.$route.query.br))
       this.setEventListeners()
       this.getDentists({
+        type: 'findDentists',
         state: Number(this.$route.query.st),
         appointmentTypeId: Number(this.$route.query.aTI),
         appointmentSubtypeId: Number(this.$route.query.aSI),
@@ -377,32 +406,71 @@
   }
 
   .result {
-    width: 100%;
-    border-bottom: 1px solid #dcdede;
-    min-height: 300px;
+    width: 95%;
+    border-bottom: 1px solid #a7a7a7;
+    min-height: 180px;
+    padding: 10px 0px;
   }
 
   .gravatar-section {
-    width: 120px;
-    height: 100%;
+    width: 60px;
+    height: 60px;
+    float: left;
+    display: inline-block;
+    margin-right: 10px;
+    border: 1px solid #c3c3c3;
+    border-radius: 6px;
   }
 
   .about-section {
-    width: 350px;
-    height: 100%;
+    width: 250px;
+    height: 150px;
+    display: inline-block;
+    float: left;
+  }
+
+  .about-section > div {
+    display: block;
+    height: 20px;
+    line-height: 20px;
+    font-size: 14px;
+    text-align: left;
+    width: 100%;
+  }
+
+  .profile-link {
+    font-size: 10px !important;
+    color: #bfced9;
+    cursor: pointer;
+  }
+
+  .average-rating > div {
+    background: #ffffff;
+    border: 1px solid #f9af3b;
+  }
+
+  .average-rating > .filled {
+    background: #f9af3b;
   }
 
   .request-appointment-section {
-    width: 200px;
-    height: 100%;
+    width: auto;
+    height: 150px;
+    line-height: 150px;
+    display: inline-block;
+    float: right;
   }
 
   .link-to-appointment {
-    width: 100%;
+    width: 200px;
     height: 40px;
     line-height: 40px;
     color: #ffffff;
-    background: #29aae3;
+    background: #3285b1;
+    display: inline-block;
+    text-decoration: none;
+    font-size: 14px;
+    text-align: center;
   }
 
   .submit {
