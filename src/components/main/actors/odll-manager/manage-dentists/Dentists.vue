@@ -13,7 +13,7 @@
   </div>
 </template>
 
-<script type="text/javascript">
+<script>
   export default {
     computed: {
       pageNumber () {
@@ -86,6 +86,7 @@
                   offset: fetchQuery.offset,
                   dentistId: result,
                   callback: (searchResult, numberRetrieved) => {
+                    console.log(1111, numberRetrieved, ids.length, ids)
                     if (numberRetrieved === ids.length && document.querySelector('.wait-overlay')) {
                       document.querySelector('.wait-overlay').remove()
                       this.populateResults(fetchQuery.type, fetchQuery.offset)
@@ -109,6 +110,7 @@
         results.forEach((result) => {
           const resultDOMElement = this.createResultDOMElement(result)
           resultSection.appendChild(resultDOMElement)
+          resultDOMElement.querySelector('.gravatar-section').appendChild(result.avatarCanvas)
         })
       },
       clearDOMElementChildren (DOMElement) {
@@ -166,9 +168,7 @@
         const averageRatingDOMElement = this.createAverageRatingDOMElement(result.averageRating)
         const resultDOMElement = new DOMParser().parseFromString(`          
           <div class="result">
-            <div class="gravatar-section">
-              ${result.avatarCanvas.outerHTML}
-            </div>
+            <div class="gravatar-section"></div>
             <div class="about-section">
               <div class="name">${result.name || 'Name: Not Supplied'}</div>
               <div class="company-name">${result.companyName || 'Company Name: Not Supplied'}</div>

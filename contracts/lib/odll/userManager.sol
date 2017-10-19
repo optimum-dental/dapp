@@ -97,14 +97,14 @@ library userManager {
       ODLLDB(dbAddress).setUIntValue(sha3("user/created-on", userId), now);
       ODLLDB(dbAddress).setUInt8Value(sha3("user/status", userId), 1);
       utilities.addArrayItem(dbAddress, "users/ids", "users/count", userId);
-    }
 
-    string memory userTypeKey;
-    string memory userTypeIdsKey;
-    string memory userTypeCountKey;
-    (userTypeKey, userTypeIdsKey, userTypeCountKey) = getUserTypeKey(userType);
-    ODLLDB(dbAddress).setBooleanValue(sha3(userTypeKey, userId), true);
-    utilities.addArrayItem(dbAddress, userTypeIdsKey, userTypeCountKey, userId);
+      string memory userTypeKey;
+      string memory userTypeIdsKey;
+      string memory userTypeCountKey;
+      (userTypeKey, userTypeIdsKey, userTypeCountKey) = getUserTypeKey(userType);
+      ODLLDB(dbAddress).setBooleanValue(sha3(userTypeKey, userId), true);
+      utilities.addArrayItem(dbAddress, userTypeIdsKey, userTypeCountKey, userId);
+    }
 
     ODLLDB(dbAddress).setUInt8Value(sha3("user/type", userId), userType);
     ODLLDB(dbAddress).setBytes32Value(sha3("user/name", userId), name);

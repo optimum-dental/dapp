@@ -48,7 +48,7 @@
   </div>
 </template>
 
-<script type="text/javascript">
+<script>
   export default {
     computed: {
       user () {
@@ -240,6 +240,7 @@
         results.forEach((result) => {
           const resultDOMElement = this.createResultDOMElement(result)
           resultSection.appendChild(resultDOMElement)
+          resultDOMElement.querySelector('.gravatar-section').appendChild(result.avatarCanvas)
         })
       },
       clearDOMElementChildren (DOMElement) {
@@ -296,9 +297,7 @@
         const averageRatingDOMElement = this.createAverageRatingDOMElement(result.averageRating)
         const resultDOMElement = new DOMParser().parseFromString(`          
           <div class="result">
-            <div class="gravatar-section">
-              ${result.avatarCanvas.outerHTML}
-            </div>
+            <div class="gravatar-section"></div>
             <div class="about-section">
               <div class="name">${result.name || 'Name: Not Supplied'}</div>
               <div class="company-name">${result.companyName || 'Company Name: Not Supplied'}</div>

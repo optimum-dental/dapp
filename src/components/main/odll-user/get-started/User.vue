@@ -300,7 +300,7 @@
             street: `b${street}`,
             city: `b${city}`,
             state,
-            zipCode,
+            zipCode: `b${zipCode}`,
             country,
             phoneNumber: `b${document.getElementById('phone-number').value}`,
             socialSecurityNumber: `b${socialSecurityNumber}`,

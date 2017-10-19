@@ -59,7 +59,7 @@ function getGravatarFor (payload = {}) {
     })
   } else {
     const avatarCanvas = ethereumBlockies.create({
-      seed: payload.coinbase,
+      seed: payload.coinbase.toString(),
       color: identiconColor.color,
       bgcolor: identiconColor.bgColor,
       size: 8,
@@ -236,7 +236,7 @@ export default {
     searchResultCopy[payload.type].data[payload.offset] = []
     let [ gravatar, name, companyName, email, street, city, zipCode, phoneNumber ] = stringifyBytesData(state, searchResult, [ 'gravatar', 'name', 'companyName', 'email', 'street', 'city', 'zipCode', 'phoneNumber' ])
     Object.assign(searchResult, {
-      gravatar, name, companyName, email, street, city, zipCode, phoneNumber
+      coinbase: payload.coinbase, gravatar, name, companyName, email, street, city, zipCode, phoneNumber
     })
 
     getGravatarFor({
