@@ -4,23 +4,11 @@
       <div class="title">Manage Dentists</div>
 
       <div class="data-entry-section">
-        <input type="text" class="entry" placeholder="Enter the Ethereum address of a Dentist to add to the platform">
-        <input type="button" class="add" value="Add Dentist">
+        <input type="text" id="entry" class="entry" placeholder="Enter the Ethereum address of a Dentist you want to add to the platform">
+        <input type="button" class="add" value="Add Dentist" @click="addDentist">
       </div>
 
-      <div class="result-section">
-        <div class="result" v-for="dentist in fetchResults">
-          <div class="gravatar-section"></div>
-          <div class="about-section">
-            <div class="name">{{ dentist.name }}</div>
-            <div class="company-name">{{ dentist.companyName }}</div>
-            <div class="average-rating">{{ dentist.averageRating }}</div>
-            <div class="address">{{ dentist.address }}</div>
-            <div class="profile-link">See more</div>
-          </div>
-          <div class="action">{{ action(dentist.isBlocked) }}</div>
-        </div>
-      </div>
+      <div class="result-section"></div>
     </div>
   </div>
 </template>
@@ -28,9 +16,6 @@
 <script type="text/javascript">
   export default {
     computed: {
-      fetchResults () {
-        return this.$store.state.searchResult.findDentist
-      },
       pageNumber () {
         return (Number(this.$route.query.o) / this.perPage) + 1
       },
@@ -62,7 +47,7 @@
           }
         })
 
-        this.getDentists(fetchQuery)
+        this.getDentists(evt, fetchQuery)
       },
       addDentist (evt) {
         const target = evt.target
@@ -72,8 +57,8 @@
         if (addressDOMElement.value.trim() !== '' && addressPattern.test(addressDOMElement.value.trim())) {
           this.$root.callToAddOfficialToODLL({
             userObject: {
-              address: addressDOMElement.value,
-              userType: 3
+              address: addressDOMElement.value.toLowerCase(),
+              userType: 2
             },
             callback: (status = false) => {
               this.enableButton(target)
@@ -85,32 +70,65 @@
           addressDOMElement.classList.add('error')
         }
       },
-      getDentists (fetchQuery) {
+      getDentists (evt, fetchQuery) {
         this.askUserToWaitWhileWeSearch()
         this.$root.callToFetchDentists({
           fetchQuery,
           callback: (fetchResults = []) => {
-            const totalNumber = fetchResults[0]
+            const totalNumberAvailable = fetchResults[0]
             const ids = fetchResults[1]
-            console.log(totalNumber)
+            this.$root.callToSaveTotalNumberAvailable(fetchQuery.type, totalNumberAvailable)
             // update result view
             if (ids && ids.length > 0) {
               ids.forEach((result) => {
                 this.$root.callToGetDentist({
                   type: fetchQuery.type,
+                  offset: fetchQuery.offset,
                   dentistId: result,
                   callback: (searchResult, numberRetrieved) => {
-                    console.log(searchResult, numberRetrieved)
-                    if (numberRetrieved === ids.length && document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
+                    if (numberRetrieved === ids.length && document.querySelector('.wait-overlay')) {
+                      document.querySelector('.wait-overlay').remove()
+                      this.populateResults(fetchQuery.type, fetchQuery.offset)
+                      if (evt) this.enableButton(evt.target)
+                    }
                   }
                 })
               })
             } else {
               if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
               this.informOfNoOfficial()
+              if (evt) this.enableButton(evt.target)
             }
           }
         })
+      },
+      populateResults (resultType, offset) {
+        const results = this.$store.state.searchResult[resultType].data[offset]
+        const resultSection = document.querySelector('.result-section')
+        this.clearDOMElementChildren(resultSection)
+        results.forEach((result) => {
+          const resultDOMElement = this.createResultDOMElement(result)
+          resultSection.appendChild(resultDOMElement)
+        })
+      },
+      clearDOMElementChildren (DOMElement) {
+        while (DOMElement.hasChildNodes()) {
+          DOMElement.firstChild.remove()
+        }
+      },
+      showNextPage (evt) {
+        this.fetchDentists(evt, this.nextOffset, this.$store.state.searchResult.fetchDentists.seed)
+      },
+      showPreviousPage (evt) {
+        const offsetData = this.$store.state.searchResult.fetchDentists.data[this.getPageIndex(this.previousOffset)]
+        if (offsetData && offsetData.length > 0) {
+          this.populateResults('fetchDentists', this.previousOffset)
+        } else {
+          this.fetchDentists(evt, this.previousOffset, this.$store.state.searchResult.fetchDentists.seed)
+        }
+      },
+      getPageIndex (offset = 0) {
+        return offset / this.perPage
       },
       askUserToWaitWhileWeSearch () {
         if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
@@ -143,10 +161,55 @@
         `, 'text/html')
 
         return DOMELement.body.firstChild
+      },
+      createResultDOMElement (result) {
+        const averageRatingDOMElement = this.createAverageRatingDOMElement(result.averageRating)
+        const resultDOMElement = new DOMParser().parseFromString(`          
+          <div class="result">
+            <div class="gravatar-section">
+              ${result.avatarCanvas.outerHTML}
+            </div>
+            <div class="about-section">
+              <div class="name">${result.name || 'Name: Not Supplied'}</div>
+              <div class="company-name">${result.companyName || 'Company Name: Not Supplied'}</div>
+              ${averageRatingDOMElement.outerHTML}
+              <div class="address">${result.address || 'Address: Not Supplied'}</div>
+            </div>
+            <div class="action-section">
+              <input type="button" value="${result.isBlocked ? 'Unblock Dentist' : 'Block Dentist'}" class="action-button">
+            </div>
+          </div>
+        `, 'text/html').body.firstChild
+        return resultDOMElement
+      },
+      createAverageRatingDOMElement (averageRating) {
+        const ratingsArray = []
+        for (let i = 0; i < 5; i++) {
+          ratingsArray.push(`
+            <div class="rating ${i < averageRating ? 'filled' : ''}"></div>
+          `)
+        }
+
+        return new DOMParser().parseFromString(`
+          <div class="average-rating">${ratingsArray.join(' ')}</div>
+        `, 'text/html').body.firstChild
+      },
+      disableButton (target) {
+        target.disabled = true
+        target.style.cursor = 'not-allowed'
+        target.style.background = '#adcddf'
+      },
+      enableButton (target) {
+        target.disabled = false
+        target.style.cursor = 'pointer'
+        target.style.background = '#29aae1'
+      },
+      notify (message) {
+        console.log(message)
       }
     },
     mounted: function () {
-      this.getDentists({
+      this.getDentists(null, {
         type: 'fetchDentists',
         offset: this.$route.query.o ? Number(this.$route.query.o) : 0,
         limit: this.$route.query.l ? Number(this.$route.query.l) : this.perPage,
@@ -204,30 +267,6 @@
     color: #9a9a9a;
     outline: none;
     border: 1px solid #dcdede;
-  }
-
-  .result {
-    width: 100%;
-    border-bottom: 1px solid #dcdede;
-    min-height: 300px;
-  }
-
-  .gravatar-section {
-    width: 120px;
-    height: 100%;
-  }
-
-  .about-section {
-    width: 350px;
-    height: 100%;
-  }
-
-  .action {
-    width: 120px;
-    height: 40px;
-    line-height: 40px;
-    color: #ffffff;
-    background: #29aae3;
   }
 
   .add {
@@ -298,5 +337,82 @@
     100% {
       transform: rotate(360deg);
     }
+  }
+  
+  .result {
+    width: 95%;
+    border-bottom: 1px solid #a7a7a7;
+    min-height: 180px;
+    padding: 10px 0px;
+  }
+
+  .gravatar-section {
+    width: 60px;
+    height: 60px;
+    float: left;
+    display: inline-block;
+    margin-top: 10px;
+    margin-right: 20px;
+    border: 1px solid #c3c3c3;
+    border-radius: 6px;
+  }
+
+  .gravatar-section > canvas {
+    height: 100%;
+    width: 100%;
+    border-radius: 6px;
+  }
+
+  .about-section {
+    width: 250px;
+    height: 150px;
+    display: inline-block;
+    float: left;
+  }
+
+  .about-section > div {
+    display: block;
+    height: 35px;
+    line-height: 35px;
+    font-size: 14px;
+    text-align: left;
+    width: 100%;
+  }
+  
+  .average-rating > div {
+    background: #ffffff;
+    border: 1px solid #f9af3b;
+  }
+
+  .average-rating > .filled {
+    background: #f9af3b;
+  }
+
+  .profile-link {
+    font-size: 10px !important;
+    color: #bfced9;
+    cursor: pointer;
+  }
+
+  .action-section {
+    width: auto;
+    height: 150px;
+    line-height: 150px;
+    display: inline-block;
+    float: right;
+  }
+
+  .action-button {
+    width: 200px;
+    height: 40px;
+    line-height: 40px;
+    color: #ffffff;
+    background: #3285b1;
+    display: inline-block;
+    outline: none;
+    border: 0px;
+    cursor: pointer;
+    font-size: 14px;
+    text-align: center;
   }
 </style>

@@ -40,23 +40,7 @@
         <input type="button" class='submit-button' value="Find" @click="findDentists">
       </div>
 
-      <div class="result-section">
-        <div class="result" v-if="searchResults.length > 0" v-for="dentist in searchResults">
-          <div class="gravatar-section"></div>
-          <div class="about-section">
-            <div class="name">{{ dentist.name }}</div>
-            <div class="company-name">{{ dentist.companyName }}</div>
-            <div class="service">{{ dentist.service }}</div>
-            <div class="fee">{{ dentist.fee }}</div>
-            <div class="average-rating">{{ dentist.averageRating }}</div>
-            <div class="address">{{ dentist.address }}</div>
-            <div class="profile-link">See more</div>
-          </div>
-          <div v-if="user.isPatient" class="request-appointment-section">
-            <router-link :to="request-appointment" class="link-to-appointment">Request Appointment</router-link>
-          </div>
-        </div>
-      </div>
+      <div class="result-section"></div>
       
       <div v-if="isThereMore" @click="showNextPage" class="fetch-next">Next</div>
       <div v-if="pageNumber !== 1" @click="showPreviousPage" class="fetch-previous">Previous</div>
@@ -72,9 +56,6 @@
       },
       isThereMore () {
         return this.$store.state.searchResult.findDentists.totalNumberAvailable > (this.pageNumber * this.perPage)
-      },
-      searchResults () {
-        return this.$store.state.searchResult.findDentists.data
       },
       pageNumber () {
         return (Number(this.$route.query.o || 0) / this.perPage) + 1
@@ -168,11 +149,8 @@
         }
       },
       findDentists (evt, offset = 0, seed = null) {
-        const target = evt.target
         if (document.getElementById('appointment-sub-type')) {
-          target.disabled = true
-          target.style.cursor = 'not-allowed'
-          target.style.background = '#adcddf'
+          if (evt) this.disableButton(evt.target)
           const appointmentTypeId = Number(document.getElementById('appointment-type').selectedIndex)
           const appointmentSubtypeId = Number(document.getElementById('appointment-sub-type').selectedIndex)
           const searchQuery = {
@@ -194,9 +172,7 @@
               let tip = item.nextElementSibling
               tip.innerHTML = `Please check your ${item.id}`
               tip.classList.add('error')
-              target.disabled = false
-              target.style.cursor = 'pointer'
-              target.style.background = '#29aae1'
+              if (evt) this.enableButton(evt.target)
             })
           } else {
             this.$router.push({
@@ -213,7 +189,7 @@
               }
             })
 
-            this.getDentists(searchQuery)
+            this.getDentists(evt, searchQuery)
           }
         } else {
           console.log('Choose Appointment Type')
@@ -223,8 +199,7 @@
         const index = document.getElementById('budget-range').selectedIndex
         return [(index * 50), ((index + 1) * 50)]
       },
-      getDentists (searchQuery) {
-        const target = document.querySelector('.submit-button')
+      getDentists (evt, searchQuery) {
         this.askUserToWaitWhileWeSearch()
         this.$root.callToFindDentists({
           searchQuery,
@@ -242,22 +217,35 @@
                   serviceId: searchQuery.appointmentSubtypeId,
                   dentistId: result,
                   callback: (searchResult, numberRetrieved) => {
-                    if (numberRetrieved === ids.length && document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
-                    target.disabled = false
-                    target.style.cursor = 'pointer'
-                    target.style.background = '#29aae1'
+                    if (numberRetrieved === ids.length && document.querySelector('.wait-overlay')) {
+                      document.querySelector('.wait-overlay').remove()
+                      this.populateResults(searchQuery.type, searchQuery.offset)
+                      if (evt) this.enableButton(evt.target)
+                    }
                   }
                 })
               })
             } else {
               if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
-              target.disabled = false
-              target.style.cursor = 'pointer'
-              target.style.background = '#29aae1'
               this.informOfNoDentist()
+              if (evt) this.enableButton(evt.target)
             }
           }
         })
+      },
+      populateResults (resultType, offset) {
+        const results = this.$store.state.searchResult[resultType].data[offset]
+        const resultSection = document.querySelector('.result-section')
+        this.clearDOMElementChildren(resultSection)
+        results.forEach((result) => {
+          const resultDOMElement = this.createResultDOMElement(result)
+          resultSection.appendChild(resultDOMElement)
+        })
+      },
+      clearDOMElementChildren (DOMElement) {
+        while (DOMElement.hasChildNodes()) {
+          DOMElement.firstChild.remove()
+        }
       },
       showNextPage (evt) {
         this.findDentists(evt, this.nextOffset, this.$store.state.searchResult.findDentists.seed)
@@ -303,6 +291,51 @@
         `, 'text/html')
 
         return DOMELement.body.firstChild
+      },
+      createResultDOMElement (result) {
+        const averageRatingDOMElement = this.createAverageRatingDOMElement(result.averageRating)
+        const resultDOMElement = new DOMParser().parseFromString(`          
+          <div class="result">
+            <div class="gravatar-section">
+              ${result.avatarCanvas.outerHTML}
+            </div>
+            <div class="about-section">
+              <div class="name">${result.name || 'Name: Not Supplied'}</div>
+              <div class="company-name">${result.companyName || 'Company Name: Not Supplied'}</div>
+              <div class="service">${result.service}</div>
+              <div class="fee">${result.fee}</div>
+              ${averageRatingDOMElement.outerHTML}
+              <div class="address">${result.address || 'Address: Not Supplied'}</div>
+            </div>
+            ${this.user.isPatient ? '<div class="request-appointment-section"><a href="/request-appointment" class="link-to-appointment">Request Appointment</a></div>' : ''}
+          </div>
+        `, 'text/html').body.firstChild
+        return resultDOMElement
+      },
+      createAverageRatingDOMElement (averageRating) {
+        const ratingsArray = []
+        for (let i = 0; i < 5; i++) {
+          ratingsArray.push(`
+            <div class="rating ${i < averageRating ? 'filled' : ''}"></div>
+          `)
+        }
+
+        return new DOMParser().parseFromString(`
+          <div class="average-rating">${ratingsArray.join(' ')}</div>
+        `, 'text/html').body.firstChild
+      },
+      disableButton (target) {
+        target.disabled = true
+        target.style.cursor = 'not-allowed'
+        target.style.background = '#adcddf'
+      },
+      enableButton (target) {
+        target.disabled = false
+        target.style.cursor = 'pointer'
+        target.style.background = '#29aae1'
+      },
+      notify (message) {
+        console.log(message)
       }
     },
     mounted: function () {
@@ -311,7 +344,7 @@
       this.populateAppointmentSubTypes(Number(this.$route.query.aTI))
       this.populateBudgets(Number(this.$route.query.bl), Number(this.$route.query.br))
       this.setEventListeners()
-      this.getDentists({
+      this.getDentists(null, {
         type: 'findDentists',
         state: Number(this.$route.query.st),
         appointmentTypeId: Number(this.$route.query.aTI),
@@ -405,74 +438,6 @@
     color: #7f7f7f;
   }
 
-  .result {
-    width: 95%;
-    border-bottom: 1px solid #a7a7a7;
-    min-height: 180px;
-    padding: 10px 0px;
-  }
-
-  .gravatar-section {
-    width: 60px;
-    height: 60px;
-    float: left;
-    display: inline-block;
-    margin-right: 10px;
-    border: 1px solid #c3c3c3;
-    border-radius: 6px;
-  }
-
-  .about-section {
-    width: 250px;
-    height: 150px;
-    display: inline-block;
-    float: left;
-  }
-
-  .about-section > div {
-    display: block;
-    height: 20px;
-    line-height: 20px;
-    font-size: 14px;
-    text-align: left;
-    width: 100%;
-  }
-
-  .profile-link {
-    font-size: 10px !important;
-    color: #bfced9;
-    cursor: pointer;
-  }
-
-  .average-rating > div {
-    background: #ffffff;
-    border: 1px solid #f9af3b;
-  }
-
-  .average-rating > .filled {
-    background: #f9af3b;
-  }
-
-  .request-appointment-section {
-    width: auto;
-    height: 150px;
-    line-height: 150px;
-    display: inline-block;
-    float: right;
-  }
-
-  .link-to-appointment {
-    width: 200px;
-    height: 40px;
-    line-height: 40px;
-    color: #ffffff;
-    background: #3285b1;
-    display: inline-block;
-    text-decoration: none;
-    font-size: 14px;
-    text-align: center;
-  }
-
   .submit {
     position: relative;
     top: -35px;
@@ -547,4 +512,79 @@
       transform: rotate(360deg);
     }
   }
+  
+  .result {
+    width: 95%;
+    border-bottom: 1px solid #a7a7a7;
+    min-height: 180px;
+    padding: 10px 0px;
+  }
+
+  .gravatar-section {
+    width: 60px;
+    height: 60px;
+    float: left;
+    display: inline-block;
+    margin-right: 10px;
+    border: 1px solid #c3c3c3;
+    border-radius: 6px;
+  }
+
+  .gravatar-section > canvas {
+    height: 100%;
+    width: 100%;
+    border-radius: 6px;
+  }
+
+  .about-section {
+    width: 250px;
+    height: 150px;
+    display: inline-block;
+    float: left;
+  }
+
+  .about-section > div {
+    display: block;
+    height: 20px;
+    line-height: 20px;
+    font-size: 14px;
+    text-align: left;
+    width: 100%;
+  }
+
+  .profile-link {
+    font-size: 10px !important;
+    color: #bfced9;
+    cursor: pointer;
+  }
+
+  .average-rating > div {
+    background: #ffffff;
+    border: 1px solid #f9af3b;
+  }
+
+  .average-rating > .filled {
+    background: #f9af3b;
+  }
+
+  .request-appointment-section {
+    width: auto;
+    height: 150px;
+    line-height: 150px;
+    display: inline-block;
+    float: right;
+  }
+
+  .link-to-appointment {
+    width: 200px;
+    height: 40px;
+    line-height: 40px;
+    color: #ffffff;
+    background: #3285b1;
+    display: inline-block;
+    text-decoration: none;
+    font-size: 14px;
+    text-align: center;
+  }
 </style>
+

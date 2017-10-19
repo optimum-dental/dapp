@@ -93,6 +93,7 @@ export default {
     return new Promise(function (resolve, reject) {
       commit(MUTATION_TYPES.CLEAR_SEARCH_RESULT, {
         type: payload.type,
+        offset: payload.offset,
         callback: () => resolve()
       })
     })
@@ -102,8 +103,16 @@ export default {
       commit(MUTATION_TYPES.SAVE_SEARCH_RESULT, {
         searchResult: payload.searchResult,
         type: payload.type,
+        offset: payload.offset,
+        coinbase: payload.coinbase,
         callback: (numberRetrieved = 0) => resolve(numberRetrieved)
       })
+    })
+  },
+  [ACTION_TYPES.SAVE_TOTAL_NUMBER_AVAILABLE] ({ commit }, payload) {
+    commit(MUTATION_TYPES.SAVE_TOTAL_NUMBER_AVAILABLE, {
+      totalNumberAvailable: payload.totalNumberAvailable,
+      type: payload.type
     })
   }
 }

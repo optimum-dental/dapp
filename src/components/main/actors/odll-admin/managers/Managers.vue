@@ -4,22 +4,14 @@
       <div class="title">Manage Managers</div>
 
       <div class="data-entry-section">
-        <input type="text" id="entry" class="entry" placeholder="Enter the Ethereum address of a Manager to add to the platform" @input="clearError">
+        <input type="text" id="entry" class="entry" placeholder="Enter the Ethereum address of a Manager you want to add to the platform" @input="clearError">
         <input type="button" class="add" value="Add Manager" @click="addManager">
       </div>
 
-      <div class="result-section">
-        <div class="result" v-for="manager in fetchResults">
-          <div class="gravatar-section"></div>
-          <div class="about-section">
-            <div class="name">{{ manager.name }}</div>
-            <div class="company-name">{{ manager.companyName }}</div>
-            <div class="address">{{ manager.address }}</div>
-            <div class="profile-link">See more</div>
-          </div>
-          <div class="action">{{ action(manager.isBlocked) }}</div>
-        </div>
-      </div>
+      <div class="result-section"></div>
+      
+      <div v-if="isThereMore" @click="showNextPage" class="fetch-next">Next</div>
+      <div v-if="pageNumber !== 1" @click="showPreviousPage" class="fetch-previous">Previous</div>
     </div>
   </div>
 </template>
@@ -27,14 +19,23 @@
 <script type="text/javascript">
   export default {
     computed: {
+      isThereMore () {
+        return this.$store.state.searchResult.fetchManagers.totalNumberAvailable > (this.pageNumber * this.perPage)
+      },
       fetchResults () {
-        return this.$store.state.searchResult.fetchManagers
+        return this.$store.state.searchResult.fetchManagers.data[this.getPageIndex(this.currentOffset)] || []
       },
       pageNumber () {
         return (Number(this.$route.query.o || 0) / this.perPage) + 1
       },
       nextOffset () {
-        return this.pageNumber * this.perPage
+        return (this.pageNumber * this.perPage)
+      },
+      currentOffset () {
+        return (this.nextOffset - this.perPage)
+      },
+      previousOffset () {
+        return (this.currentOffset - this.perPage)
       },
       perPage () {
         return 5
@@ -44,7 +45,8 @@
       action (isBlocked) {
         return isBlocked ? 'Unblock Manager' : 'Block Manager'
       },
-      fetchManagers (offset = 0, seed = undefined) {
+      fetchManagers (evt = null, offset = 0, seed = undefined) {
+        if (evt) this.disableButton(evt.target)
         const fetchQuery = {
           type: 'fetchManagers',
           offset,
@@ -61,7 +63,7 @@
           }
         })
 
-        this.getManagers(fetchQuery)
+        this.getManagers(evt, fetchQuery)
       },
       clearError (evt) {
         const target = evt.target
@@ -75,7 +77,7 @@
         if (addressDOMElement.value.trim() !== '' && addressPattern.test(addressDOMElement.value.trim())) {
           this.$root.callToAddOfficialToODLL({
             userObject: {
-              address: addressDOMElement.value,
+              address: addressDOMElement.value.toLowerCase(),
               userType: 3
             },
             callback: (status = false) => {
@@ -88,38 +90,65 @@
           addressDOMElement.classList.add('error')
         }
       },
-      getManagers (fetchQuery) {
+      getManagers (evt, fetchQuery) {
         this.askUserToWaitWhileWeSearch()
         this.$root.callToFetchManagers({
           fetchQuery,
           callback: (fetchResults = []) => {
-            const totalNumber = fetchResults[0]
-            if (totalNumber > (fetchResults.length + fetchQuery.offset)) this.showNextPageButton()
+            const totalNumberAvailable = fetchResults[0]
             const ids = fetchResults[1]
+            this.$root.callToSaveTotalNumberAvailable(fetchQuery.type, totalNumberAvailable)
             // update result view
             if (ids && ids.length > 0) {
               ids.forEach((result) => {
                 this.$root.callToGetManager({
                   type: fetchQuery.type,
+                  offset: fetchQuery.offset,
                   managerId: result,
                   callback: (searchResult, numberRetrieved) => {
-                    console.log(searchResult, numberRetrieved)
-                    if (numberRetrieved === ids.length && document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
+                    if (numberRetrieved === ids.length && document.querySelector('.wait-overlay')) {
+                      document.querySelector('.wait-overlay').remove()
+                      this.populateResults(fetchQuery.type, fetchQuery.offset)
+                      if (evt) this.enableButton(evt.target)
+                    }
                   }
                 })
               })
             } else {
               if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
               this.informOfNoOfficial()
+              if (evt) this.enableButton(evt.target)
             }
           }
         })
       },
-      showNextPageButton () {
-        const nextPageButton = this.createNextPageButton()
-        nextPageButton.addEventListener('click', () => {
-          this.fetchManagers(this.nextOffset, this.$store.state.searchSeed.fetchManagers)
+      populateResults (resultType, offset) {
+        const results = this.$store.state.searchResult[resultType].data[offset]
+        const resultSection = document.querySelector('.result-section')
+        this.clearDOMElementChildren(resultSection)
+        results.forEach((result) => {
+          const resultDOMElement = this.createResultDOMElement(result)
+          resultSection.appendChild(resultDOMElement)
         })
+      },
+      clearDOMElementChildren (DOMElement) {
+        while (DOMElement.hasChildNodes()) {
+          DOMElement.firstChild.remove()
+        }
+      },
+      showNextPage (evt) {
+        this.fetchManagers(evt, this.nextOffset, this.$store.state.searchResult.fetchManagers.seed)
+      },
+      showPreviousPage (evt) {
+        const offsetData = this.$store.state.searchResult.fetchManagers.data[this.getPageIndex(this.previousOffset)]
+        if (offsetData && offsetData.length > 0) {
+          this.populateResults('fetchManagers', this.previousOffset)
+        } else {
+          this.fetchManagers(evt, this.previousOffset, this.$store.state.searchResult.fetchManagers.seed)
+        }
+      },
+      getPageIndex (offset = 0) {
+        return offset / this.perPage
       },
       askUserToWaitWhileWeSearch () {
         if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
@@ -153,6 +182,24 @@
 
         return DOMELement.body.firstChild
       },
+      createResultDOMElement (result) {
+        const resultDOMElement = new DOMParser().parseFromString(`          
+          <div class="result">
+            <div class="gravatar-section">
+              ${result.avatarCanvas.outerHTML}
+            </div>
+            <div class="about-section">
+              <div class="name">${result.name || 'Name: Not Supplied'}</div>
+              <div class="email">${result.email || 'Email: Not Supplied'}</div>
+              <div class="address">${result.address || 'Address: Not Supplied'}</div>
+            </div>
+            <div class="action-section">
+              <input type="button" value="${result.isBlocked ? 'Unblock Manager' : 'Block Manager'}" class="action-button">
+            </div>
+          </div>
+        `, 'text/html').body.firstChild
+        return resultDOMElement
+      },
       disableButton (target) {
         target.disabled = true
         target.style.cursor = 'not-allowed'
@@ -168,7 +215,7 @@
       }
     },
     mounted: function () {
-      this.getManagers({
+      this.getManagers(null, {
         type: 'fetchManagers',
         offset: this.$route.query.o ? Number(this.$route.query.o) : 0,
         limit: this.$route.query.l ? Number(this.$route.query.l) : this.perPage,
@@ -232,31 +279,7 @@
   .entry.error {
     border: 1px solid #f18787;
   }
-
-  .result {
-    width: 100%;
-    border-bottom: 1px solid #dcdede;
-    min-height: 300px;
-  }
-
-  .gravatar-section {
-    width: 120px;
-    height: 100%;
-  }
-
-  .about-section {
-    width: 350px;
-    height: 100%;
-  }
-
-  .action {
-    width: 120px;
-    height: 40px;
-    line-height: 40px;
-    color: #ffffff;
-    background: #29aae3;
-  }
-
+  
   .add {
     margin-right: 7px;
     padding: 2px;
@@ -325,5 +348,73 @@
     100% {
       transform: rotate(360deg);
     }
+  }
+
+  .result {
+    width: 95%;
+    border-bottom: 1px solid #a7a7a7;
+    min-height: 180px;
+    padding: 10px 0px;
+  }
+
+  .gravatar-section {
+    width: 60px;
+    height: 60px;
+    float: left;
+    display: inline-block;
+    margin-top: 10px;
+    margin-right: 20px;
+    border: 1px solid #c3c3c3;
+    border-radius: 6px;
+  }
+
+  .gravatar-section > canvas {
+    height: 100%;
+    width: 100%;
+    border-radius: 6px;
+  }
+
+  .about-section {
+    width: 250px;
+    height: 150px;
+    display: inline-block;
+    float: left;
+  }
+
+  .about-section > div {
+    display: block;
+    height: 35px;
+    line-height: 35px;
+    font-size: 14px;
+    text-align: left;
+    width: 100%;
+  }
+
+  .profile-link {
+    font-size: 10px !important;
+    color: #bfced9;
+    cursor: pointer;
+  }
+
+  .action-section {
+    width: auto;
+    height: 150px;
+    line-height: 150px;
+    display: inline-block;
+    float: right;
+  }
+
+  .action-button {
+    width: 200px;
+    height: 40px;
+    line-height: 40px;
+    color: #ffffff;
+    background: #3285b1;
+    display: inline-block;
+    outline: none;
+    border: 0px;
+    cursor: pointer;
+    font-size: 14px;
+    text-align: center;
   }
 </style>

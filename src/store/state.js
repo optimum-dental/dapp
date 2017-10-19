@@ -48,12 +48,21 @@ export default {
   isDAppReady: false,
   isValidUserBut: '0',
   originalIsValidUserBut: '0',
-  searchSeed: {
-    findDentists: null,
-    fetchManagers: null
-  },
   searchResult: {
-    fetchDentists: [],
-    fetchManagers: []
+    findDentists: {
+      data: {},
+      seed: null,
+      totalNumberAvailable: 0
+    },
+    fetchDentists: {
+      data: {},
+      seed: null,
+      totalNumberAvailable: 0
+    },
+    fetchManagers: {
+      data: {},
+      seed: null,
+      totalNumberAvailable: 0
+    }
   }
 }

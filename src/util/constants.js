@@ -23,7 +23,8 @@ export const MUTATION_TYPES = {
   UPDATE_WEB3_PROPERTIES: 'updateWeb3Properties',
   SAVE_CURRENT_SEARCH_SEED: 'saveCurrentSearchSeed',
   CLEAR_SEARCH_RESULT: 'clearSearchResult',
-  SAVE_SEARCH_RESULT: 'saveSearchResult'
+  SAVE_SEARCH_RESULT: 'saveSearchResult',
+  SAVE_TOTAL_NUMBER_AVAILABLE: 'saveTotalNumberAvailable'
 }
 
 export const ACTION_TYPES = MUTATION_TYPES

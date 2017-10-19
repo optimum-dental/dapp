@@ -125,7 +125,8 @@ new Vue({
       ACTION_TYPES.UPDATE_USER_STATE,
       ACTION_TYPES.SAVE_SEARCH_RESULT,
       ACTION_TYPES.CLEAR_SEARCH_RESULT,
-      ACTION_TYPES.SAVE_CURRENT_SEARCH_SEED
+      ACTION_TYPES.SAVE_CURRENT_SEARCH_SEED,
+      ACTION_TYPES.SAVE_TOTAL_NUMBER_AVAILABLE
     ]),
     callUpdateUserGravatar (payload = null) {
       this[ACTION_TYPES.UPDATE_USER_GRAVATAR](payload)
@@ -159,7 +160,8 @@ new Vue({
         .catch(error => console.error(error))
 
         this[ACTION_TYPES.CLEAR_SEARCH_RESULT]({
-          type: searchQuery.type
+          type: searchQuery.type,
+          offset: searchQuery.offset
         })
         .then(() => {
           if (payload.callback) payload.callback(searchResults)
@@ -177,11 +179,14 @@ new Vue({
       const blockchainParams = Object.assign({}, payload)
       delete blockchainParams.type
       delete blockchainParams.callback
+      delete blockchainParams.offset
       Search.getDentistDataFromFind(this.$store.state, blockchainParams)
       .then((searchResult) => {
         this[ACTION_TYPES.SAVE_SEARCH_RESULT]({
           searchResult,
-          type: payload.type
+          type: payload.type,
+          offset: payload.offset,
+          coinbase: payload.dentistId
         })
         .then((numberRetrieved) => {
           if (payload.callback) payload.callback(searchResult, numberRetrieved)
@@ -193,6 +198,12 @@ new Vue({
       .catch((err) => {
         if (payload.callback) payload.callback()
         console.error(err, 'Unable to find dentists')
+      })
+    },
+    callToSaveTotalNumberAvailable (searchType, totalNumberAvailable) {
+      this[ACTION_TYPES.SAVE_TOTAL_NUMBER_AVAILABLE]({
+        type: searchType,
+        totalNumberAvailable
       })
     },
     callSetIsValidUserBut (newValue) {
@@ -216,7 +227,8 @@ new Vue({
         })
 
         this[ACTION_TYPES.CLEAR_SEARCH_RESULT]({
-          type: fetchQuery.type
+          type: fetchQuery.type,
+          offset: fetchQuery.offset
         })
         .then(() => {
           if (payload.callback) payload.callback(fetchResults)
@@ -234,11 +246,14 @@ new Vue({
       const blockchainParams = Object.assign({}, payload)
       delete blockchainParams.callback
       delete blockchainParams.type
+      delete blockchainParams.offset
       Search.getManager(this.$store.state, blockchainParams)
       .then((searchResult) => {
         this[ACTION_TYPES.SAVE_SEARCH_RESULT]({
           searchResult,
-          type: payload.type
+          type: payload.type,
+          offset: payload.offset,
+          coinbase: payload.managerId
         })
         .then((numberRetrieved) => {
           if (payload.callback) payload.callback(searchResult, numberRetrieved)
@@ -263,7 +278,8 @@ new Vue({
         .catch(error => console.error(error))
 
         this[ACTION_TYPES.CLEAR_SEARCH_RESULT]({
-          type: fetchQuery.type
+          type: fetchQuery.type,
+          offset: fetchQuery.offset
         })
         .then(() => {
           if (payload.callback) payload.callback(fetchResults)
@@ -281,11 +297,14 @@ new Vue({
       const blockchainParams = Object.assign({}, payload)
       delete blockchainParams.callback
       delete blockchainParams.type
+      delete blockchainParams.offset
       Search.getDentist(this.$store.state, blockchainParams)
       .then((searchResult) => {
         this[ACTION_TYPES.SAVE_SEARCH_RESULT]({
           searchResult,
-          type: payload.type
+          type: payload.type,
+          offset: payload.offset,
+          coinbase: payload.dentistId
         })
         .then((numberRetrieved) => {
           if (payload.callback) payload.callback(searchResult, numberRetrieved)

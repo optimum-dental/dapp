@@ -47,6 +47,29 @@ function getRawData (dataObject, datakeys) {
   return result
 }
 
+function getGravatarFor (payload = {}) {
+  const colorPosition = Math.abs(getHash(payload.coinbase) % IDENTICON_COLORS.length)
+  const identiconColor = IDENTICON_COLORS[colorPosition]
+  const email = payload.email ? payload.email : ''
+
+  if (email && email.trim() !== '') {
+    avatarCanvasElement(email)
+    .then((avatarCanvas, gravatar) => {
+      if (payload.callback) payload.callback(avatarCanvas)
+    })
+  } else {
+    const avatarCanvas = ethereumBlockies.create({
+      seed: payload.coinbase,
+      color: identiconColor.color,
+      bgcolor: identiconColor.bgColor,
+      size: 8,
+      scale: 13,
+      spotcolor: identiconColor.spotColor
+    })
+    if (payload.callback) payload.callback(avatarCanvas)
+  }
+}
+
 function updateUserGravatar (state, userCopy, payload = null) {
   const colorPosition = Math.abs(getHash(state.web3.coinbase) % IDENTICON_COLORS.length)
   const identiconColor = IDENTICON_COLORS[colorPosition]
@@ -196,29 +219,40 @@ export default {
     }
   },
   [MUTATION_TYPES.SAVE_CURRENT_SEARCH_SEED] (state, payload) {
-    let searchSeedCopy = state.searchSeed
-    searchSeedCopy[payload.type] = payload.seed
-    state.searchSeed = searchSeedCopy
+    let searchResultCopy = state.searchResult
+    searchResultCopy[payload.type].seed = payload.seed
+    state.searchResult = searchResultCopy
     if (payload.callback) payload.callback()
   },
   [MUTATION_TYPES.CLEAR_SEARCH_RESULT] (state, payload) {
     let searchResultCopy = state.searchResult
-    searchResultCopy[payload.type] = []
+    searchResultCopy[payload.type].data[payload.offset] = []
     state.searchResult = searchResultCopy
     if (payload.callback) payload.callback()
   },
   [MUTATION_TYPES.SAVE_SEARCH_RESULT] (state, payload) {
-    const searchResult = payload.searchResult || {}
+    const searchResult = payload.searchResult
     const searchResultCopy = state.searchResult
-    searchResultCopy[payload.type] = searchResultCopy[payload.type] ? searchResultCopy[payload.type] : []
-    let [ type, gravatar, name, companyName, email, street, city, userState, country, zipCode, phoneNumber ] = stringifyBytesData(state, searchResult, [ 'type', 'gravatar', 'name', 'companyName', 'email', 'street', 'city', 'state', 'country', 'zipCode', 'phoneNumber' ])
+    searchResultCopy[payload.type].data[payload.offset] = []
+    let [ gravatar, name, companyName, email, street, city, zipCode, phoneNumber ] = stringifyBytesData(state, searchResult, [ 'gravatar', 'name', 'companyName', 'email', 'street', 'city', 'zipCode', 'phoneNumber' ])
     Object.assign(searchResult, {
-      type, gravatar, name, companyName, email, street, city, state: userState, country, zipCode, phoneNumber
+      gravatar, name, companyName, email, street, city, zipCode, phoneNumber
     })
 
-    searchResultCopy[payload.type].push(searchResult)
-
+    getGravatarFor({
+      email: searchResult.email,
+      coinbase: payload.coinbase,
+      callback: (avatarCanvas) => {
+        searchResult.avatarCanvas = avatarCanvas
+        searchResultCopy[payload.type].data[payload.offset].push(searchResult)
+        state.searchResult = searchResultCopy
+        if (payload.callback) payload.callback(searchResultCopy[payload.type].data[payload.offset].length)
+      }
+    })
+  },
+  [MUTATION_TYPES.SAVE_TOTAL_NUMBER_AVAILABLE] (state, payload) {
+    const searchResultCopy = state.searchResult
+    searchResultCopy[payload.type].totalNumberAvailable = payload.totalNumberAvailable
     state.searchResult = searchResultCopy
-    if (payload.callback) payload.callback(searchResultCopy[payload.type].length)
   }
 }
