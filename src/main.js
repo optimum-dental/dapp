@@ -123,10 +123,7 @@ new Vue({
       ACTION_TYPES.RESET_IS_VALID_USER_BUT,
       ACTION_TYPES.SET_CURRENT_VIEW,
       ACTION_TYPES.UPDATE_USER_STATE,
-      ACTION_TYPES.SAVE_SEARCH_RESULT,
-      ACTION_TYPES.CLEAR_SEARCH_RESULT,
-      ACTION_TYPES.SAVE_CURRENT_SEARCH_SEED,
-      ACTION_TYPES.SAVE_TOTAL_NUMBER_AVAILABLE
+      ACTION_TYPES.SAVE_SEARCH_RESULT
     ]),
     callUpdateUserGravatar (payload = null) {
       this[ACTION_TYPES.UPDATE_USER_GRAVATAR](payload)
@@ -147,173 +144,35 @@ new Vue({
         console.error(err, 'Unable to write user data')
       })
     },
-    callToFindDentists (payload = null) {
-      const searchQuery = payload.searchQuery
-      const blockchainParams = Object.assign({}, searchQuery)
-      delete blockchainParams.type
-      Search.findDentists(this.$store.state, blockchainParams)
-      .then((searchResults) => {
-        this[ACTION_TYPES.SAVE_CURRENT_SEARCH_SEED]({
-          type: searchQuery.type,
-          seed: searchQuery.seed
-        })
-        .catch(error => console.error(error))
-
-        this[ACTION_TYPES.CLEAR_SEARCH_RESULT]({
-          type: searchQuery.type,
-          offset: searchQuery.offset
-        })
-        .then(() => {
-          if (payload.callback) payload.callback(searchResults)
-        })
-        .catch((error) => {
-          console.error('Unable to clear search result state', error)
-        })
-      })
-      .catch((err) => {
-        if (payload.callback) payload.callback()
-        console.error(err, 'Unable to find dentists')
-      })
-    },
-    callToGetDentistDataFromFind (payload = null) {
-      const blockchainParams = Object.assign({}, payload)
-      delete blockchainParams.type
-      delete blockchainParams.callback
-      delete blockchainParams.offset
-      Search.getDentistDataFromFind(this.$store.state, blockchainParams)
-      .then((searchResult) => {
-        this[ACTION_TYPES.SAVE_SEARCH_RESULT]({
-          searchResult,
-          type: payload.type,
-          offset: payload.offset,
-          coinbase: payload.dentistId
-        })
-        .then((numberRetrieved) => {
-          if (payload.callback) payload.callback(searchResult, numberRetrieved)
-        })
-        .catch((error) => {
-          console.error(error)
-        })
-      })
-      .catch((err) => {
-        if (payload.callback) payload.callback()
-        console.error(err, 'Unable to find dentists')
-      })
-    },
-    callToSaveTotalNumberAvailable (searchType, totalNumberAvailable) {
-      this[ACTION_TYPES.SAVE_TOTAL_NUMBER_AVAILABLE]({
-        type: searchType,
-        totalNumberAvailable
-      })
-    },
     callSetIsValidUserBut (newValue) {
       this[ACTION_TYPES.SET_IS_VALID_USER_BUT](newValue)
     },
     callResetIsValidUserBut () {
       this[ACTION_TYPES.RESET_IS_VALID_USER_BUT]()
     },
-    callToFetchManagers (payload) {
+    callToFetchDataObjects (payload) {
       const fetchQuery = payload.fetchQuery
       const blockchainParams = Object.assign({}, fetchQuery)
-      delete blockchainParams.type
-      Search.fetchManagers(this.$store.state, blockchainParams)
-      .then((fetchResults) => {
-        this[ACTION_TYPES.SAVE_CURRENT_SEARCH_SEED]({
+      // delete blockchainParams.type
+      Search.fetchDataObjects(this.$store.state, blockchainParams)
+      .then((fetchResult) => {
+        this[ACTION_TYPES.SAVE_SEARCH_RESULT]({
           type: fetchQuery.type,
-          seed: fetchQuery.seed
+          seed: fetchQuery.seed,
+          offset: fetchQuery.offset,
+          results: fetchResult.results,
+          totalNumberAvailable: fetchResult.totalNumberAvailable
+        })
+        .then(() => {
+          if (payload.callback) payload.callback()
         })
         .catch((error) => {
           console.error(error)
         })
-
-        this[ACTION_TYPES.CLEAR_SEARCH_RESULT]({
-          type: fetchQuery.type,
-          offset: fetchQuery.offset
-        })
-        .then(() => {
-          if (payload.callback) payload.callback(fetchResults)
-        })
-        .catch((error) => {
-          console.error('Unable to clear search result state', error)
-        })
       })
       .catch((err) => {
         if (payload.callback) payload.callback()
-        console.error(err, 'Unable to find dentists')
-      })
-    },
-    callToGetManager (payload = null) {
-      const blockchainParams = Object.assign({}, payload)
-      delete blockchainParams.callback
-      delete blockchainParams.type
-      delete blockchainParams.offset
-      Search.getManager(this.$store.state, blockchainParams)
-      .then((searchResult) => {
-        this[ACTION_TYPES.SAVE_SEARCH_RESULT]({
-          searchResult,
-          type: payload.type,
-          offset: payload.offset,
-          coinbase: payload.managerId
-        })
-        .then((numberRetrieved) => {
-          if (payload.callback) payload.callback(searchResult, numberRetrieved)
-        })
-        .catch(error => console.error(error))
-      })
-      .catch((err) => {
-        if (payload.callback) payload.callback()
-        console.error(err, 'Unable to find manager')
-      })
-    },
-    callToFetchDentists (payload) {
-      const fetchQuery = payload.fetchQuery
-      const blockchainParams = Object.assign({}, fetchQuery)
-      delete blockchainParams.type
-      Search.fetchDentists(this.$store.state, blockchainParams)
-      .then((fetchResults) => {
-        this[ACTION_TYPES.SAVE_CURRENT_SEARCH_SEED]({
-          type: fetchQuery.type,
-          seed: fetchQuery.seed
-        })
-        .catch(error => console.error(error))
-
-        this[ACTION_TYPES.CLEAR_SEARCH_RESULT]({
-          type: fetchQuery.type,
-          offset: fetchQuery.offset
-        })
-        .then(() => {
-          if (payload.callback) payload.callback(fetchResults)
-        })
-        .catch((error) => {
-          console.error('Unable to clear search result state', error)
-        })
-      })
-      .catch((err) => {
-        if (payload.callback) payload.callback()
-        console.error(err, 'Unable to find dentists')
-      })
-    },
-    callToGetDentist (payload = null) {
-      const blockchainParams = Object.assign({}, payload)
-      delete blockchainParams.callback
-      delete blockchainParams.type
-      delete blockchainParams.offset
-      Search.getDentist(this.$store.state, blockchainParams)
-      .then((searchResult) => {
-        this[ACTION_TYPES.SAVE_SEARCH_RESULT]({
-          searchResult,
-          type: payload.type,
-          offset: payload.offset,
-          coinbase: payload.dentistId
-        })
-        .then((numberRetrieved) => {
-          if (payload.callback) payload.callback(searchResult, numberRetrieved)
-        })
-        .catch(error => console.error(error))
-      })
-      .catch((err) => {
-        if (payload.callback) payload.callback()
-        console.error(err, 'Unable to find dentists')
+        console.error(err, `Unable to fetch data for: ${fetchQuery.type}`)
       })
     },
     callToAddOfficialToODLL (payload = null) {

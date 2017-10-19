@@ -161,8 +161,9 @@
             budget: this.getBudget(),
             offset,
             limit: this.perPage,
-            seed: seed || Math.random()
-            // seed: this.$store.state.searchSeed.findDentists || Math.ceil(Number(this.$route.query.sd) * 113)
+            seed: seed || Math.random(),
+            callOnEach: 'getDentistDataFromFind',
+            callOnEachParams: dentistId => ({dentistId, serviceTypeId: appointmentTypeId, serviceId: appointmentSubtypeId})
           }
 
           let errors = [appointmentTypeId === 0 ? document.getElementById('appointment-type') : undefined, appointmentSubtypeId === 0 ? document.getElementById('appointment-sub-type') : undefined]
@@ -199,42 +200,28 @@
         const index = document.getElementById('budget-range').selectedIndex
         return [(index * 50), ((index + 1) * 50)]
       },
-      getDentists (evt, searchQuery) {
+      getDentists (evt, fetchQuery) {
         this.askUserToWaitWhileWeSearch()
-        this.$root.callToFindDentists({
-          searchQuery,
-          callback: (searchResults = []) => {
-            const totalNumberAvailable = searchResults[0] || 0
-            const ids = searchResults[1]
-            this.$root.callToSaveTotalNumberAvailable(searchQuery.type, totalNumberAvailable)
+        this.$root.callToFetchDataObjects({
+          fetchQuery,
+          callback: () => {
             // update result view
-            if (ids && ids.length > 0) {
-              ids.forEach((result) => {
-                this.$root.callToGetDentistDataFromFind({
-                  type: searchQuery.type,
-                  offset: searchQuery.offset,
-                  serviceTypeId: searchQuery.appointmentTypeId,
-                  serviceId: searchQuery.appointmentSubtypeId,
-                  dentistId: result,
-                  callback: (searchResult, numberRetrieved) => {
-                    if (numberRetrieved === ids.length && document.querySelector('.wait-overlay')) {
-                      document.querySelector('.wait-overlay').remove()
-                      this.populateResults(searchQuery.type, searchQuery.offset)
-                      if (evt) this.enableButton(evt.target)
-                    }
-                  }
-                })
-              })
+            if (this.$store.state.searchResult[fetchQuery.type].data[fetchQuery.offset].length > 0) {
+              const results = this.$store.state.searchResult[fetchQuery.type].data[fetchQuery.offset]
+              if (document.querySelector('.wait-overlay')) {
+                document.querySelector('.wait-overlay').remove()
+                this.populateResults(results)
+                if (evt) this.enableButton(evt.target)
+              }
             } else {
               if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
-              this.informOfNoDentist()
+              this.informOfNoOfficial()
               if (evt) this.enableButton(evt.target)
             }
           }
         })
       },
-      populateResults (resultType, offset) {
-        const results = this.$store.state.searchResult[resultType].data[offset]
+      populateResults (results) {
         const resultSection = document.querySelector('.result-section')
         this.clearDOMElementChildren(resultSection)
         results.forEach((result) => {
@@ -267,7 +254,7 @@
         let waitOverlayDOMElement = this.createWaitOverlayDOMElement()
         document.querySelector('.result-section').insertBefore(waitOverlayDOMElement, document.querySelector('.result'))
       },
-      informOfNoDentist () {
+      informOfNoOfficial () {
         if (document.querySelector('.no-dentist')) document.querySelector('.no-dentist').remove()
         let noDentistDOMElement = this.createNoDentistDOMElement()
         document.querySelector('.result-section').insertBefore(noDentistDOMElement, document.querySelector('.result'))
@@ -351,7 +338,9 @@
         budget: [Number(this.$route.query.bl), Number(this.$route.query.br)],
         offset: Number(this.$route.query.o),
         limit: Number(this.$route.query.l),
-        seed: Math.ceil(Number(this.$route.query.sd) * 113)
+        seed: Math.ceil(Number(this.$route.query.sd) * 113),
+        callOnEach: 'getDentistDataFromFind',
+        callOnEachParams: dentistId => ({dentistId, serviceTypeId: Number(this.$route.query.aTI), serviceId: Number(this.$route.query.aSI)})
       })
     }
   }
@@ -376,7 +365,7 @@
     width: 90%;
     font-size: 12px;
     margin: 30px auto;
-    color: #adadad;
+    color: #7a7a7a;
     display: flex;
     flex-direction: column;
   }
@@ -527,6 +516,7 @@
     margin-right: 10px;
     border: 1px solid #c3c3c3;
     border-radius: 6px;
+    padding: 3px;
   }
 
   .gravatar-section > canvas {

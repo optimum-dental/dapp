@@ -49,7 +49,7 @@
     width: 80%;
     font-size: 12px;
     margin: 30px auto;
-    color: #adadad;
+    color: #9a9a9a;
     display: flex;
     flex-direction: column;
     align-items: center;

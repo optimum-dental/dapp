@@ -80,39 +80,16 @@ export default {
   [ACTION_TYPES.UPDATE_WEB3_PROPERTIES] ({ commit }, payload) {
     commit(MUTATION_TYPES.UPDATE_WEB3_PROPERTIES, payload)
   },
-  [ACTION_TYPES.SAVE_CURRENT_SEARCH_SEED] ({ commit }, payload) {
-    return new Promise(function (resolve, reject) {
-      commit(MUTATION_TYPES.SAVE_CURRENT_SEARCH_SEED, {
-        type: payload.type,
-        seed: payload.seed,
-        callback: () => resolve()
-      })
-    })
-  },
-  [ACTION_TYPES.CLEAR_SEARCH_RESULT] ({ commit }, payload) {
-    return new Promise(function (resolve, reject) {
-      commit(MUTATION_TYPES.CLEAR_SEARCH_RESULT, {
-        type: payload.type,
-        offset: payload.offset,
-        callback: () => resolve()
-      })
-    })
-  },
   [ACTION_TYPES.SAVE_SEARCH_RESULT] ({ commit }, payload) {
     return new Promise(function (resolve, reject) {
       commit(MUTATION_TYPES.SAVE_SEARCH_RESULT, {
-        searchResult: payload.searchResult,
+        results: payload.results,
+        totalNumberAvailable: payload.totalNumberAvailable,
         type: payload.type,
         offset: payload.offset,
-        coinbase: payload.coinbase,
-        callback: (numberRetrieved = 0) => resolve(numberRetrieved)
+        seed: payload.seed,
+        callback: () => resolve()
       })
-    })
-  },
-  [ACTION_TYPES.SAVE_TOTAL_NUMBER_AVAILABLE] ({ commit }, payload) {
-    commit(MUTATION_TYPES.SAVE_TOTAL_NUMBER_AVAILABLE, {
-      totalNumberAvailable: payload.totalNumberAvailable,
-      type: payload.type
     })
   }
 }

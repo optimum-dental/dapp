@@ -51,7 +51,9 @@
           type: 'fetchManagers',
           offset,
           limit: this.perPage,
-          seed: seed || Math.random()
+          seed: seed || Math.random(),
+          callOnEach: 'getManager',
+          callOnEachParams: managerId => ({managerId})
         }
 
         this.$router.push({
@@ -92,28 +94,17 @@
       },
       getManagers (evt, fetchQuery) {
         this.askUserToWaitWhileWeSearch()
-        this.$root.callToFetchManagers({
+        this.$root.callToFetchDataObjects({
           fetchQuery,
-          callback: (fetchResults = []) => {
-            const totalNumberAvailable = fetchResults[0]
-            const ids = fetchResults[1]
-            this.$root.callToSaveTotalNumberAvailable(fetchQuery.type, totalNumberAvailable)
+          callback: () => {
             // update result view
-            if (ids && ids.length > 0) {
-              ids.forEach((result) => {
-                this.$root.callToGetManager({
-                  type: fetchQuery.type,
-                  offset: fetchQuery.offset,
-                  managerId: result,
-                  callback: (searchResult, numberRetrieved) => {
-                    if (numberRetrieved === ids.length && document.querySelector('.wait-overlay')) {
-                      document.querySelector('.wait-overlay').remove()
-                      this.populateResults(fetchQuery.type, fetchQuery.offset)
-                      if (evt) this.enableButton(evt.target)
-                    }
-                  }
-                })
-              })
+            if (this.$store.state.searchResult[fetchQuery.type].data[fetchQuery.offset].length > 0) {
+              const results = this.$store.state.searchResult[fetchQuery.type].data[fetchQuery.offset]
+              if (document.querySelector('.wait-overlay')) {
+                document.querySelector('.wait-overlay').remove()
+                this.populateResults(results)
+                if (evt) this.enableButton(evt.target)
+              }
             } else {
               if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
               this.informOfNoOfficial()
@@ -122,8 +113,7 @@
           }
         })
       },
-      populateResults (resultType, offset) {
-        const results = this.$store.state.searchResult[resultType].data[offset]
+      populateResults (results) {
         const resultSection = document.querySelector('.result-section')
         this.clearDOMElementChildren(resultSection)
         results.forEach((result) => {
@@ -218,7 +208,9 @@
         type: 'fetchManagers',
         offset: this.$route.query.o ? Number(this.$route.query.o) : 0,
         limit: this.$route.query.l ? Number(this.$route.query.l) : this.perPage,
-        seed: this.$route.query.sd ? Math.ceil(Number(this.$route.query.sd) * 113) : Math.ceil(Math.random() * 113)
+        seed: this.$route.query.sd ? Math.ceil(Number(this.$route.query.sd) * 113) : Math.ceil(Math.random() * 113),
+        callOnEach: 'getManager',
+        callOnEachParams: managerId => ({managerId})
       })
     }
   }
@@ -240,7 +232,7 @@
     width: 90%;
     font-size: 12px;
     margin: 30px auto;
-    color: #adadad;
+    color: #7a7a7a;
     display: flex;
     flex-direction: column;
   }
@@ -266,13 +258,17 @@
   .entry {
     height: 40px;
     line-height: 40px;
-    width: 80%;
+    width: 85%;
     display: inline-block;
     font-size: 14px;
-    color: #9a9a9a;
+    color: #7a7a7a;
     outline: none;
     border: 1px solid #dcdede;
-    padding: 0px 5px;
+    padding: 0px 10px;
+  }
+
+  .entry::placeholder {
+    color: #bababa;
   }
 
   .entry.error {
@@ -280,7 +276,6 @@
   }
   
   .add {
-    margin-right: 7px;
     padding: 2px;
     text-align: center;
     float: right;
@@ -289,7 +284,8 @@
     cursor: pointer;
     height: 40px;
     line-height: 40px;
-    width: 100px;
+    width: 15%;
+    min-width: 100px;
     background: #29aae1;
     color: #ffffff;
     font-size: 14px;
@@ -365,6 +361,7 @@
     margin-right: 20px;
     border: 1px solid #c3c3c3;
     border-radius: 6px;
+    padding: 3px;
   }
 
   .gravatar-section > canvas {
@@ -404,7 +401,7 @@
   }
 
   .action-button {
-    width: 200px;
+    width: 130px;
     height: 40px;
     line-height: 40px;
     color: #ffffff;

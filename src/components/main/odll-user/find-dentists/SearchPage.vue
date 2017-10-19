@@ -21,7 +21,7 @@
       </div>
 
       <div class="search-item">
-        <div class="search-param">Budget <span class="small-text">[optional]</span></div>
+        <div class="search-param budget">Budget <span class="small-text">[optional]</span></div>
         <div id="budget-range" class="noUiSlider"></div>
       </div>
 
@@ -306,7 +306,7 @@
     width: 80%;
     font-size: 12px;
     margin: 30px auto;
-    color: #adadad;
+    color: #7a7a7a;
     display: flex;
     flex-direction: column;
   }
@@ -324,7 +324,7 @@
     width: 80%;
     height: 40px;
     border-bottom: 1px solid #dcdede;
-    margin-bottom: 50px;
+    margin-bottom: 30px;
     background: #ffffff;
   }
 
@@ -353,15 +353,19 @@
   }
 
   .search-item:not(.submit) {
-    margin-bottom: 30px;
+    margin-bottom: 10px;
   }
 
   .search-param {
-    color: #7f7f7f;
-    margin-bottom: 20px;
+    color: #7a7a7a;
+    margin-bottom: 5px;
     height: 20px;
     font-size: 16px;
     line-height: 20px;
+  }
+
+  .budget {
+    margin-bottom: 20px;
   }
 
   .list {
@@ -370,7 +374,7 @@
     background: #ffffff;
     outline: none;
     border: 1px solid #d3d3d3;
-    color: #7f7f7f;
+    color: #7a7a7a;
   }
 
   .small-text {
@@ -397,12 +401,13 @@
   .search-item {
     width: 80%;
     height: 80px;
+    margin-bottom: 10px;
     line-height: 30px;
   }
 
   .search-param {
-    color: #4d4c49;
-    margin-bottom: 20px;
+    color: #7a7a7a;
+    margin-bottom: 5px;
     height: 20px;
     font-size: 16px;
     line-height: 20px;
@@ -411,11 +416,10 @@
   .list {
     height: 30px;
     width: 200px;
-    color: #4d4c49;
+    color: #7a7a7a;
     background: #ffffff;
     outline: none;
     border: 1px solid #d3d3d3;
-    color: #7f7f7f;
   }
 
   .query-item {

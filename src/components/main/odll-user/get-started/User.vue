@@ -396,7 +396,7 @@
     width: 400px;
     font-size: 12px;
     margin: 30px auto;
-    color: #adadad;
+    color: #7a7a7a;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -411,14 +411,14 @@
   }
 
   .field {
-    min-height: 60px;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
     width: 100%;
   }
 
   .field-key {
     height: 20px;
     display: block;
+    margin-top: 10px;
   }
 
   .field-key:not(.show) {
@@ -426,7 +426,7 @@
   }
 
   .field-value {
-    height: 30px;
+    height: 20px;
   }
 
   .field-value:not(.special) {
@@ -442,8 +442,8 @@
     color: #f18787;
   }
 
-  :placeholder {
-    color: #adadad;
+  ::placeholder {
+    color: #bababa;
   }
 
   .side-key {
@@ -462,7 +462,7 @@
     outline: none;
     border-width: 0px 0px 2px 0px;
     border-color: #a0a0a0;
-    color: #4d4c49;
+    color: #7a7a7a;
     background: none;
   }
 
@@ -480,6 +480,7 @@
     height: 30px;
     min-width: 100px;
     margin-right: 20px;
+    color: #7a7a7a;
   }
 
   input:not(:placeholder-shown):not(:focus):invalid {

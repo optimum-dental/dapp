@@ -9,25 +9,12 @@ class Search {
     return search
   }
 
-  findDentists (state = null, dataObject = {}) {
-    return blockchainManager.querySmartContract({
-      smartContractMethod: 'findDentists',
-      smartContractMethodParams: (coinbase) => [...(Object.values(dataObject)), {from: coinbase}],
-      state,
-      smartContractResolve: result => result,
-      smartContractReject: (error) => ({
-        error,
-        isValid: true,
-        warningMessage: "We've encountered a problem finding dentists on the blockchain. Please do try again in a few minutes."
-      })
-    })
-  }
-
   getDentistDataFromFind (state = null, dataObject = {}) {
     return new Promise((resolve, reject) => {
       const userObject = {}
       odllUser.getUserIdentityData(state, dataObject.dentistId)
       .then((result) => {
+        result.coinbase = dataObject.dentistId
         Object.assign(userObject, result)
         odllUser.getUserContactData(state, dataObject.dentistId)
         .then((result) => {
@@ -50,16 +37,30 @@ class Search {
     })
   }
 
-  fetchManagers (state = null, dataObject = {}) {
+  fetchDataObjects (state = null, dataObject = {}) {
+    const fetchType = dataObject.type
+    const callOnEach = dataObject.callOnEach
+    const callOnEachParams = dataObject.callOnEachParams
+    delete dataObject.type
+    delete dataObject.callOnEach
+    delete dataObject.callOnEachParams
     return blockchainManager.querySmartContract({
-      smartContractMethod: 'fetchManagers',
+      smartContractMethod: fetchType,
       smartContractMethodParams: (coinbase) => [...(Object.values(dataObject)), {from: coinbase}],
       state,
-      smartContractResolve: result => result,
+      smartContractResolve: (resultIds) => {
+        const results = resultIds[1].map((resultId) => {
+          return new Promise(function (resolve, reject) {
+            resolve(search[callOnEach](state, callOnEachParams(resultId)))
+          })
+        })
+
+        return {totalNumberAvailable: resultIds[0], results}
+      },
       smartContractReject: (error) => ({
         error,
         isValid: true,
-        warningMessage: "We've encountered a problem fetching managers from the blockchain. Please do try again in a few minutes."
+        warningMessage: `We've encountered a problem fetching the data objects [${fetchType}] from the blockchain. Please do try again in a few minutes.`
       })
     })
   }
@@ -69,6 +70,7 @@ class Search {
       const userObject = {}
       odllUser.getUserIdentityData(state, dataObject.managerId)
       .then((result) => {
+        result.coinbase = dataObject.managerId
         Object.assign(userObject, result)
         odllUser.getUserContactData(state, dataObject.managerId)
         .then((result) => {
@@ -81,25 +83,12 @@ class Search {
     })
   }
 
-  fetchDentists (state = null, dataObject = {}) {
-    return blockchainManager.querySmartContract({
-      smartContractMethod: 'fetchDentists',
-      smartContractMethodParams: (coinbase) => [...(Object.values(dataObject)), {from: coinbase}],
-      state,
-      smartContractResolve: result => result,
-      smartContractReject: (error) => ({
-        error,
-        isValid: true,
-        warningMessage: "We've encountered a problem fetching dentists from the blockchain. Please do try again in a few minutes."
-      })
-    })
-  }
-
   getDentist (state = null, dataObject = {}) {
     return new Promise((resolve, reject) => {
       const userObject = {}
       odllUser.getUserIdentityData(state, dataObject.dentistId)
       .then((result) => {
+        result.coinbase = dataObject.dentistId
         Object.assign(userObject, result)
         odllUser.getUserContactData(state, dataObject.dentistId)
         .then((result) => {

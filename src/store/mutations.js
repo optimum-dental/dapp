@@ -218,41 +218,32 @@ export default {
       if (state.user[payload.properties[i]]) state.user[payload.properties[i]] = payload.values[i]
     }
   },
-  [MUTATION_TYPES.SAVE_CURRENT_SEARCH_SEED] (state, payload) {
-    let searchResultCopy = state.searchResult
-    searchResultCopy[payload.type].seed = payload.seed
-    state.searchResult = searchResultCopy
-    if (payload.callback) payload.callback()
-  },
-  [MUTATION_TYPES.CLEAR_SEARCH_RESULT] (state, payload) {
-    let searchResultCopy = state.searchResult
-    searchResultCopy[payload.type].data[payload.offset] = []
-    state.searchResult = searchResultCopy
-    if (payload.callback) payload.callback()
-  },
   [MUTATION_TYPES.SAVE_SEARCH_RESULT] (state, payload) {
-    const searchResult = payload.searchResult
+    const results = payload.results
     const searchResultCopy = state.searchResult
     searchResultCopy[payload.type].data[payload.offset] = []
-    let [ gravatar, name, companyName, email, street, city, zipCode, phoneNumber ] = stringifyBytesData(state, searchResult, [ 'gravatar', 'name', 'companyName', 'email', 'street', 'city', 'zipCode', 'phoneNumber' ])
-    Object.assign(searchResult, {
-      coinbase: payload.coinbase, gravatar, name, companyName, email, street, city, zipCode, phoneNumber
+    Promise.all(results)
+    .then((values) => {
+      values.forEach((value) => {
+        let [ gravatar, name, companyName, email, street, city, zipCode, phoneNumber ] = stringifyBytesData(state, value, [ 'gravatar', 'name', 'companyName', 'email', 'street', 'city', 'zipCode', 'phoneNumber' ])
+        Object.assign(value, {
+          coinbase: value.coinbase, gravatar, name, companyName, email, street, city, zipCode, phoneNumber
+        })
+        getGravatarFor({
+          email: value.email,
+          coinbase: value.coinbase,
+          callback: (avatarCanvas) => {
+            searchResultCopy[payload.type].seed = payload.seed
+            searchResultCopy[payload.type].totalNumberAvailable = payload.totalNumberAvailable
+            value.avatarCanvas = avatarCanvas
+            searchResultCopy[payload.type].data[payload.offset].push(value)
+            state.searchResult = searchResultCopy
+          }
+        })
+      })
     })
-
-    getGravatarFor({
-      email: searchResult.email,
-      coinbase: payload.coinbase,
-      callback: (avatarCanvas) => {
-        searchResult.avatarCanvas = avatarCanvas
-        searchResultCopy[payload.type].data[payload.offset].push(searchResult)
-        state.searchResult = searchResultCopy
-        if (payload.callback) payload.callback(searchResultCopy[payload.type].data[payload.offset].length)
-      }
+    .then(() => {
+      if (payload.callback) payload.callback()
     })
-  },
-  [MUTATION_TYPES.SAVE_TOTAL_NUMBER_AVAILABLE] (state, payload) {
-    const searchResultCopy = state.searchResult
-    searchResultCopy[payload.type].totalNumberAvailable = payload.totalNumberAvailable
-    state.searchResult = searchResultCopy
   }
 }
