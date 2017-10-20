@@ -305,7 +305,7 @@
     min-height: 70vh;
     width: 80%;
     font-size: 12px;
-    margin: 30px auto;
+    margin: 40px auto 0px auto;
     color: #7a7a7a;
     display: flex;
     flex-direction: column;
@@ -349,11 +349,11 @@
   .search-item {
     width: 80%;
     height: 80px;
-    line-height: 25px;
+    line-height: 30px;
   }
 
   .search-item:not(.submit) {
-    margin-bottom: 25px;
+    margin-bottom: 30px;
   }
 
   .search-param {
@@ -365,7 +365,7 @@
   }
 
   .budget {
-    margin-bottom: 25px;
+    margin-bottom: 20px;
   }
 
   .list {
@@ -394,6 +394,8 @@
     outline: 0px;
     border: 0px;
     cursor: pointer;
+    position: relative;
+    top: 25px;
   }
 </style>
 
