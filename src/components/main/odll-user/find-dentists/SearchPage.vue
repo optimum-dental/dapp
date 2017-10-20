@@ -324,7 +324,7 @@
     width: 80%;
     height: 40px;
     border-bottom: 1px solid #dcdede;
-    margin-bottom: 30px;
+    margin-bottom: 50px;
     background: #ffffff;
   }
 
@@ -343,29 +343,29 @@
     height: 30px;
     line-height: 30px;
     font-size: 18px;
-    margin-bottom: 10px;
+    margin-bottom: 30px;
   }
 
   .search-item {
     width: 80%;
     height: 80px;
-    line-height: 30px;
+    line-height: 25px;
   }
 
   .search-item:not(.submit) {
-    margin-bottom: 10px;
+    margin-bottom: 25px;
   }
 
   .search-param {
     color: #7a7a7a;
-    margin-bottom: 5px;
+    margin-bottom: 15px;
     height: 20px;
     font-size: 16px;
     line-height: 20px;
   }
 
   .budget {
-    margin-bottom: 20px;
+    margin-bottom: 25px;
   }
 
   .list {
@@ -401,13 +401,13 @@
   .search-item {
     width: 80%;
     height: 80px;
-    margin-bottom: 10px;
-    line-height: 30px;
+    margin-bottom: 25px;
+    line-height: 25px;
   }
 
   .search-param {
     color: #7a7a7a;
-    margin-bottom: 5px;
+    margin-bottom: 15px;
     height: 20px;
     font-size: 16px;
     line-height: 20px;
