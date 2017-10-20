@@ -6,7 +6,7 @@
       <div class="tip-main" v-if="message.main">{{ message.main }}</div>
       <div class="tip-cite" v-if="message.cite">{{ message.cite }}</div>
     </div>
-    <div class="spin"></div>
+    <div class="loading-spin"></div>
   </section>
 </template>
 
@@ -107,7 +107,7 @@
     margin-top: 5px;
   }
 
-  .spin {
+  .loading-spin {
     height: 45px;
     width: 45px;
     border-radius: 45px;
@@ -115,11 +115,11 @@
     border-right: 3px solid #3286b0;
     border-bottom: 3px solid #ffffff;
     border-left: transparent;
-    animation: odll-spin 1.2s cubic-bezier(0.2, 0.92, 0.94, 0.9) infinite;
+    animation: odll-loading-spin 1.2s cubic-bezier(0.2, 0.92, 0.94, 0.9) infinite;
     margin-top: 30px;
   }
 
-  @keyframes odll-spin {
+  @keyframes odll-loading-spin {
     0% {
       transform: rotate(0deg);
     }
