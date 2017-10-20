@@ -61,32 +61,35 @@ module.exports = function setup (err) {
 
 
   // // Remove permission from old ODLLUser contract
-  // ODLLDB.at('0x3bea13179705cdab071e59cc3689f9eef4c81d39').removePermittedContract("0xa55f456cea5326579970d49951eeb0c1be474710")
+  // ODLLDB.at('0x4ed9487872aa168fbeb6ec8549f2bf79c9016add').removePermittedContract("0xa55f456cea5326579970d49951eeb0c1be474710")
 
   // // Add permission for ODLLUser contract
-  // ODLLDB.at('0x3bea13179705cdab071e59cc3689f9eef4c81d39').addPermittedContract("0x0x69bd9d8d4b4b930e56ca77460554b4b7e7af481d")
+  // ODLLDB.at('0x4ed9487872aa168fbeb6ec8549f2bf79c9016add').addPermittedContract("0xed4b2724a6afef5c40d0a646346f8a9e7eba338f")
 
   // // Check permission status
-  // ODLLDB.at('0x3bea13179705cdab071e59cc3689f9eef4c81d39').permissionStatusForContract("0x0x69bd9d8d4b4b930e56ca77460554b4b7e7af481d")
+  // ODLLDB.at('0x4ed9487872aa168fbeb6ec8549f2bf79c9016add').permissionStatusForContract("0xed4b2724a6afef5c40d0a646346f8a9e7eba338f")
 
 
 
-  // ODLLDB.at('0x3bea13179705cdab071e59cc3689f9eef4c81d39').addPermittedContracts(["0x43877f21f1b344f0a18bbda4a32bc87ae2efc607", "0x0x69bd9d8d4b4b930e56ca77460554b4b7e7af481d"], { from: web3.eth.coinbase })
-
-  // ODLLSetter.at('0x43877f21f1b344f0a18bbda4a32bc87ae2efc607').setOwner({ from: web3.eth.coinbase })
-
-  // ODLLSetter.at('0x43877f21f1b344f0a18bbda4a32bc87ae2efc607').setODLLConfig({ from: web3.eth.coinbase })
-
-  // ODLLSetter.at('0x43877f21f1b344f0a18bbda4a32bc87ae2efc607').setContract("contract/odll-user", "0x0x69bd9d8d4b4b930e56ca77460554b4b7e7af481d", { from: web3.eth.coinbase })
-
-  // ODLLSetter.at('0x43877f21f1b344f0a18bbda4a32bc87ae2efc607').setFirstAdmin("0x3b26a28666a28e5037613947ac09dcf5d6caf7b9", { from: web3.eth.coinbase })
 
 
-  // ODLLDB.at('0x3bea13179705cdab071e59cc3689f9eef4c81d39').getPermittedContracts()
 
-  // ODLLDB.at('0x3bea13179705cdab071e59cc3689f9eef4c81d39').getAddressValue('0xe901f0b43f920fc0b85fb414d10fafdf40d2a0b21a6397d54c1f5c09529e47a9') // check owner
+  // ODLLDB.at('0x4ed9487872aa168fbeb6ec8549f2bf79c9016add').then((instance) => { instance.addPermittedContracts(["0x6ada7ab35b468c416d0b60465403c0b9baceb719", "0xed4b2724a6afef5c40d0a646346f8a9e7eba338f"], { from: "0x3b26a28666a28e5037613947ac09dcf5d6caf7b9" })}).catch((error) => console.log(111111, error))
 
-  // ODLLDB.at('0x3bea13179705cdab071e59cc3689f9eef4c81d39').getAddressValue('0xa2a70261844f353edc399d2fe91ce30b0e72f9cddd7ddaab87a3b0b66bc7390b') // check ODLLUser Contract
+  // ODLLSetter.at('0x6ada7ab35b468c416d0b60465403c0b9baceb719').setOwner({ from: "0x3b26a28666a28e5037613947ac09dcf5d6caf7b9" })
 
-  // ODLLDB.at('0x3bea13179705cdab071e59cc3689f9eef4c81d39').getAddressValue('0x0f6f723d4ae6fa8d6cb219977b9c034e21574f8183956d459a70e20897c43340') // check first admin
+  // ODLLSetter.at('0x6ada7ab35b468c416d0b60465403c0b9baceb719').setODLLConfig({ from: "0x3b26a28666a28e5037613947ac09dcf5d6caf7b9" })
+
+  // ODLLSetter.at('0x6ada7ab35b468c416d0b60465403c0b9baceb719').setContract("contract/odll-user", "0xed4b2724a6afef5c40d0a646346f8a9e7eba338f", { from: "0x3b26a28666a28e5037613947ac09dcf5d6caf7b9" })
+
+  // ODLLSetter.at('0x6ada7ab35b468c416d0b60465403c0b9baceb719').setFirstAdmin("0x3b26a28666a28e5037613947ac09dcf5d6caf7b9", { from: "0x3b26a28666a28e5037613947ac09dcf5d6caf7b9" })
+
+
+  // ODLLDB.at('0x4ed9487872aa168fbeb6ec8549f2bf79c9016add').getPermittedContracts()
+
+  // ODLLDB.at('0x4ed9487872aa168fbeb6ec8549f2bf79c9016add').getAddressValue('0xe901f0b43f920fc0b85fb414d10fafdf40d2a0b21a6397d54c1f5c09529e47a9') // check owner
+
+  // ODLLDB.at('0x4ed9487872aa168fbeb6ec8549f2bf79c9016add').getAddressValue('0xa2a70261844f353edc399d2fe91ce30b0e72f9cddd7ddaab87a3b0b66bc7390b') // check ODLLUser Contract
+
+  // ODLLDB.at('0x4ed9487872aa168fbeb6ec8549f2bf79c9016add').getAddressValue('0x0f6f723d4ae6fa8d6cb219977b9c034e21574f8183956d459a70e20897c43340') // check first admin
 }
