@@ -27,7 +27,7 @@
               {
                 key: 'view-apppointment-requests',
                 text: 'View Appointment Requests',
-                icon: '/static/images/search.png'
+                icon: '/static/images/appointment.png'
               },
               {
                 key: 'manage-services',
@@ -37,7 +37,7 @@
               {
                 key: 'view-scan-results',
                 text: 'View Scan Results',
-                icon: '/static/images/scan-application.png'
+                icon: '/static/images/file.png'
               }
             ]
           case '3':
@@ -50,7 +50,7 @@
               {
                 key: 'manage-dentists',
                 text: 'Manage Dentists',
-                icon: '/static/images/search.png'
+                icon: '/static/images/file.png'
               },
               {
                 key: 'view-services',
@@ -60,7 +60,7 @@
               {
                 key: 'find-dentists',
                 text: 'View Dentists',
-                icon: '/static/images/scan-application.png'
+                icon: '/static/images/search.png'
               },
               {
                 key: 'view-scan-results',
@@ -78,7 +78,7 @@
               {
                 key: 'managers',
                 text: 'Managers',
-                icon: '/static/images/search.png'
+                icon: '/static/images/file.png'
               },
               {
                 key: 'view-services',
@@ -88,7 +88,7 @@
               {
                 key: 'find-dentists',
                 text: 'View Dentists',
-                icon: '/static/images/scan-application.png'
+                icon: '/static/images/search.png'
               },
               {
                 key: 'view-scan-results',
