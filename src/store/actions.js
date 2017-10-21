@@ -88,7 +88,7 @@ export default {
         type: payload.type,
         offset: payload.offset,
         seed: payload.seed,
-        callback: () => resolve()
+        callback: payload.callback
       })
     })
   }

@@ -1,6 +1,7 @@
 import ethereumBlockies from 'ethereum-blockies'
 import { avatarCanvasElement } from '../util/DOMManipulator'
 import { MUTATION_TYPES, APPROVED_BLOCKCHAIN_NETWORK_ID, IDENTICON_COLORS, NETWORKS } from '../util/constants'
+import states from '../../static/json/states/states.json'
 
 function getHash (stringValue) {
   let hash = 0
@@ -48,26 +49,28 @@ function getRawData (dataObject, datakeys) {
 }
 
 function getGravatarFor (payload = {}) {
-  const colorPosition = Math.abs(getHash(payload.coinbase) % IDENTICON_COLORS.length)
-  const identiconColor = IDENTICON_COLORS[colorPosition]
-  const email = payload.email ? payload.email : ''
+  return new Promise(function (resolve, reject) {
+    const colorPosition = Math.abs(getHash(payload.coinbase) % IDENTICON_COLORS.length)
+    const identiconColor = IDENTICON_COLORS[colorPosition]
+    const email = payload.email ? payload.email : ''
 
-  if (email && email.trim() !== '') {
-    avatarCanvasElement(email)
-    .then((avatarCanvas, gravatar) => {
-      if (payload.callback) payload.callback(avatarCanvas)
-    })
-  } else {
-    const avatarCanvas = ethereumBlockies.create({
-      seed: payload.coinbase.toString(),
-      color: identiconColor.color,
-      bgcolor: identiconColor.bgColor,
-      size: 8,
-      scale: 13,
-      spotcolor: identiconColor.spotColor
-    })
-    if (payload.callback) payload.callback(avatarCanvas)
-  }
+    if (email && email.trim() !== '') {
+      avatarCanvasElement(email)
+      .then((avatarCanvas, gravatar) => {
+        resolve(avatarCanvas)
+      })
+    } else {
+      const avatarCanvas = ethereumBlockies.create({
+        seed: payload.coinbase.toString(),
+        color: identiconColor.color,
+        bgcolor: identiconColor.bgColor,
+        size: 8,
+        scale: 13,
+        spotcolor: identiconColor.spotColor
+      })
+      resolve(avatarCanvas)
+    }
+  })
 }
 
 function updateUserGravatar (state, userCopy, payload = null) {
@@ -219,31 +222,35 @@ export default {
     }
   },
   [MUTATION_TYPES.SAVE_SEARCH_RESULT] (state, payload) {
-    const results = payload.results
+    const results = payload.results || []
     const searchResultCopy = state.searchResult
     searchResultCopy[payload.type].data[payload.offset] = []
-    Promise.all(results)
-    .then((values) => {
-      values.forEach((value) => {
-        let [ gravatar, name, companyName, email, street, city, zipCode, phoneNumber ] = stringifyBytesData(state, value, [ 'gravatar', 'name', 'companyName', 'email', 'street', 'city', 'zipCode', 'phoneNumber' ])
-        Object.assign(value, {
-          coinbase: value.coinbase, gravatar, name, companyName, email, street, city, zipCode, phoneNumber
-        })
-        getGravatarFor({
-          email: value.email,
-          coinbase: value.coinbase,
-          callback: (avatarCanvas) => {
-            searchResultCopy[payload.type].seed = payload.seed
-            searchResultCopy[payload.type].totalNumberAvailable = payload.totalNumberAvailable
+    searchResultCopy[payload.type].seed = payload.seed
+    searchResultCopy[payload.type].totalNumberAvailable = payload.totalNumberAvailable
+    if (results.length > 0) {
+      Promise.all(results)
+      .then((values) => {
+        values.forEach((value, index) => {
+          let userState = Number(value.state) !== 0 ? states[Number(value.state)].name : ''
+          let [ gravatar, name, companyName, email, street, city, zipCode, phoneNumber ] = stringifyBytesData(state, value, [ 'gravatar', 'name', 'companyName', 'email', 'street', 'city', 'zipCode', 'phoneNumber' ])
+          let address = street || city || userState ? `${street} ${city} ${userState}` : ''
+          Object.assign(value, {
+            coinbase: value.coinbase, gravatar, name, companyName, email, street, city, address, zipCode, phoneNumber
+          })
+          getGravatarFor({
+            email: value.email,
+            coinbase: value.coinbase
+          })
+          .then((avatarCanvas) => {
             value.avatarCanvas = avatarCanvas
             searchResultCopy[payload.type].data[payload.offset].push(value)
             state.searchResult = searchResultCopy
-          }
+            if (payload.callback) payload.callback(value, results.length === index + 1)
+          })
         })
       })
-    })
-    .then(() => {
-      if (payload.callback) payload.callback()
-    })
+    } else {
+      if (payload.callback) payload.callback(null, true)
+    }
   }
 }

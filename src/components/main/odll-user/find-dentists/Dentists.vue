@@ -201,22 +201,22 @@
         return [(index * 50), ((index + 1) * 50)]
       },
       getDentists (evt, fetchQuery) {
+        const resultSection = document.querySelector('.result-section')
+        this.clearDOMElementChildren(resultSection)
         this.askUserToWaitWhileWeSearch()
         this.$root.callToFetchDataObjects({
           fetchQuery,
-          callback: () => {
+          callback: (result = null, isCompleted = false) => {
             // update result view
-            if (this.$store.state.searchResult[fetchQuery.type].data[fetchQuery.offset].length > 0) {
-              const results = this.$store.state.searchResult[fetchQuery.type].data[fetchQuery.offset]
-              if (document.querySelector('.wait-overlay')) {
-                document.querySelector('.wait-overlay').remove()
-                this.populateResults(results)
-                if (evt) this.enableButton(evt.target)
-              }
-            } else {
+            if (isCompleted) {
               if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
-              this.informOfNoOfficial()
               if (evt) this.enableButton(evt.target)
+            }
+
+            if (result) {
+              this.appendResult(result)
+            } else {
+              this.informOfNoOfficial()
             }
           }
         })
@@ -229,6 +229,12 @@
           resultSection.appendChild(resultDOMElement)
           resultDOMElement.querySelector('.gravatar-section').appendChild(result.avatarCanvas)
         })
+      },
+      appendResult (result) {
+        const resultDOMElement = this.createResultDOMElement(result)
+        const resultSection = document.querySelector('.result-section')
+        resultSection.appendChild(resultDOMElement)
+        resultDOMElement.querySelector('.gravatar-section').appendChild(result.avatarCanvas)
       },
       clearDOMElementChildren (DOMElement) {
         while (DOMElement.hasChildNodes()) {
@@ -446,6 +452,11 @@
     background: #29aae1;
     color: #ffffff;
   }
+  
+  .result-section {
+    position: relative;
+    min-height: 300px;
+  }
 </style>
 
 <style>
@@ -464,17 +475,24 @@
   }
 
   .wait-overlay {
-    position: relative;
+    position: absolute;
     width: 100%;
-    min-height: 300px;
+    height: 100%;
     text-align: center;
     font-size: 16px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.9);
   }
 
   .wait-message {
     height: 30px;
+    line-height: 30px;
     position: relative;
-    top: 110px;
+    font-size: 16px;
   }
 
   .spin {
@@ -487,10 +505,8 @@
     border-left: transparent;
     animation: odll-spin 1.2s cubic-bezier(0.2, 0.92, 0.94, 0.9) infinite;
     position: relative;
-    top: 110px;
-    left: 50%;
   }
-
+  
   @keyframes odll-spin {
     0% {
       transform: rotate(0deg);

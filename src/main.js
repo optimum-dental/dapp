@@ -161,10 +161,8 @@ new Vue({
           seed: fetchQuery.seed,
           offset: fetchQuery.offset,
           results: fetchResult.results,
-          totalNumberAvailable: fetchResult.totalNumberAvailable
-        })
-        .then(() => {
-          if (payload.callback) payload.callback()
+          totalNumberAvailable: fetchResult.totalNumberAvailable,
+          callback: payload.callback
         })
         .catch((error) => {
           console.error(error)
