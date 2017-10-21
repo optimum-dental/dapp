@@ -9,9 +9,11 @@
       </div>
 
       <div class="result-section"></div>
-      
-      <div v-if="isThereMore" @click="showNextPage" class="fetch-next">Next</div>
-      <div v-if="pageNumber !== 1" @click="showPreviousPage" class="fetch-previous">Previous</div>
+     
+      <div class="navigation">
+        <div v-if="isThereMore" @click="showNextPage" class="fetch-next">Next ></div>
+        <div v-if="pageNumber !== 1" @click="showPreviousPage" class="fetch-previous">< Previous</div>
+      </div>
     </div>
   </div>
 </template>
@@ -45,7 +47,7 @@
       action (isBlocked) {
         return isBlocked ? 'Unblock Manager' : 'Block Manager'
       },
-      fetchManagers (evt = null, offset = 0, seed = undefined) {
+      fetchManagers (evt = null, offset = 0, seed = undefined, direction = 1) {
         if (evt) this.disableButton(evt.target)
         const fetchQuery = {
           type: 'fetchManagers',
@@ -64,8 +66,12 @@
             sd: fetchQuery.seed
           }
         })
-
-        this.getManagers(evt, fetchQuery)
+        const offsetData = this.$store.state.searchResult[fetchQuery.type].data[offset]
+        if (direction < 0 && offsetData && offsetData.length > 0) {
+          this.populateResults(offsetData)
+        } else {
+          this.getManagers(evt, fetchQuery)
+        }
       },
       clearError (evt) {
         const target = evt.target
@@ -84,6 +90,7 @@
             },
             callback: (status = false) => {
               this.enableButton(target)
+              this.fetchManagers(null, this.currentOffset, this.$store.state.searchResult.fetchManagers.seed)
               this.notify(status ? 'Manager Successfully added' : 'Unable to add Manager')
             }
           })
@@ -133,16 +140,11 @@
           DOMElement.firstChild.remove()
         }
       },
-      showNextPage (evt) {
-        this.fetchManagers(evt, this.nextOffset, this.$store.state.searchResult.fetchManagers.seed)
+      showNextPage () {
+        this.fetchManagers(null, this.nextOffset, this.$store.state.searchResult.fetchManagers.seed)
       },
-      showPreviousPage (evt) {
-        const offsetData = this.$store.state.searchResult.fetchManagers.data[this.getPageIndex(this.previousOffset)]
-        if (offsetData && offsetData.length > 0) {
-          this.populateResults('fetchManagers', this.previousOffset)
-        } else {
-          this.fetchManagers(evt, this.previousOffset, this.$store.state.searchResult.fetchManagers.seed)
-        }
+      showPreviousPage () {
+        this.fetchManagers(null, this.previousOffset, this.$store.state.searchResult.fetchManagers.seed, -1)
       },
       getPageIndex (offset = 0) {
         return offset / this.perPage
@@ -212,9 +214,9 @@
     mounted: function () {
       this.getManagers(null, {
         type: 'fetchManagers',
-        offset: this.$route.query.o ? Number(this.$route.query.o) : 0,
-        limit: this.$route.query.l ? Number(this.$route.query.l) : this.perPage,
-        seed: this.$route.query.sd ? Math.ceil(Number(this.$route.query.sd) * 113) : Math.ceil(Math.random() * 113),
+        offset: Number(this.$route.query.o || 0),
+        limit: Number(this.$route.query.l || this.perPage),
+        seed: Number(this.$route.query.sd || Math.random()),
         callOnEach: 'getManager',
         callOnEachParams: managerId => ({managerId})
       })
@@ -300,6 +302,29 @@
   .result-section {
     position: relative;
     min-height: 300px;
+  }
+ 
+  .navigation {
+    width: 100%;
+    float: right;
+  }
+ 
+  .fetch-next, .fetch-previous {
+    cursor: pointer;
+    color: #6592ad;
+    background: #ffffff;
+    height: 30px;
+    line-height: 30px;
+    width: 120px;
+    display: inline-block;
+    float: right;
+    text-align: center;
+    margin-right: 5px;
+    font-size: 14px
+  }
+
+  .fetch-next:hover, .fetch-previous:hover {
+    background: #dae3e8;
   }
 </style>
 

@@ -16,7 +16,6 @@
           <div class="search-param">Appointment Type</div>
           <div class="search-value">
             <select id="appointment-type" class="list"></select>
-            <div class="tip"></div>
           </div>
         </div>
 
@@ -24,7 +23,6 @@
           <div class="search-param"></div>
           <div class="search-value">
             <select id="appointment-sub-type" class="list"></select>
-            <div class="tip"></div>
           </div>
         </div>
 
@@ -42,8 +40,10 @@
 
       <div class="result-section"></div>
       
-      <div v-if="isThereMore" @click="showNextPage" class="fetch-next">Next</div>
-      <div v-if="pageNumber !== 1" @click="showPreviousPage" class="fetch-previous">Previous</div>
+      <div class="navigation">
+        <div v-if="isThereMore" @click="showNextPage" class="fetch-next">Next ></div>
+        <div v-if="pageNumber !== 1" @click="showPreviousPage" class="fetch-previous">< Previous</div>
+      </div>
     </div>
   </div>
 </template>
@@ -56,6 +56,9 @@
       },
       isThereMore () {
         return this.$store.state.searchResult.findDentists.totalNumberAvailable > (this.pageNumber * this.perPage)
+      },
+      fetchResults () {
+        return this.$store.state.searchResult.findDentists.data[this.getPageIndex(this.currentOffset)] || []
       },
       pageNumber () {
         return (Number(this.$route.query.o || 0) / this.perPage) + 1
@@ -81,7 +84,7 @@
           optionElement.text = index === 0 ? 'Choose Location' : state.name
           if (statesElement) {
             statesElement.appendChild(optionElement)
-            if (index === Number(this.$route.query.sd)) optionElement.selected = true
+            if (index === Number(this.$route.query.st)) optionElement.selected = true
           }
         })
       },
@@ -103,6 +106,7 @@
           let target = evt.target
           switch (target.id) {
             case 'appointment-type':
+              _this.clearError(target)
               let appointmentSubtypesElement
               appointmentSubtypesElement = document.getElementById('appointment-sub-type')
               _this.populateAppointmentSubTypes(target.selectedIndex)
@@ -111,8 +115,14 @@
               appointmentSubtypesElement.dispatchEvent(eventObject)
               appointmentSubtypesElement.focus()
               break
+            case 'appointment-sub-type':
+              _this.clearError(target)
+              break
           }
         })
+      },
+      clearError (target) {
+        target.classList.remove('error')
       },
       populateAppointmentSubTypes (appointmentTypeIndex) {
         const appointmentSubtypesElement = document.getElementById('appointment-sub-type')
@@ -148,7 +158,7 @@
           }
         }
       },
-      findDentists (evt, offset = 0, seed = null) {
+      findDentists (evt, offset = 0, seed = null, direction = 1) {
         if (document.getElementById('appointment-sub-type')) {
           if (evt) this.disableButton(evt.target)
           const appointmentTypeId = Number(document.getElementById('appointment-type').selectedIndex)
@@ -170,9 +180,7 @@
           errors = errors.filter(entry => entry !== undefined)
           if (errors.length > 0) {
             errors.forEach((item) => {
-              let tip = item.nextElementSibling
-              tip.innerHTML = `Please check your ${item.id}`
-              tip.classList.add('error')
+              item.classList.add('error')
               if (evt) this.enableButton(evt.target)
             })
           } else {
@@ -189,11 +197,15 @@
                 br: searchQuery.budget[1]
               }
             })
-
-            this.getDentists(evt, searchQuery)
+            const offsetData = this.$store.state.searchResult[searchQuery.type].data[offset]
+            if (direction < 0 && offsetData && offsetData.length > 0) {
+              this.populateResults(offsetData)
+            } else {
+              this.getDentists(evt, searchQuery)
+            }
           }
         } else {
-          console.log('Choose Appointment Type')
+          document.getElementById('appointment-type').classList.add('error')
         }
       },
       getBudget () {
@@ -241,15 +253,11 @@
           DOMElement.firstChild.remove()
         }
       },
-      showNextPage (evt) {
-        this.findDentists(evt, this.nextOffset, this.$store.state.searchResult.findDentists.seed)
+      showNextPage () {
+        this.findDentists(null, this.nextOffset, this.$store.state.searchResult.findDentists.seed)
       },
-      showPreviousPage (evt) {
-        const offsetData = this.$store.state.searchResult.findDentists.data[this.getPageIndex(this.previousOffset)]
-        if (offsetData && offsetData.length > 0) {
-        } else {
-          this.findDentists(evt, this.previousOffset, this.$store.state.searchResult.findDentists.seed)
-        }
+      showPreviousPage () {
+        this.findDentists(null, this.previousOffset, this.$store.state.searchResult.findDentists.seed, -1)
       },
       getPageIndex (offset = 0) {
         return offset / this.perPage
@@ -344,7 +352,7 @@
         budget: [Number(this.$route.query.bl), Number(this.$route.query.br)],
         offset: Number(this.$route.query.o),
         limit: Number(this.$route.query.l),
-        seed: Math.ceil(Number(this.$route.query.sd) * 113),
+        seed: Number(this.$route.query.sd),
         callOnEach: 'getDentistDataFromFind',
         callOnEachParams: dentistId => ({dentistId, serviceTypeId: Number(this.$route.query.aTI), serviceId: Number(this.$route.query.aSI)})
       })
@@ -432,6 +440,10 @@
     color: #7f7f7f;
   }
 
+  .error {
+    border: 1px solid #f18787;
+  }
+
   .submit {
     position: relative;
     top: -35px;
@@ -456,6 +468,29 @@
   .result-section {
     position: relative;
     min-height: 300px;
+  }
+
+  .navigation {
+    width: 100%;
+    float: right;
+  }
+
+  .fetch-next, .fetch-previous {
+    cursor: pointer;
+    color: #6592ad;
+    background: #ffffff;
+    height: 30px;
+    line-height: 30px;
+    width: 120px;
+    display: inline-block;
+    float: right;
+    text-align: center;
+    margin-right: 5px;
+    font-size: 14px;
+  }
+
+  .fetch-next:hover, .fetch-previous:hover {
+    background: #dae3e8;
   }
 </style>
 

@@ -92,6 +92,8 @@
           let target = evt.target
           switch (target.id) {
             case 'appointment-type':
+              _this.clearError(target.nextElementSibling)
+              _this.hideDOMElement(target.nextElementSibling)
               let appointmentSubtypesElement
               if (document.getElementById('appointment-sub-type')) {
                 appointmentSubtypesElement = document.getElementById('appointment-sub-type')
@@ -107,6 +109,8 @@
               appointmentSubtypesElement.focus()
               break
             case 'appointment-sub-type':
+              _this.clearError(target.nextElementSibling)
+              _this.hideDOMElement(target.nextElementSibling)
               _this.addToSearchQuery(evt)
               break
           }
@@ -130,6 +134,12 @@
           const tooltips = [searchPage.querySelector('.noUi-handle-lower'), searchPage.querySelector('.noUi-handle-upper')]
           $(tooltips[handle]).find('.noUi-tooltip').slideDown(100)
         })
+      },
+      clearError (target) {
+        target.classList.remove('error')
+      },
+      hideDOMElement (target) {
+        target.style.display = 'none'
       },
       createAppointmentSubTypeDOMElement (title = '') {
         const DOMELement = new DOMParser().parseFromString(`
@@ -271,7 +281,9 @@
             })
           }
         } else {
-          console.log('Choose Appointment Type')
+          let tip = document.getElementById('appointment-type').nextElementSibling
+          tip.innerHTML = 'Please check your appointment type'
+          tip.classList.add('error')
         }
       }
     },
@@ -377,6 +389,10 @@
     color: #7a7a7a;
   }
 
+  .error {
+    color: #f18787;
+  }
+
   .small-text {
     font-size: 10px;
     color: #b4b4b4;
@@ -422,6 +438,10 @@
     background: #ffffff;
     outline: none;
     border: 1px solid #d3d3d3;
+  }
+
+  .error {
+    color: #f18787;
   }
 
   .query-item {

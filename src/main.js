@@ -153,7 +153,7 @@ new Vue({
     callToFetchDataObjects (payload) {
       const fetchQuery = payload.fetchQuery
       const blockchainParams = Object.assign({}, fetchQuery)
-      // delete blockchainParams.type
+      blockchainParams.seed = Math.ceil(blockchainParams.seed * 113)
       Search.fetchDataObjects(this.$store.state, blockchainParams)
       .then((fetchResult) => {
         this[ACTION_TYPES.SAVE_SEARCH_RESULT]({

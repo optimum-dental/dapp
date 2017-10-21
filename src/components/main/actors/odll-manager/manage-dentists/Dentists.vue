@@ -4,11 +4,16 @@
       <div class="title">Manage Dentists</div>
 
       <div class="data-entry-section">
-        <input type="text" id="entry" class="entry" placeholder="Enter the Ethereum address of a Dentist you want to add to the platform">
+        <input type="text" id="entry" class="entry" placeholder="Enter the Ethereum address of a Dentist you want to add to the platform" @input="clearError">
         <input type="button" class="add" value="Add Dentist" @click="addDentist">
       </div>
 
       <div class="result-section"></div>
+      
+      <div class="navigation">
+        <div v-if="isThereMore" @click="showNextPage" class="fetch-next">Next ></div>
+        <div v-if="pageNumber !== 1" @click="showPreviousPage" class="fetch-previous">< Previous</div>
+      </div>
     </div>
   </div>
 </template>
@@ -16,11 +21,23 @@
 <script>
   export default {
     computed: {
+      isThereMore () {
+        return this.$store.state.searchResult.fetchDentists.totalNumberAvailable > (this.pageNumber * this.perPage)
+      },
+      fetchResults () {
+        return this.$store.state.searchResult.fetchDentists.data[this.getPageIndex(this.currentOffset)] || []
+      },
       pageNumber () {
-        return (Number(this.$route.query.o) / this.perPage) + 1
+        return (Number(this.$route.query.o || 0) / this.perPage) + 1
       },
       nextOffset () {
-        return (this.pageNumber - 1) * this.perPage
+        return (this.pageNumber * this.perPage)
+      },
+      currentOffset () {
+        return (this.nextOffset - this.perPage)
+      },
+      previousOffset () {
+        return (this.currentOffset - this.perPage)
       },
       perPage () {
         return 5
@@ -30,7 +47,7 @@
       action (isBlocked) {
         return isBlocked ? 'Unblock Dentist' : 'Block Dentist'
       },
-      fetchDentists (evt, offset = 0, seed = null) {
+      fetchDentists (evt, offset = 0, seed = null, direction = 1) {
         const fetchQuery = {
           type: 'fetchDentists',
           offset,
@@ -41,15 +58,23 @@
         }
 
         this.$router.push({
-          path: '/dentists',
+          path: '/manage-dentists',
           query: {
             o: fetchQuery.offset,
             l: fetchQuery.limit,
             sd: fetchQuery.seed
           }
         })
-
-        this.getDentists(evt, fetchQuery)
+        const offsetData = this.$store.state.searchResult[fetchQuery.type].data[offset]
+        if (direction < 0 && offsetData && offsetData.length > 0) {
+          this.populateResults(offsetData)
+        } else {
+          this.getDentists(evt, fetchQuery)
+        }
+      },
+      clearError (evt) {
+        const target = evt.target
+        if (target.classList.contains('error')) target.classList.remove('error')
       },
       addDentist (evt) {
         const target = evt.target
@@ -64,6 +89,7 @@
             },
             callback: (status = false) => {
               this.enableButton(target)
+              this.fetchDentists(null, this.currentOffset, this.$store.state.searchResult.fetchDentists.seed)
               this.notify(status ? 'Dentist Successfully added' : 'Unable to add Dentist')
             }
           })
@@ -113,16 +139,11 @@
           DOMElement.firstChild.remove()
         }
       },
-      showNextPage (evt) {
-        this.fetchDentists(evt, this.nextOffset, this.$store.state.searchResult.fetchDentists.seed)
+      showNextPage () {
+        this.fetchDentists(null, this.nextOffset, this.$store.state.searchResult.fetchDentists.seed)
       },
-      showPreviousPage (evt) {
-        const offsetData = this.$store.state.searchResult.fetchDentists.data[this.getPageIndex(this.previousOffset)]
-        if (offsetData && offsetData.length > 0) {
-          this.populateResults('fetchDentists', this.previousOffset)
-        } else {
-          this.fetchDentists(evt, this.previousOffset, this.$store.state.searchResult.fetchDentists.seed)
-        }
+      showPreviousPage () {
+        this.fetchDentists(null, this.previousOffset, this.$store.state.searchResult.fetchDentists.seed, -1)
       },
       getPageIndex (offset = 0) {
         return offset / this.perPage
@@ -206,9 +227,9 @@
     mounted: function () {
       this.getDentists(null, {
         type: 'fetchDentists',
-        offset: this.$route.query.o ? Number(this.$route.query.o) : 0,
-        limit: this.$route.query.l ? Number(this.$route.query.l) : this.perPage,
-        seed: this.$route.query.sd ? Math.ceil(Number(this.$route.query.sd) * 113) : Math.ceil(Math.random() * 113),
+        offset: Number(this.$route.query.o || 0),
+        limit: Number(this.$route.query.l || this.perPage),
+        seed: Number(this.$route.query.sd || Math.random()),
         callOnEach: 'getDentist',
         callOnEachParams: dentistId => ({dentistId})
       })
@@ -267,6 +288,10 @@
     padding: 0px 10px;
   }
 
+  .entry.error {
+    border: 1px solid #f18787;
+  }
+
   .entry::placeholder {
     color: #bababa;
   }
@@ -290,6 +315,29 @@
   .result-section {
     position: relative;
     min-height: 300px;
+  }
+
+  .navigation {
+    width: 100%;
+    float: right;
+  }
+
+  .fetch-next, .fetch-previous {
+    cursor: pointer;
+    color: #6592ad;
+    background: #ffffff;
+    height: 30px;
+    line-height: 30px;
+    width: 120px;
+    display: inline-block;
+    float: right;
+    text-align: center;
+    margin-right: 5px;
+    font-size: 14px;
+  }
+
+  .fetch-next:hover, .fetch-previous:hover {
+    background: #dae3e8;
   }
 </style>
 
