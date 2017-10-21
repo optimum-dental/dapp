@@ -65,7 +65,8 @@ class BlockchainManager {
   }
 
   runBlockchainPromise (resolve, reject, dataObject) {
-    dataObject.odllContract.at(dataObject.addressToUse)
+    // dataObject.odllContract.at(dataObject.addressToUse)
+    dataObject.odllContract.deployed()
     .then((contractInstance) => {
       dataObject.method(contractInstance, dataObject.coinbase)
       .then((result) => {

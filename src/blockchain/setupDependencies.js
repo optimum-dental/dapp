@@ -84,6 +84,7 @@ module.exports = function setup (err) {
 
   // ODLLSetter.at('0x6ada7ab35b468c416d0b60465403c0b9baceb719').setFirstAdmin("0x3b26a28666a28e5037613947ac09dcf5d6caf7b9", { from: "0x3b26a28666a28e5037613947ac09dcf5d6caf7b9" })
 
+  // ODLLUser.at('0xed4b2724a6afef5c40d0a646346f8a9e7eba338f').addOfficialToODLL('', 4)
 
   // ODLLDB.at('0x4ed9487872aa168fbeb6ec8549f2bf79c9016add').getPermittedContracts()
 

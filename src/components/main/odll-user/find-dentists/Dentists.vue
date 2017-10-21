@@ -548,14 +548,20 @@
   }
 
   .average-rating > div {
-    background: #ffffff;
-    border: 1px solid #f9af3b;
+    background: url(/static/images/star_line.png) no-repeat;
+    background-size: contain;
+    height: 20px;
+    width: 20px;
+    display: inline-block;
+    float: left;
+    margin: 0px 5px;
   }
 
   .average-rating > .filled {
-    background: #f9af3b;
+    background: url(/static/images/star.png) no-repeat;
+    background-size: contain;
   }
-
+  
   .request-appointment-section {
     width: auto;
     height: 150px;
