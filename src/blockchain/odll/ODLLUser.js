@@ -19,15 +19,14 @@ class ODLLUser {
     })
   }
 
-  writeServicesWithFees (state = null, data = {}) {
-    // return blockchainManager.querySmartContract({
-      // smartContractMethod: 'writeServicesWithFees',
-      // smartContractMethodParams: (coinbase) => [...(Object.values(data.userObject)), {from: coinbase, gas: 4444444}],
-      // state,
-      // smartContractResolve: result => data,
-      // smartContractReject: error => error
-    // })
-    console.log(data)
+  writeServiceWithFee (state = null, data = {}) {
+    return blockchainManager.querySmartContract({
+      smartContractMethod: 'writeServiceWithFee',
+      smartContractMethodParams: (coinbase) => [...(Object.values(data.serviceObject)), {from: coinbase, gas: 4444444}],
+      state,
+      smartContractResolve: result => data,
+      smartContractReject: error => error
+    })
   }
 
   writeUser (state = null, data = {}) {

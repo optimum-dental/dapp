@@ -151,10 +151,10 @@ new Vue({
     callResetIsValidUserBut () {
       this[ACTION_TYPES.RESET_IS_VALID_USER_BUT]()
     },
-    callToWriteServicesWithFees (payload) {
+    callToWriteServiceWithFee (payload) {
       const blockchainParams = Object.assign({}, payload)
       delete blockchainParams.callback
-      ODLLUser.writeServicesWithFees(this.$store.state, blockchainParams)
+      ODLLUser.writeServiceWithFee(this.$store.state, blockchainParams)
       .then((dataObject) => {
         if (payload.callback) payload.callback(dataObject)
       })

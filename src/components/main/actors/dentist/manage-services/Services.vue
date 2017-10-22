@@ -4,14 +4,6 @@
       <div class="title">Manage Services</div>
 
       <div class="query-section">
-        <div class="entry-icon"></div>
-        <div class="entry-item">
-          <div class="entry-param">Location</div>
-          <div class="entry-value">
-            <select id="state" class="list"></select>
-          </div>
-        </div>
-
         <div class="entry-item">
           <div class="entry-param">Service Type</div>
           <div class="entry-value">
@@ -35,10 +27,19 @@
       </div>
 
       <div class="submit">
-        <input type="button" class='submit-button' :value="actionMessage" @click="writeServicesWithFees">
+        <input type="button" class='submit-button' :value="actionMessage" @click="writeServiceWithFee">
       </div>
 
-      <div class="result-section"></div>
+      <div class="result-section">
+        <div class="trigger-section">
+          <div class="trigger" :class="addClass(1, 'active')" data-open="scan-section" data-type="1" @click="switchView">Scan Services</div>
+          <div class="trigger" :class="addClass(2, 'active')" data-open="treatment-section" data-type="2" @click="switchView">Treatment Services</div>
+        </div>
+        <div class="view-section">
+          <div class="scan-section" :class="addClass(1, 'showing')" id="scan-section"></div>
+          <div class="treatment-section" :class="addClass(2, 'showing')" id="treatment-section"></div>
+        </div>
+      </div>
       
       <div class="navigation">
         <div v-if="isThereMore" @click="showNextPage" class="fetch-next">Next ></div>
@@ -54,11 +55,8 @@
       user () {
         return this.$root.user
       },
-      isThereMore () {
-        return this.$store.state.searchResult.fetchServices.totalNumberAvailable > (this.pageNumber * this.perPage)
-      },
-      fetchResults () {
-        return this.$store.state.searchResult.fetchServices.data[this.getPageIndex(this.currentOffset)] || []
+      isThereMore (serviceType) {
+        return this.$store.state.searchResult[serviceType === 1 ? 'fetchScanServices' : 'fetchTreatmentServices'].totalNumberAvailable > (this.pageNumber * this.perPage)
       },
       pageNumber () {
         return (Number(this.$route.query.o || 0) / this.perPage) + 1
@@ -83,16 +81,19 @@
       }
     },
     methods: {
-      populateStates () {
-        const statesElement = document.getElementById('state')
-        states.forEach((state, index) => {
-          const optionElement = document.createElement('option')
-          optionElement.text = index === 0 ? 'Choose Location' : state.name
-          if (statesElement) {
-            statesElement.appendChild(optionElement)
-            if (index === Number(this.$route.query.st)) optionElement.selected = true
-          }
-        })
+      addClass (check, value) {
+        return Number(this.$route.query.sT) === check || (!this.$route.query.sT && check === 1) ? value : ''
+      },
+      switchView (evt) {
+        const target = evt.target
+        if (!(target.classList.contains('active'))) {
+          document.querySelector('.showing').classList.remove('showing')
+          document.querySelector('.active').classList.remove('active')
+          target.classList.add('active')
+          document.querySelector(`.${target.dataset.open}`).classList.add('showing')
+          const serviceType = Number(target.dataset.type)
+          this.fetchServices(null, this.currentOffset, this.$store.state.searchResult[serviceType === 1 ? 'fetchScanServices' : 'fetchTreatmentServices'].seed, 1, serviceType)
+        }
       },
       populateServiceTypes () {
         const serviceTypesElement = document.getElementById('service-type')
@@ -151,11 +152,10 @@
           })
         }
       },
-      writeServicesWithFees (evt) {
+      writeServiceWithFee (evt) {
         if (evt) this.disableButton(evt.target)
         const serviceTypeId = Number(document.getElementById('service-type').selectedIndex)
         const serviceSubtypeId = Number(document.getElementById('service-sub-type').selectedIndex)
-        const state = Number(document.getElementById('state').selectedIndex)
         const fee = this.getFee()
         let errors = [serviceTypeId === 0 ? document.getElementById('service-type') : undefined, serviceSubtypeId === 0 ? document.getElementById('service-sub-type') : undefined, fee === '' ? document.getElementById('fee') : undefined]
         errors = errors.filter(entry => entry !== undefined)
@@ -165,75 +165,59 @@
             if (evt) this.enableButton(evt.target)
           })
         } else {
-          this.$root.callToWriteServicesWithFees({
-            serviceTypeId,
-            serviceSubtypeId,
-            serviceState: state,
-            fee,
+          this.$root.callToWriteServiceWithFee({
+            serviceObject: {
+              serviceTypeId,
+              serviceSubtypeId,
+              fee
+            },
             callback: (status) => {
               if (evt) this.enableButton(evt.target)
-              if (status) this.fetchServices(null, this.currentOffset, this.searchResult.fetchServices.seed)
+              if (status) this.fetchServices(null, this.currentOffset, this.$store.state.searchResult[serviceTypeId === 1 ? 'fetchScanServices' : 'fetchTreatmentServices'].seed, 1, serviceTypeId)
               this.notify(status ? 'Service Successfully added' : 'Unable to add Service')
             }
           })
         }
       },
-      fetchServices (evt, offset = 0, seed = null, direction = 1) {
-        if (document.getElementById('service-sub-type')) {
-          if (evt) this.disableButton(evt.target)
-          const serviceTypeId = Number(document.getElementById('service-type').selectedIndex)
-          const serviceSubtypeId = Number(document.getElementById('service-sub-type').selectedIndex)
-          const searchQuery = {
-            type: 'fetchServices',
-            state: Number(document.getElementById('state').selectedIndex),
-            serviceTypeId,
-            serviceSubtypeId,
-            fee: this.getFee(),
-            offset,
-            limit: this.perPage,
-            seed: seed || Math.random(),
-            callOnEach: 'getService',
-            callOnEachParams: (serviceTypeId, serviceSubtypeId) => ({serviceTypeId, serviceSubtypeId})
-          }
+      editService (evt, serviceTypeId, serviceSubtypeId) {
+        console.log(evt, serviceTypeId, serviceSubtypeId)
+      },
+      deleteService (evt, serviceTypeId, serviceSubtypeId) {
+        console.log(evt, serviceTypeId, serviceSubtypeId)
+      },
+      fetchServices (evt, offset = 0, seed = null, direction = 1, serviceType = 1) {
+        const fetchQuery = {
+          type: serviceType === 1 ? 'fetchScanServices' : 'fetchTreatmentServices',
+          offset,
+          limit: this.perPage,
+          seed: seed || Math.random(),
+          serviceType
+        }
 
-          let errors = [serviceTypeId === 0 ? document.getElementById('service-type') : undefined, serviceSubtypeId === 0 ? document.getElementById('service-sub-type') : undefined]
-          errors = errors.filter(entry => entry !== undefined)
-          if (errors.length > 0) {
-            errors.forEach((item) => {
-              item.classList.add('error')
-              if (evt) this.enableButton(evt.target)
-            })
-          } else {
-            this.$router.push({
-              path: '/manage-services',
-              query: {
-                o: searchQuery.offset,
-                l: searchQuery.limit,
-                sd: searchQuery.seed,
-                st: searchQuery.state,
-                sTI: searchQuery.serviceTypeId,
-                sSI: searchQuery.serviceSubtypeId,
-                f: searchQuery.fee
-              }
-            })
-            const offsetData = this.$store.state.searchResult[searchQuery.type].data[offset]
-            if (direction < 0 && offsetData && offsetData.length > 0) {
-              this.populateResults(offsetData)
-            } else {
-              this.getServices(evt, searchQuery)
-            }
+        this.$router.push({
+          path: '/manage-services',
+          query: {
+            o: fetchQuery.offset,
+            l: fetchQuery.limit,
+            sd: fetchQuery.seed,
+            sT: serviceType
           }
+        })
+        const offsetData = this.$store.state.searchResult[fetchQuery.type].data[offset]
+        if (direction < 0 && offsetData && offsetData.length > 0) {
+          this.populateResults(offsetData, serviceType)
         } else {
-          document.getElementById('service-type').classList.add('error')
+          this.getServices(evt, fetchQuery)
         }
       },
       getFee () {
         return document.getElementById('fee').value
       },
       getServices (evt, fetchQuery) {
-        const resultSection = document.querySelector('.result-section')
+        const serviceType = fetchQuery.serviceType
+        const resultSection = document.querySelector(`.${serviceType === 1 ? 'scan-section' : 'treatment-section'}`)
         this.clearDOMElementChildren(resultSection)
-        this.askUserToWaitWhileWeSearch()
+        this.askUserToWaitWhileWeSearch(serviceType)
         this.$root.callToFetchDataObjects({
           fetchQuery,
           callback: (result = null, isCompleted = false) => {
@@ -244,27 +228,26 @@
             }
 
             if (result) {
-              this.appendResult(result)
+              this.appendResult(result, serviceType)
             } else {
-              this.informOfNoService()
+              this.informOfNoService(serviceType)
               if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
               if (evt) this.enableButton(evt.target)
             }
           }
         })
       },
-      populateResults (results) {
-        const resultSection = document.querySelector('.result-section')
+      populateResults (results, resultType = 1) {
+        const resultSection = document.querySelector(`.${resultType === 1 ? 'scan-section' : 'treatment-section'}`)
         this.clearDOMElementChildren(resultSection)
         results.forEach((result) => {
           const resultDOMElement = this.createResultDOMElement(result)
           resultSection.appendChild(resultDOMElement)
-          resultDOMElement.querySelector('.gravatar-section').appendChild(result.avatarCanvas)
         })
       },
-      appendResult (result) {
+      appendResult (result, resultType = 1) {
         const resultDOMElement = this.createResultDOMElement(result)
-        const resultSection = document.querySelector('.result-section')
+        const resultSection = document.querySelector(`.${resultType === 1 ? 'scan-section' : 'treatment-section'}`)
         resultSection.appendChild(resultDOMElement)
         resultDOMElement.querySelector('.gravatar-section').appendChild(result.avatarCanvas)
       },
@@ -274,40 +257,42 @@
         }
       },
       showNextPage () {
-        this.fetchServices(null, this.nextOffset, this.$store.state.searchResult.fetchServices.seed)
+        const serviceType = Number(this.route.query.sT || 1)
+        this.fetchServices(null, this.nextOffset, this.$store.state.searchResult[serviceType === 1 ? 'fetchScanServices' : 'fetchTreatmentServices'].seed, 1, serviceType)
       },
       showPreviousPage () {
-        this.fetchServices(null, this.previousOffset, this.$store.state.searchResult.fetchServices.seed, -1)
+        const serviceType = Number(this.route.query.sT || 1)
+        this.fetchServices(null, this.previousOffset, this.$store.state.searchResult[serviceType === 1 ? 'fetchScanServices' : 'fetchTreatmentServices'].seed, -1, serviceType)
       },
       getPageIndex (offset = 0) {
         return offset / this.perPage
       },
-      askUserToWaitWhileWeSearch () {
+      askUserToWaitWhileWeSearch (serviceType = 1) {
         if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
         if (document.querySelector('.no-service')) document.querySelector('.no-service').remove()
-        let waitOverlayDOMElement = this.createWaitOverlayDOMElement()
+        let waitOverlayDOMElement = this.createWaitOverlayDOMElement(serviceType)
         document.querySelector('.result-section').insertBefore(waitOverlayDOMElement, document.querySelector('.result'))
       },
-      informOfNoService () {
+      informOfNoService (serviceType = 1) {
         if (document.querySelector('.no-service')) document.querySelector('.no-service').remove()
-        let noDentistDOMElement = this.createNoDentistDOMElement()
+        let noDentistDOMElement = this.createNoServiceDOMElement(serviceType)
         document.querySelector('.result-section').insertBefore(noDentistDOMElement, document.querySelector('.result'))
       },
-      createWaitOverlayDOMElement () {
+      createWaitOverlayDOMElement (serviceType = 1) {
         const DOMELement = new DOMParser().parseFromString(`
           <div class="wait-overlay">
-            <div class="wait-message">Please Wait... We're searching the blockchain for your services.</div>
+            <div class="wait-message">Please Wait... We're searching the blockchain for your ${serviceType === 1 ? 'Scan' : 'Treatment'} services.</div>
             <div class="spin"></div>
           </div>
         `, 'text/html')
 
         return DOMELement.body.firstChild
       },
-      createNoDentistDOMElement () {
+      createNoServiceDOMElement (serviceType = 1) {
         const DOMELement = new DOMParser().parseFromString(`
           <div class="no-service">
             <div class="no-service-message">
-              It appears you have no service on the blockchain.
+              It appears you have no ${serviceType === 1 ? 'Scan' : 'Treatment'} service on the blockchain.
             </div>
           </div>
         `, 'text/html')
@@ -318,10 +303,10 @@
         const resultDOMElement = new DOMParser().parseFromString(`          
           <div class="result">
             <div class="about-section">
-              <div class="service-type">${result.serviceType || 'Service Type: Not Supplied'}</div>
               <div class="service-subtype">${result.serviceSubtype || 'Service Subtype: Not Supplied'}</div>
-              <div class="state">${result.state || 'Service State: Not Supplied'}</div>
-              <div class="fee">${result.fee || 'Service Fee: Not Supplied'}</div>
+              <input class="fee" type="number" value="${result.fee || 0}"</div>
+              <div class="edit" onclick="${this.editService(result.serviceTypeId, result.serviceSubtypeId)}">Edit</div>
+              <div class="delete" onclick="${this.deleteService(result.serviceTypeId, result.serviceSubtypeId)}">Delete</div>
             </div>
           </div>
         `, 'text/html').body.firstChild
@@ -342,25 +327,20 @@
       }
     },
     mounted: function () {
-      this.populateStates()
       this.populateServiceTypes()
       this.setEventListeners()
       this.getServices(null, {
         type: 'fetchServices',
-        state: Number(this.$route.query.st || 0),
         serviceTypeId: Number(this.$route.query.sTI || 0),
         serviceSubtypeId: Number(this.$route.query.sSI || 0),
         fee: Number(this.$route.query.f || 0),
         offset: Number(this.$route.query.o || 0),
         limit: Number(this.$route.query.l || 0),
-        seed: Number(this.$route.query.sd || 0),
-        callOnEach: 'getService',
-        callOnEachParams: serviceId => ({serviceTypeId: Number(this.$route.query.sTI), serviceSubtypeId: Number(this.$route.query.sSI)})
+        seed: Number(this.$route.query.sd || 0)
       })
     }
   }
 
-  import states from '../../../../../../static/json/states/states.json'
   import serviceTypes from '../../../../../../static/json/appointment_types/appointment_types.json'
 </script>
 
@@ -401,18 +381,7 @@
     background: #ffffff;
     display: flex;
     flex-direction: row;
-  }
-
-  .entry-icon {
-    background: url('/static/images/search.png') no-repeat;
-    min-width: 4%;
-    height: 30px;
-    background-size: contain;
-    display: inline-block;
-    margin-top: 5px;
-    float: left;
-    position: relative;
-    top: 20px;
+    justify-content: space-between;
   }
 
   .entry-item {
@@ -421,7 +390,7 @@
     /*margin-right: 10px;*/
     margin-bottom: 30px;
     justify-content: center;
-    min-width: 24%;
+    min-width: 33%;
   }
 
   .entry-param {
@@ -434,7 +403,7 @@
 
   .list, #fee {
     height: 30px;
-    width: 95%;
+    width: 100%;
     background: #ffffff;
     outline: none;
     border: 1px solid #d3d3d3;
@@ -453,7 +422,6 @@
   }
 
   .submit-button {
-    margin-right: 7px;
     padding: 2px;
     text-align: center;
     float: right;
@@ -470,7 +438,52 @@
     position: relative;
     min-height: 300px;
   }
+  
+  .trigger-section {
+    width: 100%;
+    height: 40px;
+    background: #edefef;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+  }
 
+  .trigger {
+    height: 35px;
+    width: 50%;
+    margin-top: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 35px;
+    text-align: center;
+  }
+
+  .active {
+    background: #ffffff;
+    cursor: auto;
+  }
+
+  .view-section {
+    background: #ffffff;
+    position: absolute;
+    top: 40px;
+    min-height: 260px;
+    width: 100%;
+  }
+
+  .scan-section, .treatment-section {
+    width: 100%;
+    min-height: 260px;
+    position: absolute;
+    top: 0px;
+    display: none;
+  }
+
+  .showing {
+    display: block;
+  }
+  
   .navigation {
     width: 100%;
     float: right;
@@ -497,9 +510,10 @@
 
 <style>
   .no-service {
-    position: relative;
+    position: absolute;
+    top: 40px;
     width: 100%;
-    min-height: 300px;
+    min-height: 260px;
     text-align: center;
     font-size: 16px;
   }
@@ -512,11 +526,12 @@
 
   .wait-overlay {
     position: absolute;
+    top: 40px;
     width: 100%;
     height: 100%;
     text-align: center;
     font-size: 16px;
-    height: 100%;
+    height: 260px;
     display: flex;
     flex-direction: column;
     align-items: center;

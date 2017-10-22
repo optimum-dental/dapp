@@ -71,7 +71,12 @@ export default {
       seed: null,
       totalNumberAvailable: 0
     },
-    fetchServices: {
+    fetchScanServices: {
+      data: {},
+      seed: null,
+      totalNumberAvailable: 0
+    },
+    fetchTreatmentServices: {
       data: {},
       seed: null,
       totalNumberAvailable: 0

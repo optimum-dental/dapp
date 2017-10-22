@@ -236,35 +236,41 @@ contract ODLLUser is ODLLRestrictor {
   }
 
   function writeServices(
-    address userId,
     uint serviceTypeId,
     uint[] serviceIds
   )
   {
-    require(address != 0x0 && serviceTypeId != 0 && serviceIds.length > 0);
-    servicesLibrary.addDentist(dbAddress, serviceTypeId, serviceIds, userId);
+    require(serviceTypeId != 0 && serviceIds.length > 0);
+    servicesLibrary.addDentist(dbAddress, serviceTypeId, serviceIds, msg.sender);
   }
 
-  function writeServicesWithFees(
-    address userId,
+  function writeServiceWithFee(
     uint serviceTypeId,
-    uint[] serviceIds,
-    uint[] feeIds
+    uint serviceId,
+    uint fee
   )
   {
-    require(address != 0x0 && serviceTypeId != 0 && serviceIds.length > 0 && fees.length > 0);
-    servicesLibrary.addDentist(dbAddress, serviceTypeId, serviceIds, userId);
-    servicesLibrary.setFees(dbAddress, serviceTypeId, serviceIds, feeIds, userId);
+    require(serviceTypeId != 0 && serviceId != 0 && fee != 0);
+    servicesLibrary.addDentistToService(dbAddress, serviceTypeId, serviceId, msg.sender);
+    servicesLibrary.setFee(dbAddress, serviceTypeId, serviceId, fee, msg.sender);
+  }
+
+  function removeDentistFromService(
+    uint serviceTypeId,
+    uint serviceId
+  )
+  {
+    require(serviceTypeId != 0 && serviceId != 0);
+    servicesLibrary.removeDentistFromService(dbAddress, serviceTypeId, serviceId, msg.sender);
   }
 
   function removeServices(
-    address userId,
     uint serviceTypeId,
     uint[] serviceIds
   )
   {
-    require(address != 0x0 && serviceTypeId != 0 && serviceIds.length > 0);
-    servicesLibrary.removeDentist(dbAddress, serviceTypeId, serviceIds, userId);
+    require(serviceTypeId != 0 && serviceIds.length > 0);
+    servicesLibrary.removeDentist(dbAddress, serviceTypeId, serviceIds, msg.sender);
   }
 
   function getSlicedArray(address[] arrayObject, uint offset, uint limit, uint seed)

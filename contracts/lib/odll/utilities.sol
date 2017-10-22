@@ -126,6 +126,22 @@ library utilities {
     return result;
   }
 
+  function addRemovableIdItem(address dbAddress, uint id, string key, string countKey, string keysKey, uint val) internal {
+    if (ODLLDB(dbAddress).getUInt8Value(sha3(key, id, val)) == 0) { // never seen before
+      addIdArrayItem(dbAddress, id, keysKey, countKey, val);
+    }
+
+    ODLLDB(dbAddress).setUInt8Value(sha3(key, id, val), 1); // 1 == active
+  }
+
+  function addRemovableIdItem(address dbAddress, uint id, string key, string countKey, string keysKey, address val) internal {
+    if (ODLLDB(dbAddress).getUInt8Value(sha3(key, id, val)) == 0) { // never seen before
+      addIdArrayItem(dbAddress, id, keysKey, countKey, val);
+    }
+
+    ODLLDB(dbAddress).setUInt8Value(sha3(key, id, val), 1); // 1 == active
+  }
+
   function addRemovableIdArrayItem(address dbAddress, uint[] ids, string key, string countKey, string keysKey, uint val) internal {
     if (ids.length == 0) {
       return;
@@ -185,6 +201,14 @@ library utilities {
     }
 
     return take(j, result);
+  }
+
+  function removeIdItem(address dbAddress, uint id, string key, uint val) internal {
+    ODLLDB(dbAddress).setUInt8Value(sha3(key, id, val), 2); // 2 == blocked
+  }
+
+  function removeIdItem(address dbAddress, uint id, string key, address val) internal {
+    ODLLDB(dbAddress).setUInt8Value(sha3(key, id, val), 2); // 2 == blocked
   }
 
   function removeIdArrayItem(address dbAddress, uint[] ids, string key, uint val) internal {

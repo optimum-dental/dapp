@@ -11,6 +11,22 @@ library servicesLibrary {
     }
   }
 
+  function addDentistToService(address dbAddress, uint serviceTypeId, uint serviceId, address userId) internal {
+    if (serviceTypeId == 1) {
+      utilities.addRemovableIdItem(dbAddress, serviceId, "scan-services/dentists", "scan-services/dentists-count", "scan-services/dentists-keys", userId);
+    } else if (serviceTypeId == 2){
+      utilities.addRemovableIdItem(dbAddress, serviceId, "treatment-services/dentists", "treatment-services/dentists-count", "treatment-services/dentists-keys", userId);
+    }
+  }
+
+  function removeDentistFromService(address dbAddress, uint serviceTypeId, uint serviceId, address userId) internal {
+    if (serviceTypeId == 1) {
+      utilities.removeIdItem(dbAddress, serviceId, "scan-services/dentists", userId);
+    } else if (serviceTypeId == 2){
+      utilities.removeIdItem(dbAddress, serviceId, "treatment-services/dentists", userId);
+    }
+  }
+
   function removeDentist(address dbAddress, uint serviceTypeId, uint[] serviceIds, address userId) internal {
     if (serviceTypeId == 1) {
       utilities.removeIdArrayItem(dbAddress, serviceIds, "scan-services/dentists", userId);
