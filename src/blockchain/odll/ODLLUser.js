@@ -19,6 +19,17 @@ class ODLLUser {
     })
   }
 
+  writeServicesWithFees (state = null, data = {}) {
+    // return blockchainManager.querySmartContract({
+      // smartContractMethod: 'writeServicesWithFees',
+      // smartContractMethodParams: (coinbase) => [...(Object.values(data.userObject)), {from: coinbase, gas: 4444444}],
+      // state,
+      // smartContractResolve: result => data,
+      // smartContractReject: error => error
+    // })
+    console.log(data)
+  }
+
   writeUser (state = null, data = {}) {
     return blockchainManager.querySmartContract({
       smartContractMethod: 'writeUser',
@@ -120,6 +131,21 @@ class ODLLUser {
         warningMessage: "We've encountered a problem getting dentist ratings from the blockchain. Please do try again in a few minutes."
       })
     })
+  }
+
+  getServiceData (state, serviceTypeId, serviceSubtypeId) {
+    // return blockchainManager.querySmartContract({
+      // smartContractMethod: 'getDentistRatingData',
+      // smartContractMethodParams: (coinbase) => [userId || coinbase, {from: coinbase}],
+      // state,
+      // smartContractResolve: result => ({rating: result}),
+      // smartContractReject: (error) => ({
+        // error,
+        // isValid: true,
+        // warningMessage: "We've encountered a problem getting dentist ratings from the blockchain. Please do try again in a few minutes."
+      // })
+    // })
+    console.log(serviceTypeId, serviceSubtypeId)
   }
 
   getUserObject (state, results, keys) {

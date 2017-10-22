@@ -108,7 +108,8 @@ new Vue({
       isValidUserBut: state => state.isValidUserBut,
       originalIsValidUserBut: state => state.originalIsValidUserBut,
       gravatarURL: state => state.gravatarURL,
-      avatarCanvas: state => state.avatarCanvas
+      avatarCanvas: state => state.avatarCanvas,
+      defaultRoute: state => state.defaultRoute
     })
   },
   created: function () {
@@ -149,6 +150,18 @@ new Vue({
     },
     callResetIsValidUserBut () {
       this[ACTION_TYPES.RESET_IS_VALID_USER_BUT]()
+    },
+    callToWriteServicesWithFees (payload) {
+      const blockchainParams = Object.assign({}, payload)
+      delete blockchainParams.callback
+      ODLLUser.writeServicesWithFees(this.$store.state, blockchainParams)
+      .then((dataObject) => {
+        if (payload.callback) payload.callback(dataObject)
+      })
+      .catch((err) => {
+        if (payload.callback) payload.callback(false)
+        console.error(err, 'Unable to add data to the blockchain')
+      })
     },
     callToFetchDataObjects (payload) {
       const fetchQuery = payload.fetchQuery
@@ -199,6 +212,7 @@ new Vue({
     isDAppReady (isDAppReady) {
       console.log('isDAppReady: ', isDAppReady)
       this.callSetIsValidUserBut(this.$route.query.isValidUserBut || this.forcedIsValidUserBut)
+      if (['2', '3', '4'].includes(this.user.type) && ['Home', 'Root'].includes(this.currentRoute.name)) this.$router.push(this.defaultRoute[this.user.type])
     },
     $route (newRoute) {
       this[ACTION_TYPES.CHANGE_CURRENT_ROUTE_TO](newRoute)

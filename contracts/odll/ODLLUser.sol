@@ -178,6 +178,12 @@ contract ODLLUser is ODLLRestrictor {
   function blockUser(address userId)
     onlyOwnerOrActiveAdmin
   {
+    ODLLDB(dbAddress).setUInt8Value(sha3("user/status", userId), 2);
+  }
+
+  function unblockUser(address userId)
+    onlyOwnerOrActiveAdmin
+  {
     ODLLDB(dbAddress).setUInt8Value(sha3("user/status", userId), 1);
   }
 
@@ -209,6 +215,56 @@ contract ODLLUser is ODLLRestrictor {
   {
     foundManagersIds = searchLibrary.getManagers(dbAddress);
     (totalNumberFound, foundManagersIds) = getSlicedArray(foundManagersIds, offset, limit, seed);
+  }
+
+  function fetchServices(
+    address userId,
+    uint offset, // starting from offset: 0-based
+    uint limit, // not more than limit
+    uint seed // seed value to give the illusion of randomisation
+  )
+    constant
+    returns (
+      uint totalNumberFound,
+      uint[] foundServiceTypeIds
+      uint[] foundServiceIds
+    )
+  {
+    (foundServiceTypeIds, foundServiceIds) = searchLibrary.getServices(dbAddress, userId);
+    (totalNumberFound, foundServiceTypeIds) = getSlicedArray(foundServiceTypeIds, offset, limit, seed);
+    (totalNumberFound, foundServiceIds) = getSlicedArray(foundServiceIds, offset, limit, seed);
+  }
+
+  function writeServices(
+    address userId,
+    uint serviceTypeId,
+    uint[] serviceIds
+  )
+  {
+    require(address != 0x0 && serviceTypeId != 0 && serviceIds.length > 0);
+    servicesLibrary.addDentist(dbAddress, serviceTypeId, serviceIds, userId);
+  }
+
+  function writeServicesWithFees(
+    address userId,
+    uint serviceTypeId,
+    uint[] serviceIds,
+    uint[] feeIds
+  )
+  {
+    require(address != 0x0 && serviceTypeId != 0 && serviceIds.length > 0 && fees.length > 0);
+    servicesLibrary.addDentist(dbAddress, serviceTypeId, serviceIds, userId);
+    servicesLibrary.setFees(dbAddress, serviceTypeId, serviceIds, feeIds, userId);
+  }
+
+  function removeServices(
+    address userId,
+    uint serviceTypeId,
+    uint[] serviceIds
+  )
+  {
+    require(address != 0x0 && serviceTypeId != 0 && serviceIds.length > 0);
+    servicesLibrary.removeDentist(dbAddress, serviceTypeId, serviceIds, userId);
   }
 
   function getSlicedArray(address[] arrayObject, uint offset, uint limit, uint seed)

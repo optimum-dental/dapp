@@ -16,13 +16,18 @@
         return this.$root.user
       },
       menuItems () {
+        const profile = {
+          key: `${this.user.type === '0' ? 'get-started' : 'profile'}`,
+          text: `${this.user.type === '0' ? 'Get Started' : 'Profile'}`,
+          icon: '/static/images/person.png'
+        }
         switch (this.user.type) {
           case '2':
             return [
               {
-                key: 'get-started',
-                text: 'Get Started',
-                icon: '/static/images/person.png'
+                key: 'manage-services',
+                text: 'Manage Services',
+                icon: '/static/images/teeth.png'
               },
               {
                 key: 'view-apppointment-requests',
@@ -30,23 +35,14 @@
                 icon: '/static/images/appointment.png'
               },
               {
-                key: 'manage-services',
-                text: 'Manage Services',
-                icon: '/static/images/teeth.png'
-              },
-              {
                 key: 'view-scan-results',
                 text: 'View Scan Results',
                 icon: '/static/images/file.png'
-              }
+              },
+              profile
             ]
           case '3':
             return [
-              {
-                key: 'get-started',
-                text: 'Get Started',
-                icon: '/static/images/person.png'
-              },
               {
                 key: 'manage-dentists',
                 text: 'Manage Dentists',
@@ -66,15 +62,11 @@
                 key: 'view-scan-results',
                 text: 'View Scan Results',
                 icon: '/static/images/scan-application.png'
-              }
+              },
+              profile
             ]
           case '4':
             return [
-              {
-                key: 'get-started',
-                text: 'Get Started',
-                icon: '/static/images/person.png'
-              },
               {
                 key: 'managers',
                 text: 'Managers',
@@ -94,15 +86,11 @@
                 key: 'view-scan-results',
                 text: 'View Scan Results',
                 icon: '/static/images/scan-application.png'
-              }
+              },
+              profile
             ]
           default:
             return [
-              {
-                key: 'get-started',
-                text: 'Get Started',
-                icon: '/static/images/person.png'
-              },
               {
                 key: 'find-dentists',
                 text: 'Find Dentists',
@@ -128,7 +116,8 @@
                 key: 'view-treatment-applications',
                 text: 'View Treatment Applications',
                 icon: '/static/images/file.png'
-              }
+              },
+              profile
             ]
         }
       }
@@ -136,4 +125,4 @@
   }
 
   import MenuItemTemplate from './MenuItemTemplate.vue'
-</script>>
+</script>

@@ -100,6 +100,18 @@ class Search {
       .catch(error => reject(error))
     })
   }
+
+  getService (state = null, dataObject = {}) {
+    return new Promise((resolve, reject) => {
+      const serviceObject = {}
+      odllUser.getServiceData(state, dataObject.serviceTypeId, dataObject.serviceSubtypeId)
+      .then((result) => {
+        Object.assign(serviceObject, result)
+        resolve(serviceObject)
+      })
+      .catch(error => reject(error))
+    })
+  }
 }
 
 search = new Search()

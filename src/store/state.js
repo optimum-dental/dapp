@@ -1,6 +1,13 @@
 export default {
   currentRoute: null,
   currentView: null,
+  defaultRoute: {
+    '0': '/get-started',
+    '1': 'find-dentists',
+    '2': 'manage-services',
+    '3': 'manage-dentists',
+    '4': 'managers'
+  },
   web3: {
     address: '',
     coinbase: '',
@@ -60,6 +67,11 @@ export default {
       totalNumberAvailable: 0
     },
     fetchManagers: {
+      data: {},
+      seed: null,
+      totalNumberAvailable: 0
+    },
+    fetchServices: {
       data: {},
       seed: null,
       totalNumberAvailable: 0

@@ -84,4 +84,12 @@ library searchLibrary {
       return utilities.getRemovableIdArrayAddressItems(dbAddress, serviceId, "treatment-services/dentists", "treatment-services/dentists-count", "treatment-services/dentists-keys");
     }
   }
+
+  function getServices(address dbAddress, address userId)
+  internal
+  constant
+  returns (uint[] serviceTypeIds, uint[] serviceSubtypeIds) {
+    uint[] serviceTypeIds = new uint[1];
+    uint[] serviceSubtypeIds = new uint[1];
+  }
 }

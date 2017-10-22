@@ -11,6 +11,7 @@ import ViewTreatmentApplications from '@/components/main/actors/patient/view-tre
 
 import Managers from '@/components/main/actors/odll-admin/managers'
 import Dentists from '@/components/main/actors/odll-manager/manage-dentists'
+import ManageServices from '@/components/main/actors/dentist/manage-services'
 
 Vue.use(Router)
 
@@ -19,15 +20,23 @@ export default new Router({
     {
       mode: 'history',
       path: '/',
-      name: 'Home',
+      name: 'Root',
       component: Home,
       meta: { view: Home }
     },
     {
       mode: 'history',
       path: '/home',
+      name: 'Home',
       component: Home,
       meta: { view: Home }
+    },
+    {
+      mode: 'history',
+      path: '/profile',
+      name: 'Profile',
+      component: MainPage,
+      meta: { view: GetStarted }
     },
     {
       mode: 'history',
@@ -84,6 +93,13 @@ export default new Router({
       name: 'Dentists',
       component: MainPage,
       meta: { view: Dentists }
+    },
+    {
+      mode: 'history',
+      path: '/manage-services',
+      name: 'ManageServices',
+      component: MainPage,
+      meta: { view: ManageServices }
     }
   ]
 })

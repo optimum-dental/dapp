@@ -16,12 +16,16 @@ export default {
     FooterTemplate
   },
   computed: {
+    user () {
+      return this.$root.user
+    },
     vectors () {
       return vectorStyle
     }
   },
   mounted: function () {
     this.$emit('resetIsValidUserBut')
+    if (['2', '3', '4'].includes(this.user.type)) this.$router.push(this.$root.defaultRoute[this.user.type])
   }
 }
 
