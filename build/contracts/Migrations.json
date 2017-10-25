@@ -812,6 +812,11 @@
     "src": "0:493:0"
   },
   "networks": {
+    "3": {
+      "events": {},
+      "links": {},
+      "address": "0xac03136a35177f29e0ff26e861bc797bcbe61929"
+    },
     "666": {
       "events": {},
       "links": {},
@@ -819,5 +824,5 @@
     }
   },
   "schemaVersion": "1.0.0",
-  "updatedAt": "2017-10-24T20:40:42.399Z"
+  "updatedAt": "2017-10-25T01:27:16.761Z"
 }

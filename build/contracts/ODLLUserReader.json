@@ -4659,6 +4659,11 @@
     "src": "0:3793:9"
   },
   "networks": {
+    "3": {
+      "events": {},
+      "links": {},
+      "address": "0x4aa6e72bf0e88816c27abe80617cbec36986d629"
+    },
     "666": {
       "events": {},
       "links": {},
@@ -4666,5 +4671,5 @@
     }
   },
   "schemaVersion": "1.0.0",
-  "updatedAt": "2017-10-24T20:40:42.417Z"
+  "updatedAt": "2017-10-25T01:27:16.616Z"
 }
