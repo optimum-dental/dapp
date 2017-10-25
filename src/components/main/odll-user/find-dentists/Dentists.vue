@@ -303,7 +303,7 @@
               <div class="name">${result.name || 'Name: Not Supplied'}</div>
               <div class="company-name">${result.companyName || 'Company Name: Not Supplied'}</div>
               <div class="service">${result.service}</div>
-              <div class="fee">${result.fee}</div>
+              <div class="fee">$ ${result.fee}</div>
               ${averageRatingDOMElement.outerHTML}
               <div class="address">${result.address || 'Address: Not Supplied'}</div>
             </div>

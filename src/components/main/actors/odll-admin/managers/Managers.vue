@@ -83,12 +83,14 @@
         const addressDOMElement = document.getElementById('entry')
         const addressPattern = /0x[0-9a-fA-F]{40}/
         if (addressDOMElement.value.trim() !== '' && addressPattern.test(addressDOMElement.value.trim())) {
+          this.beginWait(document.querySelector('.wrapper'))
           this.$root.callToAddOfficialToODLL({
             userObject: {
               address: addressDOMElement.value.toLowerCase(),
               userType: 3
             },
             callback: (status = false) => {
+              this.endWait(document.querySelector('.wrapper'))
               this.enableButton(target)
               this.fetchManagers(null, this.currentOffset, this.$store.state.searchResult.fetchManagers.seed)
               this.notify(status ? 'Manager Successfully added' : 'Unable to add Manager')
@@ -209,6 +211,15 @@
       },
       notify (message) {
         console.log(message)
+      },
+      beginWait (target) {
+        target.classList.add('wait')
+      },
+      endWait (target) {
+        target.classList.remove('wait')
+      },
+      scrollToTop () {
+        $('html, body').animate({scrollTop: '0px'}, 500)
       }
     },
     mounted: function () {
@@ -222,6 +233,8 @@
       })
     }
   }
+  
+  import $ from 'jquery'
 </script>
 
 <style scoped>
@@ -232,6 +245,29 @@
     width: 100%;
     display: flex;
     flex-direction: column;
+  }
+
+  .wait {
+    border-top: 3px solid #fbfbfb;
+  }
+
+  .wait:before {
+    content: '';
+    display: block;
+    position: relative;
+    width: 200px;
+    margin: auto;
+    height: 4px;
+    background-color: #f4903e;
+    animation: wait-keyframe 4.2s infinite
+  }
+
+  @keyframes wait-keyframe {
+    0% {width: 20%;}
+    25% {width: 40%;}
+    50% {width: 60%;}
+    75% {width: 80%;}
+    100% {width: 100%;}
   }
 
   #managers {

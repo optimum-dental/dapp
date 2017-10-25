@@ -1,3 +1,4 @@
+import ODLLUserReaderContract from '../../../build/contracts/ODLLUserReader.json'
 import odllUser from '../odll/ODLLUser'
 import blockchainManager from '../BlockchainManager'
 
@@ -38,24 +39,41 @@ class Search {
   }
 
   fetchDataObjects (state = null, dataObject = {}) {
-    const fetchType = dataObject.type
+    let fetchType = dataObject.type
+    let willUnshiftCoinbase = false
+    let contractToUse = null
+    if (dataObject.specials) {
+      fetchType = dataObject.specials.callSmartContractWith || fetchType
+      willUnshiftCoinbase = dataObject.specials.willUnshiftCoinbase
+      contractToUse = dataObject.specials.contractToUse
+      delete dataObject.specials
+    }
+
     const callOnEach = dataObject.callOnEach
     const callOnEachParams = dataObject.callOnEachParams
     delete dataObject.type
-    delete dataObject.callOnEach
-    delete dataObject.callOnEachParams
+    if (callOnEach) delete dataObject.callOnEach
+    if (callOnEachParams) delete dataObject.callOnEachParams
+    let queryParams = Object.values(dataObject)
     return blockchainManager.querySmartContract({
+      contractToUse: contractToUse || ODLLUserReaderContract,
       smartContractMethod: fetchType,
-      smartContractMethodParams: (coinbase) => [...(Object.values(dataObject)), {from: coinbase}],
+      smartContractMethodParams: (coinbase) => {
+        if (willUnshiftCoinbase) queryParams.unshift(coinbase)
+        return [...(queryParams), {from: coinbase}]
+      },
       state,
-      smartContractResolve: (resultIds) => {
-        const results = resultIds[1].map((resultId) => {
-          return new Promise(function (resolve, reject) {
-            resolve(search[callOnEach](state, callOnEachParams(resultId)))
+      smartContractResolve: (results) => {
+        if (callOnEach && callOnEachParams) {
+          const resultIds = results[1].map((resultId) => {
+            return new Promise(function (resolve, reject) {
+              resolve(search[callOnEach](state, callOnEachParams(resultId)))
+            })
           })
-        })
-
-        return {totalNumberAvailable: resultIds[0], results}
+          return {totalNumberAvailable: results[0], results: resultIds}
+        } else {
+          return {totalNumberAvailable: results[0], results}
+        }
       },
       smartContractReject: (error) => ({
         error,
@@ -96,18 +114,6 @@ class Search {
           resolve(userObject)
         })
         .catch(error => reject(error))
-      })
-      .catch(error => reject(error))
-    })
-  }
-
-  getService (state = null, dataObject = {}) {
-    return new Promise((resolve, reject) => {
-      const serviceObject = {}
-      odllUser.getServiceData(state, dataObject.serviceTypeId, dataObject.serviceSubtypeId)
-      .then((result) => {
-        Object.assign(serviceObject, result)
-        resolve(serviceObject)
       })
       .catch(error => reject(error))
     })

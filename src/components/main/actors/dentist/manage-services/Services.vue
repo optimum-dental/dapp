@@ -165,6 +165,7 @@
             if (evt) this.enableButton(evt.target)
           })
         } else {
+          this.beginWait(document.querySelector('.wrapper'))
           this.$root.callToWriteServiceWithFee({
             serviceObject: {
               serviceTypeId,
@@ -172,6 +173,7 @@
               fee
             },
             callback: (status) => {
+              this.endWait(document.querySelector('.wrapper'))
               if (evt) this.enableButton(evt.target)
               if (status) this.fetchServices(null, this.currentOffset, this.$store.state.searchResult[serviceTypeId === 1 ? 'fetchScanServices' : 'fetchTreatmentServices'].seed, 1, serviceTypeId)
               this.notify(status ? 'Service Successfully added' : 'Unable to add Service')
@@ -180,18 +182,22 @@
         }
       },
       editService (evt, serviceTypeId, serviceSubtypeId) {
-        console.log(evt, serviceTypeId, serviceSubtypeId)
+        console.log('edit')
       },
       deleteService (evt, serviceTypeId, serviceSubtypeId) {
-        console.log(evt, serviceTypeId, serviceSubtypeId)
+        console.log('delete')
       },
       fetchServices (evt, offset = 0, seed = null, direction = 1, serviceType = 1) {
         const fetchQuery = {
           type: serviceType === 1 ? 'fetchScanServices' : 'fetchTreatmentServices',
+          specials: {
+            callSmartContractWith: 'fetchServicesWithFees',
+            willUnshiftCoinbase: true
+          },
+          serviceType,
           offset,
           limit: this.perPage,
-          seed: seed || Math.random(),
-          serviceType
+          seed: seed || Math.random()
         }
 
         this.$router.push({
@@ -220,24 +226,31 @@
         this.askUserToWaitWhileWeSearch(serviceType)
         this.$root.callToFetchDataObjects({
           fetchQuery,
-          callback: (result = null, isCompleted = false) => {
-            // update result view
-            if (isCompleted) {
-              if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
-              if (evt) this.enableButton(evt.target)
-            }
+          saveCallback: (results, state) => {
+            const serviceTypeId = serviceType
+            const serviceIds = results[1]
+            const fees = results[2]
+            serviceIds.forEach((serviceId, index) => {
+              let result = {
+                serviceName: serviceTypes[serviceTypeId].subTypes[serviceId],
+                serviceFee: fees[index],
+                serviceTypeId,
+                serviceId
+              }
 
-            if (result) {
-              this.appendResult(result, serviceType)
-            } else {
+              this.appendResult(result, serviceTypeId)
+              state.searchResult[fetchQuery.type].data[fetchQuery.offset].push(result)
+            })
+            if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
+            if (evt) this.enableButton(evt.target)
+            if (serviceIds.length === 0) {
               this.informOfNoService(serviceType)
-              if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
-              if (evt) this.enableButton(evt.target)
             }
           }
         })
       },
       populateResults (results, resultType = 1) {
+        if (typeof resultType === 'object' && resultType.toNumber) resultType = resultType.toNumber()
         const resultSection = document.querySelector(`.${resultType === 1 ? 'scan-section' : 'treatment-section'}`)
         this.clearDOMElementChildren(resultSection)
         results.forEach((result) => {
@@ -246,10 +259,10 @@
         })
       },
       appendResult (result, resultType = 1) {
+        if (typeof resultType === 'object' && resultType.toNumber) resultType = resultType.toNumber()
         const resultDOMElement = this.createResultDOMElement(result)
-        const resultSection = document.querySelector(`.${resultType === 1 ? 'scan-section' : 'treatment-section'}`)
+        const resultSection = document.querySelector(`.${Number(resultType) === 1 ? 'scan-section' : 'treatment-section'}`)
         resultSection.appendChild(resultDOMElement)
-        resultDOMElement.querySelector('.gravatar-section').appendChild(result.avatarCanvas)
       },
       clearDOMElementChildren (DOMElement) {
         while (DOMElement.hasChildNodes()) {
@@ -271,12 +284,12 @@
         if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
         if (document.querySelector('.no-service')) document.querySelector('.no-service').remove()
         let waitOverlayDOMElement = this.createWaitOverlayDOMElement(serviceType)
-        document.querySelector('.result-section').insertBefore(waitOverlayDOMElement, document.querySelector('.result'))
+        document.querySelector('.result-section').appendChild(waitOverlayDOMElement)
       },
       informOfNoService (serviceType = 1) {
         if (document.querySelector('.no-service')) document.querySelector('.no-service').remove()
-        let noDentistDOMElement = this.createNoServiceDOMElement(serviceType)
-        document.querySelector('.result-section').insertBefore(noDentistDOMElement, document.querySelector('.result'))
+        let noServiceDOMElement = this.createNoServiceDOMElement(serviceType)
+        document.querySelector('.result-section').appendChild(noServiceDOMElement)
       },
       createWaitOverlayDOMElement (serviceType = 1) {
         const DOMELement = new DOMParser().parseFromString(`
@@ -302,11 +315,10 @@
       createResultDOMElement (result) {
         const resultDOMElement = new DOMParser().parseFromString(`          
           <div class="result">
-            <div class="about-section">
-              <div class="service-subtype">${result.serviceSubtype || 'Service Subtype: Not Supplied'}</div>
-              <input class="fee" type="number" value="${result.fee || 0}"</div>
-              <div class="edit" onclick="${this.editService(result.serviceTypeId, result.serviceSubtypeId)}">Edit</div>
-              <div class="delete" onclick="${this.deleteService(result.serviceTypeId, result.serviceSubtypeId)}">Delete</div>
+            <div class="service-name">${result.serviceName}</div>
+            <div class="service-fee">$ ${result.serviceFee}</div>
+            <div class="edit" onclick="${this.editService(result.serviceTypeId, result.serviceId, result.serviceFee)}">Edit</div>
+              <div class="delete" onclick="${this.deleteService(result.serviceTypeId, result.serviceId)}">Delete</div>
             </div>
           </div>
         `, 'text/html').body.firstChild
@@ -324,16 +336,28 @@
       },
       notify (message) {
         console.log(message)
+      },
+      beginWait (target) {
+        target.classList.add('wait')
+      },
+      endWait (target) {
+        target.classList.remove('wait')
+      },
+      scrollToTop () {
+        $('html, body').animate({scrollTop: '0px'}, 500)
       }
     },
     mounted: function () {
+      const serviceType = Number(this.$route.query.sT || 1)
       this.populateServiceTypes()
       this.setEventListeners()
       this.getServices(null, {
-        type: 'fetchServices',
-        serviceTypeId: Number(this.$route.query.sTI || 0),
-        serviceSubtypeId: Number(this.$route.query.sSI || 0),
-        fee: Number(this.$route.query.f || 0),
+        type: serviceType === 1 ? 'fetchScanServices' : 'fetchTreatmentServices',
+        specials: {
+          callSmartContractWith: 'fetchServicesWithFees',
+          willUnshiftCoinbase: true
+        },
+        serviceType,
         offset: Number(this.$route.query.o || 0),
         limit: Number(this.$route.query.l || 0),
         seed: Number(this.$route.query.sd || 0)
@@ -342,6 +366,7 @@
   }
 
   import serviceTypes from '../../../../../../static/json/appointment_types/appointment_types.json'
+  import $ from 'jquery'
 </script>
 
 <style scoped>
@@ -352,6 +377,25 @@
     width: 100%;
     display: flex;
     flex-direction: column;
+  }
+
+  .wait:before {
+    content: '';
+    display: block;
+    position: relative;
+    width: 200px;
+    margin: auto;
+    height: 4px;
+    background-color: #f4903e;
+    animation: wait-keyframe 4.2s infinite
+  }
+
+  @keyframes wait-keyframe {
+    0% {width: 20%;}
+    25% {width: 40%;}
+    50% {width: 60%;}
+    75% {width: 80%;}
+    100% {width: 100%;}
   }
 
   #services {
@@ -466,8 +510,6 @@
 
   .view-section {
     background: #ffffff;
-    position: absolute;
-    top: 40px;
     min-height: 260px;
     width: 100%;
   }
@@ -475,8 +517,6 @@
   .scan-section, .treatment-section {
     width: 100%;
     min-height: 260px;
-    position: absolute;
-    top: 0px;
     display: none;
   }
 
@@ -647,6 +687,34 @@
     text-decoration: none;
     font-size: 14px;
     text-align: center;
+  }
+
+  .service-name {
+    width: 50%;
+    height: 40px;
+    font-size: 20px;
+    line-height: 40px;
+  }
+
+  .service-fee {
+    width: 50%;
+    height: 40px;
+    font-size: 16px;
+    line-height: 40px;
+  }
+
+  .edit, .delete {
+    width: 100px;
+    height: 30px;
+    line-height: 30px;
+    color: #ffffff;
+    background: #3285b1;
+    display: inline-block;
+    text-decoration: none;
+    font-size: 14px;
+    text-align: center;
+    margin-right: 10px;
+    cursor: pointer;
   }
 </style>
 

@@ -1,4 +1,4 @@
-pragma solidity ^0.4.11;
+pragma solidity 0.4.17;
 
 import "../zeppelin/ownership/Ownable.sol";
 import "../zeppelin/math/SafeMath.sol";
@@ -15,17 +15,17 @@ contract ODLLDB is Ownable {
     _;
   }
 
-  function ODLLDB() {
+  function ODLLDB() public {
 
   }
 
-  function addPermittedContract(address contractAddress)
+  function addPermittedContract(address contractAddress) external
   onlyOwner {
     permissionStatusForContract[contractAddress] = true;
     permittedContractsAddresses.push(contractAddress);
   }
 
-  function addPermittedContracts(address[] addresses)
+  function addPermittedContracts(address[] addresses) external
   onlyOwner {
     for (uint i = 0; i < addresses.length; i++) {
       permissionStatusForContract[addresses[i]] = true;
@@ -33,19 +33,19 @@ contract ODLLDB is Ownable {
     }
   }
 
-  function removePermittedContract(address addresses)
+  function removePermittedContract(address addresses) external
   onlyOwner {
     permissionStatusForContract[addresses] = false;
   }
 
-  function removePermittedContracts(address[] addresses)
+  function removePermittedContracts(address[] addresses) external
   onlyOwner {
     for (uint i = 0; i < addresses.length; i++) {
       permissionStatusForContract[addresses[i]] = false;
     }
   }
 
-  function permittedContractsCount() constant returns(uint count) {
+  function permittedContractsCount() public view returns(uint count) {
     for (uint i = 0; i < permittedContractsAddresses.length; i++) {
       if (permissionStatusForContract[permittedContractsAddresses[i]]) {
         count++;
@@ -55,7 +55,7 @@ contract ODLLDB is Ownable {
     return count;
   }
 
-  function getPermittedContracts() constant returns(address[] addresses) {
+  function getPermittedContracts() external constant returns(address[] addresses) {
     addresses = new address[](permittedContractsCount());
     for (uint i = 0; i < permittedContractsAddresses.length; i++) {
       if (permissionStatusForContract[permittedContractsAddresses[i]]) {
@@ -68,17 +68,17 @@ contract ODLLDB is Ownable {
 
   mapping(bytes32 => uint8) UInt8Storage;
 
-  function getUInt8Value(bytes32 record) constant returns (uint8){
+  function getUInt8Value(bytes32 record) public view returns (uint8){
     return UInt8Storage[record];
   }
 
-  function setUInt8Value(bytes32 record, uint8 value)
+  function setUInt8Value(bytes32 record, uint8 value) public
     onlyPermittedContractOrOwner
   {
     UInt8Storage[record] = value;
   }
 
-  function deleteUInt8Value(bytes32 record)
+  function deleteUInt8Value(bytes32 record) external
     onlyPermittedContractOrOwner
   {
     delete UInt8Storage[record];
@@ -86,29 +86,29 @@ contract ODLLDB is Ownable {
 
   mapping(bytes32 => uint) UIntStorage;
 
-  function getUIntValue(bytes32 record) constant returns (uint){
+  function getUIntValue(bytes32 record) public view returns (uint){
     return UIntStorage[record];
   }
 
-  function setUIntValue(bytes32 record, uint value)
+  function setUIntValue(bytes32 record, uint value) public
     onlyPermittedContractOrOwner
   {
     UIntStorage[record] = value;
   }
 
-  function addUIntValue(bytes32 record, uint value)
+  function addUIntValue(bytes32 record, uint value) external
     onlyPermittedContractOrOwner
   {
     UIntStorage[record] = SafeMath.add(UIntStorage[record], value);
   }
 
-  function subUIntValue(bytes32 record, uint value)
+  function subUIntValue(bytes32 record, uint value) external
     onlyPermittedContractOrOwner
   {
     UIntStorage[record] = SafeMath.sub(UIntStorage[record], value);
   }
 
-  function deleteUIntValue(bytes32 record)
+  function deleteUIntValue(bytes32 record) external
     onlyPermittedContractOrOwner
   {
     delete UIntStorage[record];
@@ -116,17 +116,17 @@ contract ODLLDB is Ownable {
 
   mapping(bytes32 => string) StringStorage;
 
-  function getStringValue(bytes32 record) constant returns (string){
+  function getStringValue(bytes32 record) public view returns (string){
     return StringStorage[record];
   }
 
-  function setStringValue(bytes32 record, string value)
+  function setStringValue(bytes32 record, string value) external
     onlyPermittedContractOrOwner
   {
     StringStorage[record] = "^".toSlice().concat(value.toSlice());
   }
 
-  function deleteStringValue(bytes32 record)
+  function deleteStringValue(bytes32 record) external
     onlyPermittedContractOrOwner
   {
     delete StringStorage[record];
@@ -134,17 +134,17 @@ contract ODLLDB is Ownable {
 
   mapping(bytes32 => address) AddressStorage;
 
-  function getAddressValue(bytes32 record) constant returns (address){
+  function getAddressValue(bytes32 record) public view returns (address){
     return AddressStorage[record];
   }
 
-  function setAddressValue(bytes32 record, address value)
+  function setAddressValue(bytes32 record, address value) external
     onlyPermittedContractOrOwner
   {
     AddressStorage[record] = value;
   }
 
-  function deleteAddressValue(bytes32 record)
+  function deleteAddressValue(bytes32 record) external
     onlyPermittedContractOrOwner
   {
     delete AddressStorage[record];
@@ -152,17 +152,17 @@ contract ODLLDB is Ownable {
 
   mapping(bytes32 => bytes) BytesStorage;
 
-  function getBytesValue(bytes32 record) constant returns (bytes){
+  function getBytesValue(bytes32 record) public view returns (bytes){
     return BytesStorage[record];
   }
 
-  function setBytesValue(bytes32 record, bytes value)
+  function setBytesValue(bytes32 record, bytes value) external
     onlyPermittedContractOrOwner
   {
     BytesStorage[record] = value;
   }
 
-  function deleteBytesValue(bytes32 record)
+  function deleteBytesValue(bytes32 record) external
     onlyPermittedContractOrOwner
   {
     delete BytesStorage[record];
@@ -170,17 +170,17 @@ contract ODLLDB is Ownable {
 
   mapping(bytes32 => bytes32) Bytes32Storage;
 
-  function getBytes32Value(bytes32 record) constant returns (bytes32){
+  function getBytes32Value(bytes32 record) public view returns (bytes32){
     return Bytes32Storage[record];
   }
 
-  function setBytes32Value(bytes32 record, bytes32 value)
+  function setBytes32Value(bytes32 record, bytes32 value) external
     onlyPermittedContractOrOwner
   {
     Bytes32Storage[record] = value;
   }
 
-  function deleteBytes32Value(bytes32 record)
+  function deleteBytes32Value(bytes32 record) external
     onlyPermittedContractOrOwner
   {
     delete Bytes32Storage[record];
@@ -188,17 +188,17 @@ contract ODLLDB is Ownable {
 
   mapping(bytes32 => bool) BooleanStorage;
 
-  function getBooleanValue(bytes32 record) constant returns (bool){
+  function getBooleanValue(bytes32 record) public view returns (bool){
     return BooleanStorage[record];
   }
 
-  function setBooleanValue(bytes32 record, bool value)
+  function setBooleanValue(bytes32 record, bool value) external
     onlyPermittedContractOrOwner
   {
     BooleanStorage[record] = value;
   }
 
-  function deleteBooleanValue(bytes32 record)
+  function deleteBooleanValue(bytes32 record) external
     onlyPermittedContractOrOwner
   {
     delete BooleanStorage[record];
@@ -206,23 +206,23 @@ contract ODLLDB is Ownable {
 
   mapping(bytes32 => int) IntStorage;
 
-  function getIntValue(bytes32 record) constant returns (int){
+  function getIntValue(bytes32 record) public view returns (int){
     return IntStorage[record];
   }
 
-  function setIntValue(bytes32 record, int value)
+  function setIntValue(bytes32 record, int value) external
     onlyPermittedContractOrOwner
   {
     IntStorage[record] = value;
   }
 
-  function deleteIntValue(bytes32 record)
+  function deleteIntValue(bytes32 record) external
     onlyPermittedContractOrOwner
   {
     delete IntStorage[record];
   }
 
-  function booleanToUInt(bool x) constant returns (uint) {
+  function booleanToUInt(bool x) public pure returns (uint) {
     if (x) {
       return 1;
     } else {
@@ -230,7 +230,7 @@ contract ODLLDB is Ownable {
     }
   }
 
-  function getUIntValueConverted(bytes32 record, uint8 uintType) constant returns(uint) {
+  function getUIntValueConverted(bytes32 record, uint8 uintType) public view returns(uint) {
     if (uintType == 1) {
       return booleanToUInt(getBooleanValue(record));
     } else if (uintType == 2) {
@@ -246,7 +246,7 @@ contract ODLLDB is Ownable {
     }
   }
 
-  function getUIntTypesCount(uint8[] types) constant returns(uint count) {
+  function getUIntTypesCount(uint8[] types) public pure returns(uint count) {
     count = 0;
     for (uint i = 0; i < types.length ; i++) {
       if (types[i] != 7) {

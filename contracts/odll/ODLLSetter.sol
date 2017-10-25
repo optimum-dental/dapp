@@ -1,46 +1,63 @@
-pragma solidity ^0.4.11;
+pragma solidity 0.4.17;
 
 import "./ODLLRestrictor.sol";
-import "./ODLLUser.sol";
 
 contract ODLLSetter is ODLLRestrictor {
   event ContractSet(address ContractAddress, bytes32 record, uint settingTime);
 
-  function ODLLSetter(address _dbAddress) {
+  function ODLLSetter(address _dbAddress) public {
     require(_dbAddress != 0x0);
     dbAddress = _dbAddress;
   }
 
   function setODLLConfig()
+    external
     onlyOwner
   {
-    ODLLDB(dbAddress).setUIntValue(sha3('config/max-user-name-length'), 32);
-    ODLLDB(dbAddress).setUIntValue(sha3('config/min-user-name-length'), 5);
+    ODLLDB(dbAddress).setUIntValue(keccak256('config/max-user-name-length'), 32);
+    ODLLDB(dbAddress).setUIntValue(keccak256('config/min-user-name-length'), 5);
   }
 
   function setOwner()
+    external
     onlyOwner
   {
-    ODLLDB(dbAddress).setAddressValue(sha3('odll/owner'), owner);
+    ODLLDB(dbAddress).setAddressValue(keccak256('odll/owner'), owner);
   }
 
-  function setFirstAdmin(address firstAdminAdress)
+  function setFirstAdmin(address firstAdminAddress)
+    external
     onlyOwnerCanCall(msg.sender)
   {
-    ODLLDB(dbAddress).setAddressValue(sha3('odll/first-admin'), firstAdminAdress);
-    ODLLDB(dbAddress).setUInt8Value(sha3("user/type", firstAdminAdress), 4);
-    ODLLDB(dbAddress).setBooleanValue(sha3('user/is-admin?', firstAdminAdress), true);
-    ODLLDB(dbAddress).setUIntValue(sha3("user/created-on", firstAdminAdress), now);
-    ODLLDB(dbAddress).setUInt8Value(sha3("user/status", firstAdminAdress), 1);
-    utilities.addArrayItem(dbAddress, "users/ids", "users/count", firstAdminAdress);
-    utilities.addArrayItem(dbAddress, "admins/ids", "admins/count", firstAdminAdress);
+    require(ODLLDB(dbAddress).getUInt8Value(keccak256("user/type", firstAdminAddress)) == 0);
+    ODLLDB(dbAddress).setAddressValue(keccak256('odll/first-admin'), firstAdminAddress);
+    addAdmin(firstAdminAddress);
+  }
+
+  function addAdmin(address adminAddress)
+    public
+    onlyOwnerCanCall(msg.sender)
+  {
+    require(ODLLDB(dbAddress).getUInt8Value(keccak256("user/type", adminAddress)) == 0);
+    ODLLDB(dbAddress).setUInt8Value(keccak256("user/type", adminAddress), 4);
+    ODLLDB(dbAddress).setBooleanValue(keccak256('user/is-admin?', adminAddress), true);
+    ODLLDB(dbAddress).setUIntValue(keccak256("user/created-on", adminAddress), now);
+    ODLLDB(dbAddress).setUInt8Value(keccak256("user/status", adminAddress), 1);
+    addArrayItem("users/ids", "users/count", adminAddress);
+    addArrayItem("admins/ids", "admins/count", adminAddress);
+  }
+
+  function addArrayItem(string key, string countKey, address val) internal {
+    var idx = ODLLDB(dbAddress).getUIntValue(keccak256(countKey));
+    ODLLDB(dbAddress).setAddressValue(keccak256(key, idx), val);
+    ODLLDB(dbAddress).setUIntValue(keccak256(countKey), idx + 1);
   }
 
   function setContract(string dbKey, address newContractAddress)
+    external
     onlyOwnerCanCall(msg.sender)
   {
-    // record: { ODLLUser: sha3('contract/odll-user') }
-    bytes32 record = sha3(dbKey);
+    bytes32 record = keccak256(dbKey);
     setNewContractAddressToKey(record, newContractAddress);
     ContractSet(newContractAddress, record, now);
   }
@@ -53,27 +70,12 @@ contract ODLLSetter is ODLLRestrictor {
     ODLLDB(dbAddress).setAddressValue(record, newContractAddress);
   }
 
-  function selfDestructOldContractToNewContract(bytes32 record, address oldContractAddress, address newContractAddress)
-    onlyOwnerCanCall(msg.sender)
-  {
-    if (oldContractAddress != 0x0 && ODLLDB(dbAddress).permissionStatusForContract(oldContractAddress) && ODLLDB(dbAddress).permissionStatusForContract(newContractAddress)) {
-      destroyOldContract(record, oldContractAddress, newContractAddress);
-    }
-  }
-
   function getContractAddress(bytes32 record)
+    external
     onlyOwnerCanCall(msg.sender)
-    constant returns (address)
+    view returns (address)
   {
     ODLLDB(dbAddress).getAddressValue(record);
   }
-
-  function destroyOldContract(bytes32 record, address oldContractAddress, address newContractAddress)
-    onlyOwnerCanCall(msg.sender)
-    internal
-  {
-    if (record == sha3('contract/odll-user')) {
-      ODLLUser(oldContractAddress).destroySelf(msg.sender, newContractAddress);
-    }
-  }
 }
+

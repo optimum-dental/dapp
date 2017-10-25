@@ -1,37 +1,37 @@
-pragma solidity ^0.4.11;
+pragma solidity 0.4.17;
 
-import "./searchLibrary.sol";
+import "./utilities.sol";
 
 library servicesLibrary {
   function addDentist(address dbAddress, uint serviceTypeId, uint[] serviceIds, address userId) internal {
-    if (serviceTypeId == 1) {
-      utilities.addRemovableIdArrayItem(dbAddress, serviceIds, "scan-services/dentists", "scan-services/dentists-count", "scan-services/dentists-keys", userId);
-    } else if (serviceTypeId == 2){
-      utilities.addRemovableIdArrayItem(dbAddress, serviceIds, "treatment-services/dentists", "treatment-services/dentists-count", "treatment-services/dentists-keys", userId);
+    for (uint i = 0; i < serviceIds.length; i++) {
+      addDentistToService(dbAddress, serviceTypeId, serviceIds[i], userId);
     }
   }
 
   function addDentistToService(address dbAddress, uint serviceTypeId, uint serviceId, address userId) internal {
     if (serviceTypeId == 1) {
-      utilities.addRemovableIdItem(dbAddress, serviceId, "scan-services/dentists", "scan-services/dentists-count", "scan-services/dentists-keys", userId);
+      utilities.addRemovableIdItem(dbAddress, userId, "dentist/scan-service", "dentist/scan-services-count", "dentist/scan-service-key", serviceId);
+      utilities.addRemovableIdItem(dbAddress, serviceId, "scan-service/dentist", "scan-service/dentists-count", "scan-service/dentist-key", userId);
     } else if (serviceTypeId == 2){
-      utilities.addRemovableIdItem(dbAddress, serviceId, "treatment-services/dentists", "treatment-services/dentists-count", "treatment-services/dentists-keys", userId);
+      utilities.addRemovableIdItem(dbAddress, userId, "dentist/treatment-service", "dentist/treatment-services-count", "dentist/treatment-service-key", serviceId);
+      utilities.addRemovableIdItem(dbAddress, serviceId, "treatment-service/dentist", "treatment-service/dentists-count", "treatment-service/dentist-key", userId);
     }
   }
 
   function removeDentistFromService(address dbAddress, uint serviceTypeId, uint serviceId, address userId) internal {
     if (serviceTypeId == 1) {
-      utilities.removeIdItem(dbAddress, serviceId, "scan-services/dentists", userId);
+      utilities.removeIdItem(dbAddress, userId, "dentist/scan-service", serviceId);
+      utilities.removeIdItem(dbAddress, serviceId, "scan-service/dentist", userId);
     } else if (serviceTypeId == 2){
-      utilities.removeIdItem(dbAddress, serviceId, "treatment-services/dentists", userId);
+      utilities.removeIdItem(dbAddress, userId, "dentist/treatment-service", serviceId);
+      utilities.removeIdItem(dbAddress, serviceId, "treatment-service/dentist", userId);
     }
   }
 
   function removeDentist(address dbAddress, uint serviceTypeId, uint[] serviceIds, address userId) internal {
-    if (serviceTypeId == 1) {
-      utilities.removeIdArrayItem(dbAddress, serviceIds, "scan-services/dentists", userId);
-    } else if (serviceTypeId == 2){
-      utilities.removeIdArrayItem(dbAddress, serviceIds, "treatment-services/dentists", userId);
+    for (uint i = 0; i < serviceIds.length; i++) {
+      removeDentistFromService(dbAddress, serviceTypeId, serviceIds[i], userId);
     }
   }
 
@@ -47,9 +47,9 @@ library servicesLibrary {
 
   function setFee(address dbAddress, uint serviceTypeId, uint serviceId, uint fee, address userId) internal {
     if (serviceTypeId == 1) {
-      ODLLDB(dbAddress).setUIntValue(sha3("scan-services/dentists", "fee", serviceId, userId), fee);
+      ODLLDB(dbAddress).setUIntValue(keccak256("dentist/scan-service/fee", userId, serviceId), fee);
     } else if (serviceTypeId == 2){
-      ODLLDB(dbAddress).setUIntValue(sha3("treatment-services/dentists", "fee", serviceId, userId), fee);
+      ODLLDB(dbAddress).setUIntValue(keccak256("dentist/treatment-service/fee", userId, serviceId), fee);
     }
   }
 }

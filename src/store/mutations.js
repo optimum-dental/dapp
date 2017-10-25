@@ -230,24 +230,28 @@ export default {
     if (results.length > 0) {
       Promise.all(results)
       .then((values) => {
-        values.forEach((value, index) => {
-          let userState = Number(value.state) !== 0 ? states[Number(value.state)].name : ''
-          let [ gravatar, name, companyName, email, street, city, zipCode, phoneNumber ] = stringifyBytesData(state, value, [ 'gravatar', 'name', 'companyName', 'email', 'street', 'city', 'zipCode', 'phoneNumber' ])
-          let address = street || city || userState ? `${street} ${city} ${userState}` : ''
-          Object.assign(value, {
-            coinbase: value.coinbase, gravatar, name, companyName, email, street, city, address, zipCode, phoneNumber
+        if (payload.saveCallback) {
+          payload.saveCallback(values, state)
+        } else {
+          values.forEach((value, index) => {
+            let userState = Number(value.state) !== 0 ? states[Number(value.state)].name : ''
+            let [ gravatar, name, companyName, email, street, city, zipCode, phoneNumber ] = stringifyBytesData(state, value, [ 'gravatar', 'name', 'companyName', 'email', 'street', 'city', 'zipCode', 'phoneNumber' ])
+            let address = street || city || userState ? `${street} ${city} ${userState}` : ''
+            Object.assign(value, {
+              coinbase: value.coinbase, gravatar, name, companyName, email, street, city, address, zipCode, phoneNumber
+            })
+            getGravatarFor({
+              email: value.email,
+              coinbase: value.coinbase
+            })
+            .then((avatarCanvas) => {
+              value.avatarCanvas = avatarCanvas
+              searchResultCopy[payload.type].data[payload.offset].push(value)
+              state.searchResult = searchResultCopy
+              if (payload.callback) payload.callback(value, results.length === index + 1)
+            })
           })
-          getGravatarFor({
-            email: value.email,
-            coinbase: value.coinbase
-          })
-          .then((avatarCanvas) => {
-            value.avatarCanvas = avatarCanvas
-            searchResultCopy[payload.type].data[payload.offset].push(value)
-            state.searchResult = searchResultCopy
-            if (payload.callback) payload.callback(value, results.length === index + 1)
-          })
-        })
+        }
       })
     } else {
       if (payload.callback) payload.callback(null, true)

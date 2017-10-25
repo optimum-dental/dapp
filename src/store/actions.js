@@ -84,6 +84,7 @@ export default {
     return new Promise(function (resolve, reject) {
       commit(MUTATION_TYPES.SAVE_SEARCH_RESULT, {
         results: payload.results,
+        saveCallback: payload.saveCallback,
         totalNumberAvailable: payload.totalNumberAvailable,
         type: payload.type,
         offset: payload.offset,

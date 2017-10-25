@@ -1,4 +1,4 @@
-// import ODLLUserContract from '../../../build/contracts/ODLLUser.json'
+import ODLLUserReaderContract from '../../../build/contracts/ODLLUserReader.json'
 import blockchainManager from '../BlockchainManager'
 
 let odllUser = null
@@ -63,6 +63,7 @@ class ODLLUser {
 
   getUserIdentityData (state = null, userId = null) {
     return blockchainManager.querySmartContract({
+      contractToUse: ODLLUserReaderContract,
       smartContractMethod: 'getUserIdentityData',
       smartContractMethodParams: (coinbase) => [userId || coinbase, {from: coinbase}],
       state,
@@ -77,6 +78,7 @@ class ODLLUser {
 
   getUserContactData (state = null, userId = null) {
     return blockchainManager.querySmartContract({
+      contractToUse: ODLLUserReaderContract,
       smartContractMethod: 'getUserContactData',
       smartContractMethodParams: (coinbase) => [userId || coinbase, {from: coinbase}],
       state,
@@ -91,6 +93,7 @@ class ODLLUser {
 
   getUserPersonalData (state = null, userId = null) {
     return blockchainManager.querySmartContract({
+      contractToUse: ODLLUserReaderContract,
       smartContractMethod: 'getUserPersonalData',
       smartContractMethodParams: (coinbase) => [userId || coinbase, {from: coinbase}],
       state,
@@ -106,6 +109,7 @@ class ODLLUser {
   getDentistFeeData (state = null, dataObject = {}) {
     const userId = dataObject.dentistId
     return blockchainManager.querySmartContract({
+      contractToUse: ODLLUserReaderContract,
       smartContractMethod: 'getDentistFeeData',
       smartContractMethodParams: (coinbase) => [dataObject.serviceTypeId, dataObject.serviceId, userId || coinbase, {from: coinbase}],
       state,
@@ -120,6 +124,7 @@ class ODLLUser {
 
   getDentistRatingData (state = null, userId = null) {
     return blockchainManager.querySmartContract({
+      contractToUse: ODLLUserReaderContract,
       smartContractMethod: 'getDentistRatingData',
       smartContractMethodParams: (coinbase) => [userId || coinbase, {from: coinbase}],
       state,
@@ -134,6 +139,7 @@ class ODLLUser {
 
   getServiceData (state, serviceTypeId, serviceSubtypeId) {
     // return blockchainManager.querySmartContract({
+      // contractToUse: ODLLUserReaderContract,
       // smartContractMethod: 'getDentistRatingData',
       // smartContractMethodParams: (coinbase) => [userId || coinbase, {from: coinbase}],
       // state,

@@ -292,6 +292,7 @@
             this.enableButton(target)
           })
         } else {
+          this.scrollToTop()
           const userObject = {
             type: this.type,
             name: `b${name}`,
@@ -333,10 +334,12 @@
             year
           })
 
+          this.beginWait(document.querySelector('.wrapper'))
           this.$root.callToWriteUser({
             userObject,
             vueUserObject,
             callback: (userData = null) => {
+              this.endWait(document.querySelector('.wrapper'))
               this.enableButton(target)
             }
           })
@@ -354,6 +357,15 @@
         target.disabled = false
         target.style.cursor = 'pointer'
         target.style.background = '#29aae1'
+      },
+      beginWait (target) {
+        target.classList.add('wait')
+      },
+      endWait (target) {
+        target.classList.remove('wait')
+      },
+      scrollToTop () {
+        $('html, body').animate({scrollTop: '0px'}, 500)
       }
     },
     mounted: function () {
@@ -376,6 +388,7 @@
   import states from '../../../../../static/json/states/states.json'
   import dateSelectionManager from 'date-selection-manager'
   import { validateFor } from '../../../../util/ssnValidator'
+  import $ from 'jquery'
 </script>
 
 <style scoped>
@@ -388,6 +401,29 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+  }
+
+  .wait {
+    border-top: 3px solid #fbfbfb;
+  }
+
+  .wait:before {
+    content: '';
+    display: block;
+    position: relative;
+    width: 200px;
+    margin: auto;
+    height: 4px;
+    background-color: #f4903e;
+    animation: wait-keyframe 4.2s infinite
+  }
+
+  @keyframes wait-keyframe {
+    0% {width: 20%;}
+    25% {width: 40%;}
+    50% {width: 60%;}
+    75% {width: 80%;}
+    100% {width: 100%;}
   }
 
   #user {

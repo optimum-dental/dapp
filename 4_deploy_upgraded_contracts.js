@@ -1,9 +1,7 @@
 var contract = require('truffle-contract');
 var ODLLDBConfigObject = require('../build/contracts/ODLLDB.json');
 
-var ODLLUserWriter = artifacts.require("./odll/ODLLUserWriter.sol");
-var ODLLUserReader = artifacts.require("./odll/ODLLUserReader.sol");
-var ODLLSetter = artifacts.require("./odll/ODLLSetter.sol");
+var ODLLUser = artifacts.require("./odll/ODLLUser.sol");
 
 var ODLLDBContract = contract(ODLLDBConfigObject);
 ODLLDBContract.setProvider(web3.currentProvider);
@@ -14,7 +12,6 @@ var dbAddress = ODLLDBContract.deployed()
 });
 
 module.exports = function (deployer) {
-  deployer.deploy(ODLLSetter, dbAddress);
-  deployer.deploy(ODLLUserWriter, dbAddress);
-  deployer.deploy(ODLLUserReader, dbAddress);
+  deployer.deploy(ODLLUser, dbAddress);
 };
+

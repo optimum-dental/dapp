@@ -2,7 +2,8 @@ import contract from 'truffle-contract'
 import ODLLDB from '../../build/contracts/ODLLDB.json'
 import { APPROVED_BLOCKCHAIN_NETWORK_ID, NETWORKS } from '../util/constants'
 import soliditySha3 from 'solidity-sha3'
-import ODLLUserContract from '../../build/contracts/ODLLUser.json'
+import ODLLUserWriterContract from '../../build/contracts/ODLLUserWriter.json'
+// import ODLLUserReaderContract from '../../build/contracts/ODLLUserReader.json'
 
 let blockchainManager = null
 
@@ -85,7 +86,7 @@ class BlockchainManager {
     return new Promise((resolve, reject) => {
       blockchainManager.accessBlockChainWith({
         state: query.state,
-        contractToUse: query.contractToUse || ODLLUserContract,
+        contractToUse: query.contractToUse || ODLLUserWriterContract,
         dbContractKey: query.dbContractKey || 'contract/odll-user',
         method: query.method || ((contractInstance, coinbase) => {
           return new Promise((resolve, reject) => {
