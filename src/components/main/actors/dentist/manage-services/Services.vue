@@ -359,7 +359,7 @@
         },
         serviceType,
         offset: Number(this.$route.query.o || 0),
-        limit: Number(this.$route.query.l || 5),
+        limit: Number(this.$route.query.l || this.perPage),
         seed: Number(this.$route.query.sd || Math.random())
       })
     }
