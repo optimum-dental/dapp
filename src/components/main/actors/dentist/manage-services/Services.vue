@@ -359,8 +359,8 @@
         },
         serviceType,
         offset: Number(this.$route.query.o || 0),
-        limit: Number(this.$route.query.l || 0),
-        seed: Number(this.$route.query.sd || 0)
+        limit: Number(this.$route.query.l || 5),
+        seed: Number(this.$route.query.sd || Math.random())
       })
     }
   }
