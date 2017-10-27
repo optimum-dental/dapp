@@ -49,6 +49,7 @@
 </template>
 
 <script>
+  const budgetPivot = 200
   export default {
     computed: {
       user () {
@@ -148,13 +149,14 @@
       populateBudgets () {
         const budgetRangeElement = document.getElementById('budget-range')
         const budgetRange = [Number(this.$route.query.bl), Number(this.$route.query.br)]
-        for (let i = 0; i < 4; i++) {
-          let budgetRangeText = '$' + (i * 50) + ' - $' + ((i + 1) * 50)
+        const numberOfOptions = 10
+        for (let i = 0; i < numberOfOptions; i++) {
+          let budgetRangeText = '$' + (i * budgetPivot) + ' - $' + ((i + 1) * budgetPivot)
           const optionElement = document.createElement('option')
           optionElement.text = budgetRangeText
           if (budgetRangeElement) {
             budgetRangeElement.appendChild(optionElement)
-            if ((i * 50) <= budgetRange[0] && (((i + 1) * 50) - 1) >= budgetRange[1]) optionElement.selected = true
+            if ((i * budgetPivot) <= budgetRange[0] && (((i + 1) * budgetPivot) - 1) >= budgetRange[1]) optionElement.selected = true
           }
         }
       },
@@ -198,6 +200,7 @@
               }
             })
             const offsetData = this.$store.state.searchResult[searchQuery.type].data[offset]
+            this.scrollToTop()
             if (direction < 0 && offsetData && offsetData.length > 0) {
               this.populateResults(offsetData)
             } else {
@@ -210,7 +213,7 @@
       },
       getBudget () {
         const index = document.getElementById('budget-range').selectedIndex
-        return [(index * 50), ((index + 1) * 50)]
+        return [(index * budgetPivot), ((index + 1) * budgetPivot)]
       },
       getDentists (evt, fetchQuery) {
         const resultSection = document.querySelector('.result-section')
@@ -307,7 +310,7 @@
               ${averageRatingDOMElement.outerHTML}
               <div class="address">${result.address || 'Address: Not Supplied'}</div>
             </div>
-            ${this.user.isPatient ? '<div class="request-appointment-section"><a href="/request-appointment" class="link-to-appointment">Request Appointment</a></div>' : ''}
+            ${this.user.isPatient ? '<div class="request-appointment-section"><a href="/#/request-appointment?sn=' + result.SN + '" class="link-to-appointment">Request Appointment</a></div>' : ''}
           </div>
         `, 'text/html').body.firstChild
         return resultDOMElement
@@ -336,6 +339,9 @@
       },
       notify (message) {
         console.log(message)
+      },
+      scrollToTop () {
+        $('html, body').animate({scrollTop: '0px'}, 500)
       }
     },
     mounted: function () {
@@ -361,6 +367,7 @@
 
   import states from '../../../../../static/json/states/states.json'
   import appointmentTypes from '../../../../../static/json/appointment_types/appointment_types.json'
+  import $ from 'jquery'
 </script>
 
 <style scoped>

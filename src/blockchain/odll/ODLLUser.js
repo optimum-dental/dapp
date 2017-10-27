@@ -29,6 +29,16 @@ class ODLLUser {
     })
   }
 
+  deleteService (state = null, data = {}) {
+    return blockchainManager.querySmartContract({
+      smartContractMethod: 'removeDentistFromService',
+      smartContractMethodParams: (coinbase) => [...(Object.values(data.serviceObject)), {from: coinbase, gas: 4444444}],
+      state,
+      smartContractResolve: result => data,
+      smartContractReject: error => error
+    })
+  }
+
   writeUser (state = null, data = {}) {
     return blockchainManager.querySmartContract({
       smartContractMethod: 'writeUser',

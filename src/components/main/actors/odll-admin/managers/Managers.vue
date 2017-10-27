@@ -83,6 +83,7 @@
         const addressDOMElement = document.getElementById('entry')
         const addressPattern = /0x[0-9a-fA-F]{40}/
         if (addressDOMElement.value.trim() !== '' && addressPattern.test(addressDOMElement.value.trim())) {
+          this.scrollToTop()
           this.beginWait(document.querySelector('.wrapper'))
           this.$root.callToAddOfficialToODLL({
             userObject: {

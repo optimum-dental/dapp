@@ -238,7 +238,7 @@ export default {
             let [ gravatar, name, companyName, email, street, city, zipCode, phoneNumber ] = stringifyBytesData(state, value, [ 'gravatar', 'name', 'companyName', 'email', 'street', 'city', 'zipCode', 'phoneNumber' ])
             let address = street || city || userState ? `${street} ${city} ${userState}` : ''
             Object.assign(value, {
-              coinbase: value.coinbase, gravatar, name, companyName, email, street, city, address, zipCode, phoneNumber
+              SN: index, coinbase: value.coinbase, gravatar, name, companyName, email, street, city, address, zipCode, phoneNumber
             })
             getGravatarFor({
               email: value.email,

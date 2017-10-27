@@ -14,7 +14,7 @@
         <div class="entry-item">
           <div class="entry-param"></div>
           <div class="entry-value">
-            <select id="service-sub-type" class="list"></select>
+            <select id="service-subtype" class="list"></select>
           </div>
         </div>
 
@@ -27,7 +27,7 @@
       </div>
 
       <div class="submit">
-        <input type="button" class='submit-button' :value="actionMessage" @click="writeServiceWithFee">
+        <input type="button" class='post button' value="Add Service" @click="writeServiceWithFee">
       </div>
 
       <div class="result-section">
@@ -72,12 +72,6 @@
       },
       perPage () {
         return 5
-      },
-      actionMessage () {
-        return this.isEditing ? 'Update Service' : 'Add Service'
-      },
-      isEditing () {
-        return Number(this.$route.query.e || 0) === 1
       }
     },
     methods: {
@@ -115,26 +109,84 @@
             case 'service-type':
               _this.clearError(target)
               let serviceSubtypesElement
-              serviceSubtypesElement = document.getElementById('service-sub-type')
+              serviceSubtypesElement = document.getElementById('service-subtype')
               _this.populateServiceSubTypes(target.selectedIndex)
-              let eventObject = document.createEvent('HTMLEvents')
-              eventObject.initEvent('change', true, true)
-              serviceSubtypesElement.dispatchEvent(eventObject)
+              _this.dispatchEventFrom(serviceSubtypesElement, 'change')
               serviceSubtypesElement.focus()
               break
-            case 'service-sub-type':
+            case 'service-subtype':
+              _this.clearError(target)
+              break
+            case 'fee':
               _this.clearError(target)
               break
           }
         })
+
+        servicesPage.addEventListener('keyup', function (evt) {
+          let target = evt.target
+          switch (target.id) {
+            case 'fee':
+              _this.clearError(target)
+              break
+          }
+        })
+
+        servicesPage.addEventListener('click', function (evt) {
+          let target = evt.target
+          switch (true) {
+            case (target.classList.contains('edit-service')):
+              _this.scrollToTop()
+              let [serviceType, serviceSubtype, serviceFee] = target.dataset.params.split('%').map(param => Number(param))
+              let [serviceTypeDOMElement, serviceSubtypeDOMElement, serviceFeeDOMElement] = [document.getElementById('service-type'), document.getElementById('service-subtype'), document.getElementById('fee')]
+              serviceTypeDOMElement.options[serviceType].selected = true
+              _this.dispatchEventFrom(serviceTypeDOMElement, 'change')
+              serviceSubtypeDOMElement.options[serviceSubtype].selected = true
+              serviceFeeDOMElement.value = serviceFee
+              let updateButton = document.querySelector('.post')
+              updateButton.value = 'Update Service'
+              if (document.querySelector('.cancel')) document.querySelector('.cancel').remove()
+              document.querySelector('.submit').insertBefore(_this.cancelButton(), updateButton)
+              serviceTypeDOMElement.disabled = true
+              serviceSubtypeDOMElement.disabled = true
+              break
+
+            case (target.classList.contains('cancel')):
+              [serviceTypeDOMElement, serviceSubtypeDOMElement, serviceFeeDOMElement] = [document.getElementById('service-type'), document.getElementById('service-subtype'), document.getElementById('fee')]
+              serviceTypeDOMElement.options[0].selected = true
+              _this.dispatchEventFrom(serviceTypeDOMElement, 'change')
+              serviceFeeDOMElement.value = ''
+              let insertButton = document.querySelector('.post')
+              insertButton.value = 'Add Service'
+              document.querySelector('.cancel').remove()
+              serviceTypeDOMElement.disabled = false
+              serviceSubtypeDOMElement.disabled = false
+              break
+
+            case (target.classList.contains('delete-service')):
+              [serviceType, serviceSubtype, serviceFee] = target.dataset.params.split('%').map(param => Number(param))
+              _this.deleteService(evt, serviceType, serviceSubtype)
+              break
+          }
+        })
+      },
+      dispatchEventFrom (DOMElement, eventType) {
+        const eventObject = document.createEvent('HTMLEvents')
+        eventObject.initEvent(eventType, true, true)
+        DOMElement.dispatchEvent(eventObject)
+      },
+      cancelButton () {
+        const DOMELement = new DOMParser().parseFromString(`<input type="button" class="button cancel" value="Cancel">`, 'text/html')
+        return DOMELement.body.firstChild
       },
       clearError (target) {
         target.classList.remove('error')
       },
       populateServiceSubTypes (serviceTypeIndex) {
-        const serviceSubtypesElement = document.getElementById('service-sub-type')
+        const serviceSubtypesElement = document.getElementById('service-subtype')
         if (serviceTypeIndex === 0) {
-          serviceSubtypesElement.options[0].selected = true
+          while (serviceSubtypesElement.hasChildNodes()) serviceSubtypesElement.firstChild.remove()
+          serviceSubtypesElement.closest('.entry-item').querySelector('.entry-param').innerHTML = ''
         } else {
           serviceSubtypesElement.closest('.entry-item').querySelector('.entry-param').innerHTML = serviceTypes[serviceTypeIndex].subTypes[0]
           while (serviceSubtypesElement.firstChild) {
@@ -153,18 +205,18 @@
         }
       },
       writeServiceWithFee (evt) {
-        if (evt) this.disableButton(evt.target)
         const serviceTypeId = Number(document.getElementById('service-type').selectedIndex)
-        const serviceSubtypeId = Number(document.getElementById('service-sub-type').selectedIndex)
+        const serviceSubtypeId = Number(document.getElementById('service-subtype').selectedIndex)
         const fee = this.getFee()
-        let errors = [serviceTypeId === 0 ? document.getElementById('service-type') : undefined, serviceSubtypeId === 0 ? document.getElementById('service-sub-type') : undefined, fee === '' ? document.getElementById('fee') : undefined]
+        let errors = [serviceTypeId === 0 ? document.getElementById('service-type') : undefined, serviceSubtypeId === 0 ? document.getElementById('service-subtype') : undefined, fee === '' ? document.getElementById('fee') : undefined]
         errors = errors.filter(entry => entry !== undefined)
         if (errors.length > 0) {
           errors.forEach((item) => {
             item.classList.add('error')
-            if (evt) this.enableButton(evt.target)
           })
         } else {
+          this.scrollToTop()
+          this.disableNecessaryButtons(evt)
           this.beginWait(document.querySelector('.wrapper'))
           this.$root.callToWriteServiceWithFee({
             serviceObject: {
@@ -174,18 +226,29 @@
             },
             callback: (status) => {
               this.endWait(document.querySelector('.wrapper'))
-              if (evt) this.enableButton(evt.target)
+              this.enableNecessaryButtons(evt)
               if (status) this.fetchServices(null, this.currentOffset, this.$store.state.searchResult[serviceTypeId === 1 ? 'fetchScanServices' : 'fetchTreatmentServices'].seed, 1, serviceTypeId)
               this.notify(status ? 'Service Successfully added' : 'Unable to add Service')
             }
           })
         }
       },
-      editService (evt, serviceTypeId, serviceSubtypeId) {
-        console.log('edit')
-      },
       deleteService (evt, serviceTypeId, serviceSubtypeId) {
-        console.log('delete')
+        this.scrollToTop()
+        this.beginWait(document.querySelector('.wrapper'))
+        this.disableNecessaryButtons(evt)
+        this.$root.callToDeleteService({
+          serviceObject: {
+            serviceTypeId,
+            serviceSubtypeId
+          },
+          callback: (status) => {
+            this.endWait(document.querySelector('.wrapper'))
+            this.enableNecessaryButtons(evt)
+            if (status) this.fetchServices(null, this.currentOffset, this.$store.state.searchResult[serviceTypeId === 1 ? 'fetchScanServices' : 'fetchTreatmentServices'].seed, 1, serviceTypeId)
+            this.notify(status ? 'Service Successfully deleted' : 'Unable to delete Service')
+          }
+        })
       },
       fetchServices (evt, offset = 0, seed = null, direction = 1, serviceType = 1) {
         const fetchQuery = {
@@ -317,12 +380,17 @@
           <div class="result">
             <div class="service-name">${result.serviceName}</div>
             <div class="service-fee">$ ${result.serviceFee}</div>
-            <div class="edit" onclick="${this.editService(result.serviceTypeId, result.serviceId, result.serviceFee)}">Edit</div>
-              <div class="delete" onclick="${this.deleteService(result.serviceTypeId, result.serviceId)}">Delete</div>
-            </div>
+            <input type="button" value="Edit" class="button edit-service" data-params="${result.serviceTypeId}%${result.serviceId}%${result.serviceFee}">
+            <input type="button" value="Delete" class="button delete-service" data-params="${result.serviceTypeId}%${result.serviceId}%${result.serviceFee}">
           </div>
         `, 'text/html').body.firstChild
         return resultDOMElement
+      },
+      disableNecessaryButtons (evt) {
+        Array.from(document.querySelectorAll('.button')).forEach(button => this.disableButton(button))
+      },
+      enableNecessaryButtons (evt) {
+        Array.from(document.querySelectorAll('.button')).forEach(button => this.enableButton(button))
       },
       disableButton (target) {
         target.disabled = true
@@ -455,7 +523,7 @@
   }
 
   .error {
-    border: 1px solid #f18787;
+    border: 1px solid #f18787 !important;
   }
 
   .submit {
@@ -463,19 +531,21 @@
     top: -35px;
     width: 100%;
     height: 30px;
+    text-align: right;
   }
 
-  .submit-button {
+  .button {
     padding: 2px;
     text-align: center;
-    float: right;
     outline: 0px;
     border: 0px;
     cursor: pointer;
     height: 30px;
+    line-height: 30px;
     width: 100px;
     background: #29aae1;
     color: #ffffff;
+    display: inline-block;
   }
   
   .result-section {
@@ -702,19 +772,26 @@
     font-size: 16px;
     line-height: 40px;
   }
-
-  .edit, .delete {
-    width: 100px;
+  
+  .button {
+    padding: 2px;
+    text-align: center;
+    outline: 0px;
+    border: 0px;
+    cursor: pointer;
     height: 30px;
     line-height: 30px;
+    width: 100px;
+    background: #29aae1;
     color: #ffffff;
-    background: #3285b1;
+    margin-left: 10px;
     display: inline-block;
+  }
+
+  .edit-service, .delete-service {
+    background: #3285b1 !important;
     text-decoration: none;
-    font-size: 14px;
-    text-align: center;
-    margin-right: 10px;
-    cursor: pointer;
+    margin: 0px 10px 0px 0px !important;
   }
 </style>
 

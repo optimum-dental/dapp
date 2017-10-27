@@ -34,18 +34,20 @@
 
 <script type="text/javascript">
   require('../../../../../static/css/nouislider.css')
-  let budgetRangeArray = [0, 200]
+  const budgetMin = 0
+  const budgetMax = 2000
+  let budgetRangeArray = [budgetMin, budgetMax]
 
   export default {
     computed: {
       budgetRange () {
         var budgetRangeElement = document.getElementById('budget-range')
         rangeSlider.create(budgetRangeElement, {
-          start: [0, 200],
+          start: [this.budgetMin, this.budgetMax],
           connect: true,
           range: {
-            'min': [0],
-            'max': [200]
+            'min': [this.budgetMin],
+            'max': [this.budgetMax]
           },
           pips: {
             mode: 'count',
@@ -62,6 +64,12 @@
       },
       budget () {
         return budgetRangeArray
+      },
+      budgetMin () {
+        return budgetMin
+      },
+      budgetMax () {
+        return budgetMax
       }
     },
     methods: {
@@ -120,7 +128,7 @@
           const tooltips = [searchPage.querySelector('.noUi-handle-lower'), searchPage.querySelector('.noUi-handle-upper')]
           $(tooltips[handle]).find('.noUi-tooltip').slideUp(100)
           budgetRangeArray = values.map(value => Math.ceil(Number(value)))
-          let range = budgetRangeArray[0] === 0 && budgetRangeArray[1] === 200 ? undefined : budgetRangeArray.map(value => '$' + value).join(' - ')
+          let range = budgetRangeArray[0] === _this.budgetMin && budgetRangeArray[1] === _this.budgetMax ? undefined : budgetRangeArray.map(value => '$' + value).join(' - ')
           _this.addToSearchQuery({
             target: {
               id: 'budget-range',

@@ -163,6 +163,18 @@ new Vue({
         console.error(err, 'Unable to add data to the blockchain')
       })
     },
+    callToDeleteService (payload) {
+      const blockchainParams = Object.assign({}, payload)
+      delete blockchainParams.callback
+      ODLLUser.deleteService(this.$store.state, blockchainParams)
+      .then((dataObject) => {
+        if (payload.callback) payload.callback(dataObject)
+      })
+      .catch((err) => {
+        if (payload.callback) payload.callback(false)
+        console.error(err, 'Unable to delete data from the blockchain')
+      })
+    },
     callToFetchDataObjects (payload) {
       const fetchQuery = payload.fetchQuery
       const blockchainParams = Object.assign({}, fetchQuery)
