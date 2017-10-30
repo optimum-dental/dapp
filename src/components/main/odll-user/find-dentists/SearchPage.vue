@@ -106,7 +106,7 @@
               if (document.getElementById('appointment-sub-type')) {
                 appointmentSubtypesElement = document.getElementById('appointment-sub-type')
               } else {
-                appointmentSubtypesElement = _this.createAppointmentSubTypeDOMElement(appointmentTypes[target.selectedIndex].subTypes[0])
+                appointmentSubtypesElement = _this.createAppointmentSubTypeDOMElement(appointmentTypes[target.selectedIndex].subtypes[0])
                 document.querySelector('#search-page').insertBefore(appointmentSubtypesElement, target.closest('.search-item').nextElementSibling)
               }
 
@@ -169,12 +169,12 @@
             appointmentSubtypesElement.closest('.search-item').remove()
           })
         } else {
-          appointmentSubtypesElement.closest('.search-item').querySelector('.search-param').innerHTML = appointmentTypes[appointmentTypeIndex].subTypes[0]
+          appointmentSubtypesElement.closest('.search-item').querySelector('.search-param').innerHTML = appointmentTypes[appointmentTypeIndex].subtypes[0]
           while (appointmentSubtypesElement.firstChild) {
             appointmentSubtypesElement.removeChild(appointmentSubtypesElement.firstChild)
           }
 
-          const appointmentSubtypes = appointmentTypes[appointmentTypeIndex].subTypes
+          const appointmentSubtypes = appointmentTypes[appointmentTypeIndex].subtypes
           appointmentSubtypes.forEach((appointmentSubtype) => {
             const optionElement = document.createElement('option')
             optionElement.text = appointmentSubtype
@@ -202,7 +202,7 @@
               case 'appointment-sub-type':
                 id = `query-${target.id}`
                 let appointmentTypeIndex = document.getElementById('appointment-type').selectedIndex
-                value = appointmentTypes[appointmentTypeIndex].subTypes[target.selectedIndex]
+                value = appointmentTypes[appointmentTypeIndex].subtypes[target.selectedIndex]
                 queryItem = document.getElementById(id) || this.createQueryItemElement(id)
                 queryItem.innerHTML = value
 

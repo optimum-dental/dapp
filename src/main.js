@@ -187,6 +187,7 @@ new Vue({
           offset: fetchQuery.offset,
           results: fetchResult.results,
           totalNumberAvailable: fetchResult.totalNumberAvailable,
+          preSaveCallback: payload.preSaveCallback,
           saveCallback: payload.saveCallback,
           callback: payload.callback
         })

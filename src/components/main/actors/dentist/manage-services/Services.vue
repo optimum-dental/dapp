@@ -40,7 +40,7 @@
           <div class="treatment-section" :class="addClass(2, 'showing')" id="treatment-section"></div>
         </div>
       </div>
-      
+
       <div class="navigation">
         <div v-if="isThereMore" @click="showNextPage" class="fetch-next">Next ></div>
         <div v-if="pageNumber !== 1" @click="showPreviousPage" class="fetch-previous">< Previous</div>
@@ -188,12 +188,12 @@
           while (serviceSubtypesElement.hasChildNodes()) serviceSubtypesElement.firstChild.remove()
           serviceSubtypesElement.closest('.entry-item').querySelector('.entry-param').innerHTML = ''
         } else {
-          serviceSubtypesElement.closest('.entry-item').querySelector('.entry-param').innerHTML = serviceTypes[serviceTypeIndex].subTypes[0]
+          serviceSubtypesElement.closest('.entry-item').querySelector('.entry-param').innerHTML = serviceTypes[serviceTypeIndex].subtypes[0]
           while (serviceSubtypesElement.firstChild) {
             serviceSubtypesElement.removeChild(serviceSubtypesElement.firstChild)
           }
 
-          const serviceSubtypes = serviceTypes[serviceTypeIndex].subTypes
+          const serviceSubtypes = serviceTypes[serviceTypeIndex].subtypes
           serviceSubtypes.forEach((serviceSubtype, index) => {
             const optionElement = document.createElement('option')
             optionElement.text = serviceSubtype
@@ -295,7 +295,7 @@
             const fees = results[2]
             serviceIds.forEach((serviceId, index) => {
               let result = {
-                serviceName: serviceTypes[serviceTypeId].subTypes[serviceId],
+                serviceName: serviceTypes[serviceTypeId].subtypes[serviceId],
                 serviceFee: fees[index],
                 serviceTypeId,
                 serviceId
@@ -376,7 +376,7 @@
         return DOMELement.body.firstChild
       },
       createResultDOMElement (result) {
-        const resultDOMElement = new DOMParser().parseFromString(`          
+        const resultDOMElement = new DOMParser().parseFromString(`
           <div class="result">
             <div class="service-name">${result.serviceName}</div>
             <div class="service-fee">$ ${result.serviceFee}</div>
@@ -547,12 +547,12 @@
     color: #ffffff;
     display: inline-block;
   }
-  
+
   .result-section {
     position: relative;
     min-height: 300px;
   }
-  
+
   .trigger-section {
     width: 100%;
     height: 40px;
@@ -593,7 +593,7 @@
   .showing {
     display: block;
   }
-  
+
   .navigation {
     width: 100%;
     float: right;
@@ -667,7 +667,7 @@
     animation: odll-spin 1.2s cubic-bezier(0.2, 0.92, 0.94, 0.9) infinite;
     position: relative;
   }
-  
+
   @keyframes odll-spin {
     0% {
       transform: rotate(0deg);
@@ -677,7 +677,7 @@
       transform: rotate(360deg);
     }
   }
-  
+
   .result {
     width: 95%;
     border-bottom: 1px solid #a7a7a7;
@@ -738,7 +738,7 @@
     background: url(/static/images/star.png) no-repeat;
     background-size: contain;
   }
-  
+
   .request-service-section {
     width: auto;
     height: 150px;
@@ -772,7 +772,7 @@
     font-size: 16px;
     line-height: 40px;
   }
-  
+
   .button {
     padding: 2px;
     text-align: center;

@@ -50,55 +50,67 @@ function getRawData (dataObject, datakeys) {
 
 function getGravatarFor (payload = {}) {
   return new Promise(function (resolve, reject) {
-    const colorPosition = Math.abs(getHash(payload.coinbase) % IDENTICON_COLORS.length)
-    const identiconColor = IDENTICON_COLORS[colorPosition]
-    const email = payload.email ? payload.email : ''
-
-    if (email && email.trim() !== '') {
-      avatarCanvasElement(email)
-      .then((avatarCanvas, gravatar) => {
-        resolve(avatarCanvas)
-      })
+    if (payload.email && payload.email.trim() !== '') {
+      getGravatarFromEmail(payload, resolve, reject)
     } else {
-      const avatarCanvas = ethereumBlockies.create({
-        seed: payload.coinbase.toString(),
-        color: identiconColor.color,
-        bgcolor: identiconColor.bgColor,
-        size: 8,
-        scale: 13,
-        spotcolor: identiconColor.spotColor
-      })
-      resolve(avatarCanvas)
+      getGravatarFromCoinbase(payload, resolve, reject)
     }
   })
 }
 
-function updateUserGravatar (state, userCopy, payload = null) {
-  const colorPosition = Math.abs(getHash(state.web3.coinbase) % IDENTICON_COLORS.length)
-  const identiconColor = IDENTICON_COLORS[colorPosition]
-  const email = payload && payload.email ? payload.email : ''
+function getGravatarFromEmail (payload = {}, resolve, reject) {
+  avatarCanvasElement(payload.email)
+  .then((avatarCanvas, gravatar) => {
+    resolve(avatarCanvas)
+  })
+}
 
-  if (email && email.trim() !== '') {
-    avatarCanvasElement(email)
-    .then((avatarCanvas, gravatar) => {
-      assignPropertyTo(userCopy, 'gravatar', gravatar)
-      assignPropertyTo(userCopy, 'avatarCanvas', avatarCanvas)
-      state.user = userCopy
-      if (payload.callback) payload.callback(avatarCanvas)
-    })
+function getGravatarFromCoinbase (payload = {}, resolve, reject) {
+  const colorPosition = Math.abs(getHash(payload.coinbase) % IDENTICON_COLORS.length)
+  const identiconColor = IDENTICON_COLORS[colorPosition]
+  const avatarCanvas = ethereumBlockies.create({
+    seed: payload.coinbase.toString(),
+    color: identiconColor.color,
+    bgcolor: identiconColor.bgColor,
+    size: 8,
+    scale: 13,
+    spotcolor: identiconColor.spotColor
+  })
+  resolve(avatarCanvas)
+}
+
+function updateUserGravatar (state, userCopy, payload = null) {
+  if (payload.email && payload.email.trim() !== '') {
+    setGravatarFromEmail(state, userCopy, payload)
   } else {
-    const avatarCanvas = ethereumBlockies.create({
-      seed: state.web3.coinbase,
-      color: identiconColor.color,
-      bgcolor: identiconColor.bgColor,
-      size: 8,
-      scale: 13,
-      spotcolor: identiconColor.spotColor
-    })
+    prepareGravatarFromCoinbase(state, userCopy, payload)
+  }
+}
+
+function setGravatarFromEmail (state, userCopy, payload = null) {
+  avatarCanvasElement(payload.email)
+  .then((avatarCanvas, gravatar) => {
+    assignPropertyTo(userCopy, 'gravatar', gravatar)
     assignPropertyTo(userCopy, 'avatarCanvas', avatarCanvas)
     state.user = userCopy
     if (payload.callback) payload.callback(avatarCanvas)
-  }
+  })
+}
+
+function prepareGravatarFromCoinbase (state, userCopy, payload = null) {
+  const colorPosition = Math.abs(getHash(state.web3.coinbase) % IDENTICON_COLORS.length)
+  const identiconColor = IDENTICON_COLORS[colorPosition]
+  const avatarCanvas = ethereumBlockies.create({
+    seed: state.web3.coinbase,
+    color: identiconColor.color,
+    bgcolor: identiconColor.bgColor,
+    size: 8,
+    scale: 13,
+    spotcolor: identiconColor.spotColor
+  })
+  assignPropertyTo(userCopy, 'avatarCanvas', avatarCanvas)
+  state.user = userCopy
+  if (payload.callback) payload.callback(avatarCanvas)
 }
 
 export default {
@@ -234,6 +246,7 @@ export default {
           payload.saveCallback(values, state)
         } else {
           values.forEach((value, index) => {
+            if (payload.preSaveCallback) payload.preSaveCallback(value)
             let userState = Number(value.state) !== 0 ? states[Number(value.state)].name : ''
             let [ gravatar, name, companyName, email, street, city, zipCode, phoneNumber ] = stringifyBytesData(state, value, [ 'gravatar', 'name', 'companyName', 'email', 'street', 'city', 'zipCode', 'phoneNumber' ])
             let address = street || city || userState ? `${street} ${city} ${userState}` : ''

@@ -39,7 +39,7 @@
       </div>
 
       <div class="result-section"></div>
-      
+
       <div class="navigation">
         <div v-if="isThereMore" @click="showNextPage" class="fetch-next">Next ></div>
         <div v-if="pageNumber !== 1" @click="showPreviousPage" class="fetch-previous">< Previous</div>
@@ -49,6 +49,8 @@
 </template>
 
 <script>
+  const budgetMin = 0
+  const budgetMax = 2000
   const budgetPivot = 200
   export default {
     computed: {
@@ -130,12 +132,12 @@
         if (appointmentTypeIndex === 0) {
           appointmentSubtypesElement.options[0].selected = true
         } else {
-          appointmentSubtypesElement.closest('.search-item').querySelector('.search-param').innerHTML = appointmentTypes[appointmentTypeIndex].subTypes[0]
+          appointmentSubtypesElement.closest('.search-item').querySelector('.search-param').innerHTML = appointmentTypes[appointmentTypeIndex].subtypes[0]
           while (appointmentSubtypesElement.firstChild) {
             appointmentSubtypesElement.removeChild(appointmentSubtypesElement.firstChild)
           }
 
-          const appointmentSubtypes = appointmentTypes[appointmentTypeIndex].subTypes
+          const appointmentSubtypes = appointmentTypes[appointmentTypeIndex].subtypes
           appointmentSubtypes.forEach((appointmentSubtype, index) => {
             const optionElement = document.createElement('option')
             optionElement.text = appointmentSubtype
@@ -150,13 +152,18 @@
         const budgetRangeElement = document.getElementById('budget-range')
         const budgetRange = [Number(this.$route.query.bl), Number(this.$route.query.br)]
         const numberOfOptions = 10
+        let budgetRangeText = 'All Prices [$0 - $2000]'
+        let optionElement = document.createElement('option')
+        optionElement.text = budgetRangeText
+        if (budgetRangeElement) budgetRangeElement.appendChild(optionElement)
+
         for (let i = 0; i < numberOfOptions; i++) {
-          let budgetRangeText = '$' + (i * budgetPivot) + ' - $' + ((i + 1) * budgetPivot)
-          const optionElement = document.createElement('option')
+          budgetRangeText = '$' + (i * budgetPivot) + ' - $' + ((i + 1) * budgetPivot)
+          optionElement = document.createElement('option')
           optionElement.text = budgetRangeText
           if (budgetRangeElement) {
             budgetRangeElement.appendChild(optionElement)
-            if ((i * budgetPivot) <= budgetRange[0] && (((i + 1) * budgetPivot) - 1) >= budgetRange[1]) optionElement.selected = true
+            if ((i * budgetPivot) <= budgetRange[0] && (((i + 1) * budgetPivot)) >= budgetRange[1]) optionElement.selected = true
           }
         }
       },
@@ -212,8 +219,8 @@
         }
       },
       getBudget () {
-        const index = document.getElementById('budget-range').selectedIndex
-        return [(index * budgetPivot), ((index + 1) * budgetPivot)]
+        const index = document.getElementById('budget-range').selectedIndex - 1
+        return index >= 0 ? [(index * budgetPivot), ((index + 1) * budgetPivot)] : [budgetMin, budgetMax]
       },
       getDentists (evt, fetchQuery) {
         const resultSection = document.querySelector('.result-section')
@@ -221,6 +228,15 @@
         this.askUserToWaitWhileWeSearch()
         this.$root.callToFetchDataObjects({
           fetchQuery,
+          preSaveCallback: (result) => {
+            Object.assign(result, {
+              serviceTypeId: fetchQuery.appointmentTypeId,
+              serviceId: fetchQuery.appointmentSubtypeId,
+              fee: result.fee.toNumber(),
+              averageRating: result.rating.toNumber(),
+              rating: result.rating.toNumber()
+            })
+          },
           callback: (result = null, isCompleted = false) => {
             // update result view
             if (isCompleted) {
@@ -299,13 +315,13 @@
       },
       createResultDOMElement (result) {
         const averageRatingDOMElement = this.createAverageRatingDOMElement(result.averageRating)
-        const resultDOMElement = new DOMParser().parseFromString(`          
+        const resultDOMElement = new DOMParser().parseFromString(`
           <div class="result">
             <div class="gravatar-section"></div>
             <div class="about-section">
               <div class="name">${result.name || 'Name: Not Supplied'}</div>
               <div class="company-name">${result.companyName || 'Company Name: Not Supplied'}</div>
-              <div class="service">${result.service}</div>
+              <div class="service">${appointmentTypes[result.serviceTypeId].subtypes[result.serviceId]}</div>
               <div class="fee">$ ${result.fee}</div>
               ${averageRatingDOMElement.outerHTML}
               <div class="address">${result.address || 'Address: Not Supplied'}</div>
@@ -471,7 +487,7 @@
     background: #29aae1;
     color: #ffffff;
   }
-  
+
   .result-section {
     position: relative;
     min-height: 300px;
@@ -548,7 +564,7 @@
     animation: odll-spin 1.2s cubic-bezier(0.2, 0.92, 0.94, 0.9) infinite;
     position: relative;
   }
-  
+
   @keyframes odll-spin {
     0% {
       transform: rotate(0deg);
@@ -558,7 +574,7 @@
       transform: rotate(360deg);
     }
   }
-  
+
   .result {
     width: 95%;
     border-bottom: 1px solid #a7a7a7;
@@ -619,7 +635,7 @@
     background: url(/static/images/star.png) no-repeat;
     background-size: contain;
   }
-  
+
   .request-appointment-section {
     width: auto;
     height: 150px;
