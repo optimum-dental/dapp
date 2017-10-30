@@ -31,7 +31,7 @@
       },
       {
         "attributes": {
-          "SourceUnit": 8433,
+          "SourceUnit": 8476,
           "absolutePath": "/home/daniel/dev/vue/apps/oral-data-link/contracts/lib/odll/utilities.sol",
           "file": "./utilities.sol",
           "scope": 2086,
@@ -198,7 +198,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "getAddressArray",
-                              "referencedDeclaration": 4706,
+                              "referencedDeclaration": 4749,
                               "type": "function (address,string memory,string memory) view returns (address[] memory)"
                             },
                             "children": [
@@ -208,7 +208,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 8432,
+                                  "referencedDeclaration": 8475,
                                   "type": "type(library utilities)",
                                   "value": "utilities"
                                 },
@@ -425,7 +425,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "getAddressArray",
-                              "referencedDeclaration": 4706,
+                              "referencedDeclaration": 4749,
                               "type": "function (address,string memory,string memory) view returns (address[] memory)"
                             },
                             "children": [
@@ -435,7 +435,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 8432,
+                                  "referencedDeclaration": 8475,
                                   "type": "type(library utilities)",
                                   "value": "utilities"
                                 },
@@ -766,7 +766,7 @@
                                       "isPure": false,
                                       "lValueRequested": false,
                                       "member_name": "getUIntValue",
-                                      "referencedDeclaration": 8708,
+                                      "referencedDeclaration": 8751,
                                       "type": "function (bytes32) view external returns (uint256)"
                                     },
                                     "children": [
@@ -796,7 +796,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 9324,
+                                              "referencedDeclaration": 9367,
                                               "type": "type(contract ODLLDB)",
                                               "value": "ODLLDB"
                                             },
@@ -862,7 +862,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 11015,
+                                          "referencedDeclaration": 11116,
                                           "type": "function () pure returns (bytes32)",
                                           "value": "keccak256"
                                         },
@@ -1023,7 +1023,7 @@
                                           "isPure": false,
                                           "lValueRequested": false,
                                           "member_name": "getUIntValue",
-                                          "referencedDeclaration": 8708,
+                                          "referencedDeclaration": 8751,
                                           "type": "function (bytes32) view external returns (uint256)"
                                         },
                                         "children": [
@@ -1053,7 +1053,7 @@
                                                   "overloadedDeclarations": [
                                                     null
                                                   ],
-                                                  "referencedDeclaration": 9324,
+                                                  "referencedDeclaration": 9367,
                                                   "type": "type(contract ODLLDB)",
                                                   "value": "ODLLDB"
                                                 },
@@ -1119,7 +1119,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 11015,
+                                              "referencedDeclaration": 11116,
                                               "type": "function () pure returns (bytes32)",
                                               "value": "keccak256"
                                             },
@@ -2503,7 +2503,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "take",
-                                  "referencedDeclaration": 7741,
+                                  "referencedDeclaration": 7784,
                                   "type": "function (uint256,address[] memory) pure returns (address[] memory)"
                                 },
                                 "children": [
@@ -2513,7 +2513,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 8432,
+                                      "referencedDeclaration": 8475,
                                       "type": "type(library utilities)",
                                       "value": "utilities"
                                     },
@@ -3589,7 +3589,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "take",
-                                  "referencedDeclaration": 7741,
+                                  "referencedDeclaration": 7784,
                                   "type": "function (uint256,address[] memory) pure returns (address[] memory)"
                                 },
                                 "children": [
@@ -3599,7 +3599,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 8432,
+                                      "referencedDeclaration": 8475,
                                       "type": "type(library utilities)",
                                       "value": "utilities"
                                     },
@@ -3916,7 +3916,7 @@
                                       "isPure": false,
                                       "lValueRequested": false,
                                       "member_name": "getRemovableIdArrayAddressItems",
-                                      "referencedDeclaration": 6248,
+                                      "referencedDeclaration": 6291,
                                       "type": "function (address,uint256,string memory,string memory,string memory) view returns (address[] memory)"
                                     },
                                     "children": [
@@ -3926,7 +3926,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 8432,
+                                          "referencedDeclaration": 8475,
                                           "type": "type(library utilities)",
                                           "value": "utilities"
                                         },
@@ -4140,7 +4140,7 @@
                                           "isPure": false,
                                           "lValueRequested": false,
                                           "member_name": "getRemovableIdArrayAddressItems",
-                                          "referencedDeclaration": 6248,
+                                          "referencedDeclaration": 6291,
                                           "type": "function (address,uint256,string memory,string memory,string memory) view returns (address[] memory)"
                                         },
                                         "children": [
@@ -4150,7 +4150,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 8432,
+                                              "referencedDeclaration": 8475,
                                               "type": "type(library utilities)",
                                               "value": "utilities"
                                             },
@@ -4528,7 +4528,7 @@
                                       "isPure": false,
                                       "lValueRequested": false,
                                       "member_name": "getRemovableIdArrayItems",
-                                      "referencedDeclaration": 5842,
+                                      "referencedDeclaration": 5885,
                                       "type": "function (address,address,string memory,string memory,string memory) view returns (uint256[] memory)"
                                     },
                                     "children": [
@@ -4538,7 +4538,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 8432,
+                                          "referencedDeclaration": 8475,
                                           "type": "type(library utilities)",
                                           "value": "utilities"
                                         },
@@ -4752,7 +4752,7 @@
                                           "isPure": false,
                                           "lValueRequested": false,
                                           "member_name": "getRemovableIdArrayItems",
-                                          "referencedDeclaration": 5842,
+                                          "referencedDeclaration": 5885,
                                           "type": "function (address,address,string memory,string memory,string memory) view returns (uint256[] memory)"
                                         },
                                         "children": [
@@ -4762,7 +4762,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 8432,
+                                              "referencedDeclaration": 8475,
                                               "type": "type(library utilities)",
                                               "value": "utilities"
                                             },
@@ -5878,7 +5878,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "getUIntValue",
-                                  "referencedDeclaration": 8708,
+                                  "referencedDeclaration": 8751,
                                   "type": "function (bytes32) view external returns (uint256)"
                                 },
                                 "children": [
@@ -5908,7 +5908,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 9324,
+                                          "referencedDeclaration": 9367,
                                           "type": "type(contract ODLLDB)",
                                           "value": "ODLLDB"
                                         },
@@ -5970,7 +5970,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 11015,
+                                      "referencedDeclaration": 11116,
                                       "type": "function () pure returns (bytes32)",
                                       "value": "keccak256"
                                     },
@@ -6332,7 +6332,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "getUIntValue",
-                                  "referencedDeclaration": 8708,
+                                  "referencedDeclaration": 8751,
                                   "type": "function (bytes32) view external returns (uint256)"
                                 },
                                 "children": [
@@ -6362,7 +6362,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 9324,
+                                          "referencedDeclaration": 9367,
                                           "type": "type(contract ODLLDB)",
                                           "value": "ODLLDB"
                                         },
@@ -6424,7 +6424,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 11015,
+                                      "referencedDeclaration": 11116,
                                       "type": "function () pure returns (bytes32)",
                                       "value": "keccak256"
                                     },
@@ -6505,5 +6505,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.0",
-  "updatedAt": "2017-10-24T20:38:27.092Z"
+  "updatedAt": "2017-10-30T11:32:00.534Z"
 }

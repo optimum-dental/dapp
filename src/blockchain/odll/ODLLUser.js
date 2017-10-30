@@ -60,8 +60,16 @@ class ODLLUser {
           Object.assign(userObject, result)
           odllUser.getUserPersonalData(state)
           .then((result) => {
-            Object.assign(userObject, result)
-            resolve(userObject)
+            if (Number(userObject.type) === 1) {
+              odllUser.getUserDentistsIds(state)
+              .then((result) => {
+                Object.assign(userObject, result)
+                resolve(userObject)
+              })
+            } else {
+              Object.assign(userObject, result)
+              resolve(userObject)
+            }
           })
           .catch(error => reject(error))
         })
@@ -112,6 +120,21 @@ class ODLLUser {
         error,
         isValid: true,
         warningMessage: "We've encountered a problem fetching your personal information from the blockchain. Please do try again in a few minutes."
+      })
+    })
+  }
+
+  getUserDentistsIds (state = null, userId = null) {
+    return blockchainManager.querySmartContract({
+      contractToUse: ODLLUserReaderContract,
+      smartContractMethod: 'getUserDentistsIds',
+      smartContractMethodParams: (coinbase) => [userId || coinbase, {from: coinbase}],
+      state,
+      smartContractResolve: result => odllUser.getUserObject(state, result, ['dentistsIds']),
+      smartContractReject: (error) => ({
+        error,
+        isValid: true,
+        warningMessage: "We've encountered a problem fetching your dentists from the blockchain. Please do try again in a few minutes."
       })
     })
   }
@@ -197,6 +220,7 @@ class ODLLUser {
       year: '',
       birthday: '',
       gender: '',
+      dentistsIds: [],
       hasWeb3InjectedBrowser: false,
       hasCoinbase: false,
       isConnectedToODLLNetwork: false,

@@ -230,6 +230,10 @@ library userManager {
     utilities.addIdArrayItem(dbAddress, userId, "user/sent-messages", "user/sent-messages-count", messageId);
   }
 
+  function writeDentistRating(address dbAddress, address userId, uint8 rating) internal {
+    addToAverageRating(dbAddress, userId, "dentist/average-rating-count", "dentist/average-rating", rating);
+  }
+
   function addToAverageRating(address dbAddress, address userId, string countKey, string key, uint8 rating) internal {
     var ratingsCount = ODLLDB(dbAddress).getUIntValue(keccak256(countKey, userId));
     var currentAverageRating = ODLLDB(dbAddress).getUInt8Value(keccak256(key, userId));
@@ -244,10 +248,6 @@ library userManager {
 
     ODLLDB(dbAddress).setUIntValue(keccak256(countKey, userId), newRatingsCount);
     ODLLDB(dbAddress).setUInt8Value(keccak256(key, userId), uint8(newAverageRating));
-  }
-
-  function addToDentistAverageRating(address dbAddress, address userId, uint8 rating) internal {
-    addToAverageRating(dbAddress, userId, "dentist/average-rating-count", "dentist/average-rating", rating);
   }
 
   function getDentistAverageRating(address dbAddress, address userId) internal view returns (uint8) {
@@ -359,6 +359,22 @@ library userManager {
     gender = ODLLDB(dbAddress).getUInt8Value(keccak256("user/gender", userId));
     socialSecurityNumber = ODLLDB(dbAddress).getBytes32Value(keccak256("user/social-security-number", userId));
     birthday = ODLLDB(dbAddress).getBytes32Value(keccak256("user/birthday", userId));
+  }
+
+  function writeUserDentistId(address dbAddress, address userId, address dentistId)
+    internal
+  {
+    utilities.addRemovableIdItem(dbAddress, userId, 'patient/dentist', 'patient/dentists-count', 'patient/dentist-key', dentistId);
+  }
+
+  function getUserDentistsIds(address dbAddress, address userId)
+    internal
+    view
+    returns (
+      address[] dentistsIds
+    )
+  {
+    dentistsIds = utilities.getRemovableIdArrayAddressItems(dbAddress, userId, 'patient/dentist', 'patient/dentists-count', 'patient/dentist-key');
   }
 
   function findDentists(

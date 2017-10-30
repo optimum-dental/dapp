@@ -39,6 +39,7 @@ export default {
     year: '',
     birthday: '',
     gender: '',
+    dentistsIds: [],
     hasWeb3InjectedBrowser: false,
     hasCoinbase: false,
     isConnectedToODLLNetwork: false,

@@ -137,6 +137,18 @@ contract ODLLUserWriter is ODLLRestrictor {
     userManager.removeServices(dbAddress, serviceTypeId, serviceIds, msg.sender);
   }
 
+  function writeDentistRating(address dentistId, uint8 rating)
+    external
+  {
+    require(dentistId != 0x0 && rating > 0);
+    userManager.writeDentistRating(dbAddress, dentistId, rating);
+  }
+
+  function writeUserDentistId (address dentistId) external {
+    userManager.writeUserDentistId(dbAddress, msg.sender, dentistId);
+  }
+
+
   function destroySelf(address callerAddress, address newContractAddress)
     external
     onlyOwnerCanCall(callerAddress)

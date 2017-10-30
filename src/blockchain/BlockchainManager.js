@@ -89,6 +89,7 @@ class BlockchainManager {
         contractToUse: query.contractToUse || ODLLUserWriterContract,
         dbContractKey: query.dbContractKey || 'contract/odll-user',
         method: query.method || ((contractInstance, coinbase) => {
+          console.log(query.smartContractMethod, ...(query.smartContractMethodParams(coinbase)))
           return new Promise((resolve, reject) => {
             contractInstance[query.smartContractMethod](...(query.smartContractMethodParams(coinbase)))
             .then((result) => {

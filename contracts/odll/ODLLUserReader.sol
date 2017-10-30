@@ -4,7 +4,7 @@ import "./ODLLRestrictor.sol";
 import "../lib/odll/userManager.sol";
 
 contract ODLLUserReader is ODLLRestrictor {
-  
+
   function ODLLUserReader(address _dbAddress) public {
     require(_dbAddress != 0x0);
     dbAddress = _dbAddress;
@@ -48,6 +48,16 @@ contract ODLLUserReader is ODLLRestrictor {
     )
   {
     (gender, socialSecurityNumber, birthday) = userManager.getUserPersonalData(dbAddress, userId);
+  }
+
+  function getUserDentistsIds(address userId)
+    external
+    view
+    returns (
+      address[] dentistsIds
+    )
+  {
+    dentistsIds = userManager.getUserDentistsIds(dbAddress, userId);
   }
 
   function findDentists(

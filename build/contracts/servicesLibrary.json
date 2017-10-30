@@ -31,7 +31,7 @@
       },
       {
         "attributes": {
-          "SourceUnit": 8433,
+          "SourceUnit": 8476,
           "absolutePath": "/home/daniel/dev/vue/apps/oral-data-link/contracts/lib/odll/utilities.sol",
           "file": "./utilities.sol",
           "scope": 2391,
@@ -783,7 +783,7 @@
                                       "isPure": false,
                                       "lValueRequested": false,
                                       "member_name": "addRemovableIdItem",
-                                      "referencedDeclaration": 5412,
+                                      "referencedDeclaration": 5455,
                                       "type": "function (address,address,string memory,string memory,string memory,uint256)"
                                     },
                                     "children": [
@@ -793,7 +793,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 8432,
+                                          "referencedDeclaration": 8475,
                                           "type": "type(library utilities)",
                                           "value": "utilities"
                                         },
@@ -959,7 +959,7 @@
                                       "isPure": false,
                                       "lValueRequested": false,
                                       "member_name": "addRemovableIdItem",
-                                      "referencedDeclaration": 5562,
+                                      "referencedDeclaration": 5605,
                                       "type": "function (address,uint256,string memory,string memory,string memory,address)"
                                     },
                                     "children": [
@@ -969,7 +969,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 8432,
+                                          "referencedDeclaration": 8475,
                                           "type": "type(library utilities)",
                                           "value": "utilities"
                                         },
@@ -1198,7 +1198,7 @@
                                           "isPure": false,
                                           "lValueRequested": false,
                                           "member_name": "addRemovableIdItem",
-                                          "referencedDeclaration": 5412,
+                                          "referencedDeclaration": 5455,
                                           "type": "function (address,address,string memory,string memory,string memory,uint256)"
                                         },
                                         "children": [
@@ -1208,7 +1208,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 8432,
+                                              "referencedDeclaration": 8475,
                                               "type": "type(library utilities)",
                                               "value": "utilities"
                                             },
@@ -1374,7 +1374,7 @@
                                           "isPure": false,
                                           "lValueRequested": false,
                                           "member_name": "addRemovableIdItem",
-                                          "referencedDeclaration": 5562,
+                                          "referencedDeclaration": 5605,
                                           "type": "function (address,uint256,string memory,string memory,string memory,address)"
                                         },
                                         "children": [
@@ -1384,7 +1384,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 8432,
+                                              "referencedDeclaration": 8475,
                                               "type": "type(library utilities)",
                                               "value": "utilities"
                                             },
@@ -1762,7 +1762,7 @@
                                       "isPure": false,
                                       "lValueRequested": false,
                                       "member_name": "removeIdItem",
-                                      "referencedDeclaration": 5954,
+                                      "referencedDeclaration": 5997,
                                       "type": "function (address,address,string memory,uint256)"
                                     },
                                     "children": [
@@ -1772,7 +1772,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 8432,
+                                          "referencedDeclaration": 8475,
                                           "type": "type(library utilities)",
                                           "value": "utilities"
                                         },
@@ -1896,7 +1896,7 @@
                                       "isPure": false,
                                       "lValueRequested": false,
                                       "member_name": "removeIdItem",
-                                      "referencedDeclaration": 6296,
+                                      "referencedDeclaration": 6339,
                                       "type": "function (address,uint256,string memory,address)"
                                     },
                                     "children": [
@@ -1906,7 +1906,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 8432,
+                                          "referencedDeclaration": 8475,
                                           "type": "type(library utilities)",
                                           "value": "utilities"
                                         },
@@ -2093,7 +2093,7 @@
                                           "isPure": false,
                                           "lValueRequested": false,
                                           "member_name": "removeIdItem",
-                                          "referencedDeclaration": 5954,
+                                          "referencedDeclaration": 5997,
                                           "type": "function (address,address,string memory,uint256)"
                                         },
                                         "children": [
@@ -2103,7 +2103,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 8432,
+                                              "referencedDeclaration": 8475,
                                               "type": "type(library utilities)",
                                               "value": "utilities"
                                             },
@@ -2227,7 +2227,7 @@
                                           "isPure": false,
                                           "lValueRequested": false,
                                           "member_name": "removeIdItem",
-                                          "referencedDeclaration": 6296,
+                                          "referencedDeclaration": 6339,
                                           "type": "function (address,uint256,string memory,address)"
                                         },
                                         "children": [
@@ -2237,7 +2237,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 8432,
+                                              "referencedDeclaration": 8475,
                                               "type": "type(library utilities)",
                                               "value": "utilities"
                                             },
@@ -3919,7 +3919,7 @@
                                       "isPure": false,
                                       "lValueRequested": false,
                                       "member_name": "setUIntValue",
-                                      "referencedDeclaration": 8724,
+                                      "referencedDeclaration": 8767,
                                       "type": "function (bytes32,uint256) external"
                                     },
                                     "children": [
@@ -3949,7 +3949,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 9324,
+                                              "referencedDeclaration": 9367,
                                               "type": "type(contract ODLLDB)",
                                               "value": "ODLLDB"
                                             },
@@ -4015,7 +4015,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 11015,
+                                          "referencedDeclaration": 11116,
                                           "type": "function () pure returns (bytes32)",
                                           "value": "keccak256"
                                         },
@@ -4194,7 +4194,7 @@
                                           "isPure": false,
                                           "lValueRequested": false,
                                           "member_name": "setUIntValue",
-                                          "referencedDeclaration": 8724,
+                                          "referencedDeclaration": 8767,
                                           "type": "function (bytes32,uint256) external"
                                         },
                                         "children": [
@@ -4224,7 +4224,7 @@
                                                   "overloadedDeclarations": [
                                                     null
                                                   ],
-                                                  "referencedDeclaration": 9324,
+                                                  "referencedDeclaration": 9367,
                                                   "type": "type(contract ODLLDB)",
                                                   "value": "ODLLDB"
                                                 },
@@ -4290,7 +4290,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 11015,
+                                              "referencedDeclaration": 11116,
                                               "type": "function () pure returns (bytes32)",
                                               "value": "keccak256"
                                             },
@@ -4409,5 +4409,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.0",
-  "updatedAt": "2017-10-24T20:38:27.094Z"
+  "updatedAt": "2017-10-30T11:32:00.536Z"
 }

@@ -194,7 +194,8 @@ export default {
       day: day || '',
       month: month || '',
       year: year || '',
-      gender: gender || ''
+      gender: gender || '',
+      dentistsIds: userObject.dentistsIds || []
     })
 
     state.user = userCopy

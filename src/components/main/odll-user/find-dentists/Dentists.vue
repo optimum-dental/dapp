@@ -123,6 +123,43 @@
               break
           }
         })
+
+        searchPage.addEventListener('click', function (evt) {
+          let target = evt.target
+          switch (true) {
+            case target.classList.contains('only-patient'):
+              const dentistId = _this.$store.state.searchResult.findDentists.data[_this.currentOffset][target.dataset.sn].coinbase
+              if (_this.user.isPatient && _this.user.dentists.includes(dentistId)) {
+                const rating = target.dataset.rating
+                _this.writeDentistRating(evt, dentistId, rating)
+              } else {
+                console.log(':::You have to be a patient of a doctor before you can rate them.')
+              }
+
+              break
+          }
+        })
+      },
+      writeDentistRating (evt, dentistId, rating) {
+        const target = evt.target
+        this.disableNecessaryButtons(evt)
+        this.beginWait(document.querySelector('.wrapper'))
+        this.$root.callToWriteDentistRating({
+          requestObject: {
+            dentistId,
+            rating
+          },
+          callback: (status) => {
+            this.endWait(document.querySelector('.wrapper'))
+            this.enableNecessaryButtons(evt)
+            this.updateRating(rating, target)
+            this.notify(status ? 'Rating Successfully added' : 'Unable to add Rating')
+          }
+        })
+      },
+      updateRating (rating, target) {
+        const averageRatingDOMElement = this.createAverageRatingDOMElement(rating, target.dataset.sn)
+        document.querySelector('.about-section').replaceChild(averageRatingDOMElement, document.querySelector('.average-rating'))
       },
       clearError (target) {
         target.classList.remove('error')
@@ -314,7 +351,7 @@
         return DOMELement.body.firstChild
       },
       createResultDOMElement (result) {
-        const averageRatingDOMElement = this.createAverageRatingDOMElement(result.averageRating)
+        const averageRatingDOMElement = this.createAverageRatingDOMElement(result.averageRating, result.SN)
         const resultDOMElement = new DOMParser().parseFromString(`
           <div class="result">
             <div class="gravatar-section"></div>
@@ -331,11 +368,11 @@
         `, 'text/html').body.firstChild
         return resultDOMElement
       },
-      createAverageRatingDOMElement (averageRating) {
+      createAverageRatingDOMElement (averageRating, SN) {
         const ratingsArray = []
         for (let i = 0; i < 5; i++) {
           ratingsArray.push(`
-            <div class="rating ${i < averageRating ? 'filled' : ''}"></div>
+            <div data-rating="${i + 1}" data-sn="${SN}" class="rating ${i < averageRating ? 'filled' : ''} ${this.user.isPatient ? 'only-patient' : ''}"></div>
           `)
         }
 
@@ -621,6 +658,10 @@
     cursor: pointer;
   }
 
+  .average-rating {
+    width: 100px !important;
+  }
+
   .average-rating > div {
     background: url(/static/images/star_line.png) no-repeat;
     background-size: contain;
@@ -628,7 +669,25 @@
     width: 20px;
     display: inline-block;
     float: left;
-    margin: 0px 5px;
+  }
+
+  .average-rating > div.only-patient {
+    cursor: pointer;
+  }
+
+  .average-rating:hover > div.only-patient {
+    background: url(/static/images/star.png) no-repeat;
+    background-size: contain;
+  }
+
+  .average-rating > div.only-patient:hover {
+    background: url(/static/images/star.png) no-repeat;
+    background-size: contain;
+  }
+
+  .average-rating > div.only-patient:hover ~ div.only-patient {
+    background: url(/static/images/star_line.png) no-repeat;
+    background-size: contain;
   }
 
   .average-rating > .filled {
