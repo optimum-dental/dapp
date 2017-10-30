@@ -5,11 +5,11 @@
 
       <div class="data-entry-section">
         <input type="text" id="entry" class="entry" placeholder="Enter the Ethereum address of a Manager you want to add to the platform" @input="clearError">
-        <input type="button" class="add" value="Add Manager" @click="addManager">
+        <input type="button" class="add button" value="Add Manager" @click="addManager">
       </div>
 
       <div class="result-section"></div>
-     
+
       <div class="navigation">
         <div v-if="isThereMore" @click="showNextPage" class="fetch-next">Next ></div>
         <div v-if="pageNumber !== 1" @click="showPreviousPage" class="fetch-previous">< Previous</div>
@@ -48,7 +48,6 @@
         return isBlocked ? 'Unblock Manager' : 'Block Manager'
       },
       fetchManagers (evt = null, offset = 0, seed = undefined, direction = 1) {
-        if (evt) this.disableButton(evt.target)
         const fetchQuery = {
           type: 'fetchManagers',
           offset,
@@ -78,27 +77,26 @@
         if (target.classList.contains('error')) target.classList.remove('error')
       },
       addManager (evt) {
-        const target = evt.target
-        this.disableButton(target)
         const addressDOMElement = document.getElementById('entry')
         const addressPattern = /0x[0-9a-fA-F]{40}/
         if (addressDOMElement.value.trim() !== '' && addressPattern.test(addressDOMElement.value.trim())) {
+          this.disableNecessaryButtons()
           this.scrollToTop()
           this.beginWait(document.querySelector('.wrapper'))
-          this.$root.callToAddOfficialToODLL({
-            userObject: {
+          this.$root.callToWriteData({
+            requestParams: {
               address: addressDOMElement.value.toLowerCase(),
               userType: 3
             },
+            methodName: 'addOfficialToODLL',
             callback: (status = false) => {
               this.endWait(document.querySelector('.wrapper'))
-              this.enableButton(target)
+              this.enableNecessaryButtons()
               this.fetchManagers(null, this.currentOffset, this.$store.state.searchResult.fetchManagers.seed)
               this.notify(status ? 'Manager Successfully added' : 'Unable to add Manager')
             }
           })
         } else {
-          this.enableButton(target)
           addressDOMElement.classList.add('error')
         }
       },
@@ -106,13 +104,14 @@
         const resultSection = document.querySelector('.result-section')
         this.clearDOMElementChildren(resultSection)
         this.askUserToWaitWhileWeSearch()
+        this.disableNecessaryButtons()
         this.$root.callToFetchDataObjects({
           fetchQuery,
           callback: (result = null, isCompleted = false) => {
             // update result view
             if (isCompleted) {
               if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
-              if (evt) this.enableButton(evt.target)
+              this.enableNecessaryButtons()
             }
 
             if (result) {
@@ -185,7 +184,7 @@
         return DOMELement.body.firstChild
       },
       createResultDOMElement (result) {
-        const resultDOMElement = new DOMParser().parseFromString(`          
+        const resultDOMElement = new DOMParser().parseFromString(`
           <div class="result">
             <div class="gravatar-section"></div>
             <div class="about-section">
@@ -194,11 +193,17 @@
               <div class="address">${result.address || 'Address: Not Supplied'}</div>
             </div>
             <div class="action-section">
-              <input type="button" value="${result.isBlocked ? 'Unblock Manager' : 'Block Manager'}" class="action-button">
+              <input type="button" value="Remove Manager" class="action-button button">
             </div>
           </div>
         `, 'text/html').body.firstChild
         return resultDOMElement
+      },
+      disableNecessaryButtons (evt = null) {
+        Array.from(document.querySelectorAll('.button')).forEach(button => this.disableButton(button))
+      },
+      enableNecessaryButtons (evt = null) {
+        Array.from(document.querySelectorAll('.button')).forEach(button => this.enableButton(button))
       },
       disableButton (target) {
         target.disabled = true
@@ -234,7 +239,7 @@
       })
     }
   }
-  
+
   import $ from 'jquery'
 </script>
 
@@ -319,7 +324,7 @@
   .entry.error {
     border: 1px solid #f18787;
   }
-  
+
   .add {
     padding: 2px;
     text-align: center;
@@ -335,17 +340,17 @@
     color: #ffffff;
     font-size: 14px;
   }
-  
+
   .result-section {
     position: relative;
     min-height: 300px;
   }
- 
+
   .navigation {
     width: 100%;
     float: right;
   }
- 
+
   .fetch-next, .fetch-previous {
     cursor: pointer;
     color: #6592ad;
@@ -483,7 +488,7 @@
     height: 40px;
     line-height: 40px;
     color: #ffffff;
-    background: #3285b1;
+    background: #3285b1 !important;
     display: inline-block;
     outline: none;
     border: 0px;

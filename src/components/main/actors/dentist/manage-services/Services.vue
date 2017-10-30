@@ -218,12 +218,13 @@
           this.scrollToTop()
           this.disableNecessaryButtons(evt)
           this.beginWait(document.querySelector('.wrapper'))
-          this.$root.callToWriteServiceWithFee({
-            serviceObject: {
+          this.$root.callToWriteData({
+            requestParams: {
               serviceTypeId,
               serviceSubtypeId,
               fee
             },
+            methodName: 'writeServiceWithFee',
             callback: (status) => {
               this.endWait(document.querySelector('.wrapper'))
               this.enableNecessaryButtons(evt)
@@ -287,6 +288,7 @@
         const resultSection = document.querySelector(`.${serviceType === 1 ? 'scan-section' : 'treatment-section'}`)
         this.clearDOMElementChildren(resultSection)
         this.askUserToWaitWhileWeSearch(serviceType)
+        this.disableNecessaryButtons()
         this.$root.callToFetchDataObjects({
           fetchQuery,
           saveCallback: (results, state) => {
@@ -305,7 +307,7 @@
               state.searchResult[fetchQuery.type].data[fetchQuery.offset].push(result)
             })
             if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
-            if (evt) this.enableButton(evt.target)
+            this.enableNecessaryButtons()
             if (serviceIds.length === 0) {
               this.informOfNoService(serviceType)
             }
@@ -386,10 +388,10 @@
         `, 'text/html').body.firstChild
         return resultDOMElement
       },
-      disableNecessaryButtons (evt) {
+      disableNecessaryButtons (evt = null) {
         Array.from(document.querySelectorAll('.button')).forEach(button => this.disableButton(button))
       },
-      enableNecessaryButtons (evt) {
+      enableNecessaryButtons (evt = null) {
         Array.from(document.querySelectorAll('.button')).forEach(button => this.enableButton(button))
       },
       disableButton (target) {

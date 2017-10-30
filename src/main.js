@@ -151,18 +151,6 @@ new Vue({
     callResetIsValidUserBut () {
       this[ACTION_TYPES.RESET_IS_VALID_USER_BUT]()
     },
-    callToWriteServiceWithFee (payload) {
-      const blockchainParams = Object.assign({}, payload)
-      delete blockchainParams.callback
-      ODLLUser.writeServiceWithFee(this.$store.state, blockchainParams)
-      .then((dataObject) => {
-        if (payload.callback) payload.callback(dataObject)
-      })
-      .catch((err) => {
-        if (payload.callback) payload.callback(false)
-        console.error(err, 'Unable to add data to the blockchain')
-      })
-    },
     callToDeleteService (payload) {
       const blockchainParams = Object.assign({}, payload)
       delete blockchainParams.callback
@@ -200,16 +188,15 @@ new Vue({
         console.error(err, `Unable to fetch data for: ${fetchQuery.type}`)
       })
     },
-    callToAddOfficialToODLL (payload = null) {
-      const blockchainParams = Object.assign({}, payload)
-      delete blockchainParams.callback
-      ODLLUser.addOfficialToODLL(this.$store.state, blockchainParams)
-      .then((userData) => {
-        if (payload.callback) payload.callback(userData)
+    callToWriteData (payload = null) {
+      const actionParams = Object.assign({}, payload.requestParams, {methodName: payload.methodName})
+      ODLLUser.writeData(this.$store.state, actionParams)
+      .then((responseObject) => {
+        if (payload.callback) payload.callback(responseObject)
       })
       .catch((err) => {
         if (payload.callback) payload.callback(false)
-        console.error(err, 'Unable to add official to the blockchain')
+        console.error(err, `Unable to ${payload.methodName}`)
       })
     }
   },

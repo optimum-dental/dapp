@@ -9,20 +9,13 @@ class ODLLUser {
     return odllUser
   }
 
-  addOfficialToODLL (state = null, data = {}) {
+  writeData (state = null, data = {}) {
+    const blockchainData = Object.assign({}, data)
+    const blockchainMethodName = blockchainData.methodName
+    delete blockchainData.methodName
     return blockchainManager.querySmartContract({
-      smartContractMethod: 'addOfficialToODLL',
-      smartContractMethodParams: (coinbase) => [...(Object.values(data.userObject)), {from: coinbase, gas: 4444444}],
-      state,
-      smartContractResolve: result => data,
-      smartContractReject: error => error
-    })
-  }
-
-  writeServiceWithFee (state = null, data = {}) {
-    return blockchainManager.querySmartContract({
-      smartContractMethod: 'writeServiceWithFee',
-      smartContractMethodParams: (coinbase) => [...(Object.values(data.serviceObject)), {from: coinbase, gas: 4444444}],
+      smartContractMethod: blockchainMethodName,
+      smartContractMethodParams: (coinbase) => [...(Object.values(blockchainData)), {from: coinbase, gas: 4444444}],
       state,
       smartContractResolve: result => data,
       smartContractReject: error => error

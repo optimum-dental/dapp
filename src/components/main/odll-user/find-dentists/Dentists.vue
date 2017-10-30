@@ -35,7 +35,7 @@
       </div>
 
       <div class="submit">
-        <input type="button" class='submit-button' value="Find" @click="findDentists">
+        <input type="button" class='submit-button button' value="Find" @click="findDentists">
       </div>
 
       <div class="result-section"></div>
@@ -144,11 +144,12 @@
         const target = evt.target
         this.disableNecessaryButtons(evt)
         this.beginWait(document.querySelector('.wrapper'))
-        this.$root.callToWriteDentistRating({
-          requestObject: {
+        this.$root.callToWriteData({
+          requestParams: {
             dentistId,
             rating
           },
+          methodName: 'writeDentistRating',
           callback: (status) => {
             this.endWait(document.querySelector('.wrapper'))
             this.enableNecessaryButtons(evt)
@@ -206,7 +207,6 @@
       },
       findDentists (evt, offset = 0, seed = null, direction = 1) {
         if (document.getElementById('appointment-sub-type')) {
-          if (evt) this.disableButton(evt.target)
           const appointmentTypeId = Number(document.getElementById('appointment-type').selectedIndex)
           const appointmentSubtypeId = Number(document.getElementById('appointment-sub-type').selectedIndex)
           const searchQuery = {
@@ -227,9 +227,9 @@
           if (errors.length > 0) {
             errors.forEach((item) => {
               item.classList.add('error')
-              if (evt) this.enableButton(evt.target)
             })
           } else {
+            this.disableNecessaryButtons()
             this.$router.push({
               path: '/find-dentists',
               query: {
@@ -247,6 +247,7 @@
             this.scrollToTop()
             if (direction < 0 && offsetData && offsetData.length > 0) {
               this.populateResults(offsetData)
+              this.enableNecessaryButtons()
             } else {
               this.getDentists(evt, searchQuery)
             }
@@ -263,6 +264,7 @@
         const resultSection = document.querySelector('.result-section')
         this.clearDOMElementChildren(resultSection)
         this.askUserToWaitWhileWeSearch()
+        this.disableNecessaryButtons()
         this.$root.callToFetchDataObjects({
           fetchQuery,
           preSaveCallback: (result) => {
@@ -278,7 +280,7 @@
             // update result view
             if (isCompleted) {
               if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
-              if (evt) this.enableButton(evt.target)
+              this.enableNecessaryButtons()
             }
 
             if (result) {
@@ -379,6 +381,12 @@
         return new DOMParser().parseFromString(`
           <div class="average-rating">${ratingsArray.join(' ')}</div>
         `, 'text/html').body.firstChild
+      },
+      disableNecessaryButtons (evt = null) {
+        Array.from(document.querySelectorAll('.button')).forEach(button => this.disableButton(button))
+      },
+      enableNecessaryButtons (evt = null) {
+        Array.from(document.querySelectorAll('.button')).forEach(button => this.enableButton(button))
       },
       disableButton (target) {
         target.disabled = true
@@ -708,7 +716,7 @@
     height: 40px;
     line-height: 40px;
     color: #ffffff;
-    background: #3285b1;
+    background: #3285b1 !important;
     display: inline-block;
     text-decoration: none;
     font-size: 14px;

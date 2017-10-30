@@ -5,11 +5,11 @@
 
       <div class="data-entry-section">
         <input type="text" id="entry" class="entry" placeholder="Enter the Ethereum address of a Dentist you want to add to the platform" @input="clearError">
-        <input type="button" class="add" value="Add Dentist" @click="addDentist">
+        <input type="button" class="add button" value="Add Dentist" @click="addDentist">
       </div>
 
       <div class="result-section"></div>
-      
+
       <div class="navigation">
         <div v-if="isThereMore" @click="showNextPage" class="fetch-next">Next ></div>
         <div v-if="pageNumber !== 1" @click="showPreviousPage" class="fetch-previous">< Previous</div>
@@ -77,26 +77,25 @@
         if (target.classList.contains('error')) target.classList.remove('error')
       },
       addDentist (evt) {
-        const target = evt.target
-        this.disableButton(target)
         const addressDOMElement = document.getElementById('entry')
         const addressPattern = /0x[0-9a-fA-F]{40}/
         if (addressDOMElement.value.trim() !== '' && addressPattern.test(addressDOMElement.value.trim())) {
+          this.disableNecessaryButtons()
           this.beginWait(document.querySelector('.wrapper'))
-          this.$root.callToAddOfficialToODLL({
-            userObject: {
+          this.$root.callToWriteData({
+            requestParams: {
               address: addressDOMElement.value.toLowerCase(),
               userType: 2
             },
+            methodName: 'addOfficialToODLL',
             callback: (status = false) => {
               this.endWait(document.querySelector('.wrapper'))
-              this.enableButton(target)
+              this.enableNecessaryButtons()
               this.fetchDentists(null, this.currentOffset, this.$store.state.searchResult.fetchDentists.seed)
               this.notify(status ? 'Dentist Successfully added' : 'Unable to add Dentist')
             }
           })
         } else {
-          this.enableButton(target)
           addressDOMElement.classList.add('error')
         }
       },
@@ -104,13 +103,14 @@
         const resultSection = document.querySelector('.result-section')
         this.clearDOMElementChildren(resultSection)
         this.askUserToWaitWhileWeSearch()
+        this.disableNecessaryButtons()
         this.$root.callToFetchDataObjects({
           fetchQuery,
           callback: (result = null, isCompleted = false) => {
             // update result view
             if (isCompleted) {
               if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
-              if (evt) this.enableButton(evt.target)
+              this.enableNecessaryButtons()
             }
 
             if (result) {
@@ -184,7 +184,7 @@
       },
       createResultDOMElement (result) {
         const averageRatingDOMElement = this.createAverageRatingDOMElement(result.averageRating)
-        const resultDOMElement = new DOMParser().parseFromString(`          
+        const resultDOMElement = new DOMParser().parseFromString(`
           <div class="result">
             <div class="gravatar-section"></div>
             <div class="about-section">
@@ -194,7 +194,7 @@
               <div class="address">${result.address || 'Address: Not Supplied'}</div>
             </div>
             <div class="action-section">
-              <input type="button" value="${result.isBlocked ? 'Unblock Dentist' : 'Block Dentist'}" class="action-button">
+              <input type="button" value="Remove Dentist" class="action-button button">
             </div>
           </div>
         `, 'text/html').body.firstChild
@@ -211,6 +211,12 @@
         return new DOMParser().parseFromString(`
           <div class="average-rating">${ratingsArray.join(' ')}</div>
         `, 'text/html').body.firstChild
+      },
+      disableNecessaryButtons (evt = null) {
+        Array.from(document.querySelectorAll('.button')).forEach(button => this.disableButton(button))
+      },
+      enableNecessaryButtons (evt = null) {
+        Array.from(document.querySelectorAll('.button')).forEach(button => this.enableButton(button))
       },
       disableButton (target) {
         target.disabled = true
@@ -246,7 +252,7 @@
       })
     }
   }
-  
+
   import $ from 'jquery'
 </script>
 
@@ -434,7 +440,7 @@
       transform: rotate(360deg);
     }
   }
-  
+
   .result {
     width: 95%;
     border-bottom: 1px solid #a7a7a7;
@@ -475,7 +481,7 @@
     text-align: left;
     width: 100%;
   }
-  
+
   .average-rating > div {
     background: url(/static/images/star_line.png) no-repeat;
     background-size: contain;
@@ -510,7 +516,7 @@
     height: 40px;
     line-height: 40px;
     color: #ffffff;
-    background: #3285b1;
+    background: #3285b1 !important;
     display: inline-block;
     outline: none;
     border: 0px;

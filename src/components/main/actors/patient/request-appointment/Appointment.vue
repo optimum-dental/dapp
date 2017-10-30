@@ -1,10 +1,10 @@
 <template>
   <div class="wrapper">
     <div id="services">
-      <div class="title">Requuest Appointment</div>
+      <div class="title">Request Appointment</div>
 
       <div class="sections">
-        <div class="trigger-section">
+        <!-- <div class="trigger-section">
           <div class="trigger" :class="addClass(1, 'active')" data-open="scan-section" data-type="1" @click="switchView">Scan Appointment</div>
           <div class="trigger" :class="addClass(2, 'active')" data-open="treatment-section" data-type="2" @click="switchView">Treatment Appointment</div>
         </div>
@@ -27,395 +27,395 @@
               <input type="button" class='post button' value="Send" @click="writeAppointment">
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
 </template>
 
 <script>
-  // export default {
-  //   computed: {
-  //     user () {
-  //       return this.$root.user
-  //     },
-  //     isThereMore (serviceType) {
-  //       return this.$store.state.searchResult[serviceType === 1 ? 'fetchScanServices' : 'fetchTreatmentServices'].totalNumberAvailable > (this.pageNumber * this.perPage)
-  //     },
-  //     pageNumber () {
-  //       return (Number(this.$route.query.o || 0) / this.perPage) + 1
-  //     },
-  //     nextOffset () {
-  //       return (this.pageNumber * this.perPage)
-  //     },
-  //     currentOffset () {
-  //       return (this.nextOffset - this.perPage)
-  //     },
-  //     previousOffset () {
-  //       return (this.currentOffset - this.perPage)
-  //     },
-  //     perPage () {
-  //       return 5
-  //     }
-  //   },
-  //   methods: {
-  //     addClass (check, value) {
-  //       return Number(this.$route.query.sT) === check || (!this.$route.query.sT && check === 1) ? value : ''
-  //     },
-  //     switchView (evt) {
-  //       const target = evt.target
-  //       if (!(target.classList.contains('active'))) {
-  //         document.querySelector('.showing').classList.remove('showing')
-  //         document.querySelector('.active').classList.remove('active')
-  //         target.classList.add('active')
-  //         document.querySelector(`.${target.dataset.open}`).classList.add('showing')
-  //         const serviceType = Number(target.dataset.type)
-  //         this.fetchServices(null, this.currentOffset, this.$store.state.searchResult[serviceType === 1 ? 'fetchScanServices' : 'fetchTreatmentServices'].seed, 1, serviceType)
-  //       }
-  //     },
-  //     populateServiceTypes () {
-  //       const serviceTypesElement = document.getElementById('service-type')
-  //       serviceTypes.forEach((serviceType, index) => {
-  //         const optionElement = document.createElement('option')
-  //         optionElement.text = serviceType.name
-  //         if (serviceTypesElement) {
-  //           serviceTypesElement.appendChild(optionElement)
-  //           if (index === Number(this.$route.query.sTI)) optionElement.selected = true
-  //         }
-  //       })
-  //     },
-  //     setEventListeners () {
-  //       const _this = this
-  //       const servicesPage = document.querySelector('#services')
-  //       servicesPage.addEventListener('change', function (evt) {
-  //         let target = evt.target
-  //         switch (target.id) {
-  //           case 'service-type':
-  //             _this.clearError(target)
-  //             let serviceSubtypesElement
-  //             serviceSubtypesElement = document.getElementById('service-subtype')
-  //             _this.populateServiceSubTypes(target.selectedIndex)
-  //             _this.dispatchEventFrom(serviceSubtypesElement, 'change')
-  //             serviceSubtypesElement.focus()
-  //             break
-  //           case 'service-subtype':
-  //             _this.clearError(target)
-  //             break
-  //           case 'fee':
-  //             _this.clearError(target)
-  //             break
-  //         }
-  //       })
+  export default {
+    computed: {
+      user () {
+        return this.$root.user
+      },
+      isThereMore (serviceType) {
+        return this.$store.state.searchResult[serviceType === 1 ? 'fetchScanServices' : 'fetchTreatmentServices'].totalNumberAvailable > (this.pageNumber * this.perPage)
+      },
+      pageNumber () {
+        return (Number(this.$route.query.o || 0) / this.perPage) + 1
+      },
+      nextOffset () {
+        return (this.pageNumber * this.perPage)
+      },
+      currentOffset () {
+        return (this.nextOffset - this.perPage)
+      },
+      previousOffset () {
+        return (this.currentOffset - this.perPage)
+      },
+      perPage () {
+        return 5
+      }
+    }
+    // methods: {
+    //   addClass (check, value) {
+    //     return Number(this.$route.query.sT) === check || (!this.$route.query.sT && check === 1) ? value : ''
+    //   },
+    //   switchView (evt) {
+    //     const target = evt.target
+    //     if (!(target.classList.contains('active'))) {
+    //       document.querySelector('.showing').classList.remove('showing')
+    //       document.querySelector('.active').classList.remove('active')
+    //       target.classList.add('active')
+    //       document.querySelector(`.${target.dataset.open}`).classList.add('showing')
+    //       const serviceType = Number(target.dataset.type)
+    //       this.fetchServices(null, this.currentOffset, this.$store.state.searchResult[serviceType === 1 ? 'fetchScanServices' : 'fetchTreatmentServices'].seed, 1, serviceType)
+    //     }
+    //   },
+    //   populateServiceTypes () {
+    //     const serviceTypesElement = document.getElementById('service-type')
+    //     serviceTypes.forEach((serviceType, index) => {
+    //       const optionElement = document.createElement('option')
+    //       optionElement.text = serviceType.name
+    //       if (serviceTypesElement) {
+    //         serviceTypesElement.appendChild(optionElement)
+    //         if (index === Number(this.$route.query.sTI)) optionElement.selected = true
+    //       }
+    //     })
+    //   },
+    //   setEventListeners () {
+    //     const _this = this
+    //     const servicesPage = document.querySelector('#services')
+    //     servicesPage.addEventListener('change', function (evt) {
+    //       let target = evt.target
+    //       switch (target.id) {
+    //         case 'service-type':
+    //           _this.clearError(target)
+    //           let serviceSubtypesElement
+    //           serviceSubtypesElement = document.getElementById('service-subtype')
+    //           _this.populateServiceSubTypes(target.selectedIndex)
+    //           _this.dispatchEventFrom(serviceSubtypesElement, 'change')
+    //           serviceSubtypesElement.focus()
+    //           break
+    //         case 'service-subtype':
+    //           _this.clearError(target)
+    //           break
+    //         case 'fee':
+    //           _this.clearError(target)
+    //           break
+    //       }
+    //     })
 
-  //       servicesPage.addEventListener('keyup', function (evt) {
-  //         let target = evt.target
-  //         switch (target.id) {
-  //           case 'fee':
-  //             _this.clearError(target)
-  //             break
-  //         }
-  //       })
+    //     servicesPage.addEventListener('keyup', function (evt) {
+    //       let target = evt.target
+    //       switch (target.id) {
+    //         case 'fee':
+    //           _this.clearError(target)
+    //           break
+    //       }
+    //     })
 
-  //       servicesPage.addEventListener('click', function (evt) {
-  //         let target = evt.target
-  //         switch (true) {
-  //           case (target.classList.contains('edit-service')):
-  //             _this.scrollToTop()
-  //             let [serviceType, serviceSubtype, serviceFee] = target.dataset.params.split('%').map(param => Number(param))
-  //             let [serviceTypeDOMElement, serviceSubtypeDOMElement, serviceFeeDOMElement] = [document.getElementById('service-type'), document.getElementById('service-subtype'), document.getElementById('fee')]
-  //             serviceTypeDOMElement.options[serviceType].selected = true
-  //             _this.dispatchEventFrom(serviceTypeDOMElement, 'change')
-  //             serviceSubtypeDOMElement.options[serviceSubtype].selected = true
-  //             serviceFeeDOMElement.value = serviceFee
-  //             let updateButton = document.querySelector('.post')
-  //             updateButton.value = 'Update Service'
-  //             if (document.querySelector('.cancel')) document.querySelector('.cancel').remove()
-  //             document.querySelector('.submit').insertBefore(_this.cancelButton(), updateButton)
-  //             serviceTypeDOMElement.disabled = true
-  //             serviceSubtypeDOMElement.disabled = true
-  //             break
+    //     servicesPage.addEventListener('click', function (evt) {
+    //       let target = evt.target
+    //       switch (true) {
+    //         case (target.classList.contains('edit-service')):
+    //           _this.scrollToTop()
+    //           let [serviceType, serviceSubtype, serviceFee] = target.dataset.params.split('%').map(param => Number(param))
+    //           let [serviceTypeDOMElement, serviceSubtypeDOMElement, serviceFeeDOMElement] = [document.getElementById('service-type'), document.getElementById('service-subtype'), document.getElementById('fee')]
+    //           serviceTypeDOMElement.options[serviceType].selected = true
+    //           _this.dispatchEventFrom(serviceTypeDOMElement, 'change')
+    //           serviceSubtypeDOMElement.options[serviceSubtype].selected = true
+    //           serviceFeeDOMElement.value = serviceFee
+    //           let updateButton = document.querySelector('.post')
+    //           updateButton.value = 'Update Service'
+    //           if (document.querySelector('.cancel')) document.querySelector('.cancel').remove()
+    //           document.querySelector('.submit').insertBefore(_this.cancelButton(), updateButton)
+    //           serviceTypeDOMElement.disabled = true
+    //           serviceSubtypeDOMElement.disabled = true
+    //           break
 
-  //           case (target.classList.contains('cancel')):
-  //             [serviceTypeDOMElement, serviceSubtypeDOMElement, serviceFeeDOMElement] = [document.getElementById('service-type'), document.getElementById('service-subtype'), document.getElementById('fee')]
-  //             serviceTypeDOMElement.options[0].selected = true
-  //             _this.dispatchEventFrom(serviceTypeDOMElement, 'change')
-  //             serviceFeeDOMElement.value = ''
-  //             let insertButton = document.querySelector('.post')
-  //             insertButton.value = 'Add Service'
-  //             document.querySelector('.cancel').remove()
-  //             serviceTypeDOMElement.disabled = false
-  //             serviceSubtypeDOMElement.disabled = false
-  //             break
+    //         case (target.classList.contains('cancel')):
+    //           [serviceTypeDOMElement, serviceSubtypeDOMElement, serviceFeeDOMElement] = [document.getElementById('service-type'), document.getElementById('service-subtype'), document.getElementById('fee')]
+    //           serviceTypeDOMElement.options[0].selected = true
+    //           _this.dispatchEventFrom(serviceTypeDOMElement, 'change')
+    //           serviceFeeDOMElement.value = ''
+    //           let insertButton = document.querySelector('.post')
+    //           insertButton.value = 'Add Service'
+    //           document.querySelector('.cancel').remove()
+    //           serviceTypeDOMElement.disabled = false
+    //           serviceSubtypeDOMElement.disabled = false
+    //           break
 
-  //           case (target.classList.contains('delete-service')):
-  //             [serviceType, serviceSubtype, serviceFee] = target.dataset.params.split('%').map(param => Number(param))
-  //             _this.deleteService(evt, serviceType, serviceSubtype)
-  //             break
-  //         }
-  //       })
-  //     },
-  //     dispatchEventFrom (DOMElement, eventType) {
-  //       const eventObject = document.createEvent('HTMLEvents')
-  //       eventObject.initEvent(eventType, true, true)
-  //       DOMElement.dispatchEvent(eventObject)
-  //     },
-  //     cancelButton () {
-  //       const DOMELement = new DOMParser().parseFromString(`<input type="button" class="button cancel" value="Cancel">`, 'text/html')
-  //       return DOMELement.body.firstChild
-  //     },
-  //     clearError (target) {
-  //       target.classList.remove('error')
-  //     },
-  //     populateServiceSubTypes (serviceTypeIndex) {
-  //       const serviceSubtypesElement = document.getElementById('service-subtype')
-  //       if (serviceTypeIndex === 0) {
-  //         while (serviceSubtypesElement.hasChildNodes()) serviceSubtypesElement.firstChild.remove()
-  //         serviceSubtypesElement.closest('.entry-item').querySelector('.entry-param').innerHTML = ''
-  //       } else {
-  //         serviceSubtypesElement.closest('.entry-item').querySelector('.entry-param').innerHTML = serviceTypes[serviceTypeIndex].subTypes[0]
-  //         while (serviceSubtypesElement.firstChild) {
-  //           serviceSubtypesElement.removeChild(serviceSubtypesElement.firstChild)
-  //         }
+    //         case (target.classList.contains('delete-service')):
+    //           [serviceType, serviceSubtype, serviceFee] = target.dataset.params.split('%').map(param => Number(param))
+    //           _this.deleteService(evt, serviceType, serviceSubtype)
+    //           break
+    //       }
+    //     })
+    //   },
+    //   dispatchEventFrom (DOMElement, eventType) {
+    //     const eventObject = document.createEvent('HTMLEvents')
+    //     eventObject.initEvent(eventType, true, true)
+    //     DOMElement.dispatchEvent(eventObject)
+    //   },
+    //   cancelButton () {
+    //     const DOMELement = new DOMParser().parseFromString(`<input type="button" class="button cancel" value="Cancel">`, 'text/html')
+    //     return DOMELement.body.firstChild
+    //   },
+    //   clearError (target) {
+    //     target.classList.remove('error')
+    //   },
+    //   populateServiceSubTypes (serviceTypeIndex) {
+    //     const serviceSubtypesElement = document.getElementById('service-subtype')
+    //     if (serviceTypeIndex === 0) {
+    //       while (serviceSubtypesElement.hasChildNodes()) serviceSubtypesElement.firstChild.remove()
+    //       serviceSubtypesElement.closest('.entry-item').querySelector('.entry-param').innerHTML = ''
+    //     } else {
+    //       serviceSubtypesElement.closest('.entry-item').querySelector('.entry-param').innerHTML = serviceTypes[serviceTypeIndex].subTypes[0]
+    //       while (serviceSubtypesElement.firstChild) {
+    //         serviceSubtypesElement.removeChild(serviceSubtypesElement.firstChild)
+    //       }
 
-  //         const serviceSubtypes = serviceTypes[serviceTypeIndex].subTypes
-  //         serviceSubtypes.forEach((serviceSubtype, index) => {
-  //           const optionElement = document.createElement('option')
-  //           optionElement.text = serviceSubtype
-  //           if (serviceSubtypesElement) {
-  //             serviceSubtypesElement.appendChild(optionElement)
-  //             if (index === Number(this.$route.query.sSI)) optionElement.selected = true
-  //           }
-  //         })
-  //       }
-  //     },
-  //     writeServiceWithFee (evt) {
-  //       const serviceTypeId = Number(document.getElementById('service-type').selectedIndex)
-  //       const serviceSubtypeId = Number(document.getElementById('service-subtype').selectedIndex)
-  //       const fee = this.getFee()
-  //       let errors = [serviceTypeId === 0 ? document.getElementById('service-type') : undefined, serviceSubtypeId === 0 ? document.getElementById('service-subtype') : undefined, fee === '' ? document.getElementById('fee') : undefined]
-  //       errors = errors.filter(entry => entry !== undefined)
-  //       if (errors.length > 0) {
-  //         errors.forEach((item) => {
-  //           item.classList.add('error')
-  //         })
-  //       } else {
-  //         this.scrollToTop()
-  //         this.disableNecessaryButtons(evt)
-  //         this.beginWait(document.querySelector('.wrapper'))
-  //         this.$root.callToWriteServiceWithFee({
-  //           serviceObject: {
-  //             serviceTypeId,
-  //             serviceSubtypeId,
-  //             fee
-  //           },
-  //           callback: (status) => {
-  //             this.endWait(document.querySelector('.wrapper'))
-  //             this.enableNecessaryButtons(evt)
-  //             if (status) this.fetchServices(null, this.currentOffset, this.$store.state.searchResult[serviceTypeId === 1 ? 'fetchScanServices' : 'fetchTreatmentServices'].seed, 1, serviceTypeId)
-  //             this.notify(status ? 'Service Successfully added' : 'Unable to add Service')
-  //           }
-  //         })
-  //       }
-  //     },
-  //     deleteService (evt, serviceTypeId, serviceSubtypeId) {
-  //       this.scrollToTop()
-  //       this.beginWait(document.querySelector('.wrapper'))
-  //       this.disableNecessaryButtons(evt)
-  //       this.$root.callToDeleteService({
-  //         serviceObject: {
-  //           serviceTypeId,
-  //           serviceSubtypeId
-  //         },
-  //         callback: (status) => {
-  //           this.endWait(document.querySelector('.wrapper'))
-  //           this.enableNecessaryButtons(evt)
-  //           if (status) this.fetchServices(null, this.currentOffset, this.$store.state.searchResult[serviceTypeId === 1 ? 'fetchScanServices' : 'fetchTreatmentServices'].seed, 1, serviceTypeId)
-  //           this.notify(status ? 'Service Successfully deleted' : 'Unable to delete Service')
-  //         }
-  //       })
-  //     },
-  //     fetchServices (evt, offset = 0, seed = null, direction = 1, serviceType = 1) {
-  //       const fetchQuery = {
-  //         type: serviceType === 1 ? 'fetchScanServices' : 'fetchTreatmentServices',
-  //         specials: {
-  //           callSmartContractWith: 'fetchServicesWithFees',
-  //           willUnshiftCoinbase: true
-  //         },
-  //         serviceType,
-  //         offset,
-  //         limit: this.perPage,
-  //         seed: seed || Math.random()
-  //       }
+    //       const serviceSubtypes = serviceTypes[serviceTypeIndex].subTypes
+    //       serviceSubtypes.forEach((serviceSubtype, index) => {
+    //         const optionElement = document.createElement('option')
+    //         optionElement.text = serviceSubtype
+    //         if (serviceSubtypesElement) {
+    //           serviceSubtypesElement.appendChild(optionElement)
+    //           if (index === Number(this.$route.query.sSI)) optionElement.selected = true
+    //         }
+    //       })
+    //     }
+    //   },
+    //   writeServiceWithFee (evt) {
+    //     const serviceTypeId = Number(document.getElementById('service-type').selectedIndex)
+    //     const serviceSubtypeId = Number(document.getElementById('service-subtype').selectedIndex)
+    //     const fee = this.getFee()
+    //     let errors = [serviceTypeId === 0 ? document.getElementById('service-type') : undefined, serviceSubtypeId === 0 ? document.getElementById('service-subtype') : undefined, fee === '' ? document.getElementById('fee') : undefined]
+    //     errors = errors.filter(entry => entry !== undefined)
+    //     if (errors.length > 0) {
+    //       errors.forEach((item) => {
+    //         item.classList.add('error')
+    //       })
+    //     } else {
+    //       this.scrollToTop()
+    //       this.disableNecessaryButtons(evt)
+    //       this.beginWait(document.querySelector('.wrapper'))
+    //       this.$root.callToWriteServiceWithFee({
+    //         serviceObject: {
+    //           serviceTypeId,
+    //           serviceSubtypeId,
+    //           fee
+    //         },
+    //         callback: (status) => {
+    //           this.endWait(document.querySelector('.wrapper'))
+    //           this.enableNecessaryButtons(evt)
+    //           if (status) this.fetchServices(null, this.currentOffset, this.$store.state.searchResult[serviceTypeId === 1 ? 'fetchScanServices' : 'fetchTreatmentServices'].seed, 1, serviceTypeId)
+    //           this.notify(status ? 'Service Successfully added' : 'Unable to add Service')
+    //         }
+    //       })
+    //     }
+    //   },
+    //   deleteService (evt, serviceTypeId, serviceSubtypeId) {
+    //     this.scrollToTop()
+    //     this.beginWait(document.querySelector('.wrapper'))
+    //     this.disableNecessaryButtons(evt)
+    //     this.$root.callToDeleteService({
+    //       serviceObject: {
+    //         serviceTypeId,
+    //         serviceSubtypeId
+    //       },
+    //       callback: (status) => {
+    //         this.endWait(document.querySelector('.wrapper'))
+    //         this.enableNecessaryButtons(evt)
+    //         if (status) this.fetchServices(null, this.currentOffset, this.$store.state.searchResult[serviceTypeId === 1 ? 'fetchScanServices' : 'fetchTreatmentServices'].seed, 1, serviceTypeId)
+    //         this.notify(status ? 'Service Successfully deleted' : 'Unable to delete Service')
+    //       }
+    //     })
+    //   },
+    //   fetchServices (evt, offset = 0, seed = null, direction = 1, serviceType = 1) {
+    //     const fetchQuery = {
+    //       type: serviceType === 1 ? 'fetchScanServices' : 'fetchTreatmentServices',
+    //       specials: {
+    //         callSmartContractWith: 'fetchServicesWithFees',
+    //         willUnshiftCoinbase: true
+    //       },
+    //       serviceType,
+    //       offset,
+    //       limit: this.perPage,
+    //       seed: seed || Math.random()
+    //     }
 
-  //       this.$router.push({
-  //         path: '/manage-services',
-  //         query: {
-  //           o: fetchQuery.offset,
-  //           l: fetchQuery.limit,
-  //           sd: fetchQuery.seed,
-  //           sT: serviceType
-  //         }
-  //       })
-  //       const offsetData = this.$store.state.searchResult[fetchQuery.type].data[offset]
-  //       if (direction < 0 && offsetData && offsetData.length > 0) {
-  //         this.populateResults(offsetData, serviceType)
-  //       } else {
-  //         this.getServices(evt, fetchQuery)
-  //       }
-  //     },
-  //     getFee () {
-  //       return document.getElementById('fee').value
-  //     },
-  //     getServices (evt, fetchQuery) {
-  //       const serviceType = fetchQuery.serviceType
-  //       const resultSection = document.querySelector(`.${serviceType === 1 ? 'scan-section' : 'treatment-section'}`)
-  //       this.clearDOMElementChildren(resultSection)
-  //       this.askUserToWaitWhileWeSearch(serviceType)
-  //       this.$root.callToFetchDataObjects({
-  //         fetchQuery,
-  //         saveCallback: (results, state) => {
-  //           const serviceTypeId = serviceType
-  //           const serviceIds = results[1]
-  //           const fees = results[2]
-  //           serviceIds.forEach((serviceId, index) => {
-  //             let result = {
-  //               serviceName: serviceTypes[serviceTypeId].subTypes[serviceId],
-  //               serviceFee: fees[index],
-  //               serviceTypeId,
-  //               serviceId
-  //             }
+    //     this.$router.push({
+    //       path: '/manage-services',
+    //       query: {
+    //         o: fetchQuery.offset,
+    //         l: fetchQuery.limit,
+    //         sd: fetchQuery.seed,
+    //         sT: serviceType
+    //       }
+    //     })
+    //     const offsetData = this.$store.state.searchResult[fetchQuery.type].data[offset]
+    //     if (direction < 0 && offsetData && offsetData.length > 0) {
+    //       this.populateResults(offsetData, serviceType)
+    //     } else {
+    //       this.getServices(evt, fetchQuery)
+    //     }
+    //   },
+    //   getFee () {
+    //     return document.getElementById('fee').value
+    //   },
+    //   getServices (evt, fetchQuery) {
+    //     const serviceType = fetchQuery.serviceType
+    //     const resultSection = document.querySelector(`.${serviceType === 1 ? 'scan-section' : 'treatment-section'}`)
+    //     this.clearDOMElementChildren(resultSection)
+    //     this.askUserToWaitWhileWeSearch(serviceType)
+    //     this.$root.callToFetchDataObjects({
+    //       fetchQuery,
+    //       saveCallback: (results, state) => {
+    //         const serviceTypeId = serviceType
+    //         const serviceIds = results[1]
+    //         const fees = results[2]
+    //         serviceIds.forEach((serviceId, index) => {
+    //           let result = {
+    //             serviceName: serviceTypes[serviceTypeId].subTypes[serviceId],
+    //             serviceFee: fees[index],
+    //             serviceTypeId,
+    //             serviceId
+    //           }
 
-  //             this.appendResult(result, serviceTypeId)
-  //             state.searchResult[fetchQuery.type].data[fetchQuery.offset].push(result)
-  //           })
-  //           if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
-  //           if (evt) this.enableButton(evt.target)
-  //           if (serviceIds.length === 0) {
-  //             this.informOfNoService(serviceType)
-  //           }
-  //         }
-  //       })
-  //     },
-  //     populateResults (results, resultType = 1) {
-  //       if (typeof resultType === 'object' && resultType.toNumber) resultType = resultType.toNumber()
-  //       const resultSection = document.querySelector(`.${resultType === 1 ? 'scan-section' : 'treatment-section'}`)
-  //       this.clearDOMElementChildren(resultSection)
-  //       results.forEach((result) => {
-  //         const resultDOMElement = this.createResultDOMElement(result)
-  //         resultSection.appendChild(resultDOMElement)
-  //       })
-  //     },
-  //     appendResult (result, resultType = 1) {
-  //       if (typeof resultType === 'object' && resultType.toNumber) resultType = resultType.toNumber()
-  //       const resultDOMElement = this.createResultDOMElement(result)
-  //       const resultSection = document.querySelector(`.${Number(resultType) === 1 ? 'scan-section' : 'treatment-section'}`)
-  //       resultSection.appendChild(resultDOMElement)
-  //     },
-  //     clearDOMElementChildren (DOMElement) {
-  //       while (DOMElement.hasChildNodes()) {
-  //         DOMElement.firstChild.remove()
-  //       }
-  //     },
-  //     showNextPage () {
-  //       const serviceType = Number(this.route.query.sT || 1)
-  //       this.fetchServices(null, this.nextOffset, this.$store.state.searchResult[serviceType === 1 ? 'fetchScanServices' : 'fetchTreatmentServices'].seed, 1, serviceType)
-  //     },
-  //     showPreviousPage () {
-  //       const serviceType = Number(this.route.query.sT || 1)
-  //       this.fetchServices(null, this.previousOffset, this.$store.state.searchResult[serviceType === 1 ? 'fetchScanServices' : 'fetchTreatmentServices'].seed, -1, serviceType)
-  //     },
-  //     getPageIndex (offset = 0) {
-  //       return offset / this.perPage
-  //     },
-  //     askUserToWaitWhileWeSearch (serviceType = 1) {
-  //       if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
-  //       if (document.querySelector('.no-service')) document.querySelector('.no-service').remove()
-  //       let waitOverlayDOMElement = this.createWaitOverlayDOMElement(serviceType)
-  //       document.querySelector('.sections').appendChild(waitOverlayDOMElement)
-  //     },
-  //     informOfNoService (serviceType = 1) {
-  //       if (document.querySelector('.no-service')) document.querySelector('.no-service').remove()
-  //       let noServiceDOMElement = this.createNoServiceDOMElement(serviceType)
-  //       document.querySelector('.sections').appendChild(noServiceDOMElement)
-  //     },
-  //     createWaitOverlayDOMElement (serviceType = 1) {
-  //       const DOMELement = new DOMParser().parseFromString(`
-  //         <div class="wait-overlay">
-  //           <div class="wait-message">Please Wait... We're searching the blockchain for your ${serviceType === 1 ? 'Scan' : 'Treatment'} services.</div>
-  //           <div class="spin"></div>
-  //         </div>
-  //       `, 'text/html')
+    //           this.appendResult(result, serviceTypeId)
+    //           state.searchResult[fetchQuery.type].data[fetchQuery.offset].push(result)
+    //         })
+    //         if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
+    //         if (evt) this.enableButton(evt.target)
+    //         if (serviceIds.length === 0) {
+    //           this.informOfNoService(serviceType)
+    //         }
+    //       }
+    //     })
+    //   },
+    //   populateResults (results, resultType = 1) {
+    //     if (typeof resultType === 'object' && resultType.toNumber) resultType = resultType.toNumber()
+    //     const resultSection = document.querySelector(`.${resultType === 1 ? 'scan-section' : 'treatment-section'}`)
+    //     this.clearDOMElementChildren(resultSection)
+    //     results.forEach((result) => {
+    //       const resultDOMElement = this.createResultDOMElement(result)
+    //       resultSection.appendChild(resultDOMElement)
+    //     })
+    //   },
+    //   appendResult (result, resultType = 1) {
+    //     if (typeof resultType === 'object' && resultType.toNumber) resultType = resultType.toNumber()
+    //     const resultDOMElement = this.createResultDOMElement(result)
+    //     const resultSection = document.querySelector(`.${Number(resultType) === 1 ? 'scan-section' : 'treatment-section'}`)
+    //     resultSection.appendChild(resultDOMElement)
+    //   },
+    //   clearDOMElementChildren (DOMElement) {
+    //     while (DOMElement.hasChildNodes()) {
+    //       DOMElement.firstChild.remove()
+    //     }
+    //   },
+    //   showNextPage () {
+    //     const serviceType = Number(this.route.query.sT || 1)
+    //     this.fetchServices(null, this.nextOffset, this.$store.state.searchResult[serviceType === 1 ? 'fetchScanServices' : 'fetchTreatmentServices'].seed, 1, serviceType)
+    //   },
+    //   showPreviousPage () {
+    //     const serviceType = Number(this.route.query.sT || 1)
+    //     this.fetchServices(null, this.previousOffset, this.$store.state.searchResult[serviceType === 1 ? 'fetchScanServices' : 'fetchTreatmentServices'].seed, -1, serviceType)
+    //   },
+    //   getPageIndex (offset = 0) {
+    //     return offset / this.perPage
+    //   },
+    //   askUserToWaitWhileWeSearch (serviceType = 1) {
+    //     if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
+    //     if (document.querySelector('.no-service')) document.querySelector('.no-service').remove()
+    //     let waitOverlayDOMElement = this.createWaitOverlayDOMElement(serviceType)
+    //     document.querySelector('.sections').appendChild(waitOverlayDOMElement)
+    //   },
+    //   informOfNoService (serviceType = 1) {
+    //     if (document.querySelector('.no-service')) document.querySelector('.no-service').remove()
+    //     let noServiceDOMElement = this.createNoServiceDOMElement(serviceType)
+    //     document.querySelector('.sections').appendChild(noServiceDOMElement)
+    //   },
+    //   createWaitOverlayDOMElement (serviceType = 1) {
+    //     const DOMELement = new DOMParser().parseFromString(`
+    //       <div class="wait-overlay">
+    //         <div class="wait-message">Please Wait... We're searching the blockchain for your ${serviceType === 1 ? 'Scan' : 'Treatment'} services.</div>
+    //         <div class="spin"></div>
+    //       </div>
+    //     `, 'text/html')
 
-  //       return DOMELement.body.firstChild
-  //     },
-  //     createNoServiceDOMElement (serviceType = 1) {
-  //       const DOMELement = new DOMParser().parseFromString(`
-  //         <div class="no-service">
-  //           <div class="no-service-message">
-  //             It appears you have no ${serviceType === 1 ? 'Scan' : 'Treatment'} service on the blockchain.
-  //           </div>
-  //         </div>
-  //       `, 'text/html')
+    //     return DOMELement.body.firstChild
+    //   },
+    //   createNoServiceDOMElement (serviceType = 1) {
+    //     const DOMELement = new DOMParser().parseFromString(`
+    //       <div class="no-service">
+    //         <div class="no-service-message">
+    //           It appears you have no ${serviceType === 1 ? 'Scan' : 'Treatment'} service on the blockchain.
+    //         </div>
+    //       </div>
+    //     `, 'text/html')
 
-  //       return DOMELement.body.firstChild
-  //     },
-  //     createResultDOMElement (result) {
-  //       const resultDOMElement = new DOMParser().parseFromString(`
-  //         <div class="result">
-  //           <div class="service-name">${result.serviceName}</div>
-  //           <div class="service-fee">$ ${result.serviceFee}</div>
-  //           <input type="button" value="Edit" class="button edit-service" data-params="${result.serviceTypeId}%${result.serviceId}%${result.serviceFee}">
-  //           <input type="button" value="Delete" class="button delete-service" data-params="${result.serviceTypeId}%${result.serviceId}%${result.serviceFee}">
-  //         </div>
-  //       `, 'text/html').body.firstChild
-  //       return resultDOMElement
-  //     },
-  //     disableNecessaryButtons (evt) {
-  //       Array.from(document.querySelectorAll('.button')).forEach(button => this.disableButton(button))
-  //     },
-  //     enableNecessaryButtons (evt) {
-  //       Array.from(document.querySelectorAll('.button')).forEach(button => this.enableButton(button))
-  //     },
-  //     disableButton (target) {
-  //       target.disabled = true
-  //       target.style.cursor = 'not-allowed'
-  //       target.style.background = '#adcddf'
-  //     },
-  //     enableButton (target) {
-  //       target.disabled = false
-  //       target.style.cursor = 'pointer'
-  //       target.style.background = '#29aae1'
-  //     },
-  //     notify (message) {
-  //       console.log(message)
-  //     },
-  //     beginWait (target) {
-  //       target.classList.add('wait')
-  //     },
-  //     endWait (target) {
-  //       target.classList.remove('wait')
-  //     },
-  //     scrollToTop () {
-  //       $('html, body').animate({scrollTop: '0px'}, 500)
-  //     }
-  //   },
-  //   mounted: function () {
-  //     const serviceType = Number(this.$route.query.sT || 1)
-  //     this.populateServiceTypes()
-  //     this.setEventListeners()
-  //     this.getServices(null, {
-  //       type: serviceType === 1 ? 'fetchScanServices' : 'fetchTreatmentServices',
-  //       specials: {
-  //         callSmartContractWith: 'fetchServicesWithFees',
-  //         willUnshiftCoinbase: true
-  //       },
-  //       serviceType,
-  //       offset: Number(this.$route.query.o || 0),
-  //       limit: Number(this.$route.query.l || this.perPage),
-  //       seed: Number(this.$route.query.sd || Math.random())
-  //     })
-  //   }
-  // }
+    //     return DOMELement.body.firstChild
+    //   },
+    //   createResultDOMElement (result) {
+    //     const resultDOMElement = new DOMParser().parseFromString(`
+    //       <div class="result">
+    //         <div class="service-name">${result.serviceName}</div>
+    //         <div class="service-fee">$ ${result.serviceFee}</div>
+    //         <input type="button" value="Edit" class="button edit-service" data-params="${result.serviceTypeId}%${result.serviceId}%${result.serviceFee}">
+    //         <input type="button" value="Delete" class="button delete-service" data-params="${result.serviceTypeId}%${result.serviceId}%${result.serviceFee}">
+    //       </div>
+    //     `, 'text/html').body.firstChild
+    //     return resultDOMElement
+    //   },
+    //   disableNecessaryButtons (evt) {
+    //     Array.from(document.querySelectorAll('.button')).forEach(button => this.disableButton(button))
+    //   },
+    //   enableNecessaryButtons (evt) {
+    //     Array.from(document.querySelectorAll('.button')).forEach(button => this.enableButton(button))
+    //   },
+    //   disableButton (target) {
+    //     target.disabled = true
+    //     target.style.cursor = 'not-allowed'
+    //     target.style.background = '#adcddf'
+    //   },
+    //   enableButton (target) {
+    //     target.disabled = false
+    //     target.style.cursor = 'pointer'
+    //     target.style.background = '#29aae1'
+    //   },
+    //   notify (message) {
+    //     console.log(message)
+    //   },
+    //   beginWait (target) {
+    //     target.classList.add('wait')
+    //   },
+    //   endWait (target) {
+    //     target.classList.remove('wait')
+    //   },
+    //   scrollToTop () {
+    //     $('html, body').animate({scrollTop: '0px'}, 500)
+    //   }
+    // },
+    // mounted: function () {
+    //   const serviceType = Number(this.$route.query.sT || 1)
+    //   this.populateServiceTypes()
+    //   this.setEventListeners()
+    //   this.getServices(null, {
+    //     type: serviceType === 1 ? 'fetchScanServices' : 'fetchTreatmentServices',
+    //     specials: {
+    //       callSmartContractWith: 'fetchServicesWithFees',
+    //       willUnshiftCoinbase: true
+    //     },
+    //     serviceType,
+    //     offset: Number(this.$route.query.o || 0),
+    //     limit: Number(this.$route.query.l || this.perPage),
+    //     seed: Number(this.$route.query.sd || Math.random())
+    //   })
+    // }
+  }
 
   // import serviceTypes from '../../../../../../static/json/appointment_types/appointment_types.json'
   // import $ from 'jquery'
