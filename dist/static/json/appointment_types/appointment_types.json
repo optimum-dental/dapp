@@ -1,11 +1,11 @@
 [
   {
     "name": "Choose Type",
-    "subTypes": []
+    "subtypes": []
   },
   {
     "name": "Scan Appointment",
-    "subTypes": [
+    "subtypes": [
       "Scan",
       "Intraoral Radiographs",
       "Extraoral Radiographs",
@@ -16,7 +16,7 @@
   },
   {
     "name": "Treatment Appointment",
-    "subTypes": [
+    "subtypes": [
       "Treatment",
       "Teeth Whitening",
       "Fluoride Treatment"
