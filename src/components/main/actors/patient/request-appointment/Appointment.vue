@@ -12,9 +12,35 @@
         <div class="view-section">
           <div class="scan-section" :class="addClass(1, 'showing')" id="scan-section">
             <div class="entry-item">
-              <div class="entry-param">Appointment For</div>
+              <div class="entry-param">Preferred Date *</div>
+              <div class="entry-value">
+                <datepicker class="list appointment-date scan-date" id="scan-date" @selected="validateScanDate"></datepicker>
+              </div>
+            </div>
+
+            <div class="entry-item">
+              <div class="entry-param">Preferred Time *</div>
+              <div class="entry-value">
+                <select id="scan-time" class="list">
+                  <option>Select</option>
+                  <option>Morning (8AM - 12PM)</option>
+                  <option>Early Afternoon (12PM - 3PM)</option>
+                  <option>Late Afternoon (3PM - 6PM)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="entry-item">
+              <div class="entry-param">Appointment For *</div>
               <div class="entry-value">
                 <select id="scan-appointment" class="list"></select>
+              </div>
+            </div>
+
+            <div class="entry-item comment">
+              <div class="entry-param">Additional Comments [128 characters max]</div>
+              <div class="entry-value">
+                <textarea id="scan-comment" class="list" maxlength="128"></textarea>
               </div>
             </div>
 
@@ -25,9 +51,42 @@
 
           <div class="treatment-section" :class="addClass(2, 'showing')" id="treatment-section">
             <div class="entry-item">
-              <div class="entry-param">Appointment For</div>
+              <div class="entry-param">Preferred Date *</div>
+              <div class="entry-value">
+                <datepicker class="list appointment-date treatment-date" id="treatment-date" @selected="validateTreatmentDate"></datepicker>
+              </div>
+            </div>
+
+            <div class="entry-item">
+              <div class="entry-param">Preferred Time *</div>
+              <div class="entry-value">
+                <select id="treatment-time" class="list">
+                  <option>Select</option>
+                  <option>Morning (8AM - 12PM)</option>
+                  <option>Early Afternoon (12PM - 3PM)</option>
+                  <option>Late Afternoon (3PM - 6PM)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="entry-item">
+              <div class="entry-param">Appointment For *</div>
               <div class="entry-value">
                 <select id="treatment-appointment" class="list"></select>
+              </div>
+            </div>
+
+            <div class="entry-item">
+              <div class="entry-param">Scan Result *</div>
+              <div class="entry-value">
+                <input id="scan-result" type="file" class="list"></select>
+              </div>
+            </div>
+
+            <div class="entry-item comment">
+              <div class="entry-param">Additional Comments [128 characters max]</div>
+              <div class="entry-value">
+                <textarea id="treatment-comment" class="list" maxlength="128"></textarea>
               </div>
             </div>
 
@@ -70,8 +129,32 @@
       }
     },
     methods: {
+      validateScanDate (dateValue) {
+        const today = Math.floor(+(new Date()) / 36000000)
+        const pickedDate = Math.floor(+dateValue / 36000000)
+        if (today > pickedDate) {
+          document.querySelector('.scan-date').classList.add('error')
+        } else {
+          document.querySelector('.scan-date').classList.remove('error')
+        }
+      },
+      validateTreatmentDate (dateValue) {
+        const today = Math.floor(+(new Date()) / 36000000)
+        const pickedDate = Math.floor(+dateValue / 36000000)
+        if (today > pickedDate) {
+          document.querySelector('.treatment-date').classList.add('error')
+        } else {
+          document.querySelector('.treatment-date').classList.remove('error')
+        }
+      },
+      serviceTypeIndex () {
+        return Number(this.$route.query.sTI)
+      },
+      serviceSubtypeIndex () {
+        return Number(this.$route.query.sSI)
+      },
       addClass (check, value) {
-        return Number(this.$route.query.sT) === check || (!this.$route.query.sT && check === 1) ? value : ''
+        return this.serviceTypeIndex() === check || (!this.serviceTypeIndex() && check === 1) ? value : ''
       },
       switchView (evt) {
         const target = evt.target
@@ -81,8 +164,17 @@
           target.classList.add('active')
           document.querySelector(`.${target.dataset.open}`).classList.add('showing')
           const serviceType = Number(target.dataset.type)
+          this.updateAddressBar(serviceType)
           this.populateServices(serviceType)
         }
+      },
+      updateAddressBar (serviceType) {
+        this.$router.push({
+          path: '/request-appointment',
+          query: {
+            sTI: serviceType
+          }
+        })
       },
       dispatchEventFrom (DOMElement, eventType) {
         const eventObject = document.createEvent('HTMLEvents')
@@ -97,7 +189,7 @@
         target.classList.remove('error')
       },
       populateServices (serviceTypeId = 1) {
-        const serviceTypeIndex = Number(this.$route.query.sTI || serviceTypeId)
+        const serviceTypeIndex = this.serviceTypeIndex() || serviceTypeId
         const serviceSubtypesElement = document.getElementById(`${serviceTypeId === 1 ? 'scan-appointment' : 'treatment-appointment'}`)
         if (serviceSubtypesElement) {
           this.clearDOMElementChildren(serviceSubtypesElement)
@@ -107,7 +199,7 @@
             optionElement.text = serviceSubtype
             if (serviceSubtypesElement) {
               serviceSubtypesElement.appendChild(optionElement)
-              if (index === Number(this.$route.query.sSI)) optionElement.selected = true
+              if (index === this.serviceSubtypeIndex()) optionElement.selected = true
             }
           })
         }
@@ -245,11 +337,9 @@
 
   .entry-item {
     height: 60px;
-    display: inline-block;
-    /*margin-right: 10px;*/
-    margin-bottom: 30px;
+    margin-top: 30px;
     justify-content: center;
-    min-width: 33%;
+    width: 50%;
   }
 
   .entry-param {
@@ -269,14 +359,23 @@
     color: #7f7f7f;
   }
 
+  .comment {
+    height: 100px;
+  }
+
+  #scan-comment, #treatment-comment {
+    max-height: 50px;
+    min-height: 50px;
+    max-width: 100%;
+    min-width: 100%;
+  }
+
   .error {
     border: 1px solid #f18787 !important;
   }
 
   .submit {
-    position: relative;
-    top: -35px;
-    width: 100%;
+    width: 50%;
     height: 30px;
     text-align: right;
   }
@@ -338,7 +437,10 @@
   }
 
   .showing {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
   }
 
   .navigation {
@@ -539,6 +641,16 @@
     background: #3285b1 !important;
     text-decoration: none;
     margin: 0px 10px 0px 0px !important;
+  }
+
+  input#scan-date, input#treatment-date, input#scan-result {
+    height: 28px !important;
+    width: 100% !important;
+    background: #ffffff !important;
+    outline: none !important;
+    border: 0px;
+    color: #7f7f7f !important;
+    cursor: pointer;
   }
 </style>
 
