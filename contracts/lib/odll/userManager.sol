@@ -321,12 +321,14 @@ library userManager {
     uint8 userType,
     bytes32 name,
     bytes32 email,
-    bytes32 gravatar
+    bytes32 gravatar,
+    uint8 status
   ) {
     userType = ODLLDB(dbAddress).getUInt8Value(keccak256("user/type", userId));
     name = ODLLDB(dbAddress).getBytes32Value(keccak256("user/name", userId));
     email = ODLLDB(dbAddress).getBytes32Value(keccak256("user/email", userId));
     gravatar = ODLLDB(dbAddress).getBytes32Value(keccak256("user/gravatar", userId));
+    status = ODLLDB(dbAddress).getUInt8Value(keccak256("user/status", userId));
   }
 
   function getUserContactData(address dbAddress, address userId)

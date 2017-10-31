@@ -84,14 +84,14 @@ contract ODLLUserWriter is ODLLRestrictor {
 
   function blockUser(address userId)
     external
-    onlyOwnerOrActiveAdmin
+    onlyOwnerOrActiveAdminOrActiveManager
   {
     userManager.blockUser(dbAddress, userId);
   }
 
   function unblockUser(address userId)
     external
-    onlyOwnerOrActiveAdmin
+    onlyOwnerOrActiveAdminOrActiveManager
   {
     userManager.unblockUser(dbAddress, userId);
   }

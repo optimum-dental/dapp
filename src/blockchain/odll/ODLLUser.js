@@ -78,7 +78,7 @@ class ODLLUser {
       smartContractMethod: 'getUserIdentityData',
       smartContractMethodParams: (coinbase) => [userId || coinbase, {from: coinbase}],
       state,
-      smartContractResolve: result => odllUser.getUserObject(state, result, ['type', 'name', 'email', 'gravatar']),
+      smartContractResolve: result => odllUser.getUserObject(state, result, ['type', 'name', 'email', 'gravatar', 'status']),
       smartContractReject: (error) => ({
         error,
         isValid: true,
@@ -161,22 +161,6 @@ class ODLLUser {
         warningMessage: "We've encountered a problem getting dentist ratings from the blockchain. Please do try again in a few minutes."
       })
     })
-  }
-
-  getServiceData (state, serviceTypeId, serviceSubtypeId) {
-    // return blockchainManager.querySmartContract({
-      // contractToUse: ODLLUserReaderContract,
-      // smartContractMethod: 'getDentistRatingData',
-      // smartContractMethodParams: (coinbase) => [userId || coinbase, {from: coinbase}],
-      // state,
-      // smartContractResolve: result => ({rating: result}),
-      // smartContractReject: (error) => ({
-        // error,
-        // isValid: true,
-        // warningMessage: "We've encountered a problem getting dentist ratings from the blockchain. Please do try again in a few minutes."
-      // })
-    // })
-    console.log(serviceTypeId, serviceSubtypeId)
   }
 
   getUserObject (state, results, keys) {

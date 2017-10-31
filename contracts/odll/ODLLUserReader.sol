@@ -17,7 +17,8 @@ contract ODLLUserReader is ODLLRestrictor {
       uint8,
       bytes32,
       bytes32,
-      bytes32
+      bytes32,
+      uint8
     )
   {
     return userManager.getUserIdentityData(dbAddress, userId);

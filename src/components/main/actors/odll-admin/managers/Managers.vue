@@ -47,6 +47,27 @@
       action (isBlocked) {
         return isBlocked ? 'Unblock Manager' : 'Block Manager'
       },
+      setEventListeners () {
+        const _this = this
+        document.querySelector('#managers').addEventListener('click', function (evt) {
+          const target = evt.target
+          switch (true) {
+            case (target.classList.contains('block')):
+              let userId = _this.$store.state.searchResult.fetchManagers.data[_this.currentOffset][Number(target.dataset.sn)].coinbase
+              _this.manageBlocking(userId, 'blockUser')
+              target.classList.remove('block')
+              target.classList.add('unblock')
+              break
+
+            case (target.classList.contains('unblock')):
+              userId = _this.$store.state.searchResult.fetchManagers.data[_this.currentOffset][Number(target.dataset.sn)].coinbase
+              _this.manageBlocking(userId, 'unblockUser')
+              target.classList.remove('unblock')
+              target.classList.add('block')
+              break
+          }
+        })
+      },
       fetchManagers (evt = null, offset = 0, seed = undefined, direction = 1) {
         const fetchQuery = {
           type: 'fetchManagers',
@@ -122,6 +143,23 @@
           }
         })
       },
+      manageBlocking (userId, action) {
+        this.scrollToTop()
+        this.beginWait(document.querySelector('.wrapper'))
+        this.disableNecessaryButtons()
+        this.$root.callToWriteData({
+          requestParams: {
+            address: userId
+          },
+          methodName: action,
+          callback: (status = false) => {
+            this.endWait(document.querySelector('.wrapper'))
+            this.enableNecessaryButtons()
+            this.fetchManagers(null, this.currentOffset, this.$store.state.searchResult.fetchManagers.seed)
+            this.notify(status ? `${action} successful for Manager` : `${action} unsuccessful for Manager`)
+          }
+        })
+      },
       populateResults (results) {
         const resultSection = document.querySelector('.result-section')
         this.clearDOMElementChildren(resultSection)
@@ -193,7 +231,7 @@
               <div class="address">${result.address || 'Address: Not Supplied'}</div>
             </div>
             <div class="action-section">
-              <input type="button" value="Remove Manager" class="action-button button">
+              <input type="button" value="${Number(result.status) === 2 ? 'Unblock Manager' : 'Block Manager'}" class="action-button ${Number(result.status) === 2 ? 'unblock' : 'block'} button" data-sn="${result.SN}">
             </div>
           </div>
         `, 'text/html').body.firstChild
@@ -229,6 +267,7 @@
       }
     },
     mounted: function () {
+      this.setEventListeners()
       this.getManagers(null, {
         type: 'fetchManagers',
         offset: Number(this.$route.query.o || 0),

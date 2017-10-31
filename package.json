@@ -24,6 +24,7 @@
     "truffle-hdwallet-provider": "0.0.3",
     "vue": "^2.4.2",
     "vue-router": "^2.7.0",
+    "vuejs-datepicker": "^0.9.18",
     "vuex": "^2.4.0",
     "vuex-persist": "^0.1.8",
     "web3": "0.19.0",
