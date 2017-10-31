@@ -108,14 +108,14 @@
               },
 
               {
-                key: 'view-scan-applications',
-                text: 'View Scans Applications',
-                icon: '/static/images/scan-application.png'
+                key: 'view-applications',
+                text: 'View Applications',
+                icon: '/static/images/file.png'
               },
               {
-                key: 'view-treatment-applications',
-                text: 'View Treatment Applications',
-                icon: '/static/images/file.png'
+                key: 'notifications',
+                text: 'Notifications',
+                icon: '/static/images/notifications.png'
               },
               profile
             ]

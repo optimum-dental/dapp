@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper">
-    <div id="services">
+    <div id="appointment">
       <div class="title">Request Appointment</div>
 
       <div class="sections">
@@ -14,7 +14,7 @@
             <div class="entry-item">
               <div class="entry-param">Preferred Date *</div>
               <div class="entry-value">
-                <datepicker class="list appointment-date scan-date" id="scan-date" @selected="validateScanDate"></datepicker>
+                <datepicker   v-model="scanDate" class="list appointment-date scan-date" id="scan-date" @selected="validateScanDate"></datepicker>
               </div>
             </div>
 
@@ -45,30 +45,11 @@
             </div>
 
             <div class="submit">
-              <input type="button" class='post button' value="Send" @click="writeAppointment">
+              <input type="button" class='post button' value="Send" @click="writeScanAppointment">
             </div>
           </div>
 
           <div class="treatment-section" :class="addClass(2, 'showing')" id="treatment-section">
-            <div class="entry-item">
-              <div class="entry-param">Preferred Date *</div>
-              <div class="entry-value">
-                <datepicker class="list appointment-date treatment-date" id="treatment-date" @selected="validateTreatmentDate"></datepicker>
-              </div>
-            </div>
-
-            <div class="entry-item">
-              <div class="entry-param">Preferred Time *</div>
-              <div class="entry-value">
-                <select id="treatment-time" class="list">
-                  <option>Select</option>
-                  <option>Morning (8AM - 12PM)</option>
-                  <option>Early Afternoon (12PM - 3PM)</option>
-                  <option>Late Afternoon (3PM - 6PM)</option>
-                </select>
-              </div>
-            </div>
-
             <div class="entry-item">
               <div class="entry-param">Appointment For *</div>
               <div class="entry-value">
@@ -91,7 +72,7 @@
             </div>
 
             <div class="submit">
-              <input type="button" class='post button' value="Send" @click="writeAppointment">
+              <input type="button" class='post button' value="Send" @click="writeTreatmentAppointment">
             </div>
           </div>
         </div>
@@ -108,43 +89,40 @@
     computed: {
       user () {
         return this.$root.user
-      },
-      isThereMore (serviceType) {
-        return this.$store.state.searchResult[serviceType === 1 ? 'fetchScanServices' : 'fetchTreatmentServices'].totalNumberAvailable > (this.pageNumber * this.perPage)
-      },
-      pageNumber () {
-        return (Number(this.$route.query.o || 0) / this.perPage) + 1
-      },
-      nextOffset () {
-        return (this.pageNumber * this.perPage)
-      },
-      currentOffset () {
-        return (this.nextOffset - this.perPage)
-      },
-      previousOffset () {
-        return (this.currentOffset - this.perPage)
-      },
-      perPage () {
-        return 5
+      }
+    },
+    data: function () {
+      return {
+        scanDate: '',
+        scanDateError: true
       }
     },
     methods: {
+      appointmentWith () {
+        const serialNumber = this.$route.query.sn
+        const offset = this.$route.query.o
+        return serialNumber !== undefined && offset !== undefined ? this.$store.state.searchResult.findDentists.data[offset][serialNumber].address : '0x0'
+      },
+      setEventListeners () {
+        const _this = this
+        document.querySelector('#appointment').addEventListener('change', function (evt) {
+          const target = evt.target
+          switch (true) {
+            case (['scan-time', 'scan-appointment', 'treatment-appointment'].includes(target.id)):
+              _this.clearError(target)
+              break
+          }
+        })
+      },
       validateScanDate (dateValue) {
         const today = Math.floor(+(new Date()) / 36000000)
         const pickedDate = Math.floor(+dateValue / 36000000)
         if (today > pickedDate) {
-          document.querySelector('.scan-date').classList.add('error')
+          this.addError(document.querySelector('.scan-date'))
+          this.scanDateError = true
         } else {
-          document.querySelector('.scan-date').classList.remove('error')
-        }
-      },
-      validateTreatmentDate (dateValue) {
-        const today = Math.floor(+(new Date()) / 36000000)
-        const pickedDate = Math.floor(+dateValue / 36000000)
-        if (today > pickedDate) {
-          document.querySelector('.treatment-date').classList.add('error')
-        } else {
-          document.querySelector('.treatment-date').classList.remove('error')
+          this.clearError(document.querySelector('.scan-date'))
+          this.scanDateError = false
         }
       },
       serviceTypeIndex () {
@@ -168,7 +146,7 @@
           this.populateServices(serviceType)
         }
       },
-      updateAddressBar (serviceType) {
+      updateAddressBar (serviceType = 1) {
         this.$router.push({
           path: '/request-appointment',
           query: {
@@ -184,6 +162,9 @@
       cancelButton () {
         const DOMELement = new DOMParser().parseFromString(`<input type="button" class="button cancel" value="Cancel">`, 'text/html')
         return DOMELement.body.firstChild
+      },
+      addError (target) {
+        target.classList.add('error')
       },
       clearError (target) {
         target.classList.remove('error')
@@ -204,30 +185,74 @@
           })
         }
       },
-      writeAppointment (evt) {
-        const serviceTypeId = Number(document.getElementById('service-type').selectedIndex)
-        const serviceSubtypeId = Number(document.getElementById('service-subtype').selectedIndex)
-        const fee = this.getFee()
-        let errors = [serviceTypeId === 0 ? document.getElementById('service-type') : undefined, serviceSubtypeId === 0 ? document.getElementById('service-subtype') : undefined, fee === '' ? document.getElementById('fee') : undefined]
+      writeScanAppointment () {
+        const appointmentDate = (+(this.scanDate)).toString()
+        const scanTime = Number(document.getElementById('scan-time').selectedIndex)
+        const scanAppointmentId = Number(document.getElementById('scan-appointment').selectedIndex)
+        const scanComment = document.getElementById('scan-comment').value
+        let errors = [scanTime === 0 ? document.getElementById('scan-time') : undefined, scanAppointmentId === 0 ? document.getElementById('scan-appointment') : undefined, this.scanDateError ? document.querySelector('.scan-date') : undefined]
         errors = errors.filter(entry => entry !== undefined)
         if (errors.length > 0) {
           errors.forEach((item) => {
-            item.classList.add('error')
+            this.addError(item)
           })
         } else {
           this.scrollToTop()
-          this.disableNecessaryButtons(evt)
+          this.disableNecessaryButtons()
           this.beginWait(document.querySelector('.wrapper'))
-          this.$root.callToWriteServiceWithFee({
-            serviceObject: {
-              serviceTypeId,
-              serviceSubtypeId,
-              fee
+          this.$root.callToWriteData({
+            requestParams: {
+              dentistId: this.appointmentWith(),
+              appointmentDate,
+              scanTime,
+              scanAppointmentId,
+              scanComment
             },
+            methodName: 'writeScanAppointment',
             callback: (status) => {
               this.endWait(document.querySelector('.wrapper'))
-              this.enableNecessaryButtons(evt)
-              this.notify(status ? 'Service Successfully added' : 'Unable to add Service')
+              this.enableNecessaryButtons()
+              if (status) {
+                this.updateAddressBar()
+                this.populateServices()
+              }
+
+              this.notify(status ? 'Scan Appointment Successfully added' : 'Unable to add Scan Appointment')
+            }
+          })
+        }
+      },
+      writeTreatmentAppointment () {
+        const treatmentAppointmentId = Number(document.getElementById('treatment-appointment').selectedIndex)
+        const treatmentComment = document.getElementById('treatment-comment').value
+        const scanResultURL = ''
+        let errors = [treatmentAppointmentId === 0 ? document.getElementById('treatment-appointment') : undefined]
+        errors = errors.filter(entry => entry !== undefined)
+        if (errors.length > 0) {
+          errors.forEach((item) => {
+            this.addError(item)
+          })
+        } else {
+          this.scrollToTop()
+          this.disableNecessaryButtons()
+          this.beginWait(document.querySelector('.wrapper'))
+          this.$root.callToWriteData({
+            requestParams: {
+              dentistId: this.appointmentWith(),
+              treatmentAppointmentId,
+              scanResultURL,
+              treatmentComment
+            },
+            methodName: 'writeTreatmentAppointment',
+            callback: (status) => {
+              this.endWait(document.querySelector('.wrapper'))
+              this.enableNecessaryButtons()
+              if (status) {
+                this.updateAddressBar()
+                this.populateServices()
+              }
+
+              this.notify(status ? 'Treatment Appointment Successfully added' : 'Unable to add Treatment Appointment')
             }
           })
         }
@@ -267,7 +292,8 @@
       }
     },
     mounted: function () {
-      this.populateServices()
+      this.setEventListeners()
+      this.populateServices(Number(this.$route.query.sTI))
     }
   }
 
@@ -305,7 +331,7 @@
     100% {width: 100%;}
   }
 
-  #services {
+  #appointment {
     background: #ffffff;
     min-height: 70vh;
     width: 90%;

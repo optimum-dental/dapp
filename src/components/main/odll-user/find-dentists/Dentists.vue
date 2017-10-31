@@ -365,7 +365,7 @@
               ${averageRatingDOMElement.outerHTML}
               <div class="address">${result.address || 'Address: Not Supplied'}</div>
             </div>
-            ${this.user.isPatient ? '<div class="request-appointment-section"><a href="/#/request-appointment?sn=' + result.SN + '" class="link-to-appointment">Request Appointment</a></div>' : ''}
+            ${this.user.isPatient ? '<div class="request-appointment-section"><a href="/#/request-appointment?o=' + this.currentOffset + 'sn=' + result.SN + '" class="link-to-appointment">Request Appointment</a></div>' : ''}
           </div>
         `, 'text/html').body.firstChild
         return resultDOMElement
