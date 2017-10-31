@@ -58,22 +58,22 @@
           {
             id: 1,
             title: 'How to use Oral Data Link',
-            link: 'https://www.youtube.com/embed/r43LhSUUGTQ'
+            link: 'https://www.youtube.com/embed/aerf7R2KzIY'
           },
           {
             id: 2,
             title: 'Register on Oral Data Link',
-            link: 'https://www.youtube.com/embed/r43LhSUUGTQ'
+            link: 'https://www.youtube.com/embed/aerf7R2KzIY'
           },
           {
             id: 3,
             title: 'Find a dentist',
-            link: 'https://www.youtube.com/embed/r43LhSUUGTQ'
+            link: 'https://www.youtube.com/embed/aerf7R2KzIY'
           },
           {
             id: 4,
             title: 'View services',
-            link: 'https://www.youtube.com/embed/r43LhSUUGTQ'
+            link: 'https://www.youtube.com/embed/aerf7R2KzIY'
           }
         ]
       }
