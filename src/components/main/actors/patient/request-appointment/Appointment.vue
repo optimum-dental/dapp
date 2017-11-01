@@ -37,6 +37,17 @@
               </div>
             </div>
 
+            <div class="entry-item">
+              <div class="entry-param">Do you have insurance?</div>
+              <div class="entry-value">
+                <select id="scan-insurance-query" class="list">
+                  <option>Select</option>
+                  <option>Yes</option>
+                  <option>No</option>
+                </select>
+              </div>
+            </div>
+
             <div class="entry-item comment">
               <div class="entry-param">Additional Comments [128 characters max]</div>
               <div class="entry-value">
@@ -51,16 +62,24 @@
 
           <div class="treatment-section" :class="addClass(2, 'showing')" id="treatment-section">
             <div class="entry-item">
-              <div class="entry-param">Appointment For *</div>
+              <div class="entry-param">Do you have insurance?</div>
               <div class="entry-value">
-                <select id="treatment-appointment" class="list"></select>
+                <select id="treatment-insurance-query" class="list">
+                  <option>Select</option>
+                  <option>Yes</option>
+                  <option>No</option>
+                </select>
               </div>
             </div>
 
             <div class="entry-item">
               <div class="entry-param">Scan Result *</div>
               <div class="entry-value">
-                <input id="scan-result" type="file" class="list"></select>
+                <label for="scan-result" class="scan-result-trigger list">
+                  <span class="icon"></span>
+                  <span class="text">Choose Scan Result</span>
+                </label>
+                <input id="scan-result" type="file" accept="image/*" multiple></select>
               </div>
             </div>
 
@@ -108,11 +127,55 @@
         document.querySelector('#appointment').addEventListener('change', function (evt) {
           const target = evt.target
           switch (true) {
-            case (['scan-time', 'scan-appointment', 'treatment-appointment'].includes(target.id)):
+            case (['scan-time', 'scan-appointment'].includes(target.id)):
               _this.clearError(target)
+              break
+            case (['scan-result'].includes(target.id)):
+              const label = target.closest('.entry-value').querySelector('.scan-result-trigger')
+              _this.clearError(label)
+              const fileNames = Array.from(target.files).map(file => file.name).join(', ')
+              label.querySelector('.text').innerHTML = truncate(fileNames, 50)
+              break
+            case (['scan-insurance-query', 'treatment-insurance-query'].includes(target.id)):
+              const serviceTypeId = target.id === 'scan-insurance-query' ? 1 : 2
+              const choice = target.selectedIndex
+              let DOMElement
+              if (choice === 0 || choice === 2) {
+                let insuranceDOMElement = target.closest('.entry-item').nextElementSibling
+                insuranceDOMElement = insuranceDOMElement.classList.contains('insurance') ? insuranceDOMElement : null
+                if (insuranceDOMElement) _this.removeDOMElement(insuranceDOMElement)
+              } else {
+                DOMElement = _this.createDOMElementFromString(`
+                  <div class="entry-item insurance">
+                    <div class="entry-param">Insurance Name</div>
+                    <div class="entry-value">
+                      <input id="${serviceTypeId === 1 ? 'scan' : 'treatment'}-insurance" class="list" type="text">
+                    </div>
+                  </div>
+                `)
+                _this.appendDOMElementAfter(DOMElement, target.closest('.entry-item'), document.querySelector(`.${serviceTypeId === 1 ? 'scan' : 'treatment'}-section`))
+              }
+
               break
           }
         })
+      },
+      removeDOMElement (DOMElement) {
+        DOMElement.remove()
+      },
+      createDOMElement (tagName, attributes = {}) {
+        const tag = document.createElement(tagName)
+        Object.keys(attributes).forEach((attribute) => {
+          tag[attribute] = attributes[attribute]
+        })
+
+        return tag
+      },
+      createDOMElementFromString (DOMString) {
+        return new DOMParser().parseFromString(DOMString, 'text/html').body.firstChild
+      },
+      appendDOMElementAfter (DOMElement, target, parentDOMElement) {
+        parentDOMElement.insertBefore(DOMElement, target.nextElementSibling)
       },
       validateScanDate (dateValue) {
         const today = Math.floor(+(new Date()) / 36000000)
@@ -126,10 +189,10 @@
         }
       },
       serviceTypeIndex () {
-        return Number(this.$route.query.sTI)
+        return Number(this.$route.query.sTI || 1)
       },
       serviceSubtypeIndex () {
-        return Number(this.$route.query.sSI)
+        return Number(this.$route.query.sSI || 0)
       },
       addClass (check, value) {
         return this.serviceTypeIndex() === check || (!this.serviceTypeIndex() && check === 1) ? value : ''
@@ -171,7 +234,7 @@
       },
       populateServices (serviceTypeId = 1) {
         const serviceTypeIndex = this.serviceTypeIndex() || serviceTypeId
-        const serviceSubtypesElement = document.getElementById(`${serviceTypeId === 1 ? 'scan-appointment' : 'treatment-appointment'}`)
+        const serviceSubtypesElement = document.getElementById(`${serviceTypeIndex === 1 ? 'scan-appointment' : 'treatment-appointment'}`)
         if (serviceSubtypesElement) {
           this.clearDOMElementChildren(serviceSubtypesElement)
           const serviceSubtypes = serviceTypes[serviceTypeIndex].subtypes
@@ -189,6 +252,8 @@
         const appointmentDate = (+(this.scanDate)).toString()
         const scanTime = Number(document.getElementById('scan-time').selectedIndex)
         const scanAppointmentId = Number(document.getElementById('scan-appointment').selectedIndex)
+        const scanInsuranceQuery = Number(document.getElementById('scan-insurance-query').selectedIndex)
+        const scanInsurance = scanInsuranceQuery === 1 ? document.getElementById('scan-insurance').value : ''
         const scanComment = document.getElementById('scan-comment').value
         let errors = [scanTime === 0 ? document.getElementById('scan-time') : undefined, scanAppointmentId === 0 ? document.getElementById('scan-appointment') : undefined, this.scanDateError ? document.querySelector('.scan-date') : undefined]
         errors = errors.filter(entry => entry !== undefined)
@@ -206,6 +271,7 @@
               appointmentDate,
               scanTime,
               scanAppointmentId,
+              scanInsurance,
               scanComment
             },
             methodName: 'writeScanAppointment',
@@ -223,39 +289,57 @@
         }
       },
       writeTreatmentAppointment () {
-        const treatmentAppointmentId = Number(document.getElementById('treatment-appointment').selectedIndex)
+        const treatmentInsuranceQuery = Number(document.getElementById('treatment-insurance-query').selectedIndex)
+        const treatmentInsurance = treatmentInsuranceQuery === 1 ? document.getElementById('treatment-insurance').value : ''
         const treatmentComment = document.getElementById('treatment-comment').value
-        const scanResultURL = ''
-        let errors = [treatmentAppointmentId === 0 ? document.getElementById('treatment-appointment') : undefined]
+        let errors = [document.getElementById('scan-result').files.length === 0 ? document.getElementById('scan-result') : undefined]
         errors = errors.filter(entry => entry !== undefined)
         if (errors.length > 0) {
           errors.forEach((item) => {
-            this.addError(item)
+            if (item.id === 'scan-result') {
+              const label = item.closest('.entry-value').querySelector('.scan-result-trigger')
+              this.addError(label)
+            } else {
+              this.addError(item)
+            }
           })
         } else {
+          const scanResultURL = this.getURLFromFileUpload(document.getElementById('scan-result'))
           this.scrollToTop()
           this.disableNecessaryButtons()
           this.beginWait(document.querySelector('.wrapper'))
-          this.$root.callToWriteData({
-            requestParams: {
-              dentistId: this.appointmentWith(),
-              treatmentAppointmentId,
-              scanResultURL,
-              treatmentComment
-            },
-            methodName: 'writeTreatmentAppointment',
-            callback: (status) => {
-              this.endWait(document.querySelector('.wrapper'))
-              this.enableNecessaryButtons()
-              if (status) {
-                this.updateAddressBar()
-                this.populateServices()
-              }
+          scanResultURL
+          .then((urls) => {
+            this.$root.callToWriteData({
+              requestParams: {
+                treatmentInsurance,
+                urls,
+                treatmentComment
+              },
+              methodName: 'writeTreatmentAppointment',
+              callback: (status) => {
+                this.endWait(document.querySelector('.wrapper'))
+                this.enableNecessaryButtons()
+                if (status) {
+                  this.updateAddressBar()
+                  this.populateServices()
+                }
 
-              this.notify(status ? 'Treatment Appointment Successfully added' : 'Unable to add Treatment Appointment')
-            }
+                this.notify(status ? 'Treatment Appointment Successfully added' : 'Unable to add Treatment Appointment')
+              }
+            })
+          })
+          .catch((e) => {
+            console.log(e)
           })
         }
+      },
+      getURLFromFileUpload (fileDOMElement) {
+        const files = Array.from(fileDOMElement.files)
+        return new Promise(function (resolve, reject) {
+          console.log(files)
+          resolve(files.map(file => file.name).join('~~~'))
+        })
       },
       clearDOMElementChildren (DOMElement) {
         while (DOMElement.hasChildNodes()) {
@@ -293,12 +377,13 @@
     },
     mounted: function () {
       this.setEventListeners()
-      this.populateServices(Number(this.$route.query.sTI))
+      this.populateServices()
     }
   }
 
   import Datepicker from 'vuejs-datepicker'
   import serviceTypes from '../../../../../../static/json/appointment_types/appointment_types.json'
+  import {truncate} from '../../../../../util/StringManager'
   import $ from 'jquery'
 </script>
 
@@ -376,13 +461,40 @@
     line-height: 20px;
   }
 
-  .list, #fee {
+  .list, label.list {
+    display: block;
     height: 30px;
     width: 100%;
     background: #ffffff;
     outline: none;
     border: 1px solid #d3d3d3;
     color: #7f7f7f;
+  }
+
+  label.list {
+    cursor: pointer;
+    background: #edefef;
+    text-align: center;
+    line-height: 30px;
+  }
+
+  label.list span {
+    display: inline-block;
+    float: left;
+    height: 28px;
+  }
+
+  label.list span.icon {
+    width: 28px;
+    background: url('/static/images/upload.png') no-repeat;
+    background-size: contain;
+    margin-right: 10px;
+  }
+
+  input#scan-result {
+    opacity: 0;
+    position: absolute;
+    z-index: -1;
   }
 
   .comment {
@@ -473,62 +585,32 @@
     width: 100%;
     float: right;
   }
-
-  .fetch-next, .fetch-previous {
-    cursor: pointer;
-    color: #6592ad;
-    background: #ffffff;
-    height: 30px;
-    line-height: 30px;
-    width: 120px;
-    display: inline-block;
-    float: right;
-    text-align: center;
-    margin-right: 5px;
-    font-size: 14px;
-  }
-
-  .fetch-next:hover, .fetch-previous:hover {
-    background: #dae3e8;
-  }
 </style>
 
 <style>
-  .no-service {
-    position: absolute;
-    top: 40px;
-    width: 100%;
-    min-height: 260px;
-    text-align: center;
-    font-size: 16px;
-  }
-
-  .no-service-message {
-    height: 30px;
-    position: relative;
-    top: 110px;
-  }
-
-  .wait-overlay {
-    position: absolute;
-    top: 40px;
-    width: 100%;
-    height: 100%;
-    text-align: center;
-    font-size: 16px;
-    height: 260px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  .entry-item {
+    height: 60px;
+    margin-top: 30px;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.9);
+    width: 50%;
   }
 
-  .wait-message {
+  .entry-param {
+    color: #7f7f7f;
+    margin-bottom: 5px;
+    height: 20px;
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .list, label.list {
+    display: block;
     height: 30px;
-    line-height: 30px;
-    position: relative;
-    font-size: 16px;
+    width: 100%;
+    background: #ffffff;
+    outline: none;
+    border: 1px solid #d3d3d3;
+    color: #7f7f7f;
   }
 
   .spin {
@@ -553,101 +635,6 @@
     }
   }
 
-  .result {
-    width: 95%;
-    border-bottom: 1px solid #a7a7a7;
-    min-height: 180px;
-    padding: 10px 0px;
-  }
-
-  .gravatar-section {
-    width: 60px;
-    height: 60px;
-    float: left;
-    display: inline-block;
-    margin-right: 10px;
-    border: 1px solid #c3c3c3;
-    border-radius: 6px;
-    padding: 3px;
-  }
-
-  .gravatar-section > canvas {
-    height: 100%;
-    width: 100%;
-    border-radius: 6px;
-  }
-
-  .about-section {
-    width: 250px;
-    height: 150px;
-    display: inline-block;
-    float: left;
-  }
-
-  .about-section > div {
-    display: block;
-    height: 20px;
-    line-height: 20px;
-    font-size: 14px;
-    text-align: left;
-    width: 100%;
-  }
-
-  .profile-link {
-    font-size: 10px !important;
-    color: #bfced9;
-    cursor: pointer;
-  }
-
-  .average-rating > div {
-    background: url(/static/images/star_line.png) no-repeat;
-    background-size: contain;
-    height: 20px;
-    width: 20px;
-    display: inline-block;
-    float: left;
-    margin: 0px 5px;
-  }
-
-  .average-rating > .filled {
-    background: url(/static/images/star.png) no-repeat;
-    background-size: contain;
-  }
-
-  .request-service-section {
-    width: auto;
-    height: 150px;
-    line-height: 150px;
-    display: inline-block;
-    float: right;
-  }
-
-  .link-to-service {
-    width: 200px;
-    height: 40px;
-    line-height: 40px;
-    color: #ffffff;
-    background: #3285b1;
-    display: inline-block;
-    text-decoration: none;
-    font-size: 14px;
-    text-align: center;
-  }
-
-  .service-name {
-    width: 50%;
-    height: 40px;
-    font-size: 20px;
-    line-height: 40px;
-  }
-
-  .service-fee {
-    width: 50%;
-    height: 40px;
-    font-size: 16px;
-    line-height: 40px;
-  }
-
   .button {
     padding: 2px;
     text-align: center;
@@ -663,13 +650,7 @@
     display: inline-block;
   }
 
-  .edit-service, .delete-service {
-    background: #3285b1 !important;
-    text-decoration: none;
-    margin: 0px 10px 0px 0px !important;
-  }
-
-  input#scan-date, input#treatment-date, input#scan-result {
+  input#scan-date, input#treatment-date {
     height: 28px !important;
     width: 100% !important;
     background: #ffffff !important;
