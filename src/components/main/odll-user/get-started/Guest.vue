@@ -57,8 +57,8 @@
         tutorials: [
           {
             id: 1,
-            title: 'How to use Oral Data Link',
-            link: 'https://www.youtube.com/embed/aerf7R2KzIY'
+            title: 'How to install Metamask',
+            link: 'https://www.youtube.com/embed/JeYlPFeLvLo'
           },
           {
             id: 2,
@@ -67,13 +67,18 @@
           },
           {
             id: 3,
-            title: 'Find a dentist',
+            title: 'View services',
             link: 'https://www.youtube.com/embed/aerf7R2KzIY'
           },
           {
             id: 4,
-            title: 'View services',
+            title: 'Find a dentist',
             link: 'https://www.youtube.com/embed/aerf7R2KzIY'
+          },
+          {
+            id: 5,
+            title: 'Register as a patient',
+            link: 'https://www.youtube.com/embed/lwRQb9t3nIM'
           }
         ]
       }
