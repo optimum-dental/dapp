@@ -189,6 +189,17 @@ library userManager {
     ODLLDB(dbAddress).setBytes32Value(keccak256("dentist/company-name", userId), companyName);
   }
 
+  function addODLLDentist(
+    address dbAddress,
+    address userId
+  )
+    internal
+  {
+    require(userExists(dbAddress, userId));
+    require(isActiveUser(dbAddress, userId));
+    ODLLDB(dbAddress).setBooleanValue(keccak256("user/is-odll-dentist?", userId), true);
+  }
+
   function hasStatus(address dbAddress, address userId, uint8 status) internal view returns(bool) {
     return status == getStatus(dbAddress, userId);
   }
@@ -564,38 +575,416 @@ library userManager {
     servicesLibrary.removeDentist(dbAddress, serviceTypeId, serviceIds, userId);
   }
 
-  // function findDentists(
-  //   address dbAddress,
-  //   uint scanCategoryId,
-  //   uint treatmentCategoryId,
-  //   uint minBudget,
-  //   uint maxBudget,
-  //   uint[] uintArgs
-  //   )
-  //   internal view returns (address[] userIds)
-  //   {
-  //   uint j = 0;
-  //   var allDentistIds = []
-  //   if (scanCategoryId != 0) {
-  //     allDentistIds = utilities.intersectCategoriesAndScanServices(dbAddress, scanCategoryId, minBudget, maxBudget,
-  //     scanCategoryLibrary.getDentiists, treatmentCategoryLibrary.getDentiists, getDentistsCount, getAllDentists);
-  //   }
+  function writeScanAppointment (
+    address dbAddress,
+    address dentistId,
+    address patientId,
+    uint scanAppointmentId,
+    bytes32 appointmentDate,
+    bytes32 scanTime,
+    bytes32 scanInsurance,
+    bytes32 scanComment
+  )
+    internal
+  {
+    servicesLibrary.writeScanAppointment(dbAddress, dentistId, patientId, scanAppointmentId, appointmentDate, scanTime, scanInsurance, scanComment);
+  }
 
-  //   userIds = new address[](allDentistIds.length);
-  //   for (uint i = 0; i < allDentistIds.length ; i++) {
-  //     var userId = allDentistIds[i];
-  //     if (isDentistAvailable(dbAddress, userId) &&
-  //       hasMinRating(dbAddress, userId, minAverageRating) &&
-  //       hasDentistMinRatingsCount(dbAddress, userId, minRatingsCount) &&
-  //       isFromCountry(dbAddress, userId, uintArgs[0]) &&
-  //       isFromState(dbAddress, userId, uintArgs[1]) &&
-  //       hasStatus(dbAddress, userId, 1)
-  //     ) {
-  //       userIds[j] = userId;
-  //       j++;
-  //     }
-  //   }
+  function cancelScanAppointment (
+    address dbAddress,
+    address dentistId,
+    address patientId,
+    uint scanAppointmentId,
+    uint patientScanAppointmentIndexNumber
+  )
+    internal
+  {
+    servicesLibrary.cancelScanAppointment(dbAddress, dentistId, patientId, scanAppointmentId, patientScanAppointmentIndexNumber);
+  }
 
-  //   return utilities.take(j, userIds);
-  // }
+  function expireScanAppointment (
+    address dbAddress,
+    address patientId,
+    uint scanAppointmentId,
+    uint patientScanAppointmentIndexNumber
+  )
+    internal
+  {
+    servicesLibrary.expireScanAppointment(dbAddress, patientId, scanAppointmentId, patientScanAppointmentIndexNumber);
+  }
+
+  function acceptScanAppointment (
+    address dbAddress,
+    address dentistId,
+    address patientId,
+    uint scanAppointmentId,
+    uint patientScanAppointmentIndexNumber,
+    uint quote,
+    bytes32 comment
+  )
+    internal
+  {
+    servicesLibrary.acceptScanAppointment(dbAddress, dentistId, patientId, scanAppointmentId, patientScanAppointmentIndexNumber, quote, comment);
+  }
+
+  function rejectScanAppointment (
+    address dbAddress,
+    address dentistId,
+    address patientId,
+    uint scanAppointmentId,
+    uint patientScanAppointmentIndexNumber
+  )
+    internal
+  {
+    servicesLibrary.rejectScanAppointment(dbAddress, dentistId, patientId, scanAppointmentId, patientScanAppointmentIndexNumber);
+  }
+
+  function applyToScan(
+    address dbAddress,
+    address dentistId,
+    address patientId,
+    uint scanAppointmentId,
+    uint patientScanAppointmentIndexNumber,
+    uint quote,
+    bytes32 comment
+  )
+    internal
+  {
+    servicesLibrary.applyToScan(dbAddress, dentistId, patientId, scanAppointmentId, patientScanAppointmentIndexNumber, quote, comment);
+  }
+
+  function acceptScanApplication (
+    address dbAddress,
+    address dentistId,
+    address patientId,
+    uint scanAppointmentId,
+    uint patientScanAppointmentIndexNumber,
+    uint amount
+  )
+    internal
+  {
+    servicesLibrary.acceptScanApplication(dbAddress, dentistId, patientId, scanAppointmentId, patientScanAppointmentIndexNumber, amount);
+  }
+
+  function cancelScanApplication (
+    address dbAddress,
+    address dentistId,
+    address patientId,
+    uint scanAppointmentId,
+    uint patientScanAppointmentIndexNumber
+  )
+    internal
+  {
+    servicesLibrary.cancelScanApplication(dbAddress, dentistId, patientId, scanAppointmentId, patientScanAppointmentIndexNumber);
+  }
+
+  // treatment request status: 0 => pending, 1 => has applications, 2 => closed to applications, 3 => finished
+  function applyForTreatment (
+    address dbAddress,
+    address dentistId,
+    address patientId,
+    uint scanAppointmentId,
+    uint patientScanAppointmentIndexNumber,
+    bytes32 treatmentInsurance,
+    bytes32[] scanResults,
+    bytes32 treatmentComment
+  )
+    internal
+  {
+    servicesLibrary.applyForTreatment(dbAddress, dentistId, patientId, scanAppointmentId, patientScanAppointmentIndexNumber, treatmentInsurance, scanResults, treatmentComment);
+  }
+
+  function cancelTreatmentRequest (
+    address dbAddress,
+    address patientId,
+    uint patientTreatmentIndexNumber
+  )
+    internal
+  {
+    servicesLibrary.cancelTreatmentRequest(dbAddress, patientId, patientScanAppointmentIndexNumber);
+  }
+
+  function fetchScanAppointmentsForPatient (
+    address dbAddress,
+    address dentistId,
+    address patientId,
+    uint offset, // starting from offset: 0-based
+    uint limit, // not more than limit
+    uint seed // seed value to give the illusion of randomisation
+  )
+    internal
+    view
+    returns (
+      uint totalNumberFound,
+      uint[] scanAppointmentsIds,
+      uint[] patientScanAppointmentIndexNumbers,
+      address[] dentistsIds
+    )
+  {
+    (scanAppointmentsIds, patientScanAppointmentIndexNumbers, dentistsIds) = searchLibrary.getScanAppointmentsForPatient(dbAddress, dentistId, patientId);
+    (totalNumberFound, dentistsIds) = utilities.getSlicedArray(dentistsIds, offset, limit, seed);
+    (totalNumberFound, scanAppointmentsIds) = utilities.getSlicedArray(scanAppointmentsIds, offset, limit, seed);
+    (totalNumberFound, patientScanAppointmentIndexNumbers) = utilities.getSlicedArray(patientScanAppointmentIndexNumbers, offset, limit, seed);
+  }
+
+  function fetchCanceledScanAppointmentsForPatient (
+    address dbAddress,
+    address dentistId,
+    address patientId,
+    uint offset, // starting from offset: 0-based
+    uint limit, // not more than limit
+    uint seed // seed value to give the illusion of randomisation
+  )
+    internal
+    view
+    returns (
+      uint totalNumberFound,
+      uint[] scanAppointmentsIds,
+      uint[] patientScanAppointmentIndexNumbers,
+      address[] dentistsIds
+    )
+  {
+    (scanAppointmentsIds, patientScanAppointmentIndexNumbers, dentistsIds) = searchLibrary.getCanceledScanAppointmentsForPatient(dbAddress, dentistId, patientId);
+    (totalNumberFound, dentistsIds) = utilities.getSlicedArray(dentistsIds, offset, limit, seed);
+    (totalNumberFound, scanAppointmentsIds) = utilities.getSlicedArray(scanAppointmentsIds, offset, limit, seed);
+    (totalNumberFound, patientScanAppointmentIndexNumbers) = utilities.getSlicedArray(patientScanAppointmentIndexNumbers, offset, limit, seed);
+  }
+
+  function fetchAcceptedScanAppointmentsForPatient (
+    address dbAddress,
+    address dentistId,
+    address patientId,
+    uint offset, // starting from offset: 0-based
+    uint limit, // not more than limit
+    uint seed // seed value to give the illusion of randomisation
+  )
+    internal
+    view
+    returns (
+      uint totalNumberFound,
+      uint[] scanAppointmentsIds,
+      uint[] patientScanAppointmentIndexNumbers,
+      address[] dentistsIds
+    )
+  {
+    (scanAppointmentsIds, patientScanAppointmentIndexNumbers, dentistsIds) = searchLibrary.getAceptedScanAppointmentsForPatient(dbAddress, dentistId, patientId);
+    (totalNumberFound, dentistsIds) = utilities.getSlicedArray(dentistsIds, offset, limit, seed);
+    (totalNumberFound, scanAppointmentsIds) = utilities.getSlicedArray(scanAppointmentsIds, offset, limit, seed);
+    (totalNumberFound, patientScanAppointmentIndexNumbers) = utilities.getSlicedArray(patientScanAppointmentIndexNumbers, offset, limit, seed);
+  }
+
+  function fetchRejectedScanAppointmentsForPatient (
+    address dbAddress,
+    address dentistId,
+    address patientId,
+    uint offset, // starting from offset: 0-based
+    uint limit, // not more than limit
+    uint seed // seed value to give the illusion of randomisation
+  )
+    internal
+    view
+    returns (
+      uint totalNumberFound,
+      uint[] scanAppointmentsIds,
+      uint[] patientScanAppointmentIndexNumbers,
+      address[] dentistsIds
+    )
+  {
+    (scanAppointmentsIds, patientScanAppointmentIndexNumbers, dentistsIds) = searchLibrary.getRejectedScanAppointmentsForPatient(dbAddress, dentistId, patientId);
+    (totalNumberFound, dentistsIds) = utilities.getSlicedArray(dentistsIds, offset, limit, seed);
+    (totalNumberFound, scanAppointmentsIds) = utilities.getSlicedArray(scanAppointmentsIds, offset, limit, seed);
+    (totalNumberFound, patientScanAppointmentIndexNumbers) = utilities.getSlicedArray(patientScanAppointmentIndexNumbers, offset, limit, seed);
+  }
+
+  function fetchPaidScanAppointmentsForPatient (
+    address dbAddress,
+    address dentistId,
+    address patientId,
+    uint offset, // starting from offset: 0-based
+    uint limit, // not more than limit
+    uint seed // seed value to give the illusion of randomisation
+  )
+    internal
+    view
+    returns (
+      uint totalNumberFound,
+      uint[] scanAppointmentsIds,
+      uint[] patientScanAppointmentIndexNumbers,
+      address[] dentistsIds
+    )
+  {
+    (scanAppointmentsIds, patientScanAppointmentIndexNumbers, dentistsIds) = searchLibrary.getPaidScanAppointmentsForPatient(dbAddress, dentistId, patientId);
+    (totalNumberFound, dentistsIds) = utilities.getSlicedArray(dentistsIds, offset, limit, seed);
+    (totalNumberFound, scanAppointmentsIds) = utilities.getSlicedArray(scanAppointmentsIds, offset, limit, seed);
+    (totalNumberFound, patientScanAppointmentIndexNumbers) = utilities.getSlicedArray(patientScanAppointmentIndexNumbers, offset, limit, seed);
+  }
+
+  function fetchScanApplicationsForPatient (
+    address dbAddress,
+    address dentistId,
+    address patientId,
+    uint offset, // starting from offset: 0-based
+    uint limit, // not more than limit
+    uint seed // seed value to give the illusion of randomisation
+  )
+    internal
+    view
+    returns (
+      uint totalNumberFound,
+      uint[] scanAppointmentsIds,
+      uint[] patientScanAppointmentIndexNumbers,
+      address[] dentistsIds,
+      bytes32[] comments,
+      uint[] quotes
+    )
+  {
+    (scanAppointmentsIds, patientScanAppointmentIndexNumbers, dentistsIds, comments, quotes) = searchLibrary.getScanApplicationsForPatient(dbAddress, dentistId, patientId);
+    (totalNumberFound, dentistsIds) = utilities.getSlicedArray(dentistsIds, offset, limit, seed);
+    (totalNumberFound, scanAppointmentsIds) = utilities.getSlicedArray(scanAppointmentsIds, offset, limit, seed);
+    (totalNumberFound, comments) = utilities.getSlicedArray(comments, offset, limit, seed);
+    (totalNumberFound, quotes) = utilities.getSlicedArray(quotes, offset, limit, seed);
+    (totalNumberFound, patientScanAppointmentIndexNumbers) = utilities.getSlicedArray(patientScanAppointmentIndexNumbers, offset, limit, seed);
+  }
+
+  function fetchScanAppointmentsForDentist (
+    address dbAddress,
+    address dentistId,
+    address patientId,
+    uint offset, // starting from offset: 0-based
+    uint limit, // not more than limit
+    uint seed // seed value to give the illusion of randomisation
+  )
+    internal
+    view
+    returns (
+      uint totalNumberFound,
+      uint[] scanAppointmentsIds,
+      uint[] patientScanAppointmentIndexNumbers,
+      address[] patientsIds
+    )
+  {
+    (scanAppointmentsIds, patientScanAppointmentIndexNumbers, patientsIds) = searchLibrary.getScanAppointmentsForDentist(dbAddress, dentistId, patientId);
+    (totalNumberFound, patientsIds) = utilities.getSlicedArray(patientsIds, offset, limit, seed);
+    (totalNumberFound, scanAppointmentsIds) = utilities.getSlicedArray(scanAppointmentsIds, offset, limit, seed);
+    (totalNumberFound, patientScanAppointmentIndexNumbers) = utilities.getSlicedArray(patientScanAppointmentIndexNumbers, offset, limit, seed);
+  }
+
+  function fetchCanceledScanAppointmentsForDentist (
+    address dbAddress,
+    address dentistId,
+    address patientId,
+    uint offset, // starting from offset: 0-based
+    uint limit, // not more than limit
+    uint seed // seed value to give the illusion of randomisation
+  )
+    internal
+    view
+    returns (
+      uint totalNumberFound,
+      uint[] scanAppointmentsIds,
+      uint[] patientScanAppointmentIndexNumbers,
+      address[] patientsIds
+    )
+  {
+    (scanAppointmentsIds, patientScanAppointmentIndexNumbers, patientsIds) = searchLibrary.getCanceledScanAppointmentsForDentist(dbAddress, dentistId, patientId);
+    (totalNumberFound, patientsIds) = utilities.getSlicedArray(patientsIds, offset, limit, seed);
+    (totalNumberFound, scanAppointmentsIds) = utilities.getSlicedArray(scanAppointmentsIds, offset, limit, seed);
+    (totalNumberFound, patientScanAppointmentIndexNumbers) = utilities.getSlicedArray(patientScanAppointmentIndexNumbers, offset, limit, seed);
+  }
+
+  function fetchAcceptedScanAppointmentsForDentist (
+    address dbAddress,
+    address dentistId,
+    address patientId,
+    uint offset, // starting from offset: 0-based
+    uint limit, // not more than limit
+    uint seed // seed value to give the illusion of randomisation
+  )
+    internal
+    view
+    returns (
+      uint totalNumberFound,
+      uint[] scanAppointmentsIds,
+      uint[] patientScanAppointmentIndexNumbers,
+      address[] patientsIds
+    )
+  {
+    (scanAppointmentsIds, patientScanAppointmentIndexNumbers, patientsIds) = searchLibrary.getAceptedScanAppointmentsForDentist(dbAddress, dentistId, patientId);
+    (totalNumberFound, patientsIds) = utilities.getSlicedArray(patientsIds, offset, limit, seed);
+    (totalNumberFound, scanAppointmentsIds) = utilities.getSlicedArray(scanAppointmentsIds, offset, limit, seed);
+    (totalNumberFound, patientScanAppointmentIndexNumbers) = utilities.getSlicedArray(patientScanAppointmentIndexNumbers, offset, limit, seed);
+  }
+
+  function fetchRejectedScanAppointmentsForDentist (
+    address dbAddress,
+    address dentistId,
+    address patientId,
+    uint offset, // starting from offset: 0-based
+    uint limit, // not more than limit
+    uint seed // seed value to give the illusion of randomisation
+  )
+    internal
+    view
+    returns (
+      uint totalNumberFound,
+      uint[] scanAppointmentsIds,
+      uint[] patientScanAppointmentIndexNumbers,
+      address[] patientsIds
+    )
+  {
+    (scanAppointmentsIds, patientScanAppointmentIndexNumbers, patientsIds) = searchLibrary.getRejectedScanAppointmentsForDentist(dbAddress, dentistId, patientId);
+    (totalNumberFound, patientsIds) = utilities.getSlicedArray(patientsIds, offset, limit, seed);
+    (totalNumberFound, scanAppointmentsIds) = utilities.getSlicedArray(scanAppointmentsIds, offset, limit, seed);
+    (totalNumberFound, patientScanAppointmentIndexNumbers) = utilities.getSlicedArray(patientScanAppointmentIndexNumbers, offset, limit, seed);
+  }
+
+  function fetchPaidScanAppointmentsForDentist (
+    address dbAddress,
+    address dentistId,
+    address patientId,
+    uint offset, // starting from offset: 0-based
+    uint limit, // not more than limit
+    uint seed // seed value to give the illusion of randomisation
+  )
+    internal
+    view
+    returns (
+      uint totalNumberFound,
+      uint[] scanAppointmentsIds,
+      uint[] patientScanAppointmentIndexNumbers,
+      address[] patientsIds
+    )
+  {
+    (scanAppointmentsIds, patientScanAppointmentIndexNumbers, patientsIds) = searchLibrary.getPaidScanAppointmentsForDentist(dbAddress, dentistId, patientId);
+    (totalNumberFound, patientsIds) = utilities.getSlicedArray(patientsIds, offset, limit, seed);
+    (totalNumberFound, scanAppointmentsIds) = utilities.getSlicedArray(scanAppointmentsIds, offset, limit, seed);
+    (totalNumberFound, patientScanAppointmentIndexNumbers) = utilities.getSlicedArray(patientScanAppointmentIndexNumbers, offset, limit, seed);
+  }
+
+  function fetchScanApplicationsForDentist (
+    address dbAddress,
+    address dentistId,
+    address patientId,
+    uint offset, // starting from offset: 0-based
+    uint limit, // not more than limit
+    uint seed // seed value to give the illusion of randomisation
+  )
+    internal
+    view
+    returns (
+      uint totalNumberFound,
+      uint[] scanAppointmentsIds,
+      uint[] patientScanAppointmentIndexNumbers,
+      address[] patientsIds,
+      bytes32[] comments,
+      uint[] quotes
+    )
+  {
+    (scanAppointmentsIds, patientScanAppointmentIndexNumbers, patientsIds, comments, quotes) = searchLibrary.getScanApplicationsForDentist(dbAddress, dentistId, patientId);
+    (totalNumberFound, patientsIds) = utilities.getSlicedArray(patientsIds, offset, limit, seed);
+    (totalNumberFound, scanAppointmentsIds) = utilities.getSlicedArray(scanAppointmentsIds, offset, limit, seed);
+    (totalNumberFound, comments) = utilities.getSlicedArray(comments, offset, limit, seed);
+    (totalNumberFound, quotes) = utilities.getSlicedArray(quotes, offset, limit, seed);
+    (totalNumberFound, patientScanAppointmentIndexNumbers) = utilities.getSlicedArray(patientScanAppointmentIndexNumbers, offset, limit, seed);
+  }
 }

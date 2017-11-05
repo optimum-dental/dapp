@@ -124,4 +124,336 @@ library searchLibrary {
 
     return stateId == ODLLDB(dbAddress).getUIntValue(keccak256("user/state", userId));
   }
+
+  function patientScanConditionFunction (string searchKey, address patientId, uint scanAppointmentId, uint patientScanAppointmentIndexNumber) internal view returns(bool) {
+    return ODLLDB(dbAddress).getBooleanValue(keccak256(searchKey, patientId, scanAppointmentId, patientScanAppointmentIndexNumber));
+  }
+
+  function dentistScanConditionFunction (string searchKey, address dentistId, uint scanAppointmentId, uint patientScanAppointmentIndexNumber) internal view returns(bool) {
+    return ODLLDB(dbAddress).getBooleanValue(keccak256(searchKey, dentistId, scanAppointmentId, patientScanAppointmentIndexNumber));
+  }
+
+  function getScanAppointmentsForPatient(
+    address dbAddress,
+    address dentistId,
+    address patientId
+  )
+    internal
+    view
+    returns(
+      uint[] scanAppointmentsIds,
+      uint[] patientScanAppointmentIndexNumbers,
+      address[] dentistsIds
+    )
+  {
+    if (dentistId == 0x0) {
+      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getIdArrayWithIndex(dbAddress, patientId, "patient/scan-appointment", "patient/scan-appointments-count");
+      var count = scanAppointmentsIds.length;
+      dentistsIds = new address[](count);
+      for (uint i = 0; i < count; i++) {
+        dentistsIds[i] = ODLLDB(dbAddress).getAddressValue(keccak256("patient/scan-appointment/dentist", patientId, scanAppointmentsIds[i], patientScanAppointmentIndexNumbers[i]));
+      }
+    } else {
+      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getAssociationIdArrayItemsWithIndex(dbAddress, patientId, dentistId, "patient/dentist/scan-appointment", "patient/dentist/scan-appointments-count");
+    }
+  }
+
+  function getCanceledScanAppointmentsForPatient (
+    address dbAddress,
+    address dentistId,
+    address patientId
+  )
+    internal
+    view
+    returns (
+      uint[] scanAppointmentsIds,
+      uint[] patientScanAppointmentIndexNumbers,
+      address[] dentistsIds
+    )
+  {
+    if (dentistId == 0x0) {
+      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getIdArrayWithIndexAndCondition(dbAddress, patientId, "patient/scan-appointment", "patient/scan-appointments-count", patientScanConditionFunction, "patient/scan-appointment/index/is-canceled?");
+      var count = scanAppointmentsIds.length;
+      dentistsIds = new address[](count);
+      for (uint i = 0; i < count; i++) {
+        dentistsIds[i] = ODLLDB(dbAddress).getAddressValue(keccak256("patient/scan-appointment/dentist", patientId, scanAppointmentsIds[i], patientScanAppointmentIndexNumbers[i]));
+      }
+    } else {
+      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getAssociationIdArrayItemsWithIndexAndCondition(dbAddress, patientId, dentistId, "patient/dentist/scan-appointment", "patient/dentist/scan-appointments-count", patientScanConditionFunction, "patient/scan-appointment/index/is-canceled?");
+    }
+  }
+
+  function getAceptedScanAppointmentsForPatient (
+    address dbAddress,
+    address dentistId,
+    address patientId
+  )
+    internal
+    view
+    returns (
+      uint[] scanAppointmentsIds,
+      uint[] patientScanAppointmentIndexNumbers,
+      address[] dentistsIds
+    )
+  {
+    if (dentistId == 0x0) {
+      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getIdArrayWithIndexAndCondition(dbAddress, patientId, "patient/scan-appointment", "patient/scan-appointments-count", patientScanConditionFunction, "patient/scan-appointment/index/is-accepted?");
+      var count = scanAppointmentsIds.length;
+      dentistsIds = new address[](count);
+      for (uint i = 0; i < count; i++) {
+        dentistsIds[i] = ODLLDB(dbAddress).getAddressValue(keccak256("patient/scan-appointment/dentist", patientId, scanAppointmentsIds[i], patientScanAppointmentIndexNumbers[i]));
+      }
+    } else {
+      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getAssociationIdArrayItemsWithIndexAndCondition(dbAddress, patientId, dentistId, "patient/dentist/scan-appointment", "patient/dentist/scan-appointments-count", patientScanConditionFunction, "patient/scan-appointment/index/is-accepted?");
+    }
+  }
+
+  function getRejectedScanAppointmentsForPatient (
+    address dbAddress,
+    address dentistId,
+    address patientId
+  )
+    internal
+    view
+    returns (
+      uint[] scanAppointmentsIds,
+      uint[] patientScanAppointmentIndexNumbers,
+      address[] dentistsIds
+    )
+  {
+    if (dentistId == 0x0) {
+      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getIdArrayWithIndexAndCondition(dbAddress, patientId, "patient/scan-appointment", "patient/scan-appointments-count", patientScanConditionFunction, "patient/scan-appointment/index/is-rejected?");
+      var count = scanAppointmentsIds.length;
+      dentistsIds = new address[](count);
+      for (uint i = 0; i < count; i++) {
+        dentistsIds[i] = ODLLDB(dbAddress).getAddressValue(keccak256("patient/scan-appointment/dentist", patientId, scanAppointmentsIds[i], patientScanAppointmentIndexNumbers[i]));
+      }
+    } else {
+      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getAssociationIdArrayItemsWithIndexAndCondition(dbAddress, patientId, dentistId, "patient/dentist/scan-appointment", "patient/dentist/scan-appointments-count", patientScanConditionFunction, "patient/scan-appointment/index/is-rejected?");
+    }
+  }
+
+  function getPaidScanAppointmentsForPatient (
+    address dbAddress,
+    address dentistId,
+    address patientId
+  )
+    internal
+    view
+    returns (
+      uint[] scanAppointmentsIds,
+      uint[] patientScanAppointmentIndexNumbers,
+      address[] dentistsIds
+    )
+  {
+    if (dentistId == 0x0) {
+      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getIdArrayWithIndexAndCondition(dbAddress, patientId, "patient/scan-appointment", "patient/scan-appointments-count", patientScanConditionFunction, "patient/scan-appointment/index/is-paid-for?");
+      var count = scanAppointmentsIds.length;
+      dentistsIds = new address[](count);
+      for (uint i = 0; i < count; i++) {
+        dentistsIds[i] = ODLLDB(dbAddress).getAddressValue(keccak256("patient/scan-appointment/dentist", patientId, scanAppointmentsIds[i], patientScanAppointmentIndexNumbers[i]));
+      }
+    } else {
+      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getAssociationIdArrayItemsWithIndexAndCondition(dbAddress, patientId, dentistId, "patient/dentist/scan-appointment", "patient/dentist/scan-appointments-count", patientScanConditionFunction, "patient/scan-appointment/index/is-paid-for?");
+    }
+  }
+
+  function getScanApplicationsForPatient (
+    address dbAddress,
+    address dentistId,
+    address patientId
+  )
+    internal
+    view
+    returns (
+      uint[] scanAppointmentsIds,
+      uint[] patientScanAppointmentIndexNumbers,
+      address[] dentistsIds,
+      bytes32[] comments,
+      uint[] quotes
+    )
+  {
+    if (dentistId == 0x0) {
+      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getIdArrayWithIndexAndCondition(dbAddress, patientId, "patient/scan-appointment", "patient/scan-appointments-count", patientScanConditionFunction, "patient/scan-appointment/index/is-accepted?");
+      var count = scanAppointmentsIds.length;
+      dentistsIds = new address[](count);
+      for (uint i = 0; i < count; i++) {
+        dentistsIds[i] = ODLLDB(dbAddress).getAddressValue(keccak256("patient/scan-appointment/dentist", patientId, scanAppointmentsIds[i], patientScanAppointmentIndexNumbers[i]));
+      }
+
+      for (uint i = 0; i < dentistsIds.length; i++) {
+        comments[i] = ODLLDB(dbAddress).getBytes32Value(keccak256("dentist/patient/scan-appointment/index/comment", dentistsIds[i], patientId, scanAppointmentsIds[i], patientScanAppointmentIndexNumbers[i]));
+        quotes[i] = ODLLDB(dbAddress).getUIntValue(keccak256("dentist/patient/scan-appointment/index/quote", dentistsIds[i]. patientId, scanAppointmentsIds[i], patientScanAppointmentIndexNumbers[i]));
+      }
+    } else {
+      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getAssociationIdArrayItemsWithIndexAndCondition(dbAddress, patientId, dentistId, "patient/dentist/scan-appointment", "patient/dentist/scan-appointments-count", patientScanConditionFunction, "patient/scan-appointment/index/is-accepted?");
+
+      for (uint i = 0; i < scanAppointmentsIds.length; i++) {
+        comments[i] = ODLLDB(dbAddress).getBytes32Value(keccak256("dentist/patient/scan-appointment/index/comment", dentistId, patientId, scanAppointmentsIds[i], patientScanAppointmentIndexNumbers[i]));
+        quotes[i] = ODLLDB(dbAddress).getUIntValue(keccak256("dentist/patient/scan-appointment/index/quote", dentistId. patientId, scanAppointmentsIds[i], patientScanAppointmentIndexNumbers[i]));
+      }
+    }
+  }
+
+  function getScanAppointmentsForDentist (
+    address dbAddress,
+    address dentistId,
+    address patientId
+  )
+    internal
+    view
+    returns (
+      uint[] scanAppointmentsIds,
+      uint[] patientScanAppointmentIndexNumbers,
+      address[] patientsIds
+    )
+  {
+    if (patientId == 0x0) {
+      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getIdArrayWithIndex(dbAddress, dentistId, "dentist/scan-appointment", "dentist/scan-appointments-count");
+      var count = scanAppointmentsIds.length;
+      patientsIds = new address[](count);
+      for (uint i = 0; i < count; i++) {
+        patientsIds[i] = ODLLDB(dbAddress).getAddressValue(keccak256("dentist/scan-appointment/patient", dentistId, scanAppointmentsIds[i], i, patientScanAppointmentIndexNumbers[i]));
+      }
+    } else {
+      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getAssociationIdArrayItemsWithIndex(dbAddress, dentistId, patientId, "dentist/patient/scan-appointment", "dentist/patient/scan-appointments-count");
+    }
+  }
+
+  function getCanceledScanAppointmentsForDentist (
+    address dbAddress,
+    address dentistId,
+    address patientId
+  )
+    internal
+    view
+    returns (
+      uint[] scanAppointmentsIds,
+      uint[] patientScanAppointmentIndexNumbers,
+      address[] patientsIds
+    )
+  {
+    if (patientId == 0x0) {
+      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getIdArrayWithIndexAndCondition(dbAddress, dentistId, "dentist/scan-appointment", "dentist/scan-appointments-count", dentistScanConditionFunction, "dentist/scan-appointment/index/is-canceled?");
+      var count = scanAppointmentsIds.length;
+      patientsIds = new address[](count);
+      for (uint i = 0; i < count; i++) {
+        patientsIds[i] = ODLLDB(dbAddress).getAddressValue(keccak256("dentist/scan-appointment/dentist", dentistId, scanAppointmentsIds[i], i, patientScanAppointmentIndexNumbers[i]));
+      }
+    } else {
+      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getAssociationIdArrayItemsWithIndexAndCondition(dbAddress, dentistId, patientId, "dentist/patient/scan-appointment", "dentist/patient/scan-appointments-count", dentistScanConditionFunction, "dentist/scan-appointment/index/is-canceled?");
+    }
+  }
+
+  function getAceptedScanAppointmentsForDentist (
+    address dbAddress,
+    address dentistId,
+    address patientId
+  )
+    internal
+    view
+    returns (
+      uint[] scanAppointmentsIds,
+      uint[] patientScanAppointmentIndexNumbers,
+      address[] patientsIds
+    )
+  {
+    if (patientId == 0x0) {
+      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getIdArrayWithIndexAndCondition(dbAddress, dentistId, "dentist/scan-appointment", "dentist/scan-appointments-count", dentistScanConditionFunction, "dentist/scan-appointment/index/is-accepted?");
+      var count = scanAppointmentsIds.length;
+      patientsIds = new address[](count);
+      for (uint i = 0; i < count; i++) {
+        patientsIds[i] = ODLLDB(dbAddress).getAddressValue(keccak256("dentist/scan-appointment/dentist", dentistId, scanAppointmentsIds[i], i, patientScanAppointmentIndexNumbers[i]));
+      }
+    } else {
+      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getAssociationIdArrayItemsWithIndexAndCondition(dbAddress, dentistId, patientId, "dentist/patient/scan-appointment", "dentist/patient/scan-appointments-count", dentistScanConditionFunction, "dentist/scan-appointment/index/is-accepted?");
+    }
+  }
+
+  function getRejectedScanAppointmentsForDentist (
+    address dbAddress,
+    address dentistId,
+    address patientId
+  )
+    internal
+    view
+    returns (
+      uint[] scanAppointmentsIds,
+      uint[] patientScanAppointmentIndexNumbers,
+      address[] patientsIds
+    )
+  {
+    if (patientId == 0x0) {
+      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getIdArrayWithIndexAndCondition(dbAddress, dentistId, "dentist/scan-appointment", "dentist/scan-appointments-count", dentistScanConditionFunction, "dentist/scan-appointment/index/is-rejected?");
+      var count = scanAppointmentsIds.length;
+      patientsIds = new address[](count);
+      for (uint i = 0; i < count; i++) {
+        patientsIds[i] = ODLLDB(dbAddress).getAddressValue(keccak256("dentist/scan-appointment/dentist", dentistId, scanAppointmentsIds[i], i, patientScanAppointmentIndexNumbers[i]));
+      }
+    } else {
+      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getAssociationIdArrayItemsWithIndexAndCondition(dbAddress, dentistId, patientId, "dentist/patient/scan-appointment", "dentist/patient/scan-appointments-count", dentistScanConditionFunction, "dentist/scan-appointment/index/is-rejected?");
+    }
+  }
+
+  function getPaidScanAppointmentsForDentist (
+    address dbAddress,
+    address dentistId,
+    address patientId
+  )
+    internal
+    view
+    returns (
+      uint[] scanAppointmentsIds,
+      uint[] patientScanAppointmentIndexNumbers,
+      address[] patientsIds
+    )
+  {
+    if (patientId == 0x0) {
+      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getIdArrayWithIndexAndCondition(dbAddress, dentistId, "dentist/scan-appointment", "dentist/scan-appointments-count", dentistScanConditionFunction, "dentist/scan-appointment/index/is-paid-for?");
+      var count = scanAppointmentsIds.length;
+      patientsIds = new address[](count);
+      for (uint i = 0; i < count; i++) {
+        patientsIds[i] = ODLLDB(dbAddress).getAddressValue(keccak256("dentist/scan-appointment/dentist", dentistId, scanAppointmentsIds[i], i, patientScanAppointmentIndexNumbers[i]));
+      }
+    } else {
+      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getAssociationIdArrayItemsWithIndexAndCondition(dbAddress, dentistId, patientId, "dentist/patient/scan-appointment", "dentist/patient/scan-appointments-count", dentistScanConditionFunction, "dentist/scan-appointment/index/is-paid-for?");
+    }
+  }
+
+  function getScanApplicationsForDentist (
+    address dbAddress,
+    address dentistId,
+    address patientId
+  )
+    internal
+    view
+    returns (
+      uint[] scanAppointmentsIds,
+      uint[] patientScanAppointmentIndexNumbers,
+      address[] patientsIds,
+      bytes32[] comments,
+      uint[] quotes
+    )
+  {
+    if (patientId == 0x0) {
+      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getIdArrayWithIndexAndCondition(dbAddress, dentistId, "dentist/scan-appointment", "dentist/scan-appointments-count", dentistScanConditionFunction, "dentist/scan-appointment/index/is-accepted?");
+      var count = scanAppointmentsIds.length;
+      patientsIds = new address[](count);
+      for (uint i = 0; i < count; i++) {
+        patientsIds[i] = ODLLDB(dbAddress).getAddressValue(keccak256("dentist/scan-appointment/patient", dentistId, scanAppointmentsIds[i], i, patientScanAppointmentIndexNumbers[i]));
+      }
+
+      for (uint i = 0; i < patientsIds.length; i++) {
+        comments[i] = ODLLDB(dbAddress).getBytes32Value(keccak256("dentist/patient/scan-appointment/index/comment", dentistId, patientsIds[i], scanAppointmentsIds[i], patientScanAppointmentIndexNumbers[i]));
+        quotes[i] = ODLLDB(dbAddress).getUIntValue(keccak256("dentist/patient/scan-appointment/index/quote", dentistId. patientsIds[i], scanAppointmentsIds[i], patientScanAppointmentIndexNumbers[i]));
+      }
+    } else {
+      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getAssociationIdArrayItemsWithIndexAndCondition(dbAddress, dentistId, patientId, "dentist/patient/scan-appointment", "dentist/patient/scan-appointments-count", dentistScanConditionFunction, "dentist/scan-appointment/index/is-accepted?");
+
+      for (uint i = 0; i < scanAppointmentsIds.length; i++) {
+        comments[i] = ODLLDB(dbAddress).getBytes32Value(keccak256("dentist/patient/scan-appointment/index/comment", dentistId, patientId, scanAppointmentsIds[i], patientScanAppointmentIndexNumbers[i]));
+        quotes[i] = ODLLDB(dbAddress).getUIntValue(keccak256("dentist/patient/scan-appointment/index/quote", dentistId. patientId, scanAppointmentsIds[i], patientScanAppointmentIndexNumbers[i]));
+      }
+    }
+  }
 }

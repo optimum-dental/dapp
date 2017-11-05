@@ -174,6 +174,238 @@ contract ODLLUserReader is ODLLRestrictor {
     return userManager.fetchServices(dbAddress, userId, serviceTypeId, offset, limit, seed);
   }
 
+  function fetchScanAppointmentsForPatient (
+    address dentistId,
+    address patientId,
+    uint offset, // starting from offset: 0-based
+    uint limit, // not more than limit
+    uint seed // seed value to give the illusion of randomisation
+  )
+    internal
+    view
+    returns (
+      uint totalNumberFound,
+      uint[] scanAppointmentsIds,
+      uint[] patientScanAppointmentIndexNumbers,
+      address[] dentistsIds
+    )
+  {
+    return userManager.fetchScanAppointmentsForPatient(dbAddress, dentistId, patientId, offset, limit, seed);
+  }
+
+  function fetchCanceledScanAppointmentsForPatient (
+    address dentistId,
+    address patientId,
+    uint offset, // starting from offset: 0-based
+    uint limit, // not more than limit
+    uint seed // seed value to give the illusion of randomisation
+  )
+    internal
+    view
+    returns (
+      uint totalNumberFound,
+      uint[] scanAppointmentsIds,
+      uint[] patientScanAppointmentIndexNumbers,
+      address[] dentistsIds
+    )
+  {
+    return userManager.fetchCanceledScanAppointmentsForPatient(dbAddress, dentistId, patientId, offset, limit, seed);
+  }
+
+  function fetchAcceptedScanAppointmentsForPatient (
+    address dentistId,
+    address patientId,
+    uint offset, // starting from offset: 0-based
+    uint limit, // not more than limit
+    uint seed // seed value to give the illusion of randomisation
+  )
+    internal
+    view
+    returns (
+      uint totalNumberFound,
+      uint[] scanAppointmentsIds,
+      uint[] patientScanAppointmentIndexNumbers,
+      address[] dentistsIds
+    )
+  {
+    return userManager.fetchAcceptedScanAppointmentsForPatient(dbAddress, dentistId, patientId, offset, limit, seed);
+  }
+
+  function fetchRejectedScanAppointmentsForPatient (
+    address dentistId,
+    address patientId,
+    uint offset, // starting from offset: 0-based
+    uint limit, // not more than limit
+    uint seed // seed value to give the illusion of randomisation
+  )
+    internal
+    view
+    returns (
+      uint totalNumberFound,
+      uint[] scanAppointmentsIds,
+      uint[] patientScanAppointmentIndexNumbers,
+      address[] dentistsIds
+    )
+  {
+    return userManager.fetchRejectedScanAppointmentsForPatient(dbAddress, dentistId, patientId, offset, limit, seed);
+  }
+
+  function fetchPaidScanAppointmentsForPatient (
+    address dentistId,
+    address patientId,
+    uint offset, // starting from offset: 0-based
+    uint limit, // not more than limit
+    uint seed // seed value to give the illusion of randomisation
+  )
+    internal
+    view
+    returns (
+      uint totalNumberFound,
+      uint[] scanAppointmentsIds,
+      uint[] patientScanAppointmentIndexNumbers,
+      address[] dentistsIds
+    )
+  {
+    return userManager.fetchPaidScanAppointmentsForPatient(dbAddress, dentistId, patientId, offset, limit, seed);
+  }
+
+  function fetchScanApplicationsForPatient (
+    address dentistId,
+    address patientId,
+    uint offset, // starting from offset: 0-based
+    uint limit, // not more than limit
+    uint seed // seed value to give the illusion of randomisation
+  )
+    internal
+    view
+    returns (
+      uint totalNumberFound,
+      uint[] scanAppointmentsIds,
+      uint[] patientScanAppointmentIndexNumbers,
+      address[] dentistsIds,
+      bytes32[] comments,
+      uint[] quotes
+    )
+  {
+    return userManager.fetchScanApplicationsForPatient(dbAddress, dentistId, patientId, offset, limit, seed);
+  }
+
+  function fetchScanAppointmentsForDentist (
+    address dentistId,
+    address patientId,
+    uint offset, // starting from offset: 0-based
+    uint limit, // not more than limit
+    uint seed // seed value to give the illusion of randomisation
+  )
+    internal
+    view
+    returns (
+      uint totalNumberFound,
+      uint[] scanAppointmentsIds,
+      uint[] patientScanAppointmentIndexNumbers,
+      address[] patientsIds
+    )
+  {
+    return userManager.fetchScanAppointmentsForDentist(dbAddress, dentistId, patientId, offset, limit, seed);
+  }
+
+  function fetchCanceledScanAppointmentsForDentist (
+    address dentistId,
+    address patientId,
+    uint offset, // starting from offset: 0-based
+    uint limit, // not more than limit
+    uint seed // seed value to give the illusion of randomisation
+  )
+    internal
+    view
+    returns (
+      uint totalNumberFound,
+      uint[] scanAppointmentsIds,
+      uint[] patientScanAppointmentIndexNumbers,
+      address[] patientsIds
+    )
+  {
+    return userManager.fetchCanceledScanAppointmentsForDentist(dbAddress, dentistId, patientId, offset, limit, seed);
+  }
+
+  function fetchAcceptedScanAppointmentsForDentist (
+    address dentistId,
+    address patientId,
+    uint offset, // starting from offset: 0-based
+    uint limit, // not more than limit
+    uint seed // seed value to give the illusion of randomisation
+  )
+    internal
+    view
+    returns (
+      uint totalNumberFound,
+      uint[] scanAppointmentsIds,
+      uint[] patientScanAppointmentIndexNumbers,
+      address[] patientsIds
+    )
+  {
+    return userManager.fetchAcceptedScanAppointmentsForDentist(dbAddress, dentistId, patientId, offset, limit, seed);
+  }
+
+  function fetchRejectedScanAppointmentsForDentist (
+    address dentistId,
+    address patientId,
+    uint offset, // starting from offset: 0-based
+    uint limit, // not more than limit
+    uint seed // seed value to give the illusion of randomisation
+  )
+    internal
+    view
+    returns (
+      uint totalNumberFound,
+      uint[] scanAppointmentsIds,
+      uint[] patientScanAppointmentIndexNumbers,
+      address[] patientsIds
+    )
+  {
+    return userManager.fetchRejectedScanAppointmentsForDentist(dbAddress, dentistId, patientId, offset, limit, seed);
+  }
+
+  function fetchPaidScanAppointmentsForDentist (
+    address dentistId,
+    address patientId,
+    uint offset, // starting from offset: 0-based
+    uint limit, // not more than limit
+    uint seed // seed value to give the illusion of randomisation
+  )
+    internal
+    view
+    returns (
+      uint totalNumberFound,
+      uint[] scanAppointmentsIds,
+      uint[] patientScanAppointmentIndexNumbers,
+      address[] patientsIds
+    )
+  {
+    return userManager.fetchPaidScanAppointmentsForDentist(dbAddress, dentistId, patientId, offset, limit, seed);
+  }
+
+  function fetchScanApplicationsForDentist (
+    address dentistId,
+    address patientId,
+    uint offset, // starting from offset: 0-based
+    uint limit, // not more than limit
+    uint seed // seed value to give the illusion of randomisation
+  )
+    internal
+    view
+    returns (
+      uint totalNumberFound,
+      uint[] scanAppointmentsIds,
+      uint[] patientScanAppointmentIndexNumbers,
+      address[] patientsIds,
+      bytes32[] comments,
+      uint[] quotes
+    )
+  {
+    return userManager.fetchScanApplicationsForDentist(dbAddress, dentistId, patientId, offset, limit, seed);
+  }
+
   function destroySelf(address callerAddress, address newContractAddress)
     external
     onlyOwnerCanCall(callerAddress)

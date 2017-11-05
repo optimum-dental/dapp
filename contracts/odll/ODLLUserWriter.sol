@@ -75,6 +75,15 @@ contract ODLLUserWriter is ODLLRestrictor {
     OnDentistAdded(msg.sender);
   }
 
+  function addODLLDentist(
+    address userId
+  )
+    external
+    onlyOwnerOrActiveAdminOrActiveManager
+  {
+    userManager.addODLLDentist(dbAddress, msg.sender);
+  }
+
   function addOfficialToODLL(address officialId, uint8 userType)
     external
     onlyOwnerOrActiveAdminOrActiveManager
@@ -148,6 +157,133 @@ contract ODLLUserWriter is ODLLRestrictor {
     userManager.writeUserDentistId(dbAddress, msg.sender, dentistId);
   }
 
+  function writeScanAppointment (
+    address dentistId,
+    address patientId,
+    uint scanAppointmentId,
+    bytes32 appointmentDate,
+    bytes32 scanTime,
+    bytes32 scanInsurance,
+    bytes32 scanComment
+  )
+    external
+    onlyPermittedSmartContract
+  {
+    userManager.writeScanAppointment(dbAddress, dentistId, patientId, scanAppointmentId, appointmentDate, scanTime, scanInsurance, scanComment);
+  }
+
+  function cancelScanAppointment (
+    address dentistId,
+    address patientId,
+    uint scanAppointmentId,
+    uint patientScanAppointmentIndexNumber
+  )
+    external
+    onlyPermittedSmartContract
+  {
+    userManager.cancelScanAppointment(dbAddress, dentistId, patientId, scanAppointmentId, patientScanAppointmentIndexNumber);
+  }
+
+  function expireScanAppointment (
+    address patientId,
+    uint scanAppointmentId,
+    uint patientScanAppointmentIndexNumber
+  )
+    external
+    onlyPermittedSmartContract
+  {
+    userManager.expireScanAppointment(dbAddress, patientId, scanAppointmentId, patientScanAppointmentIndexNumber);
+  }
+
+  function acceptScanAppointment (
+    address dentistId,
+    address patientId,
+    uint scanAppointmentId,
+    uint patientScanAppointmentIndexNumber,
+    uint quote,
+    bytes32 comment
+  )
+    external
+    onlyPermittedSmartContract
+  {
+    userManager.acceptScanAppointment(dbAddress, dentistId, patientId, scanAppointmentId, patientScanAppointmentIndexNumber, quote, comment);
+  }
+
+  function rejectScanAppointment (
+    address dentistId,
+    address patientId,
+    uint scanAppointmentId,
+    uint patientScanAppointmentIndexNumber
+  )
+    external
+    onlyPermittedSmartContract
+  {
+    userManager.rejectScanAppointment(dbAddress, dentistId, patientId, scanAppointmentId, patientScanAppointmentIndexNumber);
+  }
+
+  function applyToScan(
+    address dentistId,
+    address patientId,
+    uint scanAppointmentId,
+    uint patientScanAppointmentIndexNumber,
+    uint quote,
+    bytes32 comment
+  )
+    external
+    onlyPermittedSmartContract
+  {
+    userManager.applyToScan(dbAddress, dentistId, patientId, scanAppointmentId, patientScanAppointmentIndexNumber, quote, comment);
+  }
+
+  function acceptScanApplication (
+    address dentistId,
+    address patientId,
+    uint scanAppointmentId,
+    uint patientScanAppointmentIndexNumber,
+    uint amount
+  )
+    external
+    onlyPermittedSmartContract
+  {
+    userManager.acceptScanApplication(dbAddress, dentistId, patientId, scanAppointmentId, patientScanAppointmentIndexNumber, amount);
+  }
+
+  function cancelScanApplication (
+    address dentistId,
+    address patientId,
+    uint scanAppointmentId,
+    uint patientScanAppointmentIndexNumber
+  )
+    external
+  {
+    userManager.cancelScanApplication(dbAddress, dentistId, patientId, scanAppointmentId, patientScanAppointmentIndexNumber);
+  }
+
+  // treatment request status: 0 => pending, 1 => has applications, 2 => closed to applications, 3 => finished
+  function applyForTreatment (
+    address dentistId,
+    address patientId,
+    uint scanAppointmentId,
+    uint patientScanAppointmentIndexNumber,
+    bytes32 treatmentInsurance,
+    bytes32[] scanResults,
+    bytes32 treatmentComment
+  )
+    external
+    onlyPermittedSmartContract
+  {
+    userManager.applyForTreatment(dbAddress, dentistId, patientId, scanAppointmentId, patientScanAppointmentIndexNumber, treatmentInsurance, scanResults, treatmentComment);
+  }
+
+  function cancelTreatmentRequest (
+    address patientId,
+    uint patientTreatmentIndexNumber
+  )
+    external
+    onlyPermittedSmartContract
+  {
+    userManager.cancelTreatmentRequest(dbAddress, patientId, patientScanAppointmentIndexNumber);
+  }
 
   function destroySelf(address callerAddress, address newContractAddress)
     external

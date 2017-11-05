@@ -50,7 +50,7 @@
     background: #3285b1;
     height: 40px;
     line-height: 40px;
-    width: 150px;
+    width: 180px;
     text-decoration: none;
     text-align: center;
     color: #efefef;
