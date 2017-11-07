@@ -1,4 +1,4 @@
-pragma solidity 0.4.17;
+pragma solidity 0.4.18;
 
 import "./utilities.sol";
 
@@ -25,9 +25,9 @@ library searchLibrary {
     returns (uint)
   {
     if (serviceTypeId == 1) {
-      return ODLLDB(dbAddress).getUIntValue(keccak256("dentist/scan-service/fee", userId, serviceId));
+      return DB(dbAddress).getUIntValue(keccak256("dentist/scan-service/fee", userId, serviceId));
     } else if (serviceTypeId == 2){
-      return ODLLDB(dbAddress).getUIntValue(keccak256("dentist/treatment-service/fee", userId, serviceId));
+      return DB(dbAddress).getUIntValue(keccak256("dentist/treatment-service/fee", userId, serviceId));
     } else {
       return 0;
     }
@@ -114,7 +114,7 @@ library searchLibrary {
       return true;
     }
 
-    return countryId == ODLLDB(dbAddress).getUIntValue(keccak256("user/country", userId));
+    return countryId == DB(dbAddress).getUIntValue(keccak256("user/country", userId));
   }
 
   function isFromState(address dbAddress, address userId, uint stateId) internal view returns(bool) {
@@ -122,338 +122,308 @@ library searchLibrary {
       return true;
     }
 
-    return stateId == ODLLDB(dbAddress).getUIntValue(keccak256("user/state", userId));
+    return stateId == DB(dbAddress).getUIntValue(keccak256("user/state", userId));
   }
 
-  function patientScanConditionFunction (string searchKey, address patientId, uint scanAppointmentId, uint patientScanAppointmentIndexNumber) internal view returns(bool) {
-    return ODLLDB(dbAddress).getBooleanValue(keccak256(searchKey, patientId, scanAppointmentId, patientScanAppointmentIndexNumber));
+  function patientScanConditionFunction (address dbAddress, string searchKey, address patientId, uint scanAppointmentId, uint patientScanAppointmentIndexNumber) internal view returns(bool) {
+    return DB(dbAddress).getBooleanValue(keccak256(searchKey, patientId, scanAppointmentId, patientScanAppointmentIndexNumber));
   }
 
-  function dentistScanConditionFunction (string searchKey, address dentistId, uint scanAppointmentId, uint patientScanAppointmentIndexNumber) internal view returns(bool) {
-    return ODLLDB(dbAddress).getBooleanValue(keccak256(searchKey, dentistId, scanAppointmentId, patientScanAppointmentIndexNumber));
+  function dentistScanConditionFunction (address dbAddress, string searchKey, address dentistId, uint scanAppointmentId, uint patientScanAppointmentIndexNumber) internal view returns(bool) {
+    return DB(dbAddress).getBooleanValue(keccak256(searchKey, dentistId, scanAppointmentId, patientScanAppointmentIndexNumber));
   }
 
-  function getScanAppointmentsForPatient(
+  function getScanRequestsForPatient (
     address dbAddress,
-    address dentistId,
     address patientId
   )
     internal
     view
     returns(
-      uint[] scanAppointmentsIds,
-      uint[] patientScanAppointmentIndexNumbers,
-      address[] dentistsIds
+      uint[] scanRequestsIds,
+      bytes32[] appointmentDates,
+      bytes32[] scanTimes,
+      bytes32[] scanInsurances,
+      bytes32[] comments,
+      uint8[] statuses,
+      uint[] createdOns
     )
   {
-    if (dentistId == 0x0) {
-      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getIdArrayWithIndex(dbAddress, patientId, "patient/scan-appointment", "patient/scan-appointments-count");
-      var count = scanAppointmentsIds.length;
-      dentistsIds = new address[](count);
-      for (uint i = 0; i < count; i++) {
-        dentistsIds[i] = ODLLDB(dbAddress).getAddressValue(keccak256("patient/scan-appointment/dentist", patientId, scanAppointmentsIds[i], patientScanAppointmentIndexNumbers[i]));
-      }
-    } else {
-      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getAssociationIdArrayItemsWithIndex(dbAddress, patientId, dentistId, "patient/dentist/scan-appointment", "patient/dentist/scan-appointments-count");
+    scanRequestsIds = utilities.getIdArray(dbAddress, patientId, "patient/scan-request", "patient/scan-requests-count");
+    var count = scanRequestsIds.length;
+    appointmentDates = new bytes32[](count);
+    scanTimes = new bytes32[](count);
+    scanInsurances = new bytes32[](count);
+    comments = new bytes32[](count);
+    statuses = new uint8[](count);
+    createdOns = new uint[](count);
+
+    for (uint i = 0; i < count; i++) {
+      appointmentDates[i] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-date", scanRequestsIds[i]));
+      scanTimes[i] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-time", scanRequestsIds[i]));
+      scanInsurances[i] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-insurance", scanRequestsIds[i]));
+      comments[i] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-comment", scanRequestsIds[i]));
+      statuses[i] = DB(dbAddress).getUInt8Value(keccak256("scan-request/status", scanRequestsIds[i]));
+      createdOns[i] = DB(dbAddress).getUIntValue(keccak256("scan-request/created-on", scanRequestsIds[i]));
     }
   }
 
-  function getCanceledScanAppointmentsForPatient (
+  function getAcceptedScanRequestsForPatient (
     address dbAddress,
-    address dentistId,
     address patientId
   )
     internal
     view
     returns (
-      uint[] scanAppointmentsIds,
-      uint[] patientScanAppointmentIndexNumbers,
-      address[] dentistsIds
+      uint[] scanRequestsIds,
+      bytes32[] appointmentDates,
+      bytes32[] scanTimes,
+      bytes32[] scanInsurances,
+      bytes32[] comments,
+      uint8[] statuses,
+      uint[] createdOns,
+      address dentistsIds
     )
   {
-    if (dentistId == 0x0) {
-      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getIdArrayWithIndexAndCondition(dbAddress, patientId, "patient/scan-appointment", "patient/scan-appointments-count", patientScanConditionFunction, "patient/scan-appointment/index/is-canceled?");
-      var count = scanAppointmentsIds.length;
-      dentistsIds = new address[](count);
-      for (uint i = 0; i < count; i++) {
-        dentistsIds[i] = ODLLDB(dbAddress).getAddressValue(keccak256("patient/scan-appointment/dentist", patientId, scanAppointmentsIds[i], patientScanAppointmentIndexNumbers[i]));
-      }
-    } else {
-      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getAssociationIdArrayItemsWithIndexAndCondition(dbAddress, patientId, dentistId, "patient/dentist/scan-appointment", "patient/dentist/scan-appointments-count", patientScanConditionFunction, "patient/scan-appointment/index/is-canceled?");
-    }
-  }
+    uint[] allScanRequestsIds = utilities.getIdArray(dbAddress, patientId, "patient/scan-request", "patient/scan-requests-count");
+    var count = allScanRequestsIds.length;
+    scanRequestsIds = new uint[](count)
+    appointmentDates = new bytes32[](count);
+    scanTimes = new bytes32[](count);
+    scanInsurances = new bytes32[](count);
+    comments = new bytes32[](count);
+    statuses = new uint8[](count);
+    createdOns = new uint[](count);
+    dentistsIds = new address[](count);
 
-  function getAceptedScanAppointmentsForPatient (
-    address dbAddress,
-    address dentistId,
-    address patientId
-  )
-    internal
-    view
-    returns (
-      uint[] scanAppointmentsIds,
-      uint[] patientScanAppointmentIndexNumbers,
-      address[] dentistsIds
-    )
-  {
-    if (dentistId == 0x0) {
-      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getIdArrayWithIndexAndCondition(dbAddress, patientId, "patient/scan-appointment", "patient/scan-appointments-count", patientScanConditionFunction, "patient/scan-appointment/index/is-accepted?");
-      var count = scanAppointmentsIds.length;
-      dentistsIds = new address[](count);
-      for (uint i = 0; i < count; i++) {
-        dentistsIds[i] = ODLLDB(dbAddress).getAddressValue(keccak256("patient/scan-appointment/dentist", patientId, scanAppointmentsIds[i], patientScanAppointmentIndexNumbers[i]));
-      }
-    } else {
-      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getAssociationIdArrayItemsWithIndexAndCondition(dbAddress, patientId, dentistId, "patient/dentist/scan-appointment", "patient/dentist/scan-appointments-count", patientScanConditionFunction, "patient/scan-appointment/index/is-accepted?");
-    }
-  }
+    uint j = 0;
+    for (uint i = 0; i < count; i++) {
+      if (DB(dbAddress).getBytes32Value(keccak256("scan-request/is-accepted?", allScanRequestsIds[i]))) {
+        scanRequestsIds[j] = allScanRequestsIds[i];
+        appointmentDates[j] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-date", allScanRequestsIds[i]));
+        scanTimes[j] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-time", allScanRequestsIds[i]));
+        scanInsurances[j] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-insurance", allScanRequestsIds[i]));
+        comments[j] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-comment", allScanRequestsIds[i]));
+        statuses[j] = DB(dbAddress).getUInt8Value(keccak256("scan-request/status", allScanRequestsIds[i]));
+        createdOns[j] = DB(dbAddress).getUIntValue(keccak256("scan-request/created-on", allScanRequestsIds[i]));
+        dentistsIds[j] = DB(dbAddress).getAddressValue(keccak256("scan-request/dentist", allScanRequestsIds[i]));
 
-  function getRejectedScanAppointmentsForPatient (
-    address dbAddress,
-    address dentistId,
-    address patientId
-  )
-    internal
-    view
-    returns (
-      uint[] scanAppointmentsIds,
-      uint[] patientScanAppointmentIndexNumbers,
-      address[] dentistsIds
-    )
-  {
-    if (dentistId == 0x0) {
-      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getIdArrayWithIndexAndCondition(dbAddress, patientId, "patient/scan-appointment", "patient/scan-appointments-count", patientScanConditionFunction, "patient/scan-appointment/index/is-rejected?");
-      var count = scanAppointmentsIds.length;
-      dentistsIds = new address[](count);
-      for (uint i = 0; i < count; i++) {
-        dentistsIds[i] = ODLLDB(dbAddress).getAddressValue(keccak256("patient/scan-appointment/dentist", patientId, scanAppointmentsIds[i], patientScanAppointmentIndexNumbers[i]));
+        j++;
       }
-    } else {
-      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getAssociationIdArrayItemsWithIndexAndCondition(dbAddress, patientId, dentistId, "patient/dentist/scan-appointment", "patient/dentist/scan-appointments-count", patientScanConditionFunction, "patient/scan-appointment/index/is-rejected?");
     }
-  }
 
-  function getPaidScanAppointmentsForPatient (
-    address dbAddress,
-    address dentistId,
-    address patientId
-  )
-    internal
-    view
-    returns (
-      uint[] scanAppointmentsIds,
-      uint[] patientScanAppointmentIndexNumbers,
-      address[] dentistsIds
-    )
-  {
-    if (dentistId == 0x0) {
-      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getIdArrayWithIndexAndCondition(dbAddress, patientId, "patient/scan-appointment", "patient/scan-appointments-count", patientScanConditionFunction, "patient/scan-appointment/index/is-paid-for?");
-      var count = scanAppointmentsIds.length;
-      dentistsIds = new address[](count);
-      for (uint i = 0; i < count; i++) {
-        dentistsIds[i] = ODLLDB(dbAddress).getAddressValue(keccak256("patient/scan-appointment/dentist", patientId, scanAppointmentsIds[i], patientScanAppointmentIndexNumbers[i]));
-      }
-    } else {
-      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getAssociationIdArrayItemsWithIndexAndCondition(dbAddress, patientId, dentistId, "patient/dentist/scan-appointment", "patient/dentist/scan-appointments-count", patientScanConditionFunction, "patient/scan-appointment/index/is-paid-for?");
-    }
+    scanRequestsIds = utilities.take(j, scanRequestsIds);
+    appointmentDates = utilities.take(j, appointmentDates);
+    scanTimes = utilities.take(j, scanTimes);
+    scanInsurances = utilities.take(j, scanInsurances);
+    comments = utilities.take(j, comments);
+    statuses = utilities.take(j, statuses);
+    createdOns = utilities.take(j, createdOns);
+    dentistsIds = utilities.take(j, dentistsIds);
   }
 
   function getScanApplicationsForPatient (
     address dbAddress,
-    address dentistId,
     address patientId
   )
     internal
     view
     returns (
-      uint[] scanAppointmentsIds,
-      uint[] patientScanAppointmentIndexNumbers,
+      uint[] scanApplicationsIds
       address[] dentistsIds,
       bytes32[] comments,
-      uint[] quotes
+      uint[] quotes,
+      uint8[] statuses,
+      uint[] createdOns
     )
   {
-    if (dentistId == 0x0) {
-      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getIdArrayWithIndexAndCondition(dbAddress, patientId, "patient/scan-appointment", "patient/scan-appointments-count", patientScanConditionFunction, "patient/scan-appointment/index/is-accepted?");
-      var count = scanAppointmentsIds.length;
-      dentistsIds = new address[](count);
-      for (uint i = 0; i < count; i++) {
-        dentistsIds[i] = ODLLDB(dbAddress).getAddressValue(keccak256("patient/scan-appointment/dentist", patientId, scanAppointmentsIds[i], patientScanAppointmentIndexNumbers[i]));
-      }
+    scanApplicationsIds = utilities.getIdArray(dbAddress, patientId, "patient/scan-application", "patient/scan-applications-count");
+    var count = scanApplicationsIds.length;
+    dentistsIds = new address[](count);
+    comments = new bytes32[](count);
+    quotes = new uint[](count);
+    statuses = new uint8[](count);
+    createdOns = new uint[](count);
 
-      for (uint i = 0; i < dentistsIds.length; i++) {
-        comments[i] = ODLLDB(dbAddress).getBytes32Value(keccak256("dentist/patient/scan-appointment/index/comment", dentistsIds[i], patientId, scanAppointmentsIds[i], patientScanAppointmentIndexNumbers[i]));
-        quotes[i] = ODLLDB(dbAddress).getUIntValue(keccak256("dentist/patient/scan-appointment/index/quote", dentistsIds[i]. patientId, scanAppointmentsIds[i], patientScanAppointmentIndexNumbers[i]));
-      }
-    } else {
-      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getAssociationIdArrayItemsWithIndexAndCondition(dbAddress, patientId, dentistId, "patient/dentist/scan-appointment", "patient/dentist/scan-appointments-count", patientScanConditionFunction, "patient/scan-appointment/index/is-accepted?");
-
-      for (uint i = 0; i < scanAppointmentsIds.length; i++) {
-        comments[i] = ODLLDB(dbAddress).getBytes32Value(keccak256("dentist/patient/scan-appointment/index/comment", dentistId, patientId, scanAppointmentsIds[i], patientScanAppointmentIndexNumbers[i]));
-        quotes[i] = ODLLDB(dbAddress).getUIntValue(keccak256("dentist/patient/scan-appointment/index/quote", dentistId. patientId, scanAppointmentsIds[i], patientScanAppointmentIndexNumbers[i]));
-      }
+    for (uint i = 0; i < count; i++) {
+      dentistsIds[i] = DB(dbAddress).getAddressValue(keccak256("scan-application/dentist", scanApplicationsIds[i]));
+      comments[i] = DB(dbAddress).getBytes32Value(keccak256("scan-application/comment", scanApplicationsIds[i]));
+      quotes[i] = DB(dbAddress).getUIntValue(keccak256("scan-application/quote", scanApplicationsIds[i]));
+      statuses[i] = DB(dbAddress).getUInt8Value(keccak256("scan-application/status", scanApplicationsIds[i]));
+      createdOns[i] = DB(dbAddress).getUIntValue(keccak256("scan-application/created-on", scanApplicationsIds[i]));
     }
   }
 
-  function getScanAppointmentsForDentist (
+  function getAllScanRequests (address dbAddress)
+    internal
+    view
+    returns(
+      uint[] scanRequestsIds,
+      address[] patientsIds,
+      bytes32[] appointmentDates,
+      bytes32[] scanTimes,
+      bytes32[] scanInsurances,
+      bytes32[] comments,
+      uint8[] statuses,
+      uint[] createdOns
+    )
+  {
+    uint[] allScanRequestsIds = utilities.getArrayItems(dbAddress, "patient/scan-request", "patient/scan-requests-count");
+    var count = allScanRequestsIds.length;
+    scanRequestsIds = new uint[](count);
+    patientsIds = new address[](count);
+    appointmentDates = new bytes32[](count);
+    scanTimes = new bytes32[](count);
+    scanInsurances = new bytes32[](count);
+    comments = new bytes32[](count);
+    statuses = new uint8[](count);
+    createdOns = new uint[](count);
+
+    uint j = 0;
+    for (uint i = 0; i < count; i++) {
+      if (DB(dbAddress).getBooleanValue(keccak256("scan-request/is-general?"))) {
+        patientsIds[j] = DB(dbAddress).getAddressValue(keccak256("scan-request/patient", allScanRequestsIds[i]));
+        appointmentDates[j] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-date", allScanRequestsIds[i]));
+        scanTimes[j] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-time", allScanRequestsIds[i]));
+        scanInsurances[j] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-insurance", allScanRequestsIds[i]));
+        comments[j] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-comment", allScanRequestsIds[i]));
+        statuses[j] = DB(dbAddress).getUInt8Value(keccak256("scan-request/status", allScanRequestsIds[i]));
+        createdOns[j] = DB(dbAddress).getUIntValue(keccak256("scan-request/created-on", allScanRequestsIds[i]));
+
+        j++;
+      }
+    }
+
+    scanRequestsIds = utilities.take(j, scanRequestsIds);
+    patientsIds = utilities.take(j, patientsIds);
+    appointmentDates = utilities.take(j, appointmentDates);
+    scanTimes = utilities.take(j, scanTimes);
+    scanInsurances = utilities.take(j, scanInsurances);
+    comments = utilities.take(j, comments);
+    statuses = utilities.take(j, statuses);
+    createdOns = utilities.take(j, createdOns);
+  }
+
+  function getDirectScanRequestsForDentist (
     address dbAddress,
-    address dentistId,
-    address patientId
+    address dentistId
+  )
+    internal
+    view
+    returns(
+      uint[] scanRequestsIds,
+      address[] patientsIds,
+      bytes32[] appointmentDates,
+      bytes32[] scanTimes,
+      bytes32[] scanInsurances,
+      bytes32[] comments,
+      uint8[] statuses,
+      uint[] createdOns
+    )
+  {
+    scanRequestsIds = utilities.getIdArray(dbAddress, dentistId, "dentist/scan-request", "dentist/scan-requests-count");
+    var count = scanRequestsIds.length;
+    patientsIds = new address[](count);
+    appointmentDates = new bytes32[](count);
+    scanTimes = new bytes32[](count);
+    scanInsurances = new bytes32[](count);
+    comments = new bytes32[](count);
+    statuses = new uint8[](count);
+    createdOns = new uint[](count);
+
+    for (uint i = 0; i < count; i++) {
+      patientsIds[i] = DB(dbAddress).getBytes32Value(keccak256("scan-request/patient", scanRequestsIds[i]));
+      appointmentDates[i] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-date", scanRequestsIds[i]));
+      scanTimes[i] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-time", scanRequestsIds[i]));
+      scanInsurances[i] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-insurance", scanRequestsIds[i]));
+      comments[i] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-comment", scanRequestsIds[i]));
+      statuses[i] = DB(dbAddress).getUInt8Value(keccak256("scan-request/status", scanRequestsIds[i]));
+      createdOns[i] = DB(dbAddress).getUIntValue(keccak256("scan-request/created-on", scanRequestsIds[i]));
+    }
+  }
+
+  function getAcceptedScanRequestsForDentist (
+    address dbAddress,
+    address dentistId
   )
     internal
     view
     returns (
-      uint[] scanAppointmentsIds,
-      uint[] patientScanAppointmentIndexNumbers,
-      address[] patientsIds
+      uint[] scanRequestsIds,
+      address[] patientsIds,
+      bytes32[] appointmentDates,
+      bytes32[] scanTimes,
+      bytes32[] scanInsurances,
+      bytes32[] comments,
+      uint8[] statuses,
+      uint[] createdOns
     )
   {
-    if (patientId == 0x0) {
-      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getIdArrayWithIndex(dbAddress, dentistId, "dentist/scan-appointment", "dentist/scan-appointments-count");
-      var count = scanAppointmentsIds.length;
-      patientsIds = new address[](count);
-      for (uint i = 0; i < count; i++) {
-        patientsIds[i] = ODLLDB(dbAddress).getAddressValue(keccak256("dentist/scan-appointment/patient", dentistId, scanAppointmentsIds[i], i, patientScanAppointmentIndexNumbers[i]));
-      }
-    } else {
-      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getAssociationIdArrayItemsWithIndex(dbAddress, dentistId, patientId, "dentist/patient/scan-appointment", "dentist/patient/scan-appointments-count");
-    }
-  }
+    uint[] allScanRequestsIds = utilities.getArrayItems(dbAddress, "dentist/scan-request", "dentist/scan-requests-count");
+    var count = allScanRequestsIds.length;
+    scanRequestsIds = new uint[](count);
+    patientsIds = new address[](count);
+    appointmentDates = new bytes32[](count);
+    scanTimes = new bytes32[](count);
+    scanInsurances = new bytes32[](count);
+    comments = new bytes32[](count);
+    statuses = new uint8[](count);
+    createdOns = new uint[](count);
 
-  function getCanceledScanAppointmentsForDentist (
-    address dbAddress,
-    address dentistId,
-    address patientId
-  )
-    internal
-    view
-    returns (
-      uint[] scanAppointmentsIds,
-      uint[] patientScanAppointmentIndexNumbers,
-      address[] patientsIds
-    )
-  {
-    if (patientId == 0x0) {
-      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getIdArrayWithIndexAndCondition(dbAddress, dentistId, "dentist/scan-appointment", "dentist/scan-appointments-count", dentistScanConditionFunction, "dentist/scan-appointment/index/is-canceled?");
-      var count = scanAppointmentsIds.length;
-      patientsIds = new address[](count);
-      for (uint i = 0; i < count; i++) {
-        patientsIds[i] = ODLLDB(dbAddress).getAddressValue(keccak256("dentist/scan-appointment/dentist", dentistId, scanAppointmentsIds[i], i, patientScanAppointmentIndexNumbers[i]));
-      }
-    } else {
-      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getAssociationIdArrayItemsWithIndexAndCondition(dbAddress, dentistId, patientId, "dentist/patient/scan-appointment", "dentist/patient/scan-appointments-count", dentistScanConditionFunction, "dentist/scan-appointment/index/is-canceled?");
-    }
-  }
+    uint j = 0;
+    for (uint i = 0; i < count; i++) {
+      if (DB(dbAddress).getBooleanValue(keccak256("scan-request/is-accepted?"))) {
+        patientsIds[j] = DB(dbAddress).getAddressValue(keccak256("scan-request/patient", allScanRequestsIds[i]));
+        appointmentDates[j] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-date", allScanRequestsIds[i]));
+        scanTimes[j] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-time", allScanRequestsIds[i]));
+        scanInsurances[j] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-insurance", allScanRequestsIds[i]));
+        comments[j] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-comment", allScanRequestsIds[i]));
+        statuses[j] = DB(dbAddress).getUInt8Value(keccak256("scan-request/status", allScanRequestsIds[i]));
+        createdOns[j] = DB(dbAddress).getUIntValue(keccak256("scan-request/created-on", allScanRequestsIds[i]));
 
-  function getAceptedScanAppointmentsForDentist (
-    address dbAddress,
-    address dentistId,
-    address patientId
-  )
-    internal
-    view
-    returns (
-      uint[] scanAppointmentsIds,
-      uint[] patientScanAppointmentIndexNumbers,
-      address[] patientsIds
-    )
-  {
-    if (patientId == 0x0) {
-      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getIdArrayWithIndexAndCondition(dbAddress, dentistId, "dentist/scan-appointment", "dentist/scan-appointments-count", dentistScanConditionFunction, "dentist/scan-appointment/index/is-accepted?");
-      var count = scanAppointmentsIds.length;
-      patientsIds = new address[](count);
-      for (uint i = 0; i < count; i++) {
-        patientsIds[i] = ODLLDB(dbAddress).getAddressValue(keccak256("dentist/scan-appointment/dentist", dentistId, scanAppointmentsIds[i], i, patientScanAppointmentIndexNumbers[i]));
+        j++;
       }
-    } else {
-      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getAssociationIdArrayItemsWithIndexAndCondition(dbAddress, dentistId, patientId, "dentist/patient/scan-appointment", "dentist/patient/scan-appointments-count", dentistScanConditionFunction, "dentist/scan-appointment/index/is-accepted?");
     }
-  }
 
-  function getRejectedScanAppointmentsForDentist (
-    address dbAddress,
-    address dentistId,
-    address patientId
-  )
-    internal
-    view
-    returns (
-      uint[] scanAppointmentsIds,
-      uint[] patientScanAppointmentIndexNumbers,
-      address[] patientsIds
-    )
-  {
-    if (patientId == 0x0) {
-      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getIdArrayWithIndexAndCondition(dbAddress, dentistId, "dentist/scan-appointment", "dentist/scan-appointments-count", dentistScanConditionFunction, "dentist/scan-appointment/index/is-rejected?");
-      var count = scanAppointmentsIds.length;
-      patientsIds = new address[](count);
-      for (uint i = 0; i < count; i++) {
-        patientsIds[i] = ODLLDB(dbAddress).getAddressValue(keccak256("dentist/scan-appointment/dentist", dentistId, scanAppointmentsIds[i], i, patientScanAppointmentIndexNumbers[i]));
-      }
-    } else {
-      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getAssociationIdArrayItemsWithIndexAndCondition(dbAddress, dentistId, patientId, "dentist/patient/scan-appointment", "dentist/patient/scan-appointments-count", dentistScanConditionFunction, "dentist/scan-appointment/index/is-rejected?");
-    }
-  }
-
-  function getPaidScanAppointmentsForDentist (
-    address dbAddress,
-    address dentistId,
-    address patientId
-  )
-    internal
-    view
-    returns (
-      uint[] scanAppointmentsIds,
-      uint[] patientScanAppointmentIndexNumbers,
-      address[] patientsIds
-    )
-  {
-    if (patientId == 0x0) {
-      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getIdArrayWithIndexAndCondition(dbAddress, dentistId, "dentist/scan-appointment", "dentist/scan-appointments-count", dentistScanConditionFunction, "dentist/scan-appointment/index/is-paid-for?");
-      var count = scanAppointmentsIds.length;
-      patientsIds = new address[](count);
-      for (uint i = 0; i < count; i++) {
-        patientsIds[i] = ODLLDB(dbAddress).getAddressValue(keccak256("dentist/scan-appointment/dentist", dentistId, scanAppointmentsIds[i], i, patientScanAppointmentIndexNumbers[i]));
-      }
-    } else {
-      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getAssociationIdArrayItemsWithIndexAndCondition(dbAddress, dentistId, patientId, "dentist/patient/scan-appointment", "dentist/patient/scan-appointments-count", dentistScanConditionFunction, "dentist/scan-appointment/index/is-paid-for?");
-    }
+    scanRequestsIds = utilities.take(j, scanRequestsIds);
+    patientsIds = utilities.take(j, patientsIds);
+    appointmentDates = utilities.take(j, appointmentDates);
+    scanTimes = utilities.take(j, scanTimes);
+    scanInsurances = utilities.take(j, scanInsurances);
+    comments = utilities.take(j, comments);
+    statuses = utilities.take(j, statuses);
+    createdOns = utilities.take(j, createdOns);
   }
 
   function getScanApplicationsForDentist (
     address dbAddress,
-    address dentistId,
-    address patientId
+    address dentistId
   )
     internal
     view
     returns (
-      uint[] scanAppointmentsIds,
-      uint[] patientScanAppointmentIndexNumbers,
+      uint[] scanApplicationsIds
       address[] patientsIds,
       bytes32[] comments,
-      uint[] quotes
+      uint[] quotes,
+      uint8[] statuses,
+      uint[] createdOns
     )
   {
-    if (patientId == 0x0) {
-      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getIdArrayWithIndexAndCondition(dbAddress, dentistId, "dentist/scan-appointment", "dentist/scan-appointments-count", dentistScanConditionFunction, "dentist/scan-appointment/index/is-accepted?");
-      var count = scanAppointmentsIds.length;
-      patientsIds = new address[](count);
-      for (uint i = 0; i < count; i++) {
-        patientsIds[i] = ODLLDB(dbAddress).getAddressValue(keccak256("dentist/scan-appointment/patient", dentistId, scanAppointmentsIds[i], i, patientScanAppointmentIndexNumbers[i]));
-      }
+    scanApplicationsIds = utilities.getIdArray(dbAddress, dentistId, "dentist/scan-application", "dentist/scan-applications-count");
+    var count = scanApplicationsIds.length;
+    patientsIds = new address[](count);
+    comments = new bytes32[](count);
+    quotes = new uint[](count);
+    statuses = new uint8[](count);
+    createdOns = new uint[](count);
 
-      for (uint i = 0; i < patientsIds.length; i++) {
-        comments[i] = ODLLDB(dbAddress).getBytes32Value(keccak256("dentist/patient/scan-appointment/index/comment", dentistId, patientsIds[i], scanAppointmentsIds[i], patientScanAppointmentIndexNumbers[i]));
-        quotes[i] = ODLLDB(dbAddress).getUIntValue(keccak256("dentist/patient/scan-appointment/index/quote", dentistId. patientsIds[i], scanAppointmentsIds[i], patientScanAppointmentIndexNumbers[i]));
-      }
-    } else {
-      (scanAppointmentsIds, patientScanAppointmentIndexNumbers) = utilities.getAssociationIdArrayItemsWithIndexAndCondition(dbAddress, dentistId, patientId, "dentist/patient/scan-appointment", "dentist/patient/scan-appointments-count", dentistScanConditionFunction, "dentist/scan-appointment/index/is-accepted?");
-
-      for (uint i = 0; i < scanAppointmentsIds.length; i++) {
-        comments[i] = ODLLDB(dbAddress).getBytes32Value(keccak256("dentist/patient/scan-appointment/index/comment", dentistId, patientId, scanAppointmentsIds[i], patientScanAppointmentIndexNumbers[i]));
-        quotes[i] = ODLLDB(dbAddress).getUIntValue(keccak256("dentist/patient/scan-appointment/index/quote", dentistId. patientId, scanAppointmentsIds[i], patientScanAppointmentIndexNumbers[i]));
-      }
+    for (uint i = 0; i < count; i++) {
+      patientsIds[i] = DB(dbAddress).getAddressValue(keccak256("scan-application/patient", scanApplicationsIds[i]));
+      comments[i] = DB(dbAddress).getBytes32Value(keccak256("scan-application/comment", scanApplicationsIds[i]));
+      quotes[i] = DB(dbAddress).getUIntValue(keccak256("scan-application/quote", scanApplicationsIds[i]));
+      statuses[i] = DB(dbAddress).getUInt8Value(keccak256("scan-application/status", scanApplicationsIds[i]));
+      createdOns[i] = DB(dbAddress).getUIntValue(keccak256("scan-application/created-on", scanApplicationsIds[i]));
     }
   }
 }

@@ -1,5 +1,6 @@
 import ODLLUserReaderContract from '../../../build/contracts/ODLLUserReader.json'
 import blockchainManager from '../BlockchainManager'
+import {EXCHANGE_RATE_API} from '../../util/constants'
 
 let odllUser = null
 
@@ -36,6 +37,24 @@ class ODLLUser {
     return blockchainManager.querySmartContract({
       smartContractMethod: 'writeUser',
       smartContractMethodParams: (coinbase) => [...(Object.values(data.userObject)), {from: coinbase, gas: 4444444}],
+      state,
+      smartContractResolve: result => data,
+      smartContractReject: error => error
+    })
+  }
+
+  acceptScanApplication (state = null, data = {}) {
+    const quoteInEther = fetch(EXCHANGE_RATE_API)
+    .then(response => response.json())
+    .then((JSONResponse) => {
+      const USDExchange = JSONResponse[0].price_usd
+      return (data.requestObject.quote / USDExchange)
+    })
+    .catch((e) => console.error(e))
+
+    return blockchainManager.querySmartContract({
+      smartContractMethod: 'acceptScanApplication',
+      smartContractMethodParams: (coinbase) => [...(Object.values(data.requestObject)), {from: coinbase, gas: 4444444, value: state.web3.instance().toWei(quoteInEther, 'ether')}],
       state,
       smartContractResolve: result => data,
       smartContractReject: error => error

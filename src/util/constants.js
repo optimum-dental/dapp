@@ -4,10 +4,11 @@ export const NETWORKS = {
   '3': 'Ropsten test network',
   '4': 'Rinkeby test network',
   '42': 'Kovan test network',
-  '666': 'DanielNet test network'
+  '666': 'DanielNet test network',
+  '4447': 'Truffle Develop Network'
 }
 
-export const APPROVED_BLOCKCHAIN_NETWORK_ID = '666'
+export const APPROVED_BLOCKCHAIN_NETWORK_ID = '4447'
 
 export const MUTATION_TYPES = {
   CHANGE_CURRENT_ROUTE_TO: 'changeCurrentRouteTo',

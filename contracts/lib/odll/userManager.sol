@@ -1,4 +1,4 @@
-pragma solidity 0.4.17;
+pragma solidity 0.4.18;
 
 import "./utilities.sol";
 import "./servicesLibrary.sol";
@@ -13,55 +13,55 @@ library userManager {
   //    userType:
   //    { 1 => patient, 2 => dentist, 3 => manager, 4 => admin }
 
-  function getConfig(address dbAddress, bytes32 key) internal view returns(uint) {
-    return ODLLDB(dbAddress).getUIntValue(keccak256("config/", key));
+  function getConfig (address dbAddress, bytes32 key) internal view returns(uint) {
+    return DB(dbAddress).getUIntValue(keccak256("config/", key));
   }
 
-  function getUsersCount(address dbAddress) internal view returns(uint) {
-    return ODLLDB(dbAddress).getUIntValue(keccak256("users/count"));
+  function getUsersCount (address dbAddress) internal view returns(uint) {
+    return DB(dbAddress).getUIntValue(keccak256("users/count"));
   }
 
-  function getAdminsCount(address dbAddress) internal view returns(uint) {
-    return ODLLDB(dbAddress).getUIntValue(keccak256("admins/count"));
+  function getAdminsCount (address dbAddress) internal view returns(uint) {
+    return DB(dbAddress).getUIntValue(keccak256("admins/count"));
   }
 
-  function getDentistsCount(address dbAddress) internal view returns(uint) {
-    return ODLLDB(dbAddress).getUIntValue(keccak256("dentists/count"));
+  function getDentistsCount (address dbAddress) internal view returns(uint) {
+    return DB(dbAddress).getUIntValue(keccak256("dentists/count"));
   }
 
-  function getManagersCount(address dbAddress) internal view returns(uint) {
-    return ODLLDB(dbAddress).getUIntValue(keccak256("managers/count"));
+  function getManagersCount (address dbAddress) internal view returns(uint) {
+    return DB(dbAddress).getUIntValue(keccak256("managers/count"));
   }
 
-  function getPatientsCount(address dbAddress) internal view returns(uint) {
-    return ODLLDB(dbAddress).getUIntValue(keccak256("patients/count"));
+  function getPatientsCount (address dbAddress) internal view returns(uint) {
+    return DB(dbAddress).getUIntValue(keccak256("patients/count"));
   }
 
-  function isActiveUser(address dbAddress, address userId) internal view returns(bool) {
+  function isActiveUser (address dbAddress, address userId) internal view returns(bool) {
     return hasStatus(dbAddress, userId, 1);
   }
 
-  function isActiveAdmin(address dbAddress, address userId) internal view returns(bool) {
+  function isActiveAdmin (address dbAddress, address userId) internal view returns(bool) {
     return isUserType(dbAddress, userId, 4) && hasStatus(dbAddress, userId, 1);
   }
 
-  function isActiveManager(address dbAddress, address userId) internal view returns(bool) {
+  function isActiveManager (address dbAddress, address userId) internal view returns(bool) {
     return isUserType(dbAddress, userId, 3) && hasStatus(dbAddress, userId, 1);
   }
 
-  function isActiveDentist(address dbAddress, address userId) internal view returns(bool) {
+  function isActiveDentist (address dbAddress, address userId) internal view returns(bool) {
     return isUserType(dbAddress, userId, 2) && hasStatus(dbAddress, userId, 1);
   }
 
-  function isActivePatient(address dbAddress, address userId) internal view returns(bool) {
+  function isActivePatient (address dbAddress, address userId) internal view returns(bool) {
     return isUserType(dbAddress, userId, 1) && hasStatus(dbAddress, userId, 1);
   }
 
-  function userExists(address dbAddress, address userId) internal view returns(bool) {
+  function userExists (address dbAddress, address userId) internal view returns(bool) {
     return getStatus(dbAddress, userId) > 0;
   }
 
-  function getAllUsers(address dbAddress) internal view returns(address[]) {
+  function getAllUsers (address dbAddress) internal view returns(address[]) {
     return utilities.getAddressArray(dbAddress, "users/ids", "users/count");
   }
 
@@ -73,15 +73,15 @@ library userManager {
     return utilities.getAddressArray(dbAddress, "dentists/ids", "dentists/count");
   }
 
-  function getAllManagers(address dbAddress) internal view returns(address[]) {
+  function getAllManagers (address dbAddress) internal view returns(address[]) {
     return utilities.getAddressArray(dbAddress, "managers/ids", "managers/count");
   }
 
-  function getAllPatients(address dbAddress) internal view returns(address[]) {
+  function getAllPatients (address dbAddress) internal view returns(address[]) {
     return utilities.getAddressArray(dbAddress, "patients/ids", "patients/count");
   }
 
-  function setUserIdentity(
+  function setUserIdentity (
     address dbAddress,
     address userId,
     uint8 userType,
@@ -96,25 +96,25 @@ library userManager {
     // require(email.toSlice().len() >= 5 && email.toSlice().len() <= 254);
 
     if (!userExists(dbAddress, userId)) {
-      ODLLDB(dbAddress).setUIntValue(keccak256("user/created-on", userId), now);
-      ODLLDB(dbAddress).setUInt8Value(keccak256("user/status", userId), 1);
+      DB(dbAddress).setUIntValue(keccak256("user/created-on", userId), now);
+      DB(dbAddress).setUInt8Value(keccak256("user/status", userId), 1);
       utilities.addArrayItem(dbAddress, "users/ids", "users/count", userId);
 
       string memory userTypeKey;
       string memory userTypeIdsKey;
       string memory userTypeCountKey;
       (userTypeKey, userTypeIdsKey, userTypeCountKey) = getUserTypeKey(userType);
-      ODLLDB(dbAddress).setBooleanValue(keccak256(userTypeKey, userId), true);
+      DB(dbAddress).setBooleanValue(keccak256(userTypeKey, userId), true);
       utilities.addArrayItem(dbAddress, userTypeIdsKey, userTypeCountKey, userId);
     }
 
-    ODLLDB(dbAddress).setUInt8Value(keccak256("user/type", userId), userType);
-    ODLLDB(dbAddress).setBytes32Value(keccak256("user/name", userId), name);
-    ODLLDB(dbAddress).setBytes32Value(keccak256("user/email", userId), email);
-    ODLLDB(dbAddress).setBytes32Value(keccak256("user/gravatar", userId), gravatar);
+    DB(dbAddress).setUInt8Value(keccak256("user/type", userId), userType);
+    DB(dbAddress).setBytes32Value(keccak256("user/name", userId), name);
+    DB(dbAddress).setBytes32Value(keccak256("user/email", userId), email);
+    DB(dbAddress).setBytes32Value(keccak256("user/gravatar", userId), gravatar);
   }
 
-  function setUserLocation(
+  function setUserLocation (
     address dbAddress,
     address userId,
     bytes32 street,
@@ -128,14 +128,14 @@ library userManager {
     require(userExists(dbAddress, userId));
     require(isActiveUser(dbAddress, userId));
 
-    ODLLDB(dbAddress).setBytes32Value(keccak256("user/street", userId), street);
-    ODLLDB(dbAddress).setBytes32Value(keccak256("user/city", userId), city);
-    ODLLDB(dbAddress).setUIntValue(keccak256("user/state", userId), state);
-    ODLLDB(dbAddress).setBytes32Value(keccak256("user/zip-code", userId), zipCode);
-    ODLLDB(dbAddress).setUIntValue(keccak256("user/country", userId), country);
+    DB(dbAddress).setBytes32Value(keccak256("user/street", userId), street);
+    DB(dbAddress).setBytes32Value(keccak256("user/city", userId), city);
+    DB(dbAddress).setUIntValue(keccak256("user/state", userId), state);
+    DB(dbAddress).setBytes32Value(keccak256("user/zip-code", userId), zipCode);
+    DB(dbAddress).setUIntValue(keccak256("user/country", userId), country);
   }
 
-  function setUserOptionalValues(
+  function setUserOptionalValues (
     address dbAddress,
     address userId,
     bytes32 phoneNumber,
@@ -147,13 +147,13 @@ library userManager {
   {
     require(userExists(dbAddress, userId));
     require(isActiveUser(dbAddress, userId));
-    ODLLDB(dbAddress).setBytes32Value(keccak256("user/phone-number", userId), phoneNumber);
-    ODLLDB(dbAddress).setBytes32Value(keccak256("user/social-security-number", userId), socialSecurityNumber);
-    ODLLDB(dbAddress).setBytes32Value(keccak256("user/birthday", userId), birthday);
-    ODLLDB(dbAddress).setUInt8Value(keccak256("user/gender", userId), gender);
+    DB(dbAddress).setBytes32Value(keccak256("user/phone-number", userId), phoneNumber);
+    DB(dbAddress).setBytes32Value(keccak256("user/social-security-number", userId), socialSecurityNumber);
+    DB(dbAddress).setBytes32Value(keccak256("user/birthday", userId), birthday);
+    DB(dbAddress).setUInt8Value(keccak256("user/gender", userId), gender);
   }
 
-  function getUserTypeKey(uint8 userType) internal pure returns (string memory userTypeKey, string memory userTypeIdsKey, string memory userTypeCountKey) {
+  function getUserTypeKey (uint8 userType) internal pure returns (string memory userTypeKey, string memory userTypeIdsKey, string memory userTypeCountKey) {
     if (userType == 1) {
       userTypeKey = "user/is-patient?";
       userTypeIdsKey = "patients/ids";
@@ -173,7 +173,7 @@ library userManager {
     }
   }
 
-  function setDentist(
+  function setDentist (
     address dbAddress,
     address userId,
     bool isODLLDentist,
@@ -184,12 +184,12 @@ library userManager {
   {
     require(userExists(dbAddress, userId));
     require(isActiveUser(dbAddress, userId));
-    ODLLDB(dbAddress).setBooleanValue(keccak256("user/is-odll-dentist?", userId), isODLLDentist);
-    ODLLDB(dbAddress).setBooleanValue(keccak256("user/is-available?", userId), isAvailable);
-    ODLLDB(dbAddress).setBytes32Value(keccak256("dentist/company-name", userId), companyName);
+    DB(dbAddress).setBooleanValue(keccak256("user/is-odll-dentist?", userId), isODLLDentist);
+    DB(dbAddress).setBooleanValue(keccak256("user/is-available?", userId), isAvailable);
+    DB(dbAddress).setBytes32Value(keccak256("dentist/company-name", userId), companyName);
   }
 
-  function addODLLDentist(
+  function addODLLDentist (
     address dbAddress,
     address userId
   )
@@ -197,57 +197,57 @@ library userManager {
   {
     require(userExists(dbAddress, userId));
     require(isActiveUser(dbAddress, userId));
-    ODLLDB(dbAddress).setBooleanValue(keccak256("user/is-odll-dentist?", userId), true);
+    DB(dbAddress).setBooleanValue(keccak256("user/is-odll-dentist?", userId), true);
   }
 
-  function hasStatus(address dbAddress, address userId, uint8 status) internal view returns(bool) {
+  function hasStatus (address dbAddress, address userId, uint8 status) internal view returns(bool) {
     return status == getStatus(dbAddress, userId);
   }
 
-  function getStatus(address dbAddress, address userId) internal view returns(uint8) {
-    return ODLLDB(dbAddress).getUInt8Value(keccak256("user/status", userId));
+  function getStatus (address dbAddress, address userId) internal view returns(uint8) {
+    return DB(dbAddress).getUInt8Value(keccak256("user/status", userId));
   }
 
-  function isUserType(address dbAddress, address userId, uint8 userType) internal view returns(bool) {
+  function isUserType (address dbAddress, address userId, uint8 userType) internal view returns(bool) {
     return userType == getUserType(dbAddress, userId);
   }
 
-  function getUserType(address dbAddress, address userId) internal view returns(uint8) {
-    return ODLLDB(dbAddress).getUInt8Value(keccak256("user/type", userId));
+  function getUserType (address dbAddress, address userId) internal view returns(uint8) {
+    return DB(dbAddress).getUInt8Value(keccak256("user/type", userId));
   }
 
-  function setStatus(address dbAddress, address userId, uint8 status) internal {
-    ODLLDB(dbAddress).setUInt8Value(keccak256("user/status", userId), status);
+  function setStatus (address dbAddress, address userId, uint8 status) internal {
+    DB(dbAddress).setUInt8Value(keccak256("user/status", userId), status);
   }
 
-  function setUserNotifications(address dbAddress, address userId, bool[] boolNotificationSettings, uint8[] uint8NotificationSettings) internal {
-    ODLLDB(dbAddress).setBooleanValue(keccak256("user.notification/disabled-all?", userId), boolNotificationSettings[0]);
-    ODLLDB(dbAddress).setBooleanValue(keccak256("user.notification/disabled-newsletter?", userId), boolNotificationSettings[1]);
-    ODLLDB(dbAddress).setBooleanValue(keccak256("user.notification/disabled-on-scan-offer?", userId), boolNotificationSettings[2]);
-    ODLLDB(dbAddress).setBooleanValue(keccak256("user.notification/disabled-on-treatment-offer?", userId), boolNotificationSettings[3]);
-    ODLLDB(dbAddress).setBooleanValue(keccak256("user.notification/disabled-on-scan-request?", userId), boolNotificationSettings[4]);
-    ODLLDB(dbAddress).setBooleanValue(keccak256("user.notification/disabled-on-treatment-request?", userId), boolNotificationSettings[5]);
-    ODLLDB(dbAddress).setBooleanValue(keccak256("user.notification/disabled-on-scan-application-accepted?", userId), boolNotificationSettings[6]);
-    ODLLDB(dbAddress).setBooleanValue(keccak256("user.notification/disabled-on-treatment-application-accepted?", userId), boolNotificationSettings[7]);
-    ODLLDB(dbAddress).setBooleanValue(keccak256("user.notification/disabled-on-rated?", userId), boolNotificationSettings[8]);
-    ODLLDB(dbAddress).setUInt8Value(keccak256("user.notification/scan-result-advert", userId), uint8NotificationSettings[0]);
+  function setUserNotifications (address dbAddress, address userId, bool[] boolNotificationSettings, uint8[] uint8NotificationSettings) internal {
+    DB(dbAddress).setBooleanValue(keccak256("user.notification/disabled-all?", userId), boolNotificationSettings[0]);
+    DB(dbAddress).setBooleanValue(keccak256("user.notification/disabled-newsletter?", userId), boolNotificationSettings[1]);
+    DB(dbAddress).setBooleanValue(keccak256("user.notification/disabled-on-scan-offer?", userId), boolNotificationSettings[2]);
+    DB(dbAddress).setBooleanValue(keccak256("user.notification/disabled-on-treatment-offer?", userId), boolNotificationSettings[3]);
+    DB(dbAddress).setBooleanValue(keccak256("user.notification/disabled-on-scan-request?", userId), boolNotificationSettings[4]);
+    DB(dbAddress).setBooleanValue(keccak256("user.notification/disabled-on-treatment-request?", userId), boolNotificationSettings[5]);
+    DB(dbAddress).setBooleanValue(keccak256("user.notification/disabled-on-scan-application-accepted?", userId), boolNotificationSettings[6]);
+    DB(dbAddress).setBooleanValue(keccak256("user.notification/disabled-on-treatment-application-accepted?", userId), boolNotificationSettings[7]);
+    DB(dbAddress).setBooleanValue(keccak256("user.notification/disabled-on-rated?", userId), boolNotificationSettings[8]);
+    DB(dbAddress).setUInt8Value(keccak256("user.notification/scan-result-advert", userId), uint8NotificationSettings[0]);
   }
 
-  function addReceivedMessage(address dbAddress, address userId, uint messageId) internal {
+  function addReceivedMessage  (address dbAddress, address userId, uint messageId) internal {
     utilities.addIdArrayItem(dbAddress, userId, "user/received-messages", "user/received-messages-count", messageId);
   }
 
-  function addSentMessage(address dbAddress, address userId, uint messageId) internal {
+  function addSentMessage  (address dbAddress, address userId, uint messageId) internal {
     utilities.addIdArrayItem(dbAddress, userId, "user/sent-messages", "user/sent-messages-count", messageId);
   }
 
-  function writeDentistRating(address dbAddress, address userId, uint8 rating) internal {
+  function writeDentistRating  (address dbAddress, address userId, uint8 rating) internal {
     addToAverageRating(dbAddress, userId, "dentist/average-rating-count", "dentist/average-rating", rating);
   }
 
-  function addToAverageRating(address dbAddress, address userId, string countKey, string key, uint8 rating) internal {
-    var ratingsCount = ODLLDB(dbAddress).getUIntValue(keccak256(countKey, userId));
-    var currentAverageRating = ODLLDB(dbAddress).getUInt8Value(keccak256(key, userId));
+  function addToAverageRating  (address dbAddress, address userId, string countKey, string key, uint8 rating) internal {
+    var ratingsCount = DB(dbAddress).getUIntValue(keccak256(countKey, userId));
+    var currentAverageRating = DB(dbAddress).getUInt8Value(keccak256(key, userId));
     var newRatingsCount = SafeMath.add(ratingsCount, 1);
     uint newAverageRating;
     if (ratingsCount == 0) {
@@ -257,63 +257,100 @@ library userManager {
       newAverageRating = newTotalRating / newRatingsCount;
     }
 
-    ODLLDB(dbAddress).setUIntValue(keccak256(countKey, userId), newRatingsCount);
-    ODLLDB(dbAddress).setUInt8Value(keccak256(key, userId), uint8(newAverageRating));
+    DB(dbAddress).setUIntValue(keccak256(countKey, userId), newRatingsCount);
+    DB(dbAddress).setUInt8Value(keccak256(key, userId), uint8(newAverageRating));
   }
 
-  function getDentistAverageRating(address dbAddress, address userId) internal view returns (uint8) {
-    return ODLLDB(dbAddress).getUInt8Value(keccak256("dentist/average-rating", userId));
+  function getDentistAverageRating (address dbAddress, address userId) internal view returns (uint8) {
+    return DB(dbAddress).getUInt8Value(keccak256("dentist/average-rating", userId));
   }
 
-  function addToDentistTotalEarned(address dbAddress, address userId, uint amount) internal {
-    ODLLDB(dbAddress).addUIntValue(keccak256("dentist/total-earned", userId), amount);
+  function addToPatientTotalPaid (address dbAddress, address userId, uint amount) internal {
+    DB(dbAddress).addUIntValue(keccak256("patient/total-paid", userId), amount);
+    DB(dbAddress).addUIntValue(keccak256("patients/total-paid"), amount);
   }
 
-  function addToPatientTotalPaid(address dbAddress, address userId, uint amount) internal {
-    ODLLDB(dbAddress).addUIntValue(keccak256("patient/total-paid", userId), amount);
+  function addToPatientScanTotalPaid (address dbAddress, address userId, uint amount) internal {
+    DB(dbAddress).addUIntValue(keccak256("patient/scan-total-paid", userId), amount);
+    DB(dbAddress).addUIntValue(keccak256("patients/scan-total-paid"), amount);
   }
 
-  function isFromCountry(address dbAddress, address userId, uint countryId) internal view returns(bool) {
+  function addToPatientTreatmentTotalPaid (address dbAddress, address userId, uint amount) internal {
+    DB(dbAddress).addUIntValue(keccak256("patient/treatment-total-paid", userId), amount);
+    DB(dbAddress).addUIntValue(keccak256("patients/treatment-total-paid"), amount);
+  }
+
+  function addToDentistTotalEarned (address dbAddress, address userId, uint amount) internal {
+    DB(dbAddress).addUIntValue(keccak256("dentist/total-earned", userId), amount);
+    DB(dbAddress).addUIntValue(keccak256("dentists/total-earned"), amount);
+  }
+
+  function addToDentistScanTotalEarned (address dbAddress, address userId, uint amount) internal {
+    DB(dbAddress).addUIntValue(keccak256("dentist/scan-total-earned", userId), amount);
+    DB(dbAddress).addUIntValue(keccak256("dentists/scan-total-earned"), amount);
+  }
+
+  function addToDentistTreatmentTotalEarned (address dbAddress, address userId, uint amount) internal {
+    DB(dbAddress).addUIntValue(keccak256("dentist/treatment-total-earned", userId), amount);
+    DB(dbAddress).addUIntValue(keccak256("dentists/treatment-total-earned"), amount);
+  }
+
+  function addToODLLTotalEarned (address dbAddress, address userId, uint amount) internal {
+    DB(dbAddress).addUIntValue(keccak256("odll/total-earned", userId), amount);
+    DB(dbAddress).addUIntValue(keccak256("odll/total-earned"), amount);
+  }
+
+  function addToODLLScanTotalEarned (address dbAddress, address userId, uint amount) internal {
+    DB(dbAddress).addUIntValue(keccak256("odll/scan-total-earned", userId), amount);
+    DB(dbAddress).addUIntValue(keccak256("odll/scan-total-earned"), amount);
+  }
+
+  function addToODLLTreatmentTotalEarned (address dbAddress, address userId, uint amount) internal {
+    DB(dbAddress).addUIntValue(keccak256("odll/treatment-total-earned", userId), amount);
+    DB(dbAddress).addUIntValue(keccak256("odll/treatment-total-earned"), amount);
+  }
+
+  function isFromCountry (address dbAddress, address userId, uint countryId) internal view returns(bool) {
     if (countryId == 0) {
       return true;
     }
 
-    return countryId == ODLLDB(dbAddress).getUIntValue(keccak256("user/country", userId));
+    return countryId == DB(dbAddress).getUIntValue(keccak256("user/country", userId));
   }
 
-  function isFromState(address dbAddress, address userId, uint stateId) internal view returns(bool) {
+  function isFromState (address dbAddress, address userId, uint stateId) internal view returns(bool) {
     if (stateId == 0) {
       return true;
     }
 
-    return stateId == ODLLDB(dbAddress).getUIntValue(keccak256("user/state", userId));
+    return stateId == DB(dbAddress).getUIntValue(keccak256("user/state", userId));
   }
 
-  function hasMinRating(address dbAddress, address userId, uint8 minAverageRating) internal view returns(bool) {
+  function hasMinRating (address dbAddress, address userId, uint8 minAverageRating) internal view returns(bool) {
     if (minAverageRating == 0) {
       return true;
     }
 
-    return minAverageRating <= ODLLDB(dbAddress).getUInt8Value(keccak256("dentist/average-rating", userId));
+    return minAverageRating <= DB(dbAddress).getUInt8Value(keccak256("dentist/average-rating", userId));
   }
 
-  function hasDentistMinRatingsCount(address dbAddress, address userId, uint minRatingsCount) internal view returns(bool) {
+  function hasDentistMinRatingsCount (address dbAddress, address userId, uint minRatingsCount) internal view returns(bool) {
     if (minRatingsCount == 0) {
       return true;
     }
 
-    return minRatingsCount <= ODLLDB(dbAddress).getUIntValue(keccak256("dentist/ratings-count", userId));
+    return minRatingsCount <= DB(dbAddress).getUIntValue(keccak256("dentist/ratings-count", userId));
   }
 
-  function hasScanResultAdverts(address dbAddress, address userId, uint scanResultAdverts) internal view returns (bool) {
+  function hasScanResultAdverts (address dbAddress, address userId, uint scanResultAdverts) internal view returns (bool) {
       if (scanResultAdverts == 0) {
           return true;
       }
-      if (ODLLDB(dbAddress).getBooleanValue(keccak256("user.notification/disabled-all?", userId))) {
+      if (DB(dbAddress).getBooleanValue(keccak256("user.notification/disabled-all?", userId))) {
           return false;
       }
 
-      uint userScanResultAdverts = ODLLDB(dbAddress).getUInt8Value(keccak256("user.notification/job-recommendations", userId));
+      uint userScanResultAdverts = DB(dbAddress).getUInt8Value(keccak256("user.notification/job-recommendations", userId));
       if (userScanResultAdverts == 0 && scanResultAdverts == 1) { // default value
           return true;
       }
@@ -321,11 +358,11 @@ library userManager {
       return userScanResultAdverts == scanResultAdverts;
   }
 
-  function isDentistAvailable(address dbAddress, address userId) internal view returns (bool) {
-    return ODLLDB(dbAddress).getBooleanValue(keccak256("dentist/is-available?", userId));
+  function isDentistAvailable (address dbAddress, address userId) internal view returns (bool) {
+    return DB(dbAddress).getBooleanValue(keccak256("dentist/is-available?", userId));
   }
 
-  function getUserIdentityData(address dbAddress, address userId)
+  function getUserIdentityData (address dbAddress, address userId)
   internal
   view
   returns (
@@ -335,14 +372,14 @@ library userManager {
     bytes32 gravatar,
     uint8 status
   ) {
-    userType = ODLLDB(dbAddress).getUInt8Value(keccak256("user/type", userId));
-    name = ODLLDB(dbAddress).getBytes32Value(keccak256("user/name", userId));
-    email = ODLLDB(dbAddress).getBytes32Value(keccak256("user/email", userId));
-    gravatar = ODLLDB(dbAddress).getBytes32Value(keccak256("user/gravatar", userId));
-    status = ODLLDB(dbAddress).getUInt8Value(keccak256("user/status", userId));
+    userType = DB(dbAddress).getUInt8Value(keccak256("user/type", userId));
+    name = DB(dbAddress).getBytes32Value(keccak256("user/name", userId));
+    email = DB(dbAddress).getBytes32Value(keccak256("user/email", userId));
+    gravatar = DB(dbAddress).getBytes32Value(keccak256("user/gravatar", userId));
+    status = DB(dbAddress).getUInt8Value(keccak256("user/status", userId));
   }
 
-  function getUserContactData(address dbAddress, address userId)
+  function getUserContactData (address dbAddress, address userId)
   internal
   view
   returns (
@@ -353,15 +390,15 @@ library userManager {
     bytes32 zipCode,
     uint country
   ) {
-    street = ODLLDB(dbAddress).getBytes32Value(keccak256("user/street", userId));
-    city = ODLLDB(dbAddress).getBytes32Value(keccak256("user/city", userId));
-    phoneNumber = ODLLDB(dbAddress).getBytes32Value(keccak256("user/phone-number", userId));
-    state = ODLLDB(dbAddress).getUIntValue(keccak256("user/state", userId));
-    zipCode = ODLLDB(dbAddress).getBytes32Value(keccak256("user/zip-code", userId));
-    country = ODLLDB(dbAddress).getUIntValue(keccak256("user/country", userId));
+    street = DB(dbAddress).getBytes32Value(keccak256("user/street", userId));
+    city = DB(dbAddress).getBytes32Value(keccak256("user/city", userId));
+    phoneNumber = DB(dbAddress).getBytes32Value(keccak256("user/phone-number", userId));
+    state = DB(dbAddress).getUIntValue(keccak256("user/state", userId));
+    zipCode = DB(dbAddress).getBytes32Value(keccak256("user/zip-code", userId));
+    country = DB(dbAddress).getUIntValue(keccak256("user/country", userId));
   }
 
-  function getUserPersonalData(address dbAddress, address userId)
+  function getUserPersonalData (address dbAddress, address userId)
   internal
   view
   returns (
@@ -369,18 +406,18 @@ library userManager {
     bytes32 socialSecurityNumber,
     bytes32 birthday
   ) {
-    gender = ODLLDB(dbAddress).getUInt8Value(keccak256("user/gender", userId));
-    socialSecurityNumber = ODLLDB(dbAddress).getBytes32Value(keccak256("user/social-security-number", userId));
-    birthday = ODLLDB(dbAddress).getBytes32Value(keccak256("user/birthday", userId));
+    gender = DB(dbAddress).getUInt8Value(keccak256("user/gender", userId));
+    socialSecurityNumber = DB(dbAddress).getBytes32Value(keccak256("user/social-security-number", userId));
+    birthday = DB(dbAddress).getBytes32Value(keccak256("user/birthday", userId));
   }
 
-  function writeUserDentistId(address dbAddress, address userId, address dentistId)
+  function writeUserDentistId (address dbAddress, address userId, address dentistId)
     internal
   {
-    utilities.addRemovableIdItem(dbAddress, userId, 'patient/dentist', 'patient/dentists-count', 'patient/dentist-key', dentistId);
+    utilities.addIdArrayItem(dbAddress, userId, 'patient/dentist', 'patient/dentists-count', dentistId);
   }
 
-  function getUserDentistsIds(address dbAddress, address userId)
+  function getUserDentistsIds (address dbAddress, address userId)
     internal
     view
     returns (
@@ -390,7 +427,7 @@ library userManager {
     dentistsIds = utilities.getRemovableIdArrayAddressItems(dbAddress, userId, 'patient/dentist', 'patient/dentists-count', 'patient/dentist-key');
   }
 
-  function findDentists(
+  function findDentists (
     address dbAddress,
     uint stateId,
     uint serviceTypeId,
@@ -414,7 +451,7 @@ library userManager {
     (totalNumberFound, foundDentistsIds) = utilities.getSlicedArray(foundDentistsIds, offset, limit, seed);
   }
 
-  function getDentistIdentityData(address dbAddress, address dentistId)
+  function getDentistIdentityData (address dbAddress, address dentistId)
     internal
     view
     returns (
@@ -422,12 +459,12 @@ library userManager {
       bool isAvailable,
       bytes32 companyName
     ) {
-    isODLLDentist = ODLLDB(dbAddress).getBooleanValue(keccak256("user/is-odll-dentist?", dentistId));
-    isAvailable = ODLLDB(dbAddress).getBooleanValue(keccak256("user/is-available?", dentistId));
-    companyName = ODLLDB(dbAddress).getBytes32Value(keccak256("dentist/company-name", dentistId));
+    isODLLDentist = DB(dbAddress).getBooleanValue(keccak256("user/is-odll-dentist?", dentistId));
+    isAvailable = DB(dbAddress).getBooleanValue(keccak256("user/is-available?", dentistId));
+    companyName = DB(dbAddress).getBytes32Value(keccak256("dentist/company-name", dentistId));
   }
 
-  function getDentistFeeData(address dbAddress, uint serviceTypeId, uint serviceId, address dentistId)
+  function getDentistFeeData (address dbAddress, uint serviceTypeId, uint serviceId, address dentistId)
     internal
     view
     returns (
@@ -436,27 +473,27 @@ library userManager {
     fee = searchLibrary.getServiceFee(dbAddress, serviceTypeId, serviceId, dentistId);
   }
 
-  function addOfficialToODLL(address dbAddress, address officialId, uint8 userType)
+  function addOfficialToODLL (address dbAddress, address officialId, uint8 userType)
     internal
   {
-    uint8 userTypeCheck = ODLLDB(dbAddress).getUInt8Value(keccak256('user/type', officialId));
+    uint8 userTypeCheck = DB(dbAddress).getUInt8Value(keccak256('user/type', officialId));
     require(officialId != 0x0 && userType != 0 && userTypeCheck == 0);
     setUserIdentity(dbAddress, officialId, userType, "", "", "");
   }
 
-  function blockUser(address dbAddress, address userId)
+  function blockUser (address dbAddress, address userId)
     internal
   {
-    ODLLDB(dbAddress).setUInt8Value(keccak256("user/status", userId), 2);
+    DB(dbAddress).setUInt8Value(keccak256("user/status", userId), 2);
   }
 
-  function unblockUser(address dbAddress, address userId)
+  function unblockUser (address dbAddress, address userId)
     internal
   {
-    ODLLDB(dbAddress).setUInt8Value(keccak256("user/status", userId), 1);
+    DB(dbAddress).setUInt8Value(keccak256("user/status", userId), 1);
   }
 
-  function fetchDentists(
+  function fetchDentists (
     address dbAddress,
     uint offset, // starting from offset: 0-based
     uint limit, // not more than limit
@@ -473,7 +510,7 @@ library userManager {
     (totalNumberFound, foundDentistsIds) = utilities.getSlicedArray(foundDentistsIds, offset, limit, seed);
   }
 
-  function fetchManagers(
+  function fetchManagers (
     address dbAddress,
     uint offset, // starting from offset: 0-based
     uint limit, // not more than limit
@@ -490,7 +527,7 @@ library userManager {
     (totalNumberFound, foundManagersIds) = utilities.getSlicedArray(foundManagersIds, offset, limit, seed);
   }
 
-  function fetchServicesWithFees(
+  function fetchServicesWithFees (
     address dbAddress,
     address userId,
     uint serviceTypeId,
@@ -510,7 +547,7 @@ library userManager {
     foundFees = searchLibrary.getServiceFees(dbAddress, serviceTypeId, foundServiceIds, userId);
   }
 
-  function fetchServices(
+  function fetchServices (
     address dbAddress,
     address userId,
     uint serviceTypeId,
@@ -529,7 +566,7 @@ library userManager {
     (totalNumberFound, foundServiceIds) = utilities.getSlicedArray(foundServiceIds, offset, limit, seed);
   }
 
-  function writeServices(
+  function writeServices (
     address dbAddress,
     uint serviceTypeId,
     uint[] serviceIds,
@@ -540,7 +577,7 @@ library userManager {
     servicesLibrary.addDentist(dbAddress, serviceTypeId, serviceIds, userId);
   }
 
-  function writeServiceWithFee(
+  function writeServiceWithFee (
     address dbAddress,
     uint serviceTypeId,
     uint serviceId,
@@ -553,7 +590,7 @@ library userManager {
     servicesLibrary.setFee(dbAddress, serviceTypeId, serviceId, fee, userId);
   }
 
-  function removeDentistFromService(
+  function removeDentistFromService (
     address dbAddress,
     uint serviceTypeId,
     uint serviceId,
@@ -564,7 +601,7 @@ library userManager {
     servicesLibrary.removeDentistFromService(dbAddress, serviceTypeId, serviceId, userId);
   }
 
-  function removeServices(
+  function removeServices (
     address dbAddress,
     uint serviceTypeId,
     uint[] serviceIds,
@@ -575,7 +612,7 @@ library userManager {
     servicesLibrary.removeDentist(dbAddress, serviceTypeId, serviceIds, userId);
   }
 
-  function writeScanAppointment (
+  function writeScanRequest (
     address dbAddress,
     address dentistId,
     address patientId,
@@ -583,130 +620,238 @@ library userManager {
     bytes32 appointmentDate,
     bytes32 scanTime,
     bytes32 scanInsurance,
-    bytes32 scanComment
+    bytes32 comment
   )
     internal
   {
-    servicesLibrary.writeScanAppointment(dbAddress, dentistId, patientId, scanAppointmentId, appointmentDate, scanTime, scanInsurance, scanComment);
+    servicesLibrary.writeScanRequest(dbAddress, dentistId, patientId, scanAppointmentId, appointmentDate, scanTime, scanInsurance, comment);
   }
 
-  function cancelScanAppointment (
+  function cancelScanRequest (
+    address dbAddress,
+    address patientId,
+    uint scanRequestId
+  )
+    internal
+  {
+    servicesLibrary.cancelScanRequest(dbAddress, patientId, scanRequestId);
+  }
+
+  function expireScanRequest (
+    address dbAddress,
+    uint scanRequestId
+  )
+    internal
+  {
+    servicesLibrary.expireScanRequest(dbAddress, patientId, scanRequestId);
+  }
+
+  function acceptScanRequest (
     address dbAddress,
     address dentistId,
     address patientId,
-    uint scanAppointmentId,
-    uint patientScanAppointmentIndexNumber
-  )
-    internal
-  {
-    servicesLibrary.cancelScanAppointment(dbAddress, dentistId, patientId, scanAppointmentId, patientScanAppointmentIndexNumber);
-  }
-
-  function expireScanAppointment (
-    address dbAddress,
-    address patientId,
-    uint scanAppointmentId,
-    uint patientScanAppointmentIndexNumber
-  )
-    internal
-  {
-    servicesLibrary.expireScanAppointment(dbAddress, patientId, scanAppointmentId, patientScanAppointmentIndexNumber);
-  }
-
-  function acceptScanAppointment (
-    address dbAddress,
-    address dentistId,
-    address patientId,
-    uint scanAppointmentId,
-    uint patientScanAppointmentIndexNumber,
+    uint scanRequestId,
     uint quote,
     bytes32 comment
   )
     internal
   {
-    servicesLibrary.acceptScanAppointment(dbAddress, dentistId, patientId, scanAppointmentId, patientScanAppointmentIndexNumber, quote, comment);
+    servicesLibrary.acceptScanRequest(dbAddress, dentistId, patientId, scanRequestId, quote, comment);
   }
 
-  function rejectScanAppointment (
+  function rejectScanRequest (
     address dbAddress,
     address dentistId,
     address patientId,
-    uint scanAppointmentId,
-    uint patientScanAppointmentIndexNumber
+    uint scanRequestId
   )
     internal
   {
-    servicesLibrary.rejectScanAppointment(dbAddress, dentistId, patientId, scanAppointmentId, patientScanAppointmentIndexNumber);
+    servicesLibrary.rejectScanRequest(dbAddress, dentistId, patientId, scanRequestId);
   }
 
-  function applyToScan(
+  function applyToScan (
     address dbAddress,
     address dentistId,
     address patientId,
-    uint scanAppointmentId,
-    uint patientScanAppointmentIndexNumber,
+    uint scanRequestId,
     uint quote,
     bytes32 comment
   )
     internal
   {
-    servicesLibrary.applyToScan(dbAddress, dentistId, patientId, scanAppointmentId, patientScanAppointmentIndexNumber, quote, comment);
-  }
-
-  function acceptScanApplication (
-    address dbAddress,
-    address dentistId,
-    address patientId,
-    uint scanAppointmentId,
-    uint patientScanAppointmentIndexNumber,
-    uint amount
-  )
-    internal
-  {
-    servicesLibrary.acceptScanApplication(dbAddress, dentistId, patientId, scanAppointmentId, patientScanAppointmentIndexNumber, amount);
+    servicesLibrary.applyToScan(dbAddress, dentistId, patientId, scanRequestId, quote, comment);
   }
 
   function cancelScanApplication (
     address dbAddress,
     address dentistId,
     address patientId,
-    uint scanAppointmentId,
-    uint patientScanAppointmentIndexNumber
+    uint scanApplicationId
   )
     internal
   {
-    servicesLibrary.cancelScanApplication(dbAddress, dentistId, patientId, scanAppointmentId, patientScanAppointmentIndexNumber);
+    servicesLibrary.cancelScanApplication(dbAddress, dentistId, patientId, scanApplicationId);
   }
 
-  // treatment request status: 0 => pending, 1 => has applications, 2 => closed to applications, 3 => finished
-  function applyForTreatment (
+  function acceptScanApplication (
     address dbAddress,
     address dentistId,
     address patientId,
-    uint scanAppointmentId,
-    uint patientScanAppointmentIndexNumber,
-    bytes32 treatmentInsurance,
-    bytes32[] scanResults,
-    bytes32 treatmentComment
+    uint scanApplicationId,
+    uint amount,
+    uint quote
   )
     internal
   {
-    servicesLibrary.applyForTreatment(dbAddress, dentistId, patientId, scanAppointmentId, patientScanAppointmentIndexNumber, treatmentInsurance, scanResults, treatmentComment);
+    address ODLLId = DB(dbAddress).getAddressValue(keccak256("odll/payment-address"));
+    uint ODLLTreatmentPaymentPercentage = DB(dbAddress).getUIntValue(keccak256("odll/scan-payment-percentage"));
+    uint change = SafeMath.sub(amount, quote);
+    uint ODLLFee = SafeMath.mul(SafeMath.div(ODLLScanPaymentPercentage, 100), quote);
+    uint dentistFee = SafeMath.sub(quote, ODLLFee);
+
+    uint tempODLLFee = ODLLFee;
+    ODLLFee = 0;
+
+    uint tempDentistFee = dentistFee;
+    dentistFee = 0;
+
+    addToPatientScanTotalPaid(dbAddress, patientId, quote);
+    addToPatientTotalPaid(dbAddress, patientId, quote);
+
+    addToDentistScanTotalEarned(dbAddress, dentistId, tempDentistFee);
+    addToDentistTotalEarned(dbAddress, dentistId, tempDentistFee);
+
+    addToODLLScanTotalEarned(dbAddress, ODLLId, tempODLLFee);
+    addToODLLTotalEarned(dbAddress, ODLLId, tempODLLFee);
+
+    servicesLibrary.acceptScanApplication(dbAddress, dentistId, patientId, scanApplicationId, quote);
+
+    ODLLId.transfer(tempODLLFee);
+    dentistId.transfer(tempDentistFee);
+    if (change > 0) {
+      uint tempChange = change;
+      change = 0;
+      patientId.transfer(tempChange);
+    }
+  }
+
+  function writeTreatmentRequest (
+    address dbAddress,
+    address dentistId,
+    address patientId,
+    bool hasCaseId,
+    uint caseId,
+    bytes32 insurance,
+    bytes32[] scanResults,
+    bytes32 comment
+  )
+    internal
+  {
+    servicesLibrary.writeTreatmentRequest(dbAddress, dentistId, patientId, hasCaseId, caseId, insurance, scanResults, comment);
   }
 
   function cancelTreatmentRequest (
     address dbAddress,
     address patientId,
-    uint patientTreatmentIndexNumber
+    uint treatmentRequestId
   )
     internal
   {
-    servicesLibrary.cancelTreatmentRequest(dbAddress, patientId, patientScanAppointmentIndexNumber);
+    servicesLibrary.cancelTreatmentRequest(dbAddress, patientId, treatmentRequestId);
   }
 
-  function fetchScanAppointmentsForPatient (
+  function applyToTreat (
     address dbAddress,
     address dentistId,
+    address patientId,
+    uint treatmentRequestId,
+    uint quote,
+    bytes32 comment
+  )
+    internal
+  {
+    servicesLibrary.applyToTreat(dbAddress, dentistId, patientId, treatmentRequestId, quote, comment);
+  }
+
+  function cancelTreatmentApplication (
+    address dbAddress,
+    address dentistId,
+    address patientId,
+    uint treatmentApplicationId
+  )
+    internal
+  {
+    servicesLibrary.cancelTreatmentApplication(dbAddress, dentistId, patientId, treatmentApplicationId);
+  }
+
+  // treatment status: 1 => pending, 2 => done, 3 => canceled
+  function acceptTreatmentApplication (
+    address dbAddress,
+    address dentistId,
+    address patientId,
+    uint treatmentApplicationId,
+    uint amount,
+    uint quote
+  )
+    internal
+  {
+    address ODLLId = DB(dbAddress).getAddressValue(keccak256("odll/payment-address"));
+    uint ODLLTreatmentPaymentPercentage = DB(dbAddress).getUIntValue(keccak256("odll/treatment-payment-percentage"));
+    uint change = SafeMath.sub(amount, quote);
+    uint ODLLFee = SafeMath.mul(SafeMath.div(ODLLTreatmentPaymentPercentage, 100), quote);
+    uint dentistFee = SafeMath.sub(quote, ODLLFee);
+
+    uint tempODLLFee = ODLLFee;
+    ODLLFee = 0;
+
+    uint tempDentistFee = dentistFee;
+    dentistFee = 0;
+
+    addToPatientTreatmentTotalPaid(dbAddress, patientId, quote);
+    addToPatientTotalPaid(dbAddress, patientId, quote);
+
+    addToDentistTreatmentTotalEarned(dbAddress, dentistId, tempDentistFee);
+    addToDentistTotalEarned(dbAddress, dentistId, tempDentistFee);
+
+    addToODLLTreatmentTotalEarned(dbAddress, ODLLId, tempODLLFee);
+    addToODLLTotalEarned(dbAddress, ODLLId, tempODLLFee);
+
+    servicesLibrary.acceptTreatmentApplication(dbAddress, dentistId, patientId, treatmentApplicationId, quote);
+
+    ODLLId.transfer(tempODLLFee);
+    dentistId.transfer(tempDentistFee);
+    if (change > 0) {
+      uint tempChange = change;
+      change = 0;
+      patientId.transfer(tempChange);
+    }
+  }
+
+  function cancelTreatment (
+    address dbAddress,
+    address dentistId,
+    address patientId,
+    uint treatmentId
+  )
+    internal
+  {
+    servicesLibrary.cancelTreatment(dbAddress, dentistId, patientId, treatmentId);
+  }
+
+  function markTreatmentDone (
+    address dbAddress,
+    address dentistId,
+    address patientId,
+    uint treatmentId
+  )
+    internal
+  {
+    servicesLibrary.markTreatmentDone(dbAddress, dentistId, patientId, treatmentId);
+  }
+
+  function fetchScanRequestsForPatient (
+    address dbAddress,
     address patientId,
     uint offset, // starting from offset: 0-based
     uint limit, // not more than limit
@@ -716,20 +861,27 @@ library userManager {
     view
     returns (
       uint totalNumberFound,
-      uint[] scanAppointmentsIds,
-      uint[] patientScanAppointmentIndexNumbers,
-      address[] dentistsIds
+      uint[] scanRequestsIds,
+      bytes32[] appointmentDates,
+      bytes32[] scanTimes,
+      bytes32[] scanInsurances,
+      bytes32[] comments,
+      uint8[] statuses,
+      uint[] createdOns
     )
   {
-    (scanAppointmentsIds, patientScanAppointmentIndexNumbers, dentistsIds) = searchLibrary.getScanAppointmentsForPatient(dbAddress, dentistId, patientId);
-    (totalNumberFound, dentistsIds) = utilities.getSlicedArray(dentistsIds, offset, limit, seed);
-    (totalNumberFound, scanAppointmentsIds) = utilities.getSlicedArray(scanAppointmentsIds, offset, limit, seed);
-    (totalNumberFound, patientScanAppointmentIndexNumbers) = utilities.getSlicedArray(patientScanAppointmentIndexNumbers, offset, limit, seed);
+    (scanRequestsIds, appointmentDates, scanTimes, scanInsurances, comments, statuses, createdOns) = searchLibrary.getScanRequestsForPatient(dbAddress, patientId);
+    (totalNumberFound, appointmentDates) = utilities.getSlicedArray(appointmentDates, offset, limit, seed);
+    (totalNumberFound, scanTimes) = utilities.getSlicedArray(scanTimes, offset, limit, seed);
+    (totalNumberFound, scanInsurances) = utilities.getSlicedArray(scanInsurances, offset, limit, seed);
+    (totalNumberFound, comments) = utilities.getSlicedArray(comments, offset, limit, seed);
+    (totalNumberFound, statuses) = utilities.getSlicedArray(statuses, offset, limit, seed);
+    (totalNumberFound, createdOns) = utilities.getSlicedArray(createdOns, offset, limit, seed);
+    (totalNumberFound, scanRequestsIds) = utilities.getSlicedArray(scanRequestsIds, offset, limit, seed);
   }
 
-  function fetchCanceledScanAppointmentsForPatient (
+  function fetchAcceptedScanRequestsForPatient (
     address dbAddress,
-    address dentistId,
     address patientId,
     uint offset, // starting from offset: 0-based
     uint limit, // not more than limit
@@ -739,89 +891,29 @@ library userManager {
     view
     returns (
       uint totalNumberFound,
-      uint[] scanAppointmentsIds,
-      uint[] patientScanAppointmentIndexNumbers,
+      uint[] scanRequestsIds,
+      bytes32[] appointmentDates,
+      bytes32[] scanTimes,
+      bytes32[] scanInsurances,
+      bytes32[] comments,
+      uint8[] statuses,
+      uint[] createdOns,
       address[] dentistsIds
     )
   {
-    (scanAppointmentsIds, patientScanAppointmentIndexNumbers, dentistsIds) = searchLibrary.getCanceledScanAppointmentsForPatient(dbAddress, dentistId, patientId);
+    (scanRequestsIds, appointmentDates, scanTimes, scanInsurances, comments, statuses, createdOns, dentistsIds) = searchLibrary.getAcceptedScanRequestsForPatient(dbAddress, patientId);
+    (totalNumberFound, appointmentDates) = utilities.getSlicedArray(appointmentDates, offset, limit, seed);
+    (totalNumberFound, scanTimes) = utilities.getSlicedArray(scanTimes, offset, limit, seed);
+    (totalNumberFound, scanInsurances) = utilities.getSlicedArray(scanInsurances, offset, limit, seed);
+    (totalNumberFound, comments) = utilities.getSlicedArray(comments, offset, limit, seed);
+    (totalNumberFound, statuses) = utilities.getSlicedArray(statuses, offset, limit, seed);
+    (totalNumberFound, createdOns) = utilities.getSlicedArray(createdOns, offset, limit, seed);
     (totalNumberFound, dentistsIds) = utilities.getSlicedArray(dentistsIds, offset, limit, seed);
-    (totalNumberFound, scanAppointmentsIds) = utilities.getSlicedArray(scanAppointmentsIds, offset, limit, seed);
-    (totalNumberFound, patientScanAppointmentIndexNumbers) = utilities.getSlicedArray(patientScanAppointmentIndexNumbers, offset, limit, seed);
-  }
-
-  function fetchAcceptedScanAppointmentsForPatient (
-    address dbAddress,
-    address dentistId,
-    address patientId,
-    uint offset, // starting from offset: 0-based
-    uint limit, // not more than limit
-    uint seed // seed value to give the illusion of randomisation
-  )
-    internal
-    view
-    returns (
-      uint totalNumberFound,
-      uint[] scanAppointmentsIds,
-      uint[] patientScanAppointmentIndexNumbers,
-      address[] dentistsIds
-    )
-  {
-    (scanAppointmentsIds, patientScanAppointmentIndexNumbers, dentistsIds) = searchLibrary.getAceptedScanAppointmentsForPatient(dbAddress, dentistId, patientId);
-    (totalNumberFound, dentistsIds) = utilities.getSlicedArray(dentistsIds, offset, limit, seed);
-    (totalNumberFound, scanAppointmentsIds) = utilities.getSlicedArray(scanAppointmentsIds, offset, limit, seed);
-    (totalNumberFound, patientScanAppointmentIndexNumbers) = utilities.getSlicedArray(patientScanAppointmentIndexNumbers, offset, limit, seed);
-  }
-
-  function fetchRejectedScanAppointmentsForPatient (
-    address dbAddress,
-    address dentistId,
-    address patientId,
-    uint offset, // starting from offset: 0-based
-    uint limit, // not more than limit
-    uint seed // seed value to give the illusion of randomisation
-  )
-    internal
-    view
-    returns (
-      uint totalNumberFound,
-      uint[] scanAppointmentsIds,
-      uint[] patientScanAppointmentIndexNumbers,
-      address[] dentistsIds
-    )
-  {
-    (scanAppointmentsIds, patientScanAppointmentIndexNumbers, dentistsIds) = searchLibrary.getRejectedScanAppointmentsForPatient(dbAddress, dentistId, patientId);
-    (totalNumberFound, dentistsIds) = utilities.getSlicedArray(dentistsIds, offset, limit, seed);
-    (totalNumberFound, scanAppointmentsIds) = utilities.getSlicedArray(scanAppointmentsIds, offset, limit, seed);
-    (totalNumberFound, patientScanAppointmentIndexNumbers) = utilities.getSlicedArray(patientScanAppointmentIndexNumbers, offset, limit, seed);
-  }
-
-  function fetchPaidScanAppointmentsForPatient (
-    address dbAddress,
-    address dentistId,
-    address patientId,
-    uint offset, // starting from offset: 0-based
-    uint limit, // not more than limit
-    uint seed // seed value to give the illusion of randomisation
-  )
-    internal
-    view
-    returns (
-      uint totalNumberFound,
-      uint[] scanAppointmentsIds,
-      uint[] patientScanAppointmentIndexNumbers,
-      address[] dentistsIds
-    )
-  {
-    (scanAppointmentsIds, patientScanAppointmentIndexNumbers, dentistsIds) = searchLibrary.getPaidScanAppointmentsForPatient(dbAddress, dentistId, patientId);
-    (totalNumberFound, dentistsIds) = utilities.getSlicedArray(dentistsIds, offset, limit, seed);
-    (totalNumberFound, scanAppointmentsIds) = utilities.getSlicedArray(scanAppointmentsIds, offset, limit, seed);
-    (totalNumberFound, patientScanAppointmentIndexNumbers) = utilities.getSlicedArray(patientScanAppointmentIndexNumbers, offset, limit, seed);
+    (totalNumberFound, scanRequestsIds) = utilities.getSlicedArray(scanRequestsIds, offset, limit, seed);
   }
 
   function fetchScanApplicationsForPatient (
     address dbAddress,
-    address dentistId,
     address patientId,
     uint offset, // starting from offset: 0-based
     uint limit, // not more than limit
@@ -831,25 +923,90 @@ library userManager {
     view
     returns (
       uint totalNumberFound,
-      uint[] scanAppointmentsIds,
-      uint[] patientScanAppointmentIndexNumbers,
+      uint[] scanApplicationsIds,
       address[] dentistsIds,
       bytes32[] comments,
-      uint[] quotes
+      uint[] quotes,
+      uint8[] statuses,
+      uint[] createdOns
     )
   {
-    (scanAppointmentsIds, patientScanAppointmentIndexNumbers, dentistsIds, comments, quotes) = searchLibrary.getScanApplicationsForPatient(dbAddress, dentistId, patientId);
+    (scanApplicationsIds, dentistsIds, comments, quotes, statuses, createdOns) = searchLibrary.getScanApplicationsForPatient(dbAddress, patientId);
     (totalNumberFound, dentistsIds) = utilities.getSlicedArray(dentistsIds, offset, limit, seed);
-    (totalNumberFound, scanAppointmentsIds) = utilities.getSlicedArray(scanAppointmentsIds, offset, limit, seed);
     (totalNumberFound, comments) = utilities.getSlicedArray(comments, offset, limit, seed);
     (totalNumberFound, quotes) = utilities.getSlicedArray(quotes, offset, limit, seed);
-    (totalNumberFound, patientScanAppointmentIndexNumbers) = utilities.getSlicedArray(patientScanAppointmentIndexNumbers, offset, limit, seed);
+    (totalNumberFound, statuses) = utilities.getSlicedArray(statuses, offset, limit, seed);
+    (totalNumberFound, createdOns) = utilities.getSlicedArray(createdOns, offset, limit, seed);
+    (totalNumberFound, scanApplicationsIds) = utilities.getSlicedArray(scanApplicationsIds, offset, limit, seed);
   }
 
-  function fetchScanAppointmentsForDentist (
+  function fetchAllScanRequests (
+    uint offset, // starting from offset: 0-based
+    uint limit, // not more than limit
+    uint seed // seed value to give the illusion of randomisation
+  )
+    external
+    view
+    returns (
+      uint totalNumberFound,
+      uint[] scanRequestsIds,
+      address[] patientsIds,
+      bytes32[] appointmentDates,
+      bytes32[] scanTimes,
+      bytes32[] scanInsurances,
+      bytes32[] comments,
+      uint8[] statuses,
+      uint[] createdOns
+    )
+  {
+    (scanRequestsIds, patientsIds, appointmentDates, scanTimes, scanInsurances, comments, quotes, statuses, createdOns) = searchLibrary.getAllScanRequests(dbAddress);
+
+    (totalNumberFound, patientsIds) = utilities.getSlicedArray(patientsIds, offset, limit, seed);
+    (totalNumberFound, appointmentDates) = utilities.getSlicedArray(appointmentDates, offset, limit, seed);
+    (totalNumberFound, scanTimes) = utilities.getSlicedArray(scanTimes, offset, limit, seed);
+    (totalNumberFound, scanInsurances) = utilities.getSlicedArray(scanInsurances, offset, limit, seed);
+    (totalNumberFound, comments) = utilities.getSlicedArray(comments, offset, limit, seed);
+    (totalNumberFound, statuses) = utilities.getSlicedArray(statuses, offset, limit, seed);
+    (totalNumberFound, createdOns) = utilities.getSlicedArray(createdOns, offset, limit, seed);
+    (totalNumberFound, scanRequestsIds) = utilities.getSlicedArray(scanRequestsIds, offset, limit, seed);
+  }
+
+  function fetchDirectScanRequestsForDentist (
     address dbAddress,
     address dentistId,
-    address patientId,
+    uint offset, // starting from offset: 0-based
+    uint limit, // not more than limit
+    uint seed // seed value to give the illusion of randomisation
+  )
+    internal
+    view
+    returns(
+      uint totalNumberFound,
+      uint[] scanRequestsIds,
+      address[] patientsIds,
+      bytes32[] appointmentDates,
+      bytes32[] scanTimes,
+      bytes32[] scanInsurances,
+      bytes32[] comments,
+      uint8[] statuses,
+      uint[] createdOns
+    )
+  {
+    (scanRequestsIds, patientsIds, appointmentDates, scanTimes, scanInsurances, comments, quotes, statuses, createdOns) = searchLibrary.getDirectScanRequestsForDentist(dbAddress, dentistId);
+
+    (totalNumberFound, patientsIds) = utilities.getSlicedArray(patientsIds, offset, limit, seed);
+    (totalNumberFound, appointmentDates) = utilities.getSlicedArray(appointmentDates, offset, limit, seed);
+    (totalNumberFound, scanTimes) = utilities.getSlicedArray(scanTimes, offset, limit, seed);
+    (totalNumberFound, scanInsurances) = utilities.getSlicedArray(scanInsurances, offset, limit, seed);
+    (totalNumberFound, comments) = utilities.getSlicedArray(comments, offset, limit, seed);
+    (totalNumberFound, statuses) = utilities.getSlicedArray(statuses, offset, limit, seed);
+    (totalNumberFound, createdOns) = utilities.getSlicedArray(createdOns, offset, limit, seed);
+    (totalNumberFound, scanRequestsIds) = utilities.getSlicedArray(scanRequestsIds, offset, limit, seed);
+  }
+
+  function fetchAcceptedScanRequestsForDentist (
+    address dbAddress,
+    address dentistId,
     uint offset, // starting from offset: 0-based
     uint limit, // not more than limit
     uint seed // seed value to give the illusion of randomisation
@@ -858,113 +1015,31 @@ library userManager {
     view
     returns (
       uint totalNumberFound,
-      uint[] scanAppointmentsIds,
-      uint[] patientScanAppointmentIndexNumbers,
-      address[] patientsIds
+      uint[] scanRequestsIds,
+      address[] patientsIds,
+      bytes32[] appointmentDates,
+      bytes32[] scanTimes,
+      bytes32[] scanInsurances,
+      bytes32[] comments,
+      uint8[] statuses,
+      uint[] createdOns
     )
   {
-    (scanAppointmentsIds, patientScanAppointmentIndexNumbers, patientsIds) = searchLibrary.getScanAppointmentsForDentist(dbAddress, dentistId, patientId);
-    (totalNumberFound, patientsIds) = utilities.getSlicedArray(patientsIds, offset, limit, seed);
-    (totalNumberFound, scanAppointmentsIds) = utilities.getSlicedArray(scanAppointmentsIds, offset, limit, seed);
-    (totalNumberFound, patientScanAppointmentIndexNumbers) = utilities.getSlicedArray(patientScanAppointmentIndexNumbers, offset, limit, seed);
-  }
+    (scanRequestsIds, patientsIds, appointmentDates, scanTimes, scanInsurances, comments, quotes, statuses, createdOns) = searchLibrary.getAceptedScanRequestsForDentist(dbAddress, dentistId);
 
-  function fetchCanceledScanAppointmentsForDentist (
-    address dbAddress,
-    address dentistId,
-    address patientId,
-    uint offset, // starting from offset: 0-based
-    uint limit, // not more than limit
-    uint seed // seed value to give the illusion of randomisation
-  )
-    internal
-    view
-    returns (
-      uint totalNumberFound,
-      uint[] scanAppointmentsIds,
-      uint[] patientScanAppointmentIndexNumbers,
-      address[] patientsIds
-    )
-  {
-    (scanAppointmentsIds, patientScanAppointmentIndexNumbers, patientsIds) = searchLibrary.getCanceledScanAppointmentsForDentist(dbAddress, dentistId, patientId);
     (totalNumberFound, patientsIds) = utilities.getSlicedArray(patientsIds, offset, limit, seed);
-    (totalNumberFound, scanAppointmentsIds) = utilities.getSlicedArray(scanAppointmentsIds, offset, limit, seed);
-    (totalNumberFound, patientScanAppointmentIndexNumbers) = utilities.getSlicedArray(patientScanAppointmentIndexNumbers, offset, limit, seed);
-  }
-
-  function fetchAcceptedScanAppointmentsForDentist (
-    address dbAddress,
-    address dentistId,
-    address patientId,
-    uint offset, // starting from offset: 0-based
-    uint limit, // not more than limit
-    uint seed // seed value to give the illusion of randomisation
-  )
-    internal
-    view
-    returns (
-      uint totalNumberFound,
-      uint[] scanAppointmentsIds,
-      uint[] patientScanAppointmentIndexNumbers,
-      address[] patientsIds
-    )
-  {
-    (scanAppointmentsIds, patientScanAppointmentIndexNumbers, patientsIds) = searchLibrary.getAceptedScanAppointmentsForDentist(dbAddress, dentistId, patientId);
-    (totalNumberFound, patientsIds) = utilities.getSlicedArray(patientsIds, offset, limit, seed);
-    (totalNumberFound, scanAppointmentsIds) = utilities.getSlicedArray(scanAppointmentsIds, offset, limit, seed);
-    (totalNumberFound, patientScanAppointmentIndexNumbers) = utilities.getSlicedArray(patientScanAppointmentIndexNumbers, offset, limit, seed);
-  }
-
-  function fetchRejectedScanAppointmentsForDentist (
-    address dbAddress,
-    address dentistId,
-    address patientId,
-    uint offset, // starting from offset: 0-based
-    uint limit, // not more than limit
-    uint seed // seed value to give the illusion of randomisation
-  )
-    internal
-    view
-    returns (
-      uint totalNumberFound,
-      uint[] scanAppointmentsIds,
-      uint[] patientScanAppointmentIndexNumbers,
-      address[] patientsIds
-    )
-  {
-    (scanAppointmentsIds, patientScanAppointmentIndexNumbers, patientsIds) = searchLibrary.getRejectedScanAppointmentsForDentist(dbAddress, dentistId, patientId);
-    (totalNumberFound, patientsIds) = utilities.getSlicedArray(patientsIds, offset, limit, seed);
-    (totalNumberFound, scanAppointmentsIds) = utilities.getSlicedArray(scanAppointmentsIds, offset, limit, seed);
-    (totalNumberFound, patientScanAppointmentIndexNumbers) = utilities.getSlicedArray(patientScanAppointmentIndexNumbers, offset, limit, seed);
-  }
-
-  function fetchPaidScanAppointmentsForDentist (
-    address dbAddress,
-    address dentistId,
-    address patientId,
-    uint offset, // starting from offset: 0-based
-    uint limit, // not more than limit
-    uint seed // seed value to give the illusion of randomisation
-  )
-    internal
-    view
-    returns (
-      uint totalNumberFound,
-      uint[] scanAppointmentsIds,
-      uint[] patientScanAppointmentIndexNumbers,
-      address[] patientsIds
-    )
-  {
-    (scanAppointmentsIds, patientScanAppointmentIndexNumbers, patientsIds) = searchLibrary.getPaidScanAppointmentsForDentist(dbAddress, dentistId, patientId);
-    (totalNumberFound, patientsIds) = utilities.getSlicedArray(patientsIds, offset, limit, seed);
-    (totalNumberFound, scanAppointmentsIds) = utilities.getSlicedArray(scanAppointmentsIds, offset, limit, seed);
-    (totalNumberFound, patientScanAppointmentIndexNumbers) = utilities.getSlicedArray(patientScanAppointmentIndexNumbers, offset, limit, seed);
+    (totalNumberFound, appointmentDates) = utilities.getSlicedArray(appointmentDates, offset, limit, seed);
+    (totalNumberFound, scanTimes) = utilities.getSlicedArray(scanTimes, offset, limit, seed);
+    (totalNumberFound, scanInsurances) = utilities.getSlicedArray(scanInsurances, offset, limit, seed);
+    (totalNumberFound, comments) = utilities.getSlicedArray(comments, offset, limit, seed);
+    (totalNumberFound, statuses) = utilities.getSlicedArray(statuses, offset, limit, seed);
+    (totalNumberFound, createdOns) = utilities.getSlicedArray(createdOns, offset, limit, seed);
+    (totalNumberFound, scanRequestsIds) = utilities.getSlicedArray(scanRequestsIds, offset, limit, seed);
   }
 
   function fetchScanApplicationsForDentist (
     address dbAddress,
     address dentistId,
-    address patientId,
     uint offset, // starting from offset: 0-based
     uint limit, // not more than limit
     uint seed // seed value to give the illusion of randomisation
@@ -973,18 +1048,20 @@ library userManager {
     view
     returns (
       uint totalNumberFound,
-      uint[] scanAppointmentsIds,
-      uint[] patientScanAppointmentIndexNumbers,
+      uint[] scanApplicationsIds
       address[] patientsIds,
       bytes32[] comments,
-      uint[] quotes
+      uint[] quotes,
+      uint8[] statuses,
+      uint[] createdOns
     )
   {
-    (scanAppointmentsIds, patientScanAppointmentIndexNumbers, patientsIds, comments, quotes) = searchLibrary.getScanApplicationsForDentist(dbAddress, dentistId, patientId);
+    (scanApplicationsIds, patientsIds, comments, quotes, statuses, createdOns) = searchLibrary.getScanApplicationsForDentist(dbAddress, dentistId);
     (totalNumberFound, patientsIds) = utilities.getSlicedArray(patientsIds, offset, limit, seed);
-    (totalNumberFound, scanAppointmentsIds) = utilities.getSlicedArray(scanAppointmentsIds, offset, limit, seed);
     (totalNumberFound, comments) = utilities.getSlicedArray(comments, offset, limit, seed);
     (totalNumberFound, quotes) = utilities.getSlicedArray(quotes, offset, limit, seed);
-    (totalNumberFound, patientScanAppointmentIndexNumbers) = utilities.getSlicedArray(patientScanAppointmentIndexNumbers, offset, limit, seed);
+    (totalNumberFound, statuses) = utilities.getSlicedArray(statuses, offset, limit, seed);
+    (totalNumberFound, createdOns) = utilities.getSlicedArray(createdOns, offset, limit, seed);
+    (totalNumberFound, scanApplicationsIds) = utilities.getSlicedArray(scanApplicationsIds, offset, limit, seed);
   }
 }

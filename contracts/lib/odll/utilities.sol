@@ -1,15 +1,15 @@
-pragma solidity 0.4.17;
+pragma solidity 0.4.18;
 
-import "../../odll/ODLLDB.sol";
+import "../../odll/DB.sol";
 
 library utilities {
   function getCount(address dbAddress, string countKey) internal view returns(uint) {
-    return ODLLDB(dbAddress).getUIntValue(keccak256(countKey));
+    return DB(dbAddress).getUIntValue(keccak256(countKey));
   }
 
   function createNext(address dbAddress, string countKey) internal view returns(uint index) {
     var count = getCount(dbAddress, countKey);
-    ODLLDB(dbAddress).addUIntValue(keccak256(countKey), 1);
+    DB(dbAddress).addUIntValue(keccak256(countKey), 1);
     return count + 1;
   }
 
@@ -17,7 +17,7 @@ library utilities {
     if (array.length == 0) {
       return true;
     }
-    var val = ODLLDB(dbAddress).getUInt8Value(keccak256(key, id));
+    var val = DB(dbAddress).getUInt8Value(keccak256(key, id));
     for (uint i = 0; i < array.length ; i++) {
       if (array[i] == val) {
         return true;
@@ -28,76 +28,192 @@ library utilities {
   }
 
   function addArrayItem(address dbAddress, string key, string countKey, address val) internal {
-    var idx = ODLLDB(dbAddress).getUIntValue(keccak256(countKey));
-    ODLLDB(dbAddress).setAddressValue(keccak256(key, idx), val);
-    ODLLDB(dbAddress).setUIntValue(keccak256(countKey), idx + 1);
+    var idx = DB(dbAddress).getUIntValue(keccak256(countKey));
+    DB(dbAddress).setAddressValue(keccak256(key, idx), val);
+    DB(dbAddress).setUIntValue(keccak256(countKey), idx + 1);
   }
 
-  function getAddressArray(address dbAddress, string key, string countKey) internal view returns(address[] result) {
-    var totalNumberOfUsers = ODLLDB(dbAddress).getUIntValue(keccak256(countKey));
-    result = new address[](totalNumberOfUsers);
-    for (uint i = 0; i < totalNumberOfUsers; i++) {
-      result[i] = ODLLDB(dbAddress).getAddressValue(keccak256(key, i));
+  function addArrayItem(address dbAddress, string key, string countKey, uint val) internal {
+    var idx = DB(dbAddress).getUIntValue(keccak256(countKey));
+    DB(dbAddress).setUIntValue(keccak256(key, idx), val);
+    DB(dbAddress).setUIntValue(keccak256(countKey), idx + 1);
+  }
+
+  // function addArrayItemWithIndex(address dbAddress, string key, string countKey, address val, uint index) internal {
+  //   var idx = DB(dbAddress).getUIntValue(keccak256(countKey));
+  //   DB(dbAddress).setAddressValue(keccak256(key, idx), val);
+  //   DB(dbAddress).setAddressValue(keccak256(key, idx, index), val);
+  //   DB(dbAddress).setUIntValue(keccak256(key, idx, "index"), index);
+  //   DB(dbAddress).setUIntValue(keccak256(countKey), idx + 1);
+  // }
+
+  // function addArrayItemWithIndex(address dbAddress, string key, string countKey, uint val, uint index) internal {
+  //   var idx = DB(dbAddress).getUIntValue(keccak256(countKey));
+  //   DB(dbAddress).setUIntValue(keccak256(key, idx), val);
+  //   DB(dbAddress).setUIntValue(keccak256(key, idx, index), val);
+  //   DB(dbAddress).setUIntValue(keccak256(key, idx, "index"), index);
+  //   DB(dbAddress).setUIntValue(keccak256(countKey), idx + 1);
+  // }
+
+  function getArrayItems(address dbAddress, string key, string countKey) internal view returns(uint[] result) {
+    var count = DB(dbAddress).getUIntValue(keccak256(countKey));
+    result = new uint[](count);
+    for (uint i = 0; i < count; i++) {
+      result[i] = DB(dbAddress).getUIntValue(keccak256(key, i));
     }
 
     return result;
   }
 
+  function getAddressArray(address dbAddress, string key, string countKey) internal view returns(address[] result) {
+    var count = DB(dbAddress).getUIntValue(keccak256(countKey));
+    result = new address[](count);
+    for (uint i = 0; i < count; i++) {
+      result[i] = DB(dbAddress).getAddressValue(keccak256(key, i));
+    }
+
+    return result;
+  }
+
+  // function getArrayItemsWithIndex(address dbAddress, string key, string countKey) internal view returns(uint[] result, uint[] indexArray) {
+  //   var count = DB(dbAddress).getUIntValue(keccak256(countKey));
+  //   result = new uint[](count);
+  //   for (uint i = 0; i < count; i++) {
+  //     var index = DB(dbAddress).getUIntValue(keccak256(key, i, "index"));
+  //     result[i] = DB(dbAddress).getUIntValue(keccak256(key, i, index));
+  //     indexArray[i] = index;
+  //   }
+  // }
+
+  // function getAddressArrayWithIndex(address dbAddress, string key, string countKey) internal view returns(address[] result, uint[] indexArray) {
+  //   var count = DB(dbAddress).getUIntValue(keccak256(countKey));
+  //   result = new address[](count);
+  //   for (uint i = 0; i < count; i++) {
+  //     var index = DB(dbAddress).getUIntValue(keccak256(key, i, "index"));
+  //     result[i] = DB(dbAddress).getAddressValue(keccak256(key, i, index));
+  //     indexArray[i] = index;
+  //   }
+  // }
+
+  function getArrayItemsCount(address dbAddress, string countKey) internal view returns(uint) {
+    return DB(dbAddress).getUIntValue(keccak256(countKey));
+  }
+
   function getIdArrayItemsCount(address dbAddress, uint id, string countKey) internal view returns(uint) {
-    return ODLLDB(dbAddress).getUIntValue(keccak256(countKey, id));
+    return DB(dbAddress).getUIntValue(keccak256(countKey, id));
   }
 
   function getIdArrayItemsCount(address dbAddress, address id, string countKey) internal view returns(uint) {
-    return ODLLDB(dbAddress).getUIntValue(keccak256(countKey, id));
+    return DB(dbAddress).getUIntValue(keccak256(countKey, id));
   }
 
   function addIdArrayItem(address dbAddress, uint id, string key, string countKey, uint val) internal {
     var idx = getIdArrayItemsCount(dbAddress, id, countKey);
-    ODLLDB(dbAddress).setUIntValue(keccak256(key, id, idx), val);
-    ODLLDB(dbAddress).setUIntValue(keccak256(countKey, id), idx + 1);
+    DB(dbAddress).setUIntValue(keccak256(key, id, idx), val);
+    DB(dbAddress).setUIntValue(keccak256(countKey, id), idx + 1);
   }
 
   function addIdArrayItem(address dbAddress, uint id, string key, string countKey, address val) internal {
     var idx = getIdArrayItemsCount(dbAddress, id, countKey);
-    ODLLDB(dbAddress).setAddressValue(keccak256(key, id, idx), val);
-    ODLLDB(dbAddress).setUIntValue(keccak256(countKey, id), idx + 1);
+    DB(dbAddress).setAddressValue(keccak256(key, id, idx), val);
+    DB(dbAddress).setUIntValue(keccak256(countKey, id), idx + 1);
   }
 
   function addIdArrayItem(address dbAddress, address id, string key, string countKey, uint val) internal {
     var idx = getIdArrayItemsCount(dbAddress, id, countKey);
-    ODLLDB(dbAddress).setUIntValue(keccak256(key, id, idx), val);
-    ODLLDB(dbAddress).setUIntValue(keccak256(countKey, id), idx + 1);
+    DB(dbAddress).setUIntValue(keccak256(key, id, idx), val);
+    DB(dbAddress).setUIntValue(keccak256(countKey, id), idx + 1);
   }
 
   function addIdArrayItem(address dbAddress, address id, string key, string countKey, address val) internal {
     var idx = getIdArrayItemsCount(dbAddress, id, countKey);
-    ODLLDB(dbAddress).setAddressValue(keccak256(key, id, idx), val);
-    ODLLDB(dbAddress).setUIntValue(keccak256(countKey, id), idx + 1);
+    DB(dbAddress).setAddressValue(keccak256(key, id, idx), val);
+    DB(dbAddress).setUIntValue(keccak256(countKey, id), idx + 1);
+  }
+
+  function addIdArrayItem(address dbAddress, uint id, string key, string countKey, bytes32 val) internal {
+    var idx = getIdArrayItemsCount(dbAddress, id, countKey);
+    DB(dbAddress).setBytes32Value(keccak256(key, id, idx), val);
+    DB(dbAddress).setUIntValue(keccak256(countKey, id), idx + 1);
+  }
+
+  function addIdArrayItem(address dbAddress, address id, string key, string countKey, bytes32 val) internal {
+    var idx = getIdArrayItemsCount(dbAddress, id, countKey);
+    DB(dbAddress).setBytes32Value(keccak256(key, id, idx), val);
+    DB(dbAddress).setUIntValue(keccak256(countKey, id), idx + 1);
+  }
+
+  function getIdArray(address dbAddress, address id, string key, string countKey)
+    internal
+    view
+    returns(uint[] result)
+  {
+    uint count = getIdArrayItemsCount(dbAddress, id, countKey);
+    result = new uint[](count);
+    for (uint i = 0; i < count; i++) {
+      result[i] = DB(dbAddress).getUIntValue(keccak256(key, id, i));
+    }
+  }
+
+  function getIdArrayAddresses(address dbAddress, address id, string key, string countKey)
+    internal
+    view
+    returns(address[] result)
+  {
+    uint count = getIdArrayItemsCount(dbAddress, id, countKey);
+    result = new address[](count);
+    for (uint i = 0; i < count; i++) {
+      result[i] = DB(dbAddress).getAddressValue(keccak256(key, id, i));
+    }
+  }
+
+  function getIdArray(address dbAddress, uint id, string key, string countKey)
+    internal
+    view
+    returns(uint[] result)
+  {
+    uint count = getIdArrayItemsCount(dbAddress, id, countKey);
+    result = new uint[](count);
+    for (uint i = 0; i < count; i++) {
+      result[i] = DB(dbAddress).getUIntValue(keccak256(key, id, i));
+    }
+  }
+
+  function getIdArrayAddresses(address dbAddress, uint id, string key, string countKey)
+    internal
+    view
+    returns(address[] result)
+  {
+    uint count = getIdArrayItemsCount(dbAddress, id, countKey);
+    result = new address[](count);
+    for (uint i = 0; i < count; i++) {
+      result[i] = DB(dbAddress).getAddressValue(keccak256(key, id, i));
+    }
   }
 
   function setIdArray(address dbAddress, uint id, string key, string countKey, uint[] array) internal {
     for (uint i = 0; i < array.length; i++) {
       require(array[i] != 0);
-      ODLLDB(dbAddress).setUIntValue(keccak256(key, id, i), array[i]);
+      DB(dbAddress).setUIntValue(keccak256(key, id, i), array[i]);
     }
 
-    ODLLDB(dbAddress).setUIntValue(keccak256(countKey, id), array.length);
+    DB(dbAddress).setUIntValue(keccak256(countKey, id), array.length);
   }
 
   function setIdArray(address dbAddress, address id, string key, string countKey, uint[] array) internal {
     for (uint i = 0; i < array.length; i++) {
       require(array[i] != 0);
-      ODLLDB(dbAddress).setUIntValue(keccak256(key, id, i), array[i]);
+      DB(dbAddress).setUIntValue(keccak256(key, id, i), array[i]);
     }
 
-    ODLLDB(dbAddress).setUIntValue(keccak256(countKey, id), array.length);
+    DB(dbAddress).setUIntValue(keccak256(countKey, id), array.length);
   }
 
   function getIdArray(address dbAddress, uint id, string key, string countKey) internal view returns(uint[] result) {
     uint count = getIdArrayItemsCount(dbAddress, id, countKey);
     result = new uint[](count);
     for (uint i = 0; i < count; i++) {
-      result[i] = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, i));
+      result[i] = DB(dbAddress).getUIntValue(keccak256(key, id, i));
     }
 
     return result;
@@ -107,7 +223,7 @@ library utilities {
     uint count = getIdArrayItemsCount(dbAddress, id, countKey);
     result = new uint[](count);
     for (uint i = 0; i < count; i++) {
-      result[i] = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, i));
+      result[i] = DB(dbAddress).getUIntValue(keccak256(key, id, i));
     }
 
     return result;
@@ -116,61 +232,61 @@ library utilities {
   function setIdArray(address dbAddress, address id, string key, string countKey, address[] array) internal {
     for (uint i = 0; i < array.length; i++) {
       require(array[i] != 0x0);
-      ODLLDB(dbAddress).setAddressValue(keccak256(key, id, i), array[i]);
+      DB(dbAddress).setAddressValue(keccak256(key, id, i), array[i]);
     }
 
-    ODLLDB(dbAddress).setUIntValue(keccak256(countKey, id), array.length);
+    DB(dbAddress).setUIntValue(keccak256(countKey, id), array.length);
   }
 
   function setIdArray(address dbAddress, uint id, string key, string countKey, address[] array) internal {
     for (uint i = 0; i < array.length; i++) {
       require(array[i] != 0x0);
-      ODLLDB(dbAddress).setAddressValue(keccak256(key, id, i), array[i]);
+      DB(dbAddress).setAddressValue(keccak256(key, id, i), array[i]);
     }
 
-    ODLLDB(dbAddress).setUIntValue(keccak256(countKey, id), array.length);
+    DB(dbAddress).setUIntValue(keccak256(countKey, id), array.length);
   }
 
   function getAddressIdArray(address dbAddress, uint id, string key, string countKey) internal view returns(address[] result) {
     uint count = getIdArrayItemsCount(dbAddress, id, countKey);
     result = new address[](count);
     for (uint i = 0; i < count; i++) {
-      result[i] = ODLLDB(dbAddress).getAddressValue(keccak256(key, id, i));
+      result[i] = DB(dbAddress).getAddressValue(keccak256(key, id, i));
     }
 
     return result;
   }
 
   function addRemovableIdItem(address dbAddress, address id, string key, string countKey, string keysKey, uint val) internal {
-    if (ODLLDB(dbAddress).getUInt8Value(keccak256(key, id, val)) == 0) { // never seen before
+    if (DB(dbAddress).getUInt8Value(keccak256(key, id, val)) == 0) { // never seen before
       addIdArrayItem(dbAddress, id, keysKey, countKey, val);
     }
 
-    ODLLDB(dbAddress).setUInt8Value(keccak256(key, id, val), 1); // 1 == active
+    DB(dbAddress).setUInt8Value(keccak256(key, id, val), 1); // 1 == active
   }
 
   function addRemovableIdItem(address dbAddress, address id, string key, string countKey, string keysKey, address val) internal {
-    if (ODLLDB(dbAddress).getUInt8Value(keccak256(key, id, val)) == 0) { // never seen before
+    if (DB(dbAddress).getUInt8Value(keccak256(key, id, val)) == 0) { // never seen before
       addIdArrayItem(dbAddress, id, keysKey, countKey, val);
     }
 
-    ODLLDB(dbAddress).setUInt8Value(keccak256(key, id, val), 1); // 1 == active
+    DB(dbAddress).setUInt8Value(keccak256(key, id, val), 1); // 1 == active
   }
 
   function addRemovableIdItem(address dbAddress, uint id, string key, string countKey, string keysKey, uint val) internal {
-    if (ODLLDB(dbAddress).getUInt8Value(keccak256(key, id, val)) == 0) { // never seen before
+    if (DB(dbAddress).getUInt8Value(keccak256(key, id, val)) == 0) { // never seen before
       addIdArrayItem(dbAddress, id, keysKey, countKey, val);
     }
 
-    ODLLDB(dbAddress).setUInt8Value(keccak256(key, id, val), 1); // 1 == active
+    DB(dbAddress).setUInt8Value(keccak256(key, id, val), 1); // 1 == active
   }
 
   function addRemovableIdItem(address dbAddress, uint id, string key, string countKey, string keysKey, address val) internal {
-    if (ODLLDB(dbAddress).getUInt8Value(keccak256(key, id, val)) == 0) { // never seen before
+    if (DB(dbAddress).getUInt8Value(keccak256(key, id, val)) == 0) { // never seen before
       addIdArrayItem(dbAddress, id, keysKey, countKey, val);
     }
 
-    ODLLDB(dbAddress).setUInt8Value(keccak256(key, id, val), 1); // 1 == active
+    DB(dbAddress).setUInt8Value(keccak256(key, id, val), 1); // 1 == active
   }
 
   function addRemovableIdArrayItem(address dbAddress, address[] ids, string key, string countKey, string keysKey, uint val) internal {
@@ -217,8 +333,8 @@ library utilities {
     result = new uint[](count);
     uint j = 0;
     for (uint i = 0; i < count; i++) {
-      var itemId = ODLLDB(dbAddress).getUIntValue(keccak256(keysKey, id, i));
-      if (ODLLDB(dbAddress).getUInt8Value(keccak256(key, id, itemId)) == 1) { // 1 == active
+      var itemId = DB(dbAddress).getUIntValue(keccak256(keysKey, id, i));
+      if (DB(dbAddress).getUInt8Value(keccak256(key, id, itemId)) == 1) { // 1 == active
         result[j] = itemId;
         j++;
       }
@@ -234,8 +350,8 @@ library utilities {
     result = new address[](count);
     uint j = 0;
     for (uint i = 0; i < count; i++) {
-      var itemId = ODLLDB(dbAddress).getAddressValue(keccak256(keysKey, id, i));
-      if (ODLLDB(dbAddress).getUInt8Value(keccak256(key, id, itemId)) == 1) { // 1 == active
+      var itemId = DB(dbAddress).getAddressValue(keccak256(keysKey, id, i));
+      if (DB(dbAddress).getUInt8Value(keccak256(key, id, itemId)) == 1) { // 1 == active
         result[j] = itemId;
         j++;
       }
@@ -245,11 +361,11 @@ library utilities {
   }
 
   function removeIdItem(address dbAddress, address id, string key, uint val) internal {
-    ODLLDB(dbAddress).setUInt8Value(keccak256(key, id, val), 2); // 2 == blocked
+    DB(dbAddress).setUInt8Value(keccak256(key, id, val), 2); // 2 == blocked
   }
 
   function removeIdItem(address dbAddress, address id, string key, address val) internal {
-    ODLLDB(dbAddress).setUInt8Value(keccak256(key, id, val), 2); // 2 == blocked
+    DB(dbAddress).setUInt8Value(keccak256(key, id, val), 2); // 2 == blocked
   }
 
   function removeIdArrayItem(address dbAddress, address[] ids, string key, uint val) internal {
@@ -258,7 +374,7 @@ library utilities {
     }
 
     for (uint i = 0; i < ids.length; i++) {
-      ODLLDB(dbAddress).setUInt8Value(keccak256(key, ids[i], val), 2); // 2 == blocked
+      DB(dbAddress).setUInt8Value(keccak256(key, ids[i], val), 2); // 2 == blocked
     }
   }
 
@@ -268,7 +384,7 @@ library utilities {
     }
 
     for (uint i = 0; i < ids.length; i++) {
-      ODLLDB(dbAddress).setUInt8Value(keccak256(key, ids[i], val), 2); // 2 == blocked
+      DB(dbAddress).setUInt8Value(keccak256(key, ids[i], val), 2); // 2 == blocked
     }
   }
 
@@ -279,8 +395,8 @@ library utilities {
     result = new uint[](count);
     uint j = 0;
     for (uint i = 0; i < count; i++) {
-      var itemId = ODLLDB(dbAddress).getUIntValue(keccak256(keysKey, id, i));
-      if (ODLLDB(dbAddress).getUInt8Value(keccak256(key, id, itemId)) == 1) { // 1 == active
+      var itemId = DB(dbAddress).getUIntValue(keccak256(keysKey, id, i));
+      if (DB(dbAddress).getUInt8Value(keccak256(key, id, itemId)) == 1) { // 1 == active
         result[j] = itemId;
         j++;
       }
@@ -296,8 +412,8 @@ library utilities {
     result = new address[](count);
     uint j = 0;
     for (uint i = 0; i < count; i++) {
-      var itemId = ODLLDB(dbAddress).getAddressValue(keccak256(keysKey, id, i));
-      if (ODLLDB(dbAddress).getUInt8Value(keccak256(key, id, itemId)) == 1) { // 1 == active
+      var itemId = DB(dbAddress).getAddressValue(keccak256(keysKey, id, i));
+      if (DB(dbAddress).getUInt8Value(keccak256(key, id, itemId)) == 1) { // 1 == active
         result[j] = itemId;
         j++;
       }
@@ -307,11 +423,11 @@ library utilities {
   }
 
   function removeIdItem(address dbAddress, uint id, string key, uint val) internal {
-    ODLLDB(dbAddress).setUInt8Value(keccak256(key, id, val), 2); // 2 == blocked
+    DB(dbAddress).setUInt8Value(keccak256(key, id, val), 2); // 2 == blocked
   }
 
   function removeIdItem(address dbAddress, uint id, string key, address val) internal {
-    ODLLDB(dbAddress).setUInt8Value(keccak256(key, id, val), 2); // 2 == blocked
+    DB(dbAddress).setUInt8Value(keccak256(key, id, val), 2); // 2 == blocked
   }
 
   function removeIdArrayItem(address dbAddress, uint[] ids, string key, uint val) internal {
@@ -320,7 +436,7 @@ library utilities {
     }
 
     for (uint i = 0; i < ids.length; i++) {
-      ODLLDB(dbAddress).setUInt8Value(keccak256(key, ids[i], val), 2); // 2 == blocked
+      DB(dbAddress).setUInt8Value(keccak256(key, ids[i], val), 2); // 2 == blocked
     }
   }
 
@@ -330,7 +446,7 @@ library utilities {
     }
 
     for (uint i = 0; i < ids.length; i++) {
-      ODLLDB(dbAddress).setUInt8Value(keccak256(key, ids[i], val), 2); // 2 == blocked
+      DB(dbAddress).setUInt8Value(keccak256(key, ids[i], val), 2); // 2 == blocked
     }
   }
 
@@ -374,6 +490,38 @@ library utilities {
     }
 
     result = new address[](limit);
+    for (uint i = offset; i < (offset + limit); i++) {
+      if (length == i) {
+        break;
+      }
+
+      result[j] = array[i];
+      j++;
+    }
+
+    if (cycle && j < limit) {
+      var k = limit - j;
+      for (i = 0; i <= k; i++) {
+        if (limit == j) {
+          break;
+        }
+
+        result[j] = array[i];
+        j++;
+      }
+    }
+
+    return take(j, result);
+  }
+
+  function getPage(bytes32[] array, uint offset, uint limit, bool cycle) internal pure returns (bytes32[] result) {
+    uint j = 0;
+    uint length = array.length;
+    if (offset >= length || limit == 0) {
+      return result;
+    }
+
+    result = new bytes32[](limit);
     for (uint i = offset; i < (offset + limit); i++) {
       if (length == i) {
         break;
@@ -627,6 +775,18 @@ library utilities {
     return array;
   }
 
+  function take(uint n, uint8[] array) internal pure returns(uint8[] result) {
+    if (n > array.length) {
+      return array;
+    }
+
+    result = new uint8[](n);
+    for (uint i = 0; i < n ; i++) {
+      result[i] = array[i];
+    }
+
+    return result;
+  }
 
   function take(uint n, uint[] array) internal pure returns(uint[] result) {
     if (n > array.length) {
@@ -796,7 +956,7 @@ library utilities {
   )
     internal view returns (address[] result)
   {
-    var maxCount = ODLLDB(dbAddress).getUIntValue(keccak256("dentists/count"));
+    var maxCount = DB(dbAddress).getUIntValue(keccak256("dentists/count"));
     if (maxCount == 0) {
       return result;
     }
@@ -805,6 +965,24 @@ library utilities {
     stateBasedDentistsIds = sort(stateBasedDentistsIds);
 
     return intersect(budgetBasedDentistsIds, stateBasedDentistsIds);
+  }
+
+  function getSlicedArray(uint8[] arrayObject, uint offset, uint limit, uint seed)
+    internal
+    pure
+    returns (uint totalSize, uint8[] slicedArray)
+  {
+    totalSize = arrayObject.length;
+
+    if (arrayObject.length > 0) {
+      if (offset > arrayObject.length) {
+        return (totalSize, take(0, arrayObject));
+      } else if (offset + limit > arrayObject.length) {
+        limit = arrayObject.length - offset;
+      }
+
+      slicedArray = getPage(arrayObject, (seed + offset) % arrayObject.length, limit, true);
+    }
   }
 
   function getSlicedArray(uint[] arrayObject, uint offset, uint limit, uint seed)
@@ -843,663 +1021,681 @@ library utilities {
     }
   }
 
-  function addAssociationIdArrayItem(address dbAddress, address id, address associationId, string key, string countKey, address val) internal {
-    var idx = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    ODLLDB(dbAddress).setAddressValue(keccak256(key, id, associationId, idx), val);
-    ODLLDB(dbAddress).setUIntValue(keccak256(countKey, id, associationId), idx + 1);
-  }
-
-  function addAssociationIdArrayItem(address dbAddress, address id, address associationId, string key, string countKey, uint val) internal {
-    var idx = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    ODLLDB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx), val);
-    ODLLDB(dbAddress).setUIntValue(keccak256(countKey, id, associationId), idx + 1);
-  }
-
-  function addAssociationIdArrayItem(address dbAddress, address id, uint associationId, string key, string countKey, address val) internal {
-    var idx = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    ODLLDB(dbAddress).setAddressValue(keccak256(key, id, associationId, idx), val);
-    ODLLDB(dbAddress).setUIntValue(keccak256(countKey, id, associationId), idx + 1);
-  }
-
-  function addAssociationIdArrayItem(address dbAddress, address id, uint associationId, string key, string countKey, uint val) internal {
-    var idx = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    ODLLDB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx), val);
-    ODLLDB(dbAddress).setUIntValue(keccak256(countKey, id, associationId), idx + 1);
-  }
-
-  function addAssociationIdArrayItem(address dbAddress, uint id, uint associationId, string key, string countKey, uint val) internal {
-    var idx = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    ODLLDB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx), val);
-    ODLLDB(dbAddress).setUIntValue(keccak256(countKey, id, associationId), idx + 1);
-  }
-
-  function addAssociationIdArrayItem(address dbAddress, uint id, uint associationId, string key, string countKey, address val) internal {
-    var idx = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    ODLLDB(dbAddress).setAddressValue(keccak256(key, id, associationId, idx), val);
-    ODLLDB(dbAddress).setUIntValue(keccak256(countKey, id, associationId), idx + 1);
-  }
-
-  function addAssociationIdArrayItem(address dbAddress, uint id, address associationId, string key, string countKey, address val) internal {
-    var idx = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    ODLLDB(dbAddress).setAddressValue(keccak256(key, id, associationId, idx), val);
-    ODLLDB(dbAddress).setUIntValue(keccak256(countKey, id, associationId), idx + 1);
-  }
-
-  function addAssociationIdArrayItem(address dbAddress, uint id, address associationId, string key, string countKey, uint val) internal {
-    var idx = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    ODLLDB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx), val);
-    ODLLDB(dbAddress).setUIntValue(keccak256(countKey, id, associationId), idx + 1);
-  }
-
-  function getAssociationIdArrayItemsCount(address dbAddress, address id, address associationId, string countKey) internal view returns(uint) {
-    return ODLLDB(dbAddress).getUIntValue(keccak256(countKey, id, associationId));
-  }
-
-  function getAssociationIdArrayItemsCount(address dbAddress, address id, uint associationId, string countKey) internal view returns(uint) {
-    return ODLLDB(dbAddress).getUIntValue(keccak256(countKey, id, associationId));
-  }
-
-  function getAssociationIdArrayItemsCount(address dbAddress, uint id, uint associationId, string countKey) internal view returns(uint) {
-    return ODLLDB(dbAddress).getUIntValue(keccak256(countKey, id, associationId));
-  }
-
-  function getAssociationIdArrayItemsCount(address dbAddress, uint id, address associationId, string countKey) internal view returns(uint) {
-    return ODLLDB(dbAddress).getUIntValue(keccak256(countKey, id, associationId));
-  }
-
-  function getAssociationIdArrayItems(address dbAddress, address id, address associationId, string key, string countKey) internal view returns(uint[] result) {
-    var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    result = new uint[](count);
-    for (uint i = 0; i < count; i++) {
-      var itemId = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, associationId, i));
-      result[i] = itemId;
-    }
-  }
-
-  function getAssociationIdArrayItems(address dbAddress, address id, uint associationId, string key, string countKey) internal view returns(uint[] result) {
-    var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    result = new uint[](count);
-    for (uint i = 0; i < count; i++) {
-      var itemId = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, associationId, i));
-      result[i] = itemId;
-    }
-  }
-
-  function getAssociationIdArrayItems(address dbAddress, uint id, uint associationId, string key, string countKey) internal view returns(uint[] result) {
-    var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    result = new uint[](count);
-    for (uint i = 0; i < count; i++) {
-      var itemId = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, associationId, i));
-      result[i] = itemId;
-    }
-  }
-
-  function getAssociationIdArrayItems(address dbAddress, uint id, address associationId, string key, string countKey) internal view returns(uint[] result) {
-    var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    result = new uint[](count);
-    for (uint i = 0; i < count; i++) {
-      var itemId = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, associationId, i));
-      result[i] = itemId;
-    }
-  }
-
-  function getAssociationIdArrayItems(address dbAddress, address id, address associationId, string key, string countKey) internal view returns(address[] result) {
-    var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    result = new address[](count);
-    for (uint i = 0; i < count; i++) {
-      var itemId = ODLLDB(dbAddress).getAddressValue(keccak256(key, id, associationId, i));
-      result[i] = itemId;
-    }
-  }
-
-  function getAssociationIdArrayItems(address dbAddress, address id, uint associationId, string key, string countKey) internal view returns(address[] result) {
-    var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    result = new address[](count);
-    for (uint i = 0; i < count; i++) {
-      var itemId = ODLLDB(dbAddress).getAddressValue(keccak256(key, id, associationId, i));
-      result[i] = itemId;
-    }
-  }
-
-  function getAssociationIdArrayItems(address dbAddress, uint id, uint associationId, string key, string countKey) internal view returns(address[] result) {
-    var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    result = new address[](count);
-    for (uint i = 0; i < count; i++) {
-      var itemId = ODLLDB(dbAddress).getAddressValue(keccak256(key, id, associationId, i));
-      result[i] = itemId;
-    }
-  }
-
-  function getAssociationIdArrayItems(address dbAddress, uint id, address associationId, string key, string countKey) internal view returns(address[] result) {
-    var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    result = new address[](count);
-    for (uint i = 0; i < count; i++) {
-      var itemId = ODLLDB(dbAddress).getAddressValue(keccak256(key, id, associationId, i));
-      result[i] = itemId;
-    }
-  }
-
-  function addIdArrayItemWithIndex(address dbAddress, uint id, uint index, string key, string countKey, uint val) internal {
-    var idx = getIdArrayItemsCount(dbAddress, id, countKey);
-    ODLLDB(dbAddress).setUIntValue(keccak256(key, id, idx), val);
-    ODLLDB(dbAddress).setUIntValue(keccak256(key, id, idx, index), val);
-    ODLLDB(dbAddress).setUIntValue(keccak256(key, id, idx, "index"), index);
-    ODLLDB(dbAddress).setUIntValue(keccak256(countKey, id), idx + 1);
-  }
-
-  function addIdArrayItemWithIndex(address dbAddress, uint id, uint index, string key, string countKey, address val) internal {
-    var idx = getIdArrayItemsCount(dbAddress, id, countKey);
-    ODLLDB(dbAddress).setAddressValue(keccak256(key, id, idx), val);
-    ODLLDB(dbAddress).setAddressValue(keccak256(key, id, idx, index), val);
-    ODLLDB(dbAddress).setUIntValue(keccak256(key, id, idx, "index"), index);
-    ODLLDB(dbAddress).setUIntValue(keccak256(countKey, id), idx + 1);
-  }
-
-  function addIdArrayItemWithIndex(address dbAddress, address id, uint index, string key, string countKey, uint val) internal {
-    var idx = getIdArrayItemsCount(dbAddress, id, countKey);
-    ODLLDB(dbAddress).setUIntValue(keccak256(key, id, idx), val);
-    ODLLDB(dbAddress).setUIntValue(keccak256(key, id, idx, index), val);
-    ODLLDB(dbAddress).setUIntValue(keccak256(key, id, idx, "index"), index);
-    ODLLDB(dbAddress).setUIntValue(keccak256(countKey, id), idx + 1);
-  }
-
-  function addIdArrayItemWithIndex(address dbAddress, address id, uint index, string key, string countKey, address val) internal {
-    var idx = getIdArrayItemsCount(dbAddress, id, countKey);
-    ODLLDB(dbAddress).setAddressValue(keccak256(key, id, idx), val);
-    ODLLDB(dbAddress).setAddressValue(keccak256(key, id, idx, index), val);
-    ODLLDB(dbAddress).setUIntValue(keccak256(key, id, idx, "index"), index);
-    ODLLDB(dbAddress).setUIntValue(keccak256(countKey, id), idx + 1);
-  }
-
-  function addAssociationIdArrayItemWithIndex(address dbAddress, address id, address associationId, uint index, string key, string countKey, address val) internal {
-    var idx = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    ODLLDB(dbAddress).setAddressValue(keccak256(key, id, associationId, idx), val);
-    ODLLDB(dbAddress).setAddressValue(keccak256(key, id, associationId, idx, index), val);
-    ODLLDB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx, "index"), index);
-    ODLLDB(dbAddress).setUIntValue(keccak256(countKey, id, associationId), idx + 1);
-  }
-
-  function addAssociationIdArrayItemWithIndex(address dbAddress, address id, address associationId, uint index, string key, string countKey, uint val) internal {
-    var idx = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    ODLLDB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx), val);
-    ODLLDB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx, index), val);
-    ODLLDB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx, "index"), index);
-    ODLLDB(dbAddress).setUIntValue(keccak256(countKey, id, associationId), idx + 1);
-  }
-
-  function addAssociationIdArrayItemWithIndex(address dbAddress, address id, uint associationId, uint index, string key, string countKey, address val) internal {
-    var idx = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    ODLLDB(dbAddress).setAddressValue(keccak256(key, id, associationId, idx), val);
-    ODLLDB(dbAddress).setAddressValue(keccak256(key, id, associationId, idx, index), val);
-    ODLLDB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx, "index"), index);
-    ODLLDB(dbAddress).setUIntValue(keccak256(countKey, id, associationId), idx + 1);
-  }
-
-  function addAssociationIdArrayItemWithIndex(address dbAddress, address id, uint associationId, uint index, string key, string countKey, uint val) internal {
-    var idx = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    ODLLDB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx), val);
-    ODLLDB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx, index), val);
-    ODLLDB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx, "index"), index);
-    ODLLDB(dbAddress).setUIntValue(keccak256(countKey, id, associationId), idx + 1);
-  }
-
-  function addAssociationIdArrayItemWithIndex(address dbAddress, uint id, uint associationId, uint index, string key, string countKey, uint val) internal {
-    var idx = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    ODLLDB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx), val);
-    ODLLDB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx, index), val);
-    ODLLDB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx, "index"), index);
-    ODLLDB(dbAddress).setUIntValue(keccak256(countKey, id, associationId), idx + 1);
-  }
-
-  function addAssociationIdArrayItemWithIndex(address dbAddress, uint id, uint associationId, uint index, string key, string countKey, address val) internal {
-    var idx = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    ODLLDB(dbAddress).setAddressValue(keccak256(key, id, associationId, idx), val);
-    ODLLDB(dbAddress).setAddressValue(keccak256(key, id, associationId, idx, index), val);
-    ODLLDB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx, "index"), index);
-    ODLLDB(dbAddress).setUIntValue(keccak256(countKey, id, associationId), idx + 1);
-  }
-
-  function addAssociationIdArrayItemWithIndex(address dbAddress, uint id, address associationId, uint index, string key, string countKey, address val) internal {
-    var idx = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    ODLLDB(dbAddress).setAddressValue(keccak256(key, id, associationId, idx), val);
-    ODLLDB(dbAddress).setAddressValue(keccak256(key, id, associationId, idx, index), val);
-    ODLLDB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx, "index"), index);
-    ODLLDB(dbAddress).setUIntValue(keccak256(countKey, id, associationId), idx + 1);
-  }
-
-  function addAssociationIdArrayItemWithIndex(address dbAddress, uint id, address associationId, uint index, string key, string countKey, uint val) internal {
-    var idx = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    ODLLDB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx), val);
-    ODLLDB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx, index), val);
-    ODLLDB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx, "index"), index);
-    ODLLDB(dbAddress).setUIntValue(keccak256(countKey, id, associationId), idx + 1);
-  }
-
-  function getAssociationIdArrayItemsWithIndex(address dbAddress, address id, address associationId, string key, string countKey) internal view returns(uint[] result, uint[] indexArray) {
-    var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    result = new uint[](count);
-    indexArray = new uint[](count);
-    for (uint i = 0; i < count; i++) {
-      var index = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, "index"));
-      var itemId = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, index));
-      result[i] = itemId;
-      indexArray[i] = index;
-    }
-  }
-
-  function getAssociationIdArrayItemsWithIndex(address dbAddress, address id, uint associationId, string key, string countKey) internal view returns(uint[] result, uint[] indexArray) {
-    var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    result = new uint[](count);
-    indexArray = new uint[](count);
-    for (uint i = 0; i < count; i++) {
-      var index = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, "index"));
-      var itemId = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, index));
-      result[i] = itemId;
-      indexArray[i] = index;
-    }
-  }
-
-  function getAssociationIdArrayItemsWithIndex(address dbAddress, uint id, uint associationId, string key, string countKey) internal view returns(uint[] result, uint[] indexArray) {
-    var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    result = new uint[](count);
-    indexArray = new uint[](count);
-    for (uint i = 0; i < count; i++) {
-      var index = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, "index"));
-      var itemId = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, index));
-      result[i] = itemId;
-      indexArray[i] = index;
-    }
-  }
-
-  function getAssociationIdArrayItemsWithIndex(address dbAddress, uint id, address associationId, string key, string countKey) internal view returns(uint[] result, uint[] indexArray) {
-    var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    result = new uint[](count);
-    indexArray = new uint[](count);
-    for (uint i = 0; i < count; i++) {
-      var index = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, "index"));
-      var itemId = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, index));
-      result[i] = itemId;
-      indexArray[i] = index;
-    }
-  }
-
-  function getAssociationIdArrayItemsWithIndex(address dbAddress, address id, address associationId, string key, string countKey) internal view returns(address[] result, uint[] indexArray) {
-    var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    result = new address[](count);
-    indexArray = new uint[](count);
-    for (uint i = 0; i < count; i++) {
-      var index = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, "index"));
-      var itemId = ODLLDB(dbAddress).getAddressValue(keccak256(key, id, associationId, i, index));
-      result[i] = itemId;
-      indexArray[i] = index;
-    }
-  }
-
-  function getAssociationIdArrayItemsWithIndex(address dbAddress, address id, uint associationId, string key, string countKey) internal view returns(address[] result, uint[] indexArray) {
-    var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    result = new address[](count);
-    indexArray = new uint[](count);
-    for (uint i = 0; i < count; i++) {
-      var index = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, "index"));
-      var itemId = ODLLDB(dbAddress).getAddressValue(keccak256(key, id, associationId, i, index));
-      result[i] = itemId;
-      indexArray[i] = index;
-    }
-  }
-
-  function getAssociationIdArrayItemsWithIndex(address dbAddress, uint id, uint associationId, string key, string countKey) internal view returns(address[] result, uint[] indexArray) {
-    var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    result = new address[](count);
-    indexArray = new uint[](count);
-    for (uint i = 0; i < count; i++) {
-      var index = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, "index"));
-      var itemId = ODLLDB(dbAddress).getAddressValue(keccak256(key, id, associationId, i, index));
-      result[i] = itemId;
-      indexArray[i] = index;
-    }
-  }
-
-  function getAssociationIdArrayItemsWithIndex(address dbAddress, uint id, address associationId, string key, string countKey) internal view returns(address[] result, uint[] indexArray) {
-    var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    result = new address[](count);
-    indexArray = new uint[](count);
-    for (uint i = 0; i < count; i++) {
-      var index = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, "index"));
-      var itemId = ODLLDB(dbAddress).getAddressValue(keccak256(key, id, associationId, i, index));
-      result[i] = itemId;
-      indexArray[i] = index;
-    }
-  }
-
-  function getAssociationIdArrayItemsWithIndexAndCondition(address dbAddress, address id, address associationId, string key, string countKey, function (string, address, uint, uint) returns(bool) conditionFunction, string searchKey) internal view returns(uint[] result, uint[] indexArray) {
-    var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    result = new uint[](count);
-    indexArray = new uint[](count);
-    uint j = 0;
-    for (uint i = 0; i < count; i++) {
-      var index = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, "index"));
-      var itemId = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, index));
-      if (conditionFunction(searchKey, id, itemId, index)) {
-        result[j] = itemId;
-        indexArray[j] = index;
-        j++;
-      }
-    }
-
-    result = take(j, result);
-    indexArray = take(j, indexArray);
-  }
-
-  function getAssociationIdArrayItemsWithIndexAndCondition(address dbAddress, address id, uint associationId, string key, string countKey, function (string, address, uint, uint) returns(bool) conditionFunction, string searchKey) internal view returns(uint[] result, uint[] indexArray) {
-    var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    result = new uint[](count);
-    indexArray = new uint[](count);
-    uint j = 0;
-    for (uint i = 0; i < count; i++) {
-      var index = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, "index"));
-      var itemId = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, index));
-      if (conditionFunction(searchKey, id, itemId, index)) {
-        result[j] = itemId;
-        indexArray[j] = index;
-        j++;
-      }
-    }
-
-    result = take(j, result);
-    indexArray = take(j, indexArray);
-  }
-
-  function getAssociationIdArrayItemsWithIndexAndCondition(address dbAddress, uint id, uint associationId, string key, string countKey, function (string, address, uint, uint) returns(bool) conditionFunction, string searchKey) internal view returns(uint[] result, uint[] indexArray) {
-    var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    result = new uint[](count);
-    indexArray = new uint[](count);
-    uint j = 0;
-    for (uint i = 0; i < count; i++) {
-      var index = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, "index"));
-      var itemId = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, index));
-      if (conditionFunction(searchKey, id, itemId, index)) {
-        result[j] = itemId;
-        indexArray[j] = index;
-        j++;
-      }
-    }
-
-    result = take(j, result);
-    indexArray = take(j, indexArray);
-  }
-
-  function getAssociationIdArrayItemsWithIndexAndCondition(address dbAddress, uint id, address associationId, string key, string countKey, function (string, address, uint, uint) returns(bool) conditionFunction, string searchKey) internal view returns(uint[] result, uint[] indexArray) {
-    var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    result = new uint[](count);
-    indexArray = new uint[](count);
-    uint j = 0;
-    for (uint i = 0; i < count; i++) {
-      var index = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, "index"));
-      var itemId = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, index));
-      if (conditionFunction(searchKey, id, itemId, index)) {
-        result[j] = itemId;
-        indexArray[j] = index;
-        j++;
-      }
-    }
-
-    result = take(j, result);
-    indexArray = take(j, indexArray);
-  }
-
-  function getAssociationIdArrayItemsWithIndexAndCondition(address dbAddress, address id, address associationId, string key, string countKey, function (string, address, uint, uint) returns(bool) conditionFunction, string searchKey) internal view returns(address[] result, uint[] indexArray) {
-    var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    result = new address[](count);
-    indexArray = new uint[](count);
-    uint j = 0;
-    for (uint i = 0; i < count; i++) {
-      var index = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, "index"));
-      var itemId = ODLLDB(dbAddress).getAddressValue(keccak256(key, id, associationId, i, index));
-      if (conditionFunction(searchKey, id, itemId, index)) {
-        result[j] = itemId;
-        indexArray[j] = index;
-        j++;
-      }
-    }
-
-    result = take(j, result);
-    indexArray = take(j, indexArray);
-  }
-
-  function getAssociationIdArrayItemsWithIndexAndCondition(address dbAddress, address id, uint associationId, string key, string countKey, function (string, address, uint, uint) returns(bool) conditionFunction, string searchKey) internal view returns(address[] result, uint[] indexArray) {
-    var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    result = new address[](count);
-    indexArray = new uint[](count);
-    uint j = 0;
-    for (uint i = 0; i < count; i++) {
-      var index = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, "index"));
-      var itemId = ODLLDB(dbAddress).getAddressValue(keccak256(key, id, associationId, i, index));
-      if (conditionFunction(searchKey, id, itemId, index)) {
-        result[j] = itemId;
-        indexArray[j] = index;
-        j++;
-      }
-    }
-
-    result = take(j, result);
-    indexArray = take(j, indexArray);
-  }
-
-  function getAssociationIdArrayItemsWithIndexAndCondition(address dbAddress, uint id, uint associationId, string key, string countKey, function (string, address, uint, uint) returns(bool) conditionFunction, string searchKey) internal view returns(address[] result, uint[] indexArray) {
-    var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    result = new address[](count);
-    indexArray = new uint[](count);
-    uint j = 0;
-    for (uint i = 0; i < count; i++) {
-      var index = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, "index"));
-      var itemId = ODLLDB(dbAddress).getAddressValue(keccak256(key, id, associationId, i, index));
-      if (conditionFunction(searchKey, id, itemId, index)) {
-        result[j] = itemId;
-        indexArray[j] = index;
-        j++;
-      }
-    }
-
-    result = take(j, result);
-    indexArray = take(j, indexArray);
-  }
-
-  function getAssociationIdArrayItemsWithIndexAndCondition(address dbAddress, uint id, address associationId, string key, string countKey, function (string, address, uint, uint) returns(bool) conditionFunction, string searchKey) internal view returns(address[] result, uint[] indexArray) {
-    var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
-    result = new address[](count);
-    indexArray = new uint[](count);
-    uint j = 0;
-    for (uint i = 0; i < count; i++) {
-      var index = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, "index"));
-      var itemId = ODLLDB(dbAddress).getAddressValue(keccak256(key, id, associationId, i, index));
-      if (conditionFunction(searchKey, id, itemId, index)) {
-        result[j] = itemId;
-        indexArray[j] = index;
-        j++;
-      }
-    }
-
-    result = take(j, result);
-    indexArray = take(j, indexArray);
-  }
-
-  function getIdArrayWithIndex(address dbAddress, address id, string key, string countKey)
+  function getSlicedArray(bytes32[] arrayObject, uint offset, uint limit, uint seed)
     internal
-    view
-    returns(uint[] result, uint[] indexArray)
+    pure
+    returns (uint totalSize, bytes32[] slicedArray)
   {
-    uint count = getIdArrayItemsCount(dbAddress, id, countKey);
-    result = new uint[](count);
-    indexArray = new uint[](count);
-    for (uint i = 0; i < count; i++) {
-      var index = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, i, "index"));
-      result[i] = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, i, index));
-      indexArray[i] = index;
-    }
-  }
+    totalSize = arrayObject.length;
 
-  function getIdArrayWithIndex(address dbAddress, address id, string key, string countKey)
-    internal
-    view
-    returns(address[] result, uint[] indexArray)
-  {
-    uint count = getIdArrayItemsCount(dbAddress, id, countKey);
-    result = new address[](count);
-    indexArray = new uint[](count);
-    for (uint i = 0; i < count; i++) {
-      var index = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, i, "index"));
-      result[i] = ODLLDB(dbAddress).getAddressValue(keccak256(key, id, i, index));
-      indexArray[i] = index;
-    }
-  }
-
-  function getIdArrayWithIndex(address dbAddress, uint id, string key, string countKey)
-    internal
-    view
-    returns(uint[] result, uint[] indexArray)
-  {
-    uint count = getIdArrayItemsCount(dbAddress, id, countKey);
-    result = new uint[](count);
-    indexArray = new uint[](count);
-    for (uint i = 0; i < count; i++) {
-      var index = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, i, "index"));
-      result[i] = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, i, index));
-      indexArray[i] = index;
-    }
-  }
-
-  function getIdArrayWithIndex(address dbAddress, uint id, string key, string countKey)
-    internal
-    view
-    returns(address[] result, uint[] indexArray)
-  {
-    uint count = getIdArrayItemsCount(dbAddress, id, countKey);
-    result = new address[](count);
-    indexArray = new uint[](count);
-    for (uint i = 0; i < count; i++) {
-      var index = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, i, "index"));
-      result[i] = ODLLDB(dbAddress).getAddressValue(keccak256(key, id, i, index));
-      indexArray[i] = index;
-    }
-  }
-
-  function getIdArrayWithIndexAndCondition(
-    address dbAddress,
-    address id,
-    string key,
-    string countKey,
-    function (string, address, uint, uint) returns(bool) conditionFunction,
-    string searchKey
-  )
-    internal
-    view
-    returns(address[] result, uint[] indexArray)
-  {
-    uint count = getIdArrayItemsCount(dbAddress, id, countKey);
-    result = new address[](count);
-    indexArray = new uint[](count);
-    uint j = 0;
-    for (uint i = 0; i < count; i++) {
-      var index = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, i, "index"));
-      var item = ODLLDB(dbAddress).getAddressValue(keccak256(key, id, i, index));
-      if (conditionFunction(searchKey, id, item, index)) {
-        result[j] = item;
-        indexArray[j] = index
-        j++;
+    if (arrayObject.length > 0) {
+      if (offset > arrayObject.length) {
+        return (totalSize, take(0, arrayObject));
+      } else if (offset + limit > arrayObject.length) {
+        limit = arrayObject.length - offset;
       }
-    }
 
-    result = take(j, result);
-    indexArray = take(j, indexArray);
+      slicedArray = getPage(arrayObject, (seed + offset) % arrayObject.length, limit, true);
+    }
   }
 
-  function getIdArrayWithIndexAndCondition(
-    address dbAddress,
-    address id,
-    string key,
-    string countKey,
-    function (string, address, uint, uint) returns(bool) conditionFunction,
-    string searchKey
-  )
-    internal
-    view
-    returns(uint[] result, uint[] indexArray)
-  {
-    uint count = getIdArrayItemsCount(dbAddress, id, countKey);
-    result = new uint[](count);
-    indexArray = new uint[](count);
-    uint j = 0;
-    for (uint i = 0; i < count; i++) {
-      var index = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, i, "index"));
-      var item = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, i, index));
-      if (conditionFunction(searchKey, id, item, index)) {
-        result[j] = item;
-        indexArray[j] = index
-        j++;
-      }
-    }
+  // function addAssociationIdArrayItem(address dbAddress, address id, address associationId, string key, string countKey, address val) internal {
+  //   var idx = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   DB(dbAddress).setAddressValue(keccak256(key, id, associationId, idx), val);
+  //   DB(dbAddress).setUIntValue(keccak256(countKey, id, associationId), idx + 1);
+  // }
 
-    result = take(j, result);
-    indexArray = take(j, indexArray);
-  }
+  // function addAssociationIdArrayItem(address dbAddress, address id, address associationId, string key, string countKey, uint val) internal {
+  //   var idx = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   DB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx), val);
+  //   DB(dbAddress).setUIntValue(keccak256(countKey, id, associationId), idx + 1);
+  // }
 
-  function getIdArrayWithIndexAndCondition(
-    address dbAddress,
-    uint id,
-    string key,
-    string countKey,
-    function (string, address, uint, uint) returns(bool) conditionFunction,
-    string searchKey
-  )
-    internal
-    view
-    returns(uint[] result, uint[] indexArray)
-  {
-    uint count = getIdArrayItemsCount(dbAddress, id, countKey);
-    result = new uint[](count);
-    indexArray = new uint[](count);
-    uint j = 0;
-    for (uint i = 0; i < count; i++) {
-      var index = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, i, "index"));
-      var item = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, i, index));
-      if (conditionFunction(searchKey, id, item, index)) {
-        result[j] = item;
-        indexArray[j] = index
-        j++;
-      }
-    }
+  // function addAssociationIdArrayItem(address dbAddress, address id, uint associationId, string key, string countKey, address val) internal {
+  //   var idx = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   DB(dbAddress).setAddressValue(keccak256(key, id, associationId, idx), val);
+  //   DB(dbAddress).setUIntValue(keccak256(countKey, id, associationId), idx + 1);
+  // }
 
-    result = take(j, result);
-    indexArray = take(j, indexArray);
-  }
+  // function addAssociationIdArrayItem(address dbAddress, address id, uint associationId, string key, string countKey, uint val) internal {
+  //   var idx = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   DB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx), val);
+  //   DB(dbAddress).setUIntValue(keccak256(countKey, id, associationId), idx + 1);
+  // }
 
-  function getIdArrayWithIndexAndCondition(
-    address dbAddress,
-    uint id,
-    string key,
-    string countKey,
-    function (string, address, uint, uint) returns(bool) conditionFunction,
-    string searchKey
-  )
-    internal
-    view
-    returns(address[] result, uint[] indexArray)
-  {
-    uint count = getIdArrayItemsCount(dbAddress, id, countKey);
-    result = new address[](count);
-    indexArray = new uint[](count);
-    uint j = 0;
-    for (uint i = 0; i < count; i++) {
-      var index = ODLLDB(dbAddress).getUIntValue(keccak256(key, id, i, "index"));
-      var item = ODLLDB(dbAddress).getAddressValue(keccak256(key, id, i, index));
-      if (conditionFunction(searchKey, id, item, index)) {
-        result[j] = item;
-        indexArray[j] = index
-        j++;
-      }
-    }
+  // function addAssociationIdArrayItem(address dbAddress, uint id, uint associationId, string key, string countKey, uint val) internal {
+  //   var idx = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   DB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx), val);
+  //   DB(dbAddress).setUIntValue(keccak256(countKey, id, associationId), idx + 1);
+  // }
 
-    result = take(j, result);
-    indexArray = take(j, indexArray);
-  }
+  // function addAssociationIdArrayItem(address dbAddress, uint id, uint associationId, string key, string countKey, address val) internal {
+  //   var idx = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   DB(dbAddress).setAddressValue(keccak256(key, id, associationId, idx), val);
+  //   DB(dbAddress).setUIntValue(keccak256(countKey, id, associationId), idx + 1);
+  // }
+
+  // function addAssociationIdArrayItem(address dbAddress, uint id, address associationId, string key, string countKey, address val) internal {
+  //   var idx = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   DB(dbAddress).setAddressValue(keccak256(key, id, associationId, idx), val);
+  //   DB(dbAddress).setUIntValue(keccak256(countKey, id, associationId), idx + 1);
+  // }
+
+  // function addAssociationIdArrayItem(address dbAddress, uint id, address associationId, string key, string countKey, uint val) internal {
+  //   var idx = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   DB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx), val);
+  //   DB(dbAddress).setUIntValue(keccak256(countKey, id, associationId), idx + 1);
+  // }
+
+  // function getAssociationIdArrayItemsCount(address dbAddress, address id, address associationId, string countKey) internal view returns(uint) {
+  //   return DB(dbAddress).getUIntValue(keccak256(countKey, id, associationId));
+  // }
+
+  // function getAssociationIdArrayItemsCount(address dbAddress, address id, uint associationId, string countKey) internal view returns(uint) {
+  //   return DB(dbAddress).getUIntValue(keccak256(countKey, id, associationId));
+  // }
+
+  // function getAssociationIdArrayItemsCount(address dbAddress, uint id, uint associationId, string countKey) internal view returns(uint) {
+  //   return DB(dbAddress).getUIntValue(keccak256(countKey, id, associationId));
+  // }
+
+  // function getAssociationIdArrayItemsCount(address dbAddress, uint id, address associationId, string countKey) internal view returns(uint) {
+  //   return DB(dbAddress).getUIntValue(keccak256(countKey, id, associationId));
+  // }
+
+  // function getAssociationIdArrayItems(address dbAddress, address id, address associationId, string key, string countKey) internal view returns(uint[] result) {
+  //   var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   result = new uint[](count);
+  //   for (uint i = 0; i < count; i++) {
+  //     var itemId = DB(dbAddress).getUIntValue(keccak256(key, id, associationId, i));
+  //     result[i] = itemId;
+  //   }
+  // }
+
+  // function getAssociationIdArrayItems(address dbAddress, address id, uint associationId, string key, string countKey) internal view returns(uint[] result) {
+  //   var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   result = new uint[](count);
+  //   for (uint i = 0; i < count; i++) {
+  //     var itemId = DB(dbAddress).getUIntValue(keccak256(key, id, associationId, i));
+  //     result[i] = itemId;
+  //   }
+  // }
+
+  // function getAssociationIdArrayItems(address dbAddress, uint id, uint associationId, string key, string countKey) internal view returns(uint[] result) {
+  //   var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   result = new uint[](count);
+  //   for (uint i = 0; i < count; i++) {
+  //     var itemId = DB(dbAddress).getUIntValue(keccak256(key, id, associationId, i));
+  //     result[i] = itemId;
+  //   }
+  // }
+
+  // function getAssociationIdArrayItems(address dbAddress, uint id, address associationId, string key, string countKey) internal view returns(uint[] result) {
+  //   var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   result = new uint[](count);
+  //   for (uint i = 0; i < count; i++) {
+  //     var itemId = DB(dbAddress).getUIntValue(keccak256(key, id, associationId, i));
+  //     result[i] = itemId;
+  //   }
+  // }
+
+  // function getAssociationIdArrayAddressItems(address dbAddress, address id, address associationId, string key, string countKey) internal view returns(address[] result) {
+  //   var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   result = new address[](count);
+  //   for (uint i = 0; i < count; i++) {
+  //     var itemId = DB(dbAddress).getAddressValue(keccak256(key, id, associationId, i));
+  //     result[i] = itemId;
+  //   }
+  // }
+
+  // function getAssociationIdArrayAddressItems(address dbAddress, address id, uint associationId, string key, string countKey) internal view returns(address[] result) {
+  //   var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   result = new address[](count);
+  //   for (uint i = 0; i < count; i++) {
+  //     var itemId = DB(dbAddress).getAddressValue(keccak256(key, id, associationId, i));
+  //     result[i] = itemId;
+  //   }
+  // }
+
+  // function getAssociationIdArrayAddressItems(address dbAddress, uint id, uint associationId, string key, string countKey) internal view returns(address[] result) {
+  //   var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   result = new address[](count);
+  //   for (uint i = 0; i < count; i++) {
+  //     var itemId = DB(dbAddress).getAddressValue(keccak256(key, id, associationId, i));
+  //     result[i] = itemId;
+  //   }
+  // }
+
+  // function getAssociationIdArrayAddressItems(address dbAddress, uint id, address associationId, string key, string countKey) internal view returns(address[] result) {
+  //   var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   result = new address[](count);
+  //   for (uint i = 0; i < count; i++) {
+  //     var itemId = DB(dbAddress).getAddressValue(keccak256(key, id, associationId, i));
+  //     result[i] = itemId;
+  //   }
+  // }
+
+  // function addIdArrayItemWithIndex(address dbAddress, uint id, uint index, string key, string countKey, uint val) internal {
+  //   var idx = getIdArrayItemsCount(dbAddress, id, countKey);
+  //   DB(dbAddress).setUIntValue(keccak256(key, id, idx), val);
+  //   DB(dbAddress).setUIntValue(keccak256(key, id, idx, index), val);
+  //   DB(dbAddress).setUIntValue(keccak256(key, id, idx, "index"), index);
+  //   DB(dbAddress).setUIntValue(keccak256(countKey, id), idx + 1);
+  // }
+
+  // function addIdArrayItemWithIndex(address dbAddress, uint id, uint index, string key, string countKey, address val) internal {
+  //   var idx = getIdArrayItemsCount(dbAddress, id, countKey);
+  //   DB(dbAddress).setAddressValue(keccak256(key, id, idx), val);
+  //   DB(dbAddress).setAddressValue(keccak256(key, id, idx, index), val);
+  //   DB(dbAddress).setUIntValue(keccak256(key, id, idx, "index"), index);
+  //   DB(dbAddress).setUIntValue(keccak256(countKey, id), idx + 1);
+  // }
+
+  // function addIdArrayItemWithIndex(address dbAddress, address id, uint index, string key, string countKey, uint val) internal {
+  //   var idx = getIdArrayItemsCount(dbAddress, id, countKey);
+  //   DB(dbAddress).setUIntValue(keccak256(key, id, idx), val);
+  //   DB(dbAddress).setUIntValue(keccak256(key, id, idx, index), val);
+  //   DB(dbAddress).setUIntValue(keccak256(key, id, idx, "index"), index);
+  //   DB(dbAddress).setUIntValue(keccak256(countKey, id), idx + 1);
+  // }
+
+  // function addIdArrayItemWithIndex(address dbAddress, address id, uint index, string key, string countKey, address val) internal {
+  //   var idx = getIdArrayItemsCount(dbAddress, id, countKey);
+  //   DB(dbAddress).setAddressValue(keccak256(key, id, idx), val);
+  //   DB(dbAddress).setAddressValue(keccak256(key, id, idx, index), val);
+  //   DB(dbAddress).setUIntValue(keccak256(key, id, idx, "index"), index);
+  //   DB(dbAddress).setUIntValue(keccak256(countKey, id), idx + 1);
+  // }
+
+  // function addAssociationIdArrayItemWithIndex(address dbAddress, address id, address associationId, uint index, string key, string countKey, address val) internal {
+  //   var idx = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   DB(dbAddress).setAddressValue(keccak256(key, id, associationId, idx), val);
+  //   DB(dbAddress).setAddressValue(keccak256(key, id, associationId, idx, index), val);
+  //   DB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx, "index"), index);
+  //   DB(dbAddress).setUIntValue(keccak256(countKey, id, associationId), idx + 1);
+  // }
+
+  // function addAssociationIdArrayItemWithIndex(address dbAddress, address id, address associationId, uint index, string key, string countKey, uint val) internal {
+  //   var idx = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   DB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx), val);
+  //   DB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx, index), val);
+  //   DB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx, "index"), index);
+  //   DB(dbAddress).setUIntValue(keccak256(countKey, id, associationId), idx + 1);
+  // }
+
+  // function addAssociationIdArrayItemWithIndex(address dbAddress, address id, uint associationId, uint index, string key, string countKey, address val) internal {
+  //   var idx = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   DB(dbAddress).setAddressValue(keccak256(key, id, associationId, idx), val);
+  //   DB(dbAddress).setAddressValue(keccak256(key, id, associationId, idx, index), val);
+  //   DB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx, "index"), index);
+  //   DB(dbAddress).setUIntValue(keccak256(countKey, id, associationId), idx + 1);
+  // }
+
+  // function addAssociationIdArrayItemWithIndex(address dbAddress, address id, uint associationId, uint index, string key, string countKey, uint val) internal {
+  //   var idx = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   DB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx), val);
+  //   DB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx, index), val);
+  //   DB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx, "index"), index);
+  //   DB(dbAddress).setUIntValue(keccak256(countKey, id, associationId), idx + 1);
+  // }
+
+  // function addAssociationIdArrayItemWithIndex(address dbAddress, uint id, uint associationId, uint index, string key, string countKey, uint val) internal {
+  //   var idx = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   DB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx), val);
+  //   DB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx, index), val);
+  //   DB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx, "index"), index);
+  //   DB(dbAddress).setUIntValue(keccak256(countKey, id, associationId), idx + 1);
+  // }
+
+  // function addAssociationIdArrayItemWithIndex(address dbAddress, uint id, uint associationId, uint index, string key, string countKey, address val) internal {
+  //   var idx = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   DB(dbAddress).setAddressValue(keccak256(key, id, associationId, idx), val);
+  //   DB(dbAddress).setAddressValue(keccak256(key, id, associationId, idx, index), val);
+  //   DB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx, "index"), index);
+  //   DB(dbAddress).setUIntValue(keccak256(countKey, id, associationId), idx + 1);
+  // }
+
+  // function addAssociationIdArrayItemWithIndex(address dbAddress, uint id, address associationId, uint index, string key, string countKey, address val) internal {
+  //   var idx = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   DB(dbAddress).setAddressValue(keccak256(key, id, associationId, idx), val);
+  //   DB(dbAddress).setAddressValue(keccak256(key, id, associationId, idx, index), val);
+  //   DB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx, "index"), index);
+  //   DB(dbAddress).setUIntValue(keccak256(countKey, id, associationId), idx + 1);
+  // }
+
+  // function addAssociationIdArrayItemWithIndex(address dbAddress, uint id, address associationId, uint index, string key, string countKey, uint val) internal {
+  //   var idx = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   DB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx), val);
+  //   DB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx, index), val);
+  //   DB(dbAddress).setUIntValue(keccak256(key, id, associationId, idx, "index"), index);
+  //   DB(dbAddress).setUIntValue(keccak256(countKey, id, associationId), idx + 1);
+  // }
+
+  // function getAssociationIdArrayItemsWithIndex(address dbAddress, address id, address associationId, string key, string countKey) internal view returns(uint[] result, uint[] indexArray) {
+  //   var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   result = new uint[](count);
+  //   indexArray = new uint[](count);
+  //   for (uint i = 0; i < count; i++) {
+  //     var index = DB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, "index"));
+  //     var itemId = DB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, index));
+  //     result[i] = itemId;
+  //     indexArray[i] = index;
+  //   }
+  // }
+
+  // function getAssociationIdArrayItemsWithIndex(address dbAddress, address id, uint associationId, string key, string countKey) internal view returns(uint[] result, uint[] indexArray) {
+  //   var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   result = new uint[](count);
+  //   indexArray = new uint[](count);
+  //   for (uint i = 0; i < count; i++) {
+  //     var index = DB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, "index"));
+  //     var itemId = DB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, index));
+  //     result[i] = itemId;
+  //     indexArray[i] = index;
+  //   }
+  // }
+
+  // function getAssociationIdArrayItemsWithIndex(address dbAddress, uint id, uint associationId, string key, string countKey) internal view returns(uint[] result, uint[] indexArray) {
+  //   var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   result = new uint[](count);
+  //   indexArray = new uint[](count);
+  //   for (uint i = 0; i < count; i++) {
+  //     var index = DB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, "index"));
+  //     var itemId = DB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, index));
+  //     result[i] = itemId;
+  //     indexArray[i] = index;
+  //   }
+  // }
+
+  // function getAssociationIdArrayItemsWithIndex(address dbAddress, uint id, address associationId, string key, string countKey) internal view returns(uint[] result, uint[] indexArray) {
+  //   var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   result = new uint[](count);
+  //   indexArray = new uint[](count);
+  //   for (uint i = 0; i < count; i++) {
+  //     var index = DB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, "index"));
+  //     var itemId = DB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, index));
+  //     result[i] = itemId;
+  //     indexArray[i] = index;
+  //   }
+  // }
+
+  // function getAssociationIdArrayAddressItemsWithIndex(address dbAddress, address id, address associationId, string key, string countKey) internal view returns(address[] result, uint[] indexArray) {
+  //   var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   result = new address[](count);
+  //   indexArray = new uint[](count);
+  //   for (uint i = 0; i < count; i++) {
+  //     var index = DB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, "index"));
+  //     var itemId = DB(dbAddress).getAddressValue(keccak256(key, id, associationId, i, index));
+  //     result[i] = itemId;
+  //     indexArray[i] = index;
+  //   }
+  // }
+
+  // function getAssociationIdArrayAddressItemsWithIndex(address dbAddress, address id, uint associationId, string key, string countKey) internal view returns(address[] result, uint[] indexArray) {
+  //   var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   result = new address[](count);
+  //   indexArray = new uint[](count);
+  //   for (uint i = 0; i < count; i++) {
+  //     var index = DB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, "index"));
+  //     var itemId = DB(dbAddress).getAddressValue(keccak256(key, id, associationId, i, index));
+  //     result[i] = itemId;
+  //     indexArray[i] = index;
+  //   }
+  // }
+
+  // function getAssociationIdArrayAddressItemsWithIndex(address dbAddress, uint id, uint associationId, string key, string countKey) internal view returns(address[] result, uint[] indexArray) {
+  //   var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   result = new address[](count);
+  //   indexArray = new uint[](count);
+  //   for (uint i = 0; i < count; i++) {
+  //     var index = DB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, "index"));
+  //     var itemId = DB(dbAddress).getAddressValue(keccak256(key, id, associationId, i, index));
+  //     result[i] = itemId;
+  //     indexArray[i] = index;
+  //   }
+  // }
+
+  // function getAssociationIdArrayAddressItemsWithIndex(address dbAddress, uint id, address associationId, string key, string countKey) internal view returns(address[] result, uint[] indexArray) {
+  //   var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   result = new address[](count);
+  //   indexArray = new uint[](count);
+  //   for (uint i = 0; i < count; i++) {
+  //     var index = DB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, "index"));
+  //     var itemId = DB(dbAddress).getAddressValue(keccak256(key, id, associationId, i, index));
+  //     result[i] = itemId;
+  //     indexArray[i] = index;
+  //   }
+  // }
+
+  // function getAssociationIdArrayItemsWithIndexAndCondition(address dbAddress, address id, address associationId, string key, string countKey, function (address, string memory, address, uint, uint) view returns(bool) conditionFunction, string searchKey) internal view returns(uint[] result, uint[] indexArray) {
+  //   var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   result = new uint[](count);
+  //   indexArray = new uint[](count);
+  //   uint j = 0;
+  //   for (uint i = 0; i < count; i++) {
+  //     var index = DB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, "index"));
+  //     var itemId = DB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, index));
+  //     if (conditionFunction(dbAddress, searchKey, id, itemId, index)) {
+  //       result[j] = itemId;
+  //       indexArray[j] = index;
+  //       j++;
+  //     }
+  //   }
+
+  //   result = take(j, result);
+  //   indexArray = take(j, indexArray);
+  // }
+
+  // function getAssociationIdArrayItemsWithIndexAndCondition(address dbAddress, address id, uint associationId, string key, string countKey, function (address, string memory, address, uint, uint) view returns(bool) conditionFunction, string searchKey) internal view returns(uint[] result, uint[] indexArray) {
+  //   var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   result = new uint[](count);
+  //   indexArray = new uint[](count);
+  //   uint j = 0;
+  //   for (uint i = 0; i < count; i++) {
+  //     var index = DB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, "index"));
+  //     var itemId = DB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, index));
+  //     if (conditionFunction(dbAddress, searchKey, id, itemId, index)) {
+  //       result[j] = itemId;
+  //       indexArray[j] = index;
+  //       j++;
+  //     }
+  //   }
+
+  //   result = take(j, result);
+  //   indexArray = take(j, indexArray);
+  // }
+
+  // function getAssociationIdArrayItemsWithIndexAndCondition(address dbAddress, uint id, uint associationId, string key, string countKey, function (address, string memory, uint, uint, uint) view returns(bool) conditionFunction, string searchKey) internal view returns(uint[] result, uint[] indexArray) {
+  //   var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   result = new uint[](count);
+  //   indexArray = new uint[](count);
+  //   uint j = 0;
+  //   for (uint i = 0; i < count; i++) {
+  //     var index = DB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, "index"));
+  //     var itemId = DB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, index));
+  //     if (conditionFunction(dbAddress, searchKey, id, itemId, index)) {
+  //       result[j] = itemId;
+  //       indexArray[j] = index;
+  //       j++;
+  //     }
+  //   }
+
+  //   result = take(j, result);
+  //   indexArray = take(j, indexArray);
+  // }
+
+  // function getAssociationIdArrayItemsWithIndexAndCondition(address dbAddress, uint id, address associationId, string key, string countKey, function (address, string memory, uint, uint, uint) view returns(bool) conditionFunction, string searchKey) internal view returns(uint[] result, uint[] indexArray) {
+  //   var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   result = new uint[](count);
+  //   indexArray = new uint[](count);
+  //   uint j = 0;
+  //   for (uint i = 0; i < count; i++) {
+  //     var index = DB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, "index"));
+  //     var itemId = DB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, index));
+  //     if (conditionFunction(dbAddress, searchKey, id, itemId, index)) {
+  //       result[j] = itemId;
+  //       indexArray[j] = index;
+  //       j++;
+  //     }
+  //   }
+
+  //   result = take(j, result);
+  //   indexArray = take(j, indexArray);
+  // }
+
+  // function getAssociationIdArrayAddressItemsWithIndexAndCondition(address dbAddress, address id, address associationId, string key, string countKey, function (address, string memory, address, address, uint) view returns(bool) conditionFunction, string searchKey) internal view returns(address[] result, uint[] indexArray) {
+  //   var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   result = new address[](count);
+  //   indexArray = new uint[](count);
+  //   uint j = 0;
+  //   for (uint i = 0; i < count; i++) {
+  //     var index = DB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, "index"));
+  //     var itemId = DB(dbAddress).getAddressValue(keccak256(key, id, associationId, i, index));
+  //     if (conditionFunction(dbAddress, searchKey, id, itemId, index)) {
+  //       result[j] = itemId;
+  //       indexArray[j] = index;
+  //       j++;
+  //     }
+  //   }
+
+  //   result = take(j, result);
+  //   indexArray = take(j, indexArray);
+  // }
+
+  // function getAssociationIdArrayAddressItemsWithIndexAndCondition(address dbAddress, address id, uint associationId, string key, string countKey, function (address, string memory, address, address, uint) view returns(bool) conditionFunction, string searchKey) internal view returns(address[] result, uint[] indexArray) {
+  //   var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   result = new address[](count);
+  //   indexArray = new uint[](count);
+  //   uint j = 0;
+  //   for (uint i = 0; i < count; i++) {
+  //     var index = DB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, "index"));
+  //     var itemId = DB(dbAddress).getAddressValue(keccak256(key, id, associationId, i, index));
+  //     if (conditionFunction(dbAddress, searchKey, id, itemId, index)) {
+  //       result[j] = itemId;
+  //       indexArray[j] = index;
+  //       j++;
+  //     }
+  //   }
+
+  //   result = take(j, result);
+  //   indexArray = take(j, indexArray);
+  // }
+
+  // function getAssociationIdArrayAddressItemsWithIndexAndCondition(address dbAddress, uint id, uint associationId, string key, string countKey, function (address, string memory, uint, address, uint) view returns(bool) conditionFunction, string searchKey) internal view returns(address[] result, uint[] indexArray) {
+  //   var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   result = new address[](count);
+  //   indexArray = new uint[](count);
+  //   uint j = 0;
+  //   for (uint i = 0; i < count; i++) {
+  //     var index = DB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, "index"));
+  //     var itemId = DB(dbAddress).getAddressValue(keccak256(key, id, associationId, i, index));
+  //     if (conditionFunction(dbAddress, searchKey, id, itemId, index)) {
+  //       result[j] = itemId;
+  //       indexArray[j] = index;
+  //       j++;
+  //     }
+  //   }
+
+  //   result = take(j, result);
+  //   indexArray = take(j, indexArray);
+  // }
+
+  // function getAssociationIdArrayAddressItemsWithIndexAndCondition(address dbAddress, uint id, address associationId, string key, string countKey, function (address, string memory, uint, address, uint) view returns(bool) conditionFunction, string searchKey) internal view returns(address[] result, uint[] indexArray) {
+  //   var count = getAssociationIdArrayItemsCount(dbAddress, id, associationId, countKey);
+  //   result = new address[](count);
+  //   indexArray = new uint[](count);
+  //   uint j = 0;
+  //   for (uint i = 0; i < count; i++) {
+  //     var index = DB(dbAddress).getUIntValue(keccak256(key, id, associationId, i, "index"));
+  //     var itemId = DB(dbAddress).getAddressValue(keccak256(key, id, associationId, i, index));
+  //     if (conditionFunction(dbAddress, searchKey, id, itemId, index)) {
+  //       result[j] = itemId;
+  //       indexArray[j] = index;
+  //       j++;
+  //     }
+  //   }
+
+  //   result = take(j, result);
+  //   indexArray = take(j, indexArray);
+  // }
+
+  // function getIdArrayWithIndex(address dbAddress, address id, string key, string countKey)
+  //   internal
+  //   view
+  //   returns(uint[] result, uint[] indexArray)
+  // {
+  //   uint count = getIdArrayItemsCount(dbAddress, id, countKey);
+  //   result = new uint[](count);
+  //   indexArray = new uint[](count);
+  //   for (uint i = 0; i < count; i++) {
+  //     var index = DB(dbAddress).getUIntValue(keccak256(key, id, i, "index"));
+  //     result[i] = DB(dbAddress).getUIntValue(keccak256(key, id, i, index));
+  //     indexArray[i] = index;
+  //   }
+  // }
+
+  // function getIdArrayAddressesWithIndex(address dbAddress, address id, string key, string countKey)
+  //   internal
+  //   view
+  //   returns(address[] result, uint[] indexArray)
+  // {
+  //   uint count = getIdArrayItemsCount(dbAddress, id, countKey);
+  //   result = new address[](count);
+  //   indexArray = new uint[](count);
+  //   for (uint i = 0; i < count; i++) {
+  //     var index = DB(dbAddress).getUIntValue(keccak256(key, id, i, "index"));
+  //     result[i] = DB(dbAddress).getAddressValue(keccak256(key, id, i, index));
+  //     indexArray[i] = index;
+  //   }
+  // }
+
+  // function getIdArrayWithIndex(address dbAddress, uint id, string key, string countKey)
+  //   internal
+  //   view
+  //   returns(uint[] result, uint[] indexArray)
+  // {
+  //   uint count = getIdArrayItemsCount(dbAddress, id, countKey);
+  //   result = new uint[](count);
+  //   indexArray = new uint[](count);
+  //   for (uint i = 0; i < count; i++) {
+  //     var index = DB(dbAddress).getUIntValue(keccak256(key, id, i, "index"));
+  //     result[i] = DB(dbAddress).getUIntValue(keccak256(key, id, i, index));
+  //     indexArray[i] = index;
+  //   }
+  // }
+
+  // function getIdArrayAddressesWithIndex(address dbAddress, uint id, string key, string countKey)
+  //   internal
+  //   view
+  //   returns(address[] result, uint[] indexArray)
+  // {
+  //   uint count = getIdArrayItemsCount(dbAddress, id, countKey);
+  //   result = new address[](count);
+  //   indexArray = new uint[](count);
+  //   for (uint i = 0; i < count; i++) {
+  //     var index = DB(dbAddress).getUIntValue(keccak256(key, id, i, "index"));
+  //     result[i] = DB(dbAddress).getAddressValue(keccak256(key, id, i, index));
+  //     indexArray[i] = index;
+  //   }
+  // }
+
+  // function getIdArrayWithIndexAndCondition(
+  //   address dbAddress,
+  //   address id,
+  //   string key,
+  //   string countKey,
+  //   function (address, string memory, address, uint, uint) view returns(bool) conditionFunction,
+  //   string searchKey
+  // )
+  //   internal
+  //   view
+  //   returns(uint[] result, uint[] indexArray)
+  // {
+  //   uint count = getIdArrayItemsCount(dbAddress, id, countKey);
+  //   result = new uint[](count);
+  //   indexArray = new uint[](count);
+  //   uint j = 0;
+  //   for (uint i = 0; i < count; i++) {
+  //     var index = DB(dbAddress).getUIntValue(keccak256(key, id, i, "index"));
+  //     var item = DB(dbAddress).getUIntValue(keccak256(key, id, i, index));
+  //     if (conditionFunction(dbAddress, searchKey, id, item, index)) {
+  //       result[j] = item;
+  //       indexArray[j] = index;
+  //       j++;
+  //     }
+  //   }
+
+  //   result = take(j, result);
+  //   indexArray = take(j, indexArray);
+  // }
+
+  // function getIdArrayWithIndexAndCondition(
+  //   address dbAddress,
+  //   uint id,
+  //   string key,
+  //   string countKey,
+  //   function (address, string memory, uint, uint, uint) view returns(bool) conditionFunction,
+  //   string searchKey
+  // )
+  //   internal
+  //   view
+  //   returns(uint[] result, uint[] indexArray)
+  // {
+  //   uint count = getIdArrayItemsCount(dbAddress, id, countKey);
+  //   result = new uint[](count);
+  //   indexArray = new uint[](count);
+  //   uint j = 0;
+  //   for (uint i = 0; i < count; i++) {
+  //     var index = DB(dbAddress).getUIntValue(keccak256(key, id, i, "index"));
+  //     var item = DB(dbAddress).getUIntValue(keccak256(key, id, i, index));
+  //     if (conditionFunction(dbAddress, searchKey, id, item, index)) {
+  //       result[j] = item;
+  //       indexArray[j] = index;
+  //       j++;
+  //     }
+  //   }
+
+  //   result = take(j, result);
+  //   indexArray = take(j, indexArray);
+  // }
+
+  // function getIdArrayAddressesWithIndexAndCondition(
+  //   address dbAddress,
+  //   address id,
+  //   string key,
+  //   string countKey,
+  //   function (address, string memory, address, address, uint) view returns(bool) conditionFunction,
+  //   string searchKey
+  // )
+  //   internal
+  //   view
+  //   returns(address[] result, uint[] indexArray)
+  // {
+  //   uint count = getIdArrayItemsCount(dbAddress, id, countKey);
+  //   result = new address[](count);
+  //   indexArray = new uint[](count);
+  //   uint j = 0;
+  //   for (uint i = 0; i < count; i++) {
+  //     var index = DB(dbAddress).getUIntValue(keccak256(key, id, i, "index"));
+  //     var item = DB(dbAddress).getAddressValue(keccak256(key, id, i, index));
+  //     if (conditionFunction(dbAddress, searchKey, id, item, index)) {
+  //       result[j] = item;
+  //       indexArray[j] = index;
+  //       j++;
+  //     }
+  //   }
+
+  //   result = take(j, result);
+  //   indexArray = take(j, indexArray);
+  // }
+
+  // function getIdArrayAddressesWithIndexAndCondition(
+  //   address dbAddress,
+  //   uint id,
+  //   string key,
+  //   string countKey,
+  //   function (address, string memory, uint, address, uint) view returns(bool) conditionFunction,
+  //   string searchKey
+  // )
+  //   internal
+  //   view
+  //   returns(address[] result, uint[] indexArray)
+  // {
+  //   uint count = getIdArrayItemsCount(dbAddress, id, countKey);
+  //   result = new address[](count);
+  //   indexArray = new uint[](count);
+  //   uint j = 0;
+  //   for (uint i = 0; i < count; i++) {
+  //     var index = DB(dbAddress).getUIntValue(keccak256(key, id, i, "index"));
+  //     var item = DB(dbAddress).getAddressValue(keccak256(key, id, i, index));
+  //     if (conditionFunction(dbAddress, searchKey, id, item, index)) {
+  //       result[j] = item;
+  //       indexArray[j] = index;
+  //       j++;
+  //     }
+  //   }
+
+  //   result = take(j, result);
+  //   indexArray = take(j, indexArray);
+  // }
 }

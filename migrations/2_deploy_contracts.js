@@ -1,5 +1,5 @@
-var ODLLDB = artifacts.require("./odll/ODLLDB.sol");
+var DB = artifacts.require("./odll/DB.sol");
 
 module.exports = function (deployer) {
-  deployer.deploy(ODLLDB);
+  deployer.deploy(DB);
 };

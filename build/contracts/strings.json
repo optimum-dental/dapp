@@ -1,11 +1,11 @@
 {
   "contractName": "strings",
   "abi": [],
-  "bytecode": "0x60606040523415600e57600080fd5b603580601b6000396000f3006060604052600080fd00a165627a7a723058209d051162f5415c711dec1c72fb4d21da45b8807c2a071e85ede3586f487db8810029",
-  "deployedBytecode": "0x6060604052600080fd00a165627a7a723058209d051162f5415c711dec1c72fb4d21da45b8807c2a071e85ede3586f487db8810029",
+  "bytecode": "0x60606040523415600e57600080fd5b603580601b6000396000f3006060604052600080fd00a165627a7a72305820931f4b678944dce99db793dea3ba65cbdcba89916da7f7ce42f87a7ce5fdfaab0029",
+  "deployedBytecode": "0x6060604052600080fd00a165627a7a72305820931f4b678944dce99db793dea3ba65cbdcba89916da7f7ce42f87a7ce5fdfaab0029",
   "sourceMap": "2001:22829:1:-;;;;;;;;;;;;;;;;;",
   "deployedSourceMap": "2001:22829:1:-;;;;;",
-  "source": "pragma solidity 0.4.17;\n\n/*\n * @title String & slice utility library for Solidity contracts.\n * @author Nick Johnson <arachnid@notdot.net>\n *\n * @dev Functionality in this library is largely implemented using an\n *      abstraction called a 'slice'. A slice represents a part of a string -\n *      anything from the entire string to a single character, or even no\n *      characters at all (a 0-length slice). Since a slice only has to specify\n *      an offset and a length, copying and manipulating slices is a lot less\n *      expensive than copying and manipulating the strings they reference.\n *\n *      To further reduce gas costs, most functions on slice that need to return\n *      a slice modify the original one instead of allocating a new one; for\n *      instance, `s.split(\".\")` will return the text up to the first '.',\n *      modifying s to only contain the remainder of the string after the '.'.\n *      In situations where you do not want to modify the original slice, you\n *      can make a copy first with `.copy()`, for example:\n *      `s.copy().split(\".\")`. Try and avoid using this idiom in loops; since\n *      Solidity has no memory management, it will result in allocating many\n *      short-lived slices that are later discarded.\n *\n *      Functions that return two slices come in two versions: a non-allocating\n *      version that takes the second slice as an argument, modifying it in\n *      place, and an allocating version that allocates and returns the second\n *      slice; see `nextRune` for example.\n *\n *      Functions that have to copy string data will return strings rather than\n *      slices; these can be cast back to slices for further processing if\n *      required.\n *\n *      For convenience, some functions are provided with non-modifying\n *      variants that create a new slice and return both; for instance,\n *      `s.splitNew('.')` leaves s unmodified, and returns two values\n *      corresponding to the left and right parts of the string.\n */\nlibrary strings {\n    struct slice {\n        uint _len;\n        uint _ptr;\n    }\n\n    function memcpy(uint dest, uint src, uint strLen) private {\n        // Copy word-length chunks while possible\n        for(; strLen >= 32; strLen -= 32) {\n            assembly {\n                mstore(dest, mload(src))\n            }\n            dest += 32;\n            src += 32;\n        }\n\n        // Copy remaining bytes\n        uint mask = 256 ** (32 - strLen) - 1;\n        assembly {\n            let srcpart := and(mload(src), not(mask))\n            let destpart := and(mload(dest), mask)\n            mstore(dest, or(destpart, srcpart))\n        }\n    }\n\n    /*\n     * @dev Returns a slice containing the entire string.\n     * @param self The string to make a slice from.\n     * @return A newly allocated slice containing the entire string.\n     */\n    function toSlice(string self) internal returns (slice) {\n        uint ptr;\n        assembly {\n            ptr := add(self, 0x20)\n        }\n        return slice(bytes(self).length, ptr);\n    }\n\n    /*\n     * @dev Returns the length of a null-terminated bytes32 string.\n     * @param self The value to find the length of.\n     * @return The length of the string, from 0 to 32.\n     */\n    function len(bytes32 self) internal returns (uint) {\n        uint ret;\n        if (self == 0)\n            return 0;\n        if (self & 0xffffffffffffffffffffffffffffffff == 0) {\n            ret += 16;\n            self = bytes32(uint(self) / 0x100000000000000000000000000000000);\n        }\n        if (self & 0xffffffffffffffff == 0) {\n            ret += 8;\n            self = bytes32(uint(self) / 0x10000000000000000);\n        }\n        if (self & 0xffffffff == 0) {\n            ret += 4;\n            self = bytes32(uint(self) / 0x100000000);\n        }\n        if (self & 0xffff == 0) {\n            ret += 2;\n            self = bytes32(uint(self) / 0x10000);\n        }\n        if (self & 0xff == 0) {\n            ret += 1;\n        }\n        return 32 - ret;\n    }\n\n    /*\n     * @dev Returns a slice containing the entire bytes32, interpreted as a\n     *      null-termintaed utf-8 string.\n     * @param self The bytes32 value to convert to a slice.\n     * @return A new slice containing the value of the input argument up to the\n     *         first null.\n     */\n    function toSliceB32(bytes32 self) internal returns (slice ret) {\n        // Allocate space for `self` in memory, copy it there, and point ret at it\n        assembly {\n            let ptr := mload(0x40)\n            mstore(0x40, add(ptr, 0x20))\n            mstore(ptr, self)\n            mstore(add(ret, 0x20), ptr)\n        }\n        ret._len = len(self);\n    }\n\n    /*\n     * @dev Returns a new slice containing the same data as the current slice.\n     * @param self The slice to copy.\n     * @return A new slice containing the same data as `self`.\n     */\n    function copy(slice self) internal returns (slice) {\n        return slice(self._len, self._ptr);\n    }\n\n    /*\n     * @dev Copies a slice to a new string.\n     * @param self The slice to copy.\n     * @return A newly allocated string containing the slice's text.\n     */\n    function toString(slice self) internal returns (string) {\n        var ret = new string(self._len);\n        uint retptr;\n        assembly { retptr := add(ret, 32) }\n\n        memcpy(retptr, self._ptr, self._len);\n        return ret;\n    }\n\n    /*\n     * @dev Returns the length in runes of the slice. Note that this operation\n     *      takes time proportional to the length of the slice; avoid using it\n     *      in loops, and call `slice.empty()` if you only need to know whether\n     *      the slice is empty or not.\n     * @param self The slice to operate on.\n     * @return The length of the slice in runes.\n     */\n    function len(slice self) internal returns (uint) {\n        // Starting at ptr-31 means the LSB will be the byte we care about\n        var ptr = self._ptr - 31;\n        var end = ptr + self._len;\n        for (uint strLen = 0; ptr < end; strLen++) {\n            uint8 b;\n            assembly { b := and(mload(ptr), 0xFF) }\n            if (b < 0x80) {\n                ptr += 1;\n            } else if(b < 0xE0) {\n                ptr += 2;\n            } else if(b < 0xF0) {\n                ptr += 3;\n            } else if(b < 0xF8) {\n                ptr += 4;\n            } else if(b < 0xFC) {\n                ptr += 5;\n            } else {\n                ptr += 6;\n            }\n        }\n        return strLen;\n    }\n\n    /*\n     * @dev Returns true if the slice is empty (has a length of 0).\n     * @param self The slice to operate on.\n     * @return True if the slice is empty, False otherwise.\n     */\n    function empty(slice self) internal returns (bool) {\n        return self._len == 0;\n    }\n\n    /*\n     * @dev Returns a positive number if `other` comes lexicographically after\n     *      `self`, a negative number if it comes before, or zero if the\n     *      contents of the two slices are equal. Comparison is done per-rune,\n     *      on unicode codepoints.\n     * @param self The first slice to compare.\n     * @param other The second slice to compare.\n     * @return The result of the comparison.\n     */\n    function compare(slice self, slice other) internal returns (int) {\n        uint shortest = self._len;\n        if (other._len < self._len)\n            shortest = other._len;\n\n        var selfptr = self._ptr;\n        var otherptr = other._ptr;\n        for (uint idx = 0; idx < shortest; idx += 32) {\n            uint a;\n            uint b;\n            assembly {\n                a := mload(selfptr)\n                b := mload(otherptr)\n            }\n            if (a != b) {\n                // Mask out irrelevant bytes and check again\n                uint mask = ~(2 ** (8 * (32 - shortest + idx)) - 1);\n                var diff = (a & mask) - (b & mask);\n                if (diff != 0)\n                    return int(diff);\n            }\n            selfptr += 32;\n            otherptr += 32;\n        }\n        return int(self._len) - int(other._len);\n    }\n\n    /*\n     * @dev Returns true if the two slices contain the same text.\n     * @param self The first slice to compare.\n     * @param self The second slice to compare.\n     * @return True if the slices are equal, false otherwise.\n     */\n    function equals(slice self, slice other) internal returns (bool) {\n        return compare(self, other) == 0;\n    }\n\n    /*\n     * @dev Extracts the first rune in the slice into `rune`, advancing the\n     *      slice to point to the next rune and returning `self`.\n     * @param self The slice to operate on.\n     * @param rune The slice that will contain the first rune.\n     * @return `rune`.\n     */\n    function nextRune(slice self, slice rune) internal returns (slice) {\n        rune._ptr = self._ptr;\n\n        if (self._len == 0) {\n            rune._len = 0;\n            return rune;\n        }\n\n        uint strLen;\n        uint b;\n        // Load the first byte of the rune into the LSBs of b\n        assembly { b := and(mload(sub(mload(add(self, 32)), 31)), 0xFF) }\n        if (b < 0x80) {\n            strLen = 1;\n        } else if(b < 0xE0) {\n            strLen = 2;\n        } else if(b < 0xF0) {\n            strLen = 3;\n        } else {\n            strLen = 4;\n        }\n\n        // Check for truncated codepoints\n        if (strLen > self._len) {\n            rune._len = self._len;\n            self._ptr += self._len;\n            self._len = 0;\n            return rune;\n        }\n\n        self._ptr += strLen;\n        self._len -= strLen;\n        rune._len = strLen;\n        return rune;\n    }\n\n    /*\n     * @dev Returns the first rune in the slice, advancing the slice to point\n     *      to the next rune.\n     * @param self The slice to operate on.\n     * @return A slice containing only the first rune from `self`.\n     */\n    function nextRune(slice self) internal returns (slice ret) {\n        nextRune(self, ret);\n    }\n\n    /*\n     * @dev Returns the number of the first codepoint in the slice.\n     * @param self The slice to operate on.\n     * @return The number of the first codepoint in the slice.\n     */\n    function ord(slice self) internal returns (uint ret) {\n        if (self._len == 0) {\n            return 0;\n        }\n\n        uint word;\n        uint strLen;\n        uint _div = 2 ** 248;\n\n        // Load the rune into the MSBs of b\n        assembly { word:= mload(mload(add(self, 32))) }\n        var b = word / _div;\n        if (b < 0x80) {\n            ret = b;\n            strLen = 1;\n        } else if(b < 0xE0) {\n            ret = b & 0x1F;\n            strLen = 2;\n        } else if(b < 0xF0) {\n            ret = b & 0x0F;\n            strLen = 3;\n        } else {\n            ret = b & 0x07;\n            strLen = 4;\n        }\n\n        // Check for truncated codepoints\n        if (strLen > self._len) {\n            return 0;\n        }\n\n        for (uint i = 1; i < strLen; i++) {\n            _div = _div / 256;\n            b = (word / _div) & 0xFF;\n            if (b & 0xC0 != 0x80) {\n                // Invalid UTF-8 sequence\n                return 0;\n            }\n            ret = (ret * 64) | (b & 0x3F);\n        }\n\n        return ret;\n    }\n\n    /*\n     * @dev Returns the keccak-256 hash of the slice.\n     * @param self The slice to hash.\n     * @return The hash of the slice.\n     */\n    function keccak(slice self) internal returns (bytes32 ret) {\n        assembly {\n            ret := sha3(mload(add(self, 32)), mload(self))\n        }\n    }\n\n    /*\n     * @dev Returns true if `self` starts with `needle`.\n     * @param self The slice to operate on.\n     * @param needle The slice to search for.\n     * @return True if the slice starts with the provided text, false otherwise.\n     */\n    function startsWith(slice self, slice needle) internal returns (bool) {\n        if (self._len < needle._len) {\n            return false;\n        }\n\n        if (self._ptr == needle._ptr) {\n            return true;\n        }\n\n        bool equal;\n        assembly {\n            let strLen := mload(needle)\n            let selfptr := mload(add(self, 0x20))\n            let needleptr := mload(add(needle, 0x20))\n            equal := eq(sha3(selfptr, strLen), sha3(needleptr, strLen))\n        }\n        return equal;\n    }\n\n    /*\n     * @dev If `self` starts with `needle`, `needle` is removed from the\n     *      beginning of `self`. Otherwise, `self` is unmodified.\n     * @param self The slice to operate on.\n     * @param needle The slice to search for.\n     * @return `self`\n     */\n    function beyond(slice self, slice needle) internal returns (slice) {\n        if (self._len < needle._len) {\n            return self;\n        }\n\n        bool equal = true;\n        if (self._ptr != needle._ptr) {\n            assembly {\n                let strLen := mload(needle)\n                let selfptr := mload(add(self, 0x20))\n                let needleptr := mload(add(needle, 0x20))\n                equal := eq(sha3(selfptr, strLen), sha3(needleptr, strLen))\n            }\n        }\n\n        if (equal) {\n            self._len -= needle._len;\n            self._ptr += needle._len;\n        }\n\n        return self;\n    }\n\n    /*\n     * @dev Returns true if the slice ends with `needle`.\n     * @param self The slice to operate on.\n     * @param needle The slice to search for.\n     * @return True if the slice starts with the provided text, false otherwise.\n     */\n    function endsWith(slice self, slice needle) internal returns (bool) {\n        if (self._len < needle._len) {\n            return false;\n        }\n\n        var selfptr = self._ptr + self._len - needle._len;\n\n        if (selfptr == needle._ptr) {\n            return true;\n        }\n\n        bool equal;\n        assembly {\n            let strLen := mload(needle)\n            let needleptr := mload(add(needle, 0x20))\n            equal := eq(sha3(selfptr, strLen), sha3(needleptr, strLen))\n        }\n\n        return equal;\n    }\n\n    /*\n     * @dev If `self` ends with `needle`, `needle` is removed from the\n     *      end of `self`. Otherwise, `self` is unmodified.\n     * @param self The slice to operate on.\n     * @param needle The slice to search for.\n     * @return `self`\n     */\n    function until(slice self, slice needle) internal returns (slice) {\n        if (self._len < needle._len) {\n            return self;\n        }\n\n        var selfptr = self._ptr + self._len - needle._len;\n        bool equal = true;\n        if (selfptr != needle._ptr) {\n            assembly {\n                let strLen := mload(needle)\n                let needleptr := mload(add(needle, 0x20))\n                equal := eq(sha3(selfptr, strLen), sha3(needleptr, strLen))\n            }\n        }\n\n        if (equal) {\n            self._len -= needle._len;\n        }\n\n        return self;\n    }\n\n    // Returns the memory address of the first byte of the first occurrence of\n    // `needle` in `self`, or the first byte after `self` if not found.\n    function findPtr(uint selflen, uint selfptr, uint needlelen, uint needleptr) private returns (uint) {\n        uint ptr;\n        uint idx;\n\n        if (needlelen <= selflen) {\n            if (needlelen <= 32) {\n                // Optimized assembly for 68 gas per byte on short strings\n                assembly {\n                    let mask := not(sub(exp(2, mul(8, sub(32, needlelen))), 1))\n                    let needledata := and(mload(needleptr), mask)\n                    let end := add(selfptr, sub(selflen, needlelen))\n                    ptr := selfptr\n                    loop:\n                    jumpi(exit, eq(and(mload(ptr), mask), needledata))\n                    ptr := add(ptr, 1)\n                    jumpi(loop, lt(sub(ptr, 1), end))\n                    ptr := add(selfptr, selflen)\n                    exit:\n                }\n                return ptr;\n            } else {\n                // For long needles, use hashing\n                bytes32 hash;\n                assembly { hash := sha3(needleptr, needlelen) }\n                ptr = selfptr;\n                for (idx = 0; idx <= selflen - needlelen; idx++) {\n                    bytes32 testHash;\n                    assembly { testHash := sha3(ptr, needlelen) }\n                    if (hash == testHash)\n                        return ptr;\n                    ptr += 1;\n                }\n            }\n        }\n        return selfptr + selflen;\n    }\n\n    // Returns the memory address of the first byte after the last occurrence of\n    // `needle` in `self`, or the address of `self` if not found.\n    function rfindPtr(uint selflen, uint selfptr, uint needlelen, uint needleptr) private returns (uint) {\n        uint ptr;\n\n        if (needlelen <= selflen) {\n            if (needlelen <= 32) {\n                // Optimized assembly for 69 gas per byte on short strings\n                assembly {\n                    let mask := not(sub(exp(2, mul(8, sub(32, needlelen))), 1))\n                    let needledata := and(mload(needleptr), mask)\n                    ptr := add(selfptr, sub(selflen, needlelen))\n                    loop:\n                    jumpi(ret, eq(and(mload(ptr), mask), needledata))\n                    ptr := sub(ptr, 1)\n                    jumpi(loop, gt(add(ptr, 1), selfptr))\n                    ptr := selfptr\n                    jump(exit)\n                    ret:\n                    ptr := add(ptr, needlelen)\n                    exit:\n                }\n                return ptr;\n            } else {\n                // For long needles, use hashing\n                bytes32 hash;\n                assembly { hash := sha3(needleptr, needlelen) }\n                ptr = selfptr + (selflen - needlelen);\n                while (ptr >= selfptr) {\n                    bytes32 testHash;\n                    assembly { testHash := sha3(ptr, needlelen) }\n                    if (hash == testHash)\n                        return ptr + needlelen;\n                    ptr -= 1;\n                }\n            }\n        }\n        return selfptr;\n    }\n\n    /*\n     * @dev Modifies `self` to contain everything from the first occurrence of\n     *      `needle` to the end of the slice. `self` is set to the empty slice\n     *      if `needle` is not found.\n     * @param self The slice to search and modify.\n     * @param needle The text to search for.\n     * @return `self`.\n     */\n    function find(slice self, slice needle) internal returns (slice) {\n        uint ptr = findPtr(self._len, self._ptr, needle._len, needle._ptr);\n        self._len -= ptr - self._ptr;\n        self._ptr = ptr;\n        return self;\n    }\n\n    /*\n     * @dev Modifies `self` to contain the part of the string from the start of\n     *      `self` to the end of the first occurrence of `needle`. If `needle`\n     *      is not found, `self` is set to the empty slice.\n     * @param self The slice to search and modify.\n     * @param needle The text to search for.\n     * @return `self`.\n     */\n    function rfind(slice self, slice needle) internal returns (slice) {\n        uint ptr = rfindPtr(self._len, self._ptr, needle._len, needle._ptr);\n        self._len = ptr - self._ptr;\n        return self;\n    }\n\n    /*\n     * @dev Splits the slice, setting `self` to everything after the first\n     *      occurrence of `needle`, and `token` to everything before it. If\n     *      `needle` does not occur in `self`, `self` is set to the empty slice,\n     *      and `token` is set to the entirety of `self`.\n     * @param self The slice to split.\n     * @param needle The text to search for in `self`.\n     * @param token An output parameter to which the first token is written.\n     * @return `token`.\n     */\n    function split(slice self, slice needle, slice token) internal returns (slice) {\n        uint ptr = findPtr(self._len, self._ptr, needle._len, needle._ptr);\n        token._ptr = self._ptr;\n        token._len = ptr - self._ptr;\n        if (ptr == self._ptr + self._len) {\n            // Not found\n            self._len = 0;\n        } else {\n            self._len -= token._len + needle._len;\n            self._ptr = ptr + needle._len;\n        }\n        return token;\n    }\n\n    /*\n     * @dev Splits the slice, setting `self` to everything after the first\n     *      occurrence of `needle`, and returning everything before it. If\n     *      `needle` does not occur in `self`, `self` is set to the empty slice,\n     *      and the entirety of `self` is returned.\n     * @param self The slice to split.\n     * @param needle The text to search for in `self`.\n     * @return The part of `self` up to the first occurrence of `delim`.\n     */\n    function split(slice self, slice needle) internal returns (slice token) {\n        split(self, needle, token);\n    }\n\n    /*\n     * @dev Splits the slice, setting `self` to everything before the last\n     *      occurrence of `needle`, and `token` to everything after it. If\n     *      `needle` does not occur in `self`, `self` is set to the empty slice,\n     *      and `token` is set to the entirety of `self`.\n     * @param self The slice to split.\n     * @param needle The text to search for in `self`.\n     * @param token An output parameter to which the first token is written.\n     * @return `token`.\n     */\n    function rsplit(slice self, slice needle, slice token) internal returns (slice) {\n        uint ptr = rfindPtr(self._len, self._ptr, needle._len, needle._ptr);\n        token._ptr = ptr;\n        token._len = self._len - (ptr - self._ptr);\n        if (ptr == self._ptr) {\n            // Not found\n            self._len = 0;\n        } else {\n            self._len -= token._len + needle._len;\n        }\n        return token;\n    }\n\n    /*\n     * @dev Splits the slice, setting `self` to everything before the last\n     *      occurrence of `needle`, and returning everything after it. If\n     *      `needle` does not occur in `self`, `self` is set to the empty slice,\n     *      and the entirety of `self` is returned.\n     * @param self The slice to split.\n     * @param needle The text to search for in `self`.\n     * @return The part of `self` after the last occurrence of `delim`.\n     */\n    function rsplit(slice self, slice needle) internal returns (slice token) {\n        rsplit(self, needle, token);\n    }\n\n    /*\n     * @dev Counts the number of nonoverlapping occurrences of `needle` in `self`.\n     * @param self The slice to search.\n     * @param needle The text to search for in `self`.\n     * @return The number of occurrences of `needle` found in `self`.\n     */\n    function count(slice self, slice needle) internal returns (uint _count) {\n        uint ptr = findPtr(self._len, self._ptr, needle._len, needle._ptr) + needle._len;\n        while (ptr <= self._ptr + self._len) {\n            _count++;\n            ptr = findPtr(self._len - (ptr - self._ptr), ptr, needle._len, needle._ptr) + needle._len;\n        }\n    }\n\n    /*\n     * @dev Returns True if `self` contains `needle`.\n     * @param self The slice to search.\n     * @param needle The text to search for in `self`.\n     * @return True if `needle` is found in `self`, false otherwise.\n     */\n    function contains(slice self, slice needle) internal returns (bool) {\n        return rfindPtr(self._len, self._ptr, needle._len, needle._ptr) != self._ptr;\n    }\n\n    /*\n     * @dev Returns a newly allocated string containing the concatenation of\n     *      `self` and `other`.\n     * @param self The first slice to concatenate.\n     * @param other The second slice to concatenate.\n     * @return The concatenation of the two strings.\n     */\n    function concat(slice self, slice other) internal returns (string) {\n        var ret = new string(self._len + other._len);\n        uint retptr;\n        assembly { retptr := add(ret, 32) }\n        memcpy(retptr, self._ptr, self._len);\n        memcpy(retptr + self._len, other._ptr, other._len);\n        return ret;\n    }\n\n    /*\n     * @dev Joins an array of slices, using `self` as a delimiter, returning a\n     *      newly allocated string.\n     * @param self The delimiter to use.\n     * @param parts A list of slices to join.\n     * @return A newly allocated string containing all the slices in `parts`,\n     *         joined with `self`.\n     */\n    function join(slice self, slice[] parts) internal returns (string) {\n        if (parts.length == 0)\n            return \"\";\n\n        uint strLen = self._len * (parts.length - 1);\n        for(uint i = 0; i < parts.length; i++)\n            strLen += parts[i]._len;\n\n        var ret = new string(strLen);\n        uint retptr;\n        assembly { retptr := add(ret, 32) }\n\n        for(i = 0; i < parts.length; i++) {\n            memcpy(retptr, parts[i]._ptr, parts[i]._len);\n            retptr += parts[i]._len;\n            if (i < parts.length - 1) {\n                memcpy(retptr, self._ptr, self._len);\n                retptr += self._len;\n            }\n        }\n\n        return ret;\n    }\n}\n",
+  "source": "pragma solidity 0.4.18;\n\n/*\n * @title String & slice utility library for Solidity contracts.\n * @author Nick Johnson <arachnid@notdot.net>\n *\n * @dev Functionality in this library is largely implemented using an\n *      abstraction called a 'slice'. A slice represents a part of a string -\n *      anything from the entire string to a single character, or even no\n *      characters at all (a 0-length slice). Since a slice only has to specify\n *      an offset and a length, copying and manipulating slices is a lot less\n *      expensive than copying and manipulating the strings they reference.\n *\n *      To further reduce gas costs, most functions on slice that need to return\n *      a slice modify the original one instead of allocating a new one; for\n *      instance, `s.split(\".\")` will return the text up to the first '.',\n *      modifying s to only contain the remainder of the string after the '.'.\n *      In situations where you do not want to modify the original slice, you\n *      can make a copy first with `.copy()`, for example:\n *      `s.copy().split(\".\")`. Try and avoid using this idiom in loops; since\n *      Solidity has no memory management, it will result in allocating many\n *      short-lived slices that are later discarded.\n *\n *      Functions that return two slices come in two versions: a non-allocating\n *      version that takes the second slice as an argument, modifying it in\n *      place, and an allocating version that allocates and returns the second\n *      slice; see `nextRune` for example.\n *\n *      Functions that have to copy string data will return strings rather than\n *      slices; these can be cast back to slices for further processing if\n *      required.\n *\n *      For convenience, some functions are provided with non-modifying\n *      variants that create a new slice and return both; for instance,\n *      `s.splitNew('.')` leaves s unmodified, and returns two values\n *      corresponding to the left and right parts of the string.\n */\nlibrary strings {\n    struct slice {\n        uint _len;\n        uint _ptr;\n    }\n\n    function memcpy(uint dest, uint src, uint strLen) private {\n        // Copy word-length chunks while possible\n        for(; strLen >= 32; strLen -= 32) {\n            assembly {\n                mstore(dest, mload(src))\n            }\n            dest += 32;\n            src += 32;\n        }\n\n        // Copy remaining bytes\n        uint mask = 256 ** (32 - strLen) - 1;\n        assembly {\n            let srcpart := and(mload(src), not(mask))\n            let destpart := and(mload(dest), mask)\n            mstore(dest, or(destpart, srcpart))\n        }\n    }\n\n    /*\n     * @dev Returns a slice containing the entire string.\n     * @param self The string to make a slice from.\n     * @return A newly allocated slice containing the entire string.\n     */\n    function toSlice(string self) internal returns (slice) {\n        uint ptr;\n        assembly {\n            ptr := add(self, 0x20)\n        }\n        return slice(bytes(self).length, ptr);\n    }\n\n    /*\n     * @dev Returns the length of a null-terminated bytes32 string.\n     * @param self The value to find the length of.\n     * @return The length of the string, from 0 to 32.\n     */\n    function len(bytes32 self) internal returns (uint) {\n        uint ret;\n        if (self == 0)\n            return 0;\n        if (self & 0xffffffffffffffffffffffffffffffff == 0) {\n            ret += 16;\n            self = bytes32(uint(self) / 0x100000000000000000000000000000000);\n        }\n        if (self & 0xffffffffffffffff == 0) {\n            ret += 8;\n            self = bytes32(uint(self) / 0x10000000000000000);\n        }\n        if (self & 0xffffffff == 0) {\n            ret += 4;\n            self = bytes32(uint(self) / 0x100000000);\n        }\n        if (self & 0xffff == 0) {\n            ret += 2;\n            self = bytes32(uint(self) / 0x10000);\n        }\n        if (self & 0xff == 0) {\n            ret += 1;\n        }\n        return 32 - ret;\n    }\n\n    /*\n     * @dev Returns a slice containing the entire bytes32, interpreted as a\n     *      null-termintaed utf-8 string.\n     * @param self The bytes32 value to convert to a slice.\n     * @return A new slice containing the value of the input argument up to the\n     *         first null.\n     */\n    function toSliceB32(bytes32 self) internal returns (slice ret) {\n        // Allocate space for `self` in memory, copy it there, and point ret at it\n        assembly {\n            let ptr := mload(0x40)\n            mstore(0x40, add(ptr, 0x20))\n            mstore(ptr, self)\n            mstore(add(ret, 0x20), ptr)\n        }\n        ret._len = len(self);\n    }\n\n    /*\n     * @dev Returns a new slice containing the same data as the current slice.\n     * @param self The slice to copy.\n     * @return A new slice containing the same data as `self`.\n     */\n    function copy(slice self) internal returns (slice) {\n        return slice(self._len, self._ptr);\n    }\n\n    /*\n     * @dev Copies a slice to a new string.\n     * @param self The slice to copy.\n     * @return A newly allocated string containing the slice's text.\n     */\n    function toString(slice self) internal returns (string) {\n        var ret = new string(self._len);\n        uint retptr;\n        assembly { retptr := add(ret, 32) }\n\n        memcpy(retptr, self._ptr, self._len);\n        return ret;\n    }\n\n    /*\n     * @dev Returns the length in runes of the slice. Note that this operation\n     *      takes time proportional to the length of the slice; avoid using it\n     *      in loops, and call `slice.empty()` if you only need to know whether\n     *      the slice is empty or not.\n     * @param self The slice to operate on.\n     * @return The length of the slice in runes.\n     */\n    function len(slice self) internal returns (uint) {\n        // Starting at ptr-31 means the LSB will be the byte we care about\n        var ptr = self._ptr - 31;\n        var end = ptr + self._len;\n        for (uint strLen = 0; ptr < end; strLen++) {\n            uint8 b;\n            assembly { b := and(mload(ptr), 0xFF) }\n            if (b < 0x80) {\n                ptr += 1;\n            } else if(b < 0xE0) {\n                ptr += 2;\n            } else if(b < 0xF0) {\n                ptr += 3;\n            } else if(b < 0xF8) {\n                ptr += 4;\n            } else if(b < 0xFC) {\n                ptr += 5;\n            } else {\n                ptr += 6;\n            }\n        }\n        return strLen;\n    }\n\n    /*\n     * @dev Returns true if the slice is empty (has a length of 0).\n     * @param self The slice to operate on.\n     * @return True if the slice is empty, False otherwise.\n     */\n    function empty(slice self) internal returns (bool) {\n        return self._len == 0;\n    }\n\n    /*\n     * @dev Returns a positive number if `other` comes lexicographically after\n     *      `self`, a negative number if it comes before, or zero if the\n     *      contents of the two slices are equal. Comparison is done per-rune,\n     *      on unicode codepoints.\n     * @param self The first slice to compare.\n     * @param other The second slice to compare.\n     * @return The result of the comparison.\n     */\n    function compare(slice self, slice other) internal returns (int) {\n        uint shortest = self._len;\n        if (other._len < self._len)\n            shortest = other._len;\n\n        var selfptr = self._ptr;\n        var otherptr = other._ptr;\n        for (uint idx = 0; idx < shortest; idx += 32) {\n            uint a;\n            uint b;\n            assembly {\n                a := mload(selfptr)\n                b := mload(otherptr)\n            }\n            if (a != b) {\n                // Mask out irrelevant bytes and check again\n                uint mask = ~(2 ** (8 * (32 - shortest + idx)) - 1);\n                var diff = (a & mask) - (b & mask);\n                if (diff != 0)\n                    return int(diff);\n            }\n            selfptr += 32;\n            otherptr += 32;\n        }\n        return int(self._len) - int(other._len);\n    }\n\n    /*\n     * @dev Returns true if the two slices contain the same text.\n     * @param self The first slice to compare.\n     * @param self The second slice to compare.\n     * @return True if the slices are equal, false otherwise.\n     */\n    function equals(slice self, slice other) internal returns (bool) {\n        return compare(self, other) == 0;\n    }\n\n    /*\n     * @dev Extracts the first rune in the slice into `rune`, advancing the\n     *      slice to point to the next rune and returning `self`.\n     * @param self The slice to operate on.\n     * @param rune The slice that will contain the first rune.\n     * @return `rune`.\n     */\n    function nextRune(slice self, slice rune) internal returns (slice) {\n        rune._ptr = self._ptr;\n\n        if (self._len == 0) {\n            rune._len = 0;\n            return rune;\n        }\n\n        uint strLen;\n        uint b;\n        // Load the first byte of the rune into the LSBs of b\n        assembly { b := and(mload(sub(mload(add(self, 32)), 31)), 0xFF) }\n        if (b < 0x80) {\n            strLen = 1;\n        } else if(b < 0xE0) {\n            strLen = 2;\n        } else if(b < 0xF0) {\n            strLen = 3;\n        } else {\n            strLen = 4;\n        }\n\n        // Check for truncated codepoints\n        if (strLen > self._len) {\n            rune._len = self._len;\n            self._ptr += self._len;\n            self._len = 0;\n            return rune;\n        }\n\n        self._ptr += strLen;\n        self._len -= strLen;\n        rune._len = strLen;\n        return rune;\n    }\n\n    /*\n     * @dev Returns the first rune in the slice, advancing the slice to point\n     *      to the next rune.\n     * @param self The slice to operate on.\n     * @return A slice containing only the first rune from `self`.\n     */\n    function nextRune(slice self) internal returns (slice ret) {\n        nextRune(self, ret);\n    }\n\n    /*\n     * @dev Returns the number of the first codepoint in the slice.\n     * @param self The slice to operate on.\n     * @return The number of the first codepoint in the slice.\n     */\n    function ord(slice self) internal returns (uint ret) {\n        if (self._len == 0) {\n            return 0;\n        }\n\n        uint word;\n        uint strLen;\n        uint _div = 2 ** 248;\n\n        // Load the rune into the MSBs of b\n        assembly { word:= mload(mload(add(self, 32))) }\n        var b = word / _div;\n        if (b < 0x80) {\n            ret = b;\n            strLen = 1;\n        } else if(b < 0xE0) {\n            ret = b & 0x1F;\n            strLen = 2;\n        } else if(b < 0xF0) {\n            ret = b & 0x0F;\n            strLen = 3;\n        } else {\n            ret = b & 0x07;\n            strLen = 4;\n        }\n\n        // Check for truncated codepoints\n        if (strLen > self._len) {\n            return 0;\n        }\n\n        for (uint i = 1; i < strLen; i++) {\n            _div = _div / 256;\n            b = (word / _div) & 0xFF;\n            if (b & 0xC0 != 0x80) {\n                // Invalid UTF-8 sequence\n                return 0;\n            }\n            ret = (ret * 64) | (b & 0x3F);\n        }\n\n        return ret;\n    }\n\n    /*\n     * @dev Returns the keccak-256 hash of the slice.\n     * @param self The slice to hash.\n     * @return The hash of the slice.\n     */\n    function keccak(slice self) internal returns (bytes32 ret) {\n        assembly {\n            ret := sha3(mload(add(self, 32)), mload(self))\n        }\n    }\n\n    /*\n     * @dev Returns true if `self` starts with `needle`.\n     * @param self The slice to operate on.\n     * @param needle The slice to search for.\n     * @return True if the slice starts with the provided text, false otherwise.\n     */\n    function startsWith(slice self, slice needle) internal returns (bool) {\n        if (self._len < needle._len) {\n            return false;\n        }\n\n        if (self._ptr == needle._ptr) {\n            return true;\n        }\n\n        bool equal;\n        assembly {\n            let strLen := mload(needle)\n            let selfptr := mload(add(self, 0x20))\n            let needleptr := mload(add(needle, 0x20))\n            equal := eq(sha3(selfptr, strLen), sha3(needleptr, strLen))\n        }\n        return equal;\n    }\n\n    /*\n     * @dev If `self` starts with `needle`, `needle` is removed from the\n     *      beginning of `self`. Otherwise, `self` is unmodified.\n     * @param self The slice to operate on.\n     * @param needle The slice to search for.\n     * @return `self`\n     */\n    function beyond(slice self, slice needle) internal returns (slice) {\n        if (self._len < needle._len) {\n            return self;\n        }\n\n        bool equal = true;\n        if (self._ptr != needle._ptr) {\n            assembly {\n                let strLen := mload(needle)\n                let selfptr := mload(add(self, 0x20))\n                let needleptr := mload(add(needle, 0x20))\n                equal := eq(sha3(selfptr, strLen), sha3(needleptr, strLen))\n            }\n        }\n\n        if (equal) {\n            self._len -= needle._len;\n            self._ptr += needle._len;\n        }\n\n        return self;\n    }\n\n    /*\n     * @dev Returns true if the slice ends with `needle`.\n     * @param self The slice to operate on.\n     * @param needle The slice to search for.\n     * @return True if the slice starts with the provided text, false otherwise.\n     */\n    function endsWith(slice self, slice needle) internal returns (bool) {\n        if (self._len < needle._len) {\n            return false;\n        }\n\n        var selfptr = self._ptr + self._len - needle._len;\n\n        if (selfptr == needle._ptr) {\n            return true;\n        }\n\n        bool equal;\n        assembly {\n            let strLen := mload(needle)\n            let needleptr := mload(add(needle, 0x20))\n            equal := eq(sha3(selfptr, strLen), sha3(needleptr, strLen))\n        }\n\n        return equal;\n    }\n\n    /*\n     * @dev If `self` ends with `needle`, `needle` is removed from the\n     *      end of `self`. Otherwise, `self` is unmodified.\n     * @param self The slice to operate on.\n     * @param needle The slice to search for.\n     * @return `self`\n     */\n    function until(slice self, slice needle) internal returns (slice) {\n        if (self._len < needle._len) {\n            return self;\n        }\n\n        var selfptr = self._ptr + self._len - needle._len;\n        bool equal = true;\n        if (selfptr != needle._ptr) {\n            assembly {\n                let strLen := mload(needle)\n                let needleptr := mload(add(needle, 0x20))\n                equal := eq(sha3(selfptr, strLen), sha3(needleptr, strLen))\n            }\n        }\n\n        if (equal) {\n            self._len -= needle._len;\n        }\n\n        return self;\n    }\n\n    // Returns the memory address of the first byte of the first occurrence of\n    // `needle` in `self`, or the first byte after `self` if not found.\n    function findPtr(uint selflen, uint selfptr, uint needlelen, uint needleptr) private returns (uint) {\n        uint ptr;\n        uint idx;\n\n        if (needlelen <= selflen) {\n            if (needlelen <= 32) {\n                // Optimized assembly for 68 gas per byte on short strings\n                assembly {\n                    let mask := not(sub(exp(2, mul(8, sub(32, needlelen))), 1))\n                    let needledata := and(mload(needleptr), mask)\n                    let end := add(selfptr, sub(selflen, needlelen))\n                    ptr := selfptr\n                    loop:\n                    jumpi(exit, eq(and(mload(ptr), mask), needledata))\n                    ptr := add(ptr, 1)\n                    jumpi(loop, lt(sub(ptr, 1), end))\n                    ptr := add(selfptr, selflen)\n                    exit:\n                }\n                return ptr;\n            } else {\n                // For long needles, use hashing\n                bytes32 hash;\n                assembly { hash := sha3(needleptr, needlelen) }\n                ptr = selfptr;\n                for (idx = 0; idx <= selflen - needlelen; idx++) {\n                    bytes32 testHash;\n                    assembly { testHash := sha3(ptr, needlelen) }\n                    if (hash == testHash)\n                        return ptr;\n                    ptr += 1;\n                }\n            }\n        }\n        return selfptr + selflen;\n    }\n\n    // Returns the memory address of the first byte after the last occurrence of\n    // `needle` in `self`, or the address of `self` if not found.\n    function rfindPtr(uint selflen, uint selfptr, uint needlelen, uint needleptr) private returns (uint) {\n        uint ptr;\n\n        if (needlelen <= selflen) {\n            if (needlelen <= 32) {\n                // Optimized assembly for 69 gas per byte on short strings\n                assembly {\n                    let mask := not(sub(exp(2, mul(8, sub(32, needlelen))), 1))\n                    let needledata := and(mload(needleptr), mask)\n                    ptr := add(selfptr, sub(selflen, needlelen))\n                    loop:\n                    jumpi(ret, eq(and(mload(ptr), mask), needledata))\n                    ptr := sub(ptr, 1)\n                    jumpi(loop, gt(add(ptr, 1), selfptr))\n                    ptr := selfptr\n                    jump(exit)\n                    ret:\n                    ptr := add(ptr, needlelen)\n                    exit:\n                }\n                return ptr;\n            } else {\n                // For long needles, use hashing\n                bytes32 hash;\n                assembly { hash := sha3(needleptr, needlelen) }\n                ptr = selfptr + (selflen - needlelen);\n                while (ptr >= selfptr) {\n                    bytes32 testHash;\n                    assembly { testHash := sha3(ptr, needlelen) }\n                    if (hash == testHash)\n                        return ptr + needlelen;\n                    ptr -= 1;\n                }\n            }\n        }\n        return selfptr;\n    }\n\n    /*\n     * @dev Modifies `self` to contain everything from the first occurrence of\n     *      `needle` to the end of the slice. `self` is set to the empty slice\n     *      if `needle` is not found.\n     * @param self The slice to search and modify.\n     * @param needle The text to search for.\n     * @return `self`.\n     */\n    function find(slice self, slice needle) internal returns (slice) {\n        uint ptr = findPtr(self._len, self._ptr, needle._len, needle._ptr);\n        self._len -= ptr - self._ptr;\n        self._ptr = ptr;\n        return self;\n    }\n\n    /*\n     * @dev Modifies `self` to contain the part of the string from the start of\n     *      `self` to the end of the first occurrence of `needle`. If `needle`\n     *      is not found, `self` is set to the empty slice.\n     * @param self The slice to search and modify.\n     * @param needle The text to search for.\n     * @return `self`.\n     */\n    function rfind(slice self, slice needle) internal returns (slice) {\n        uint ptr = rfindPtr(self._len, self._ptr, needle._len, needle._ptr);\n        self._len = ptr - self._ptr;\n        return self;\n    }\n\n    /*\n     * @dev Splits the slice, setting `self` to everything after the first\n     *      occurrence of `needle`, and `token` to everything before it. If\n     *      `needle` does not occur in `self`, `self` is set to the empty slice,\n     *      and `token` is set to the entirety of `self`.\n     * @param self The slice to split.\n     * @param needle The text to search for in `self`.\n     * @param token An output parameter to which the first token is written.\n     * @return `token`.\n     */\n    function split(slice self, slice needle, slice token) internal returns (slice) {\n        uint ptr = findPtr(self._len, self._ptr, needle._len, needle._ptr);\n        token._ptr = self._ptr;\n        token._len = ptr - self._ptr;\n        if (ptr == self._ptr + self._len) {\n            // Not found\n            self._len = 0;\n        } else {\n            self._len -= token._len + needle._len;\n            self._ptr = ptr + needle._len;\n        }\n        return token;\n    }\n\n    /*\n     * @dev Splits the slice, setting `self` to everything after the first\n     *      occurrence of `needle`, and returning everything before it. If\n     *      `needle` does not occur in `self`, `self` is set to the empty slice,\n     *      and the entirety of `self` is returned.\n     * @param self The slice to split.\n     * @param needle The text to search for in `self`.\n     * @return The part of `self` up to the first occurrence of `delim`.\n     */\n    function split(slice self, slice needle) internal returns (slice token) {\n        split(self, needle, token);\n    }\n\n    /*\n     * @dev Splits the slice, setting `self` to everything before the last\n     *      occurrence of `needle`, and `token` to everything after it. If\n     *      `needle` does not occur in `self`, `self` is set to the empty slice,\n     *      and `token` is set to the entirety of `self`.\n     * @param self The slice to split.\n     * @param needle The text to search for in `self`.\n     * @param token An output parameter to which the first token is written.\n     * @return `token`.\n     */\n    function rsplit(slice self, slice needle, slice token) internal returns (slice) {\n        uint ptr = rfindPtr(self._len, self._ptr, needle._len, needle._ptr);\n        token._ptr = ptr;\n        token._len = self._len - (ptr - self._ptr);\n        if (ptr == self._ptr) {\n            // Not found\n            self._len = 0;\n        } else {\n            self._len -= token._len + needle._len;\n        }\n        return token;\n    }\n\n    /*\n     * @dev Splits the slice, setting `self` to everything before the last\n     *      occurrence of `needle`, and returning everything after it. If\n     *      `needle` does not occur in `self`, `self` is set to the empty slice,\n     *      and the entirety of `self` is returned.\n     * @param self The slice to split.\n     * @param needle The text to search for in `self`.\n     * @return The part of `self` after the last occurrence of `delim`.\n     */\n    function rsplit(slice self, slice needle) internal returns (slice token) {\n        rsplit(self, needle, token);\n    }\n\n    /*\n     * @dev Counts the number of nonoverlapping occurrences of `needle` in `self`.\n     * @param self The slice to search.\n     * @param needle The text to search for in `self`.\n     * @return The number of occurrences of `needle` found in `self`.\n     */\n    function count(slice self, slice needle) internal returns (uint _count) {\n        uint ptr = findPtr(self._len, self._ptr, needle._len, needle._ptr) + needle._len;\n        while (ptr <= self._ptr + self._len) {\n            _count++;\n            ptr = findPtr(self._len - (ptr - self._ptr), ptr, needle._len, needle._ptr) + needle._len;\n        }\n    }\n\n    /*\n     * @dev Returns True if `self` contains `needle`.\n     * @param self The slice to search.\n     * @param needle The text to search for in `self`.\n     * @return True if `needle` is found in `self`, false otherwise.\n     */\n    function contains(slice self, slice needle) internal returns (bool) {\n        return rfindPtr(self._len, self._ptr, needle._len, needle._ptr) != self._ptr;\n    }\n\n    /*\n     * @dev Returns a newly allocated string containing the concatenation of\n     *      `self` and `other`.\n     * @param self The first slice to concatenate.\n     * @param other The second slice to concatenate.\n     * @return The concatenation of the two strings.\n     */\n    function concat(slice self, slice other) internal returns (string) {\n        var ret = new string(self._len + other._len);\n        uint retptr;\n        assembly { retptr := add(ret, 32) }\n        memcpy(retptr, self._ptr, self._len);\n        memcpy(retptr + self._len, other._ptr, other._len);\n        return ret;\n    }\n\n    /*\n     * @dev Joins an array of slices, using `self` as a delimiter, returning a\n     *      newly allocated string.\n     * @param self The delimiter to use.\n     * @param parts A list of slices to join.\n     * @return A newly allocated string containing all the slices in `parts`,\n     *         joined with `self`.\n     */\n    function join(slice self, slice[] parts) internal returns (string) {\n        if (parts.length == 0)\n            return \"\";\n\n        uint strLen = self._len * (parts.length - 1);\n        for(uint i = 0; i < parts.length; i++)\n            strLen += parts[i]._len;\n\n        var ret = new string(strLen);\n        uint retptr;\n        assembly { retptr := add(ret, 32) }\n\n        for(i = 0; i < parts.length; i++) {\n            memcpy(retptr, parts[i]._ptr, parts[i]._len);\n            retptr += parts[i]._len;\n            if (i < parts.length - 1) {\n                memcpy(retptr, self._ptr, self._len);\n                retptr += self._len;\n            }\n        }\n\n        return ret;\n    }\n}\n",
   "sourcePath": "/home/daniel/dev/vue/apps/oral-data-link/contracts/lib/arachnid/solidity-stringutils/strings.sol",
   "ast": {
     "attributes": {
@@ -22,7 +22,7 @@
           "literals": [
             "solidity",
             "0.4",
-            ".17"
+            ".18"
           ]
         },
         "id": 58,
@@ -695,20 +695,20 @@
                           }
                         },
                         {
-                          "mask": {
-                            "declaration": 91,
-                            "isOffset": false,
-                            "isSlot": false,
-                            "src": "2573:4:1",
-                            "valueSize": 1
-                          }
-                        },
-                        {
                           "dest": {
                             "declaration": 65,
                             "isOffset": false,
                             "isSlot": false,
                             "src": "2598:4:1",
+                            "valueSize": 1
+                          }
+                        },
+                        {
+                          "mask": {
+                            "declaration": 91,
+                            "isOffset": false,
+                            "isSlot": false,
+                            "src": "2573:4:1",
                             "valueSize": 1
                           }
                         }
@@ -853,26 +853,26 @@
                     ],
                     "id": 112,
                     "name": "VariableDeclarationStatement",
-                    "src": "2907:9:1"
+                    "src": "2907:8:1"
                   },
                   {
                     "attributes": {
                       "externalReferences": [
-                        {
-                          "self": {
-                            "declaration": 105,
-                            "isOffset": false,
-                            "isSlot": false,
-                            "src": "2959:4:1",
-                            "valueSize": 1
-                          }
-                        },
                         {
                           "ptr": {
                             "declaration": 111,
                             "isOffset": false,
                             "isSlot": false,
                             "src": "2948:3:1",
+                            "valueSize": 1
+                          }
+                        },
+                        {
+                          "self": {
+                            "declaration": 105,
+                            "isOffset": false,
+                            "isSlot": false,
+                            "src": "2959:4:1",
                             "valueSize": 1
                           }
                         }
@@ -1152,7 +1152,7 @@
                     ],
                     "id": 132,
                     "name": "VariableDeclarationStatement",
-                    "src": "3290:9:1"
+                    "src": "3290:8:1"
                   },
                   {
                     "attributes": {
@@ -3450,26 +3450,26 @@
                     ],
                     "id": 287,
                     "name": "VariableDeclarationStatement",
-                    "src": "5238:12:1"
+                    "src": "5238:11:1"
                   },
                   {
                     "attributes": {
                       "externalReferences": [
-                        {
-                          "ret": {
-                            "declaration": 278,
-                            "isOffset": false,
-                            "isSlot": false,
-                            "src": "5284:3:1",
-                            "valueSize": 1
-                          }
-                        },
                         {
                           "retptr": {
                             "declaration": 286,
                             "isOffset": false,
                             "isSlot": false,
                             "src": "5270:6:1",
+                            "valueSize": 1
+                          }
+                        },
+                        {
+                          "ret": {
+                            "declaration": 278,
+                            "isOffset": false,
+                            "isSlot": false,
+                            "src": "5284:3:1",
                             "valueSize": 1
                           }
                         }
@@ -4104,7 +4104,7 @@
                             ],
                             "id": 331,
                             "name": "VariableDeclarationStatement",
-                            "src": "6018:8:1"
+                            "src": "6018:7:1"
                           },
                           {
                             "attributes": {
@@ -5670,7 +5670,7 @@
                             ],
                             "id": 447,
                             "name": "VariableDeclarationStatement",
-                            "src": "7492:7:1"
+                            "src": "7492:6:1"
                           },
                           {
                             "attributes": {
@@ -5709,29 +5709,11 @@
                             ],
                             "id": 450,
                             "name": "VariableDeclarationStatement",
-                            "src": "7512:7:1"
+                            "src": "7512:6:1"
                           },
                           {
                             "attributes": {
                               "externalReferences": [
-                                {
-                                  "a": {
-                                    "declaration": 446,
-                                    "isOffset": false,
-                                    "isSlot": false,
-                                    "src": "7559:1:1",
-                                    "valueSize": 1
-                                  }
-                                },
-                                {
-                                  "b": {
-                                    "declaration": 449,
-                                    "isOffset": false,
-                                    "isSlot": false,
-                                    "src": "7595:1:1",
-                                    "valueSize": 1
-                                  }
-                                },
                                 {
                                   "selfptr": {
                                     "declaration": 426,
@@ -5742,11 +5724,29 @@
                                   }
                                 },
                                 {
+                                  "a": {
+                                    "declaration": 446,
+                                    "isOffset": false,
+                                    "isSlot": false,
+                                    "src": "7559:1:1",
+                                    "valueSize": 1
+                                  }
+                                },
+                                {
                                   "otherptr": {
                                     "declaration": 430,
                                     "isOffset": false,
                                     "isSlot": false,
                                     "src": "7606:8:1",
+                                    "valueSize": 1
+                                  }
+                                },
+                                {
+                                  "b": {
+                                    "declaration": 449,
+                                    "isOffset": false,
+                                    "isSlot": false,
+                                    "src": "7595:1:1",
                                     "valueSize": 1
                                   }
                                 }
@@ -7381,7 +7381,7 @@
                     ],
                     "id": 564,
                     "name": "VariableDeclarationStatement",
-                    "src": "8893:12:1"
+                    "src": "8893:11:1"
                   },
                   {
                     "attributes": {
@@ -7420,26 +7420,26 @@
                     ],
                     "id": 567,
                     "name": "VariableDeclarationStatement",
-                    "src": "8914:7:1"
+                    "src": "8914:6:1"
                   },
                   {
                     "attributes": {
                       "externalReferences": [
-                        {
-                          "b": {
-                            "declaration": 566,
-                            "isOffset": false,
-                            "isSlot": false,
-                            "src": "9003:1:1",
-                            "valueSize": 1
-                          }
-                        },
                         {
                           "self": {
                             "declaration": 534,
                             "isOffset": false,
                             "isSlot": false,
                             "src": "9032:4:1",
+                            "valueSize": 1
+                          }
+                        },
+                        {
+                          "b": {
+                            "declaration": 566,
+                            "isOffset": false,
+                            "isSlot": false,
+                            "src": "9003:1:1",
                             "valueSize": 1
                           }
                         }
@@ -8866,7 +8866,7 @@
                     ],
                     "id": 680,
                     "name": "VariableDeclarationStatement",
-                    "src": "10245:10:1"
+                    "src": "10245:9:1"
                   },
                   {
                     "attributes": {
@@ -8905,7 +8905,7 @@
                     ],
                     "id": 683,
                     "name": "VariableDeclarationStatement",
-                    "src": "10264:12:1"
+                    "src": "10264:11:1"
                   },
                   {
                     "attributes": {
@@ -9003,20 +9003,20 @@
                     "attributes": {
                       "externalReferences": [
                         {
-                          "word": {
-                            "declaration": 679,
-                            "isOffset": false,
-                            "isSlot": false,
-                            "src": "10371:4:1",
-                            "valueSize": 1
-                          }
-                        },
-                        {
                           "self": {
                             "declaration": 665,
                             "isOffset": false,
                             "isSlot": false,
                             "src": "10394:4:1",
+                            "valueSize": 1
+                          }
+                        },
+                        {
+                          "word": {
+                            "declaration": 679,
+                            "isOffset": false,
+                            "isSlot": false,
+                            "src": "10371:4:1",
                             "valueSize": 1
                           }
                         }
@@ -10779,6 +10779,15 @@
                             "declaration": 811,
                             "isOffset": false,
                             "isSlot": false,
+                            "src": "11434:4:1",
+                            "valueSize": 1
+                          }
+                        },
+                        {
+                          "self": {
+                            "declaration": 811,
+                            "isOffset": false,
+                            "isSlot": false,
                             "src": "11452:4:1",
                             "valueSize": 1
                           }
@@ -10789,15 +10798,6 @@
                             "isOffset": false,
                             "isSlot": false,
                             "src": "11412:3:1",
-                            "valueSize": 1
-                          }
-                        },
-                        {
-                          "self": {
-                            "declaration": 811,
-                            "isOffset": false,
-                            "isSlot": false,
-                            "src": "11434:4:1",
                             "valueSize": 1
                           }
                         }
@@ -11222,7 +11222,7 @@
                     ],
                     "id": 847,
                     "name": "VariableDeclarationStatement",
-                    "src": "11955:11:1"
+                    "src": "11955:10:1"
                   },
                   {
                     "attributes": {
@@ -11692,24 +11692,6 @@
                             "attributes": {
                               "externalReferences": [
                                 {
-                                  "needle": {
-                                    "declaration": 856,
-                                    "isOffset": false,
-                                    "isSlot": false,
-                                    "src": "12781:6:1",
-                                    "valueSize": 1
-                                  }
-                                },
-                                {
-                                  "equal": {
-                                    "declaration": 871,
-                                    "isOffset": false,
-                                    "isSlot": false,
-                                    "src": "12917:5:1",
-                                    "valueSize": 1
-                                  }
-                                },
-                                {
                                   "self": {
                                     "declaration": 854,
                                     "isOffset": false,
@@ -11723,7 +11705,25 @@
                                     "declaration": 856,
                                     "isOffset": false,
                                     "isSlot": false,
+                                    "src": "12781:6:1",
+                                    "valueSize": 1
+                                  }
+                                },
+                                {
+                                  "needle": {
+                                    "declaration": 856,
+                                    "isOffset": false,
+                                    "isSlot": false,
                                     "src": "12886:6:1",
+                                    "valueSize": 1
+                                  }
+                                },
+                                {
+                                  "equal": {
+                                    "declaration": 871,
+                                    "isOffset": false,
+                                    "isSlot": false,
+                                    "src": "12917:5:1",
                                     "valueSize": 1
                                   }
                                 }
@@ -12528,29 +12528,11 @@
                     ],
                     "id": 940,
                     "name": "VariableDeclarationStatement",
-                    "src": "13674:11:1"
+                    "src": "13674:10:1"
                   },
                   {
                     "attributes": {
                       "externalReferences": [
-                        {
-                          "needle": {
-                            "declaration": 906,
-                            "isOffset": false,
-                            "isSlot": false,
-                            "src": "13737:6:1",
-                            "valueSize": 1
-                          }
-                        },
-                        {
-                          "equal": {
-                            "declaration": 939,
-                            "isOffset": false,
-                            "isSlot": false,
-                            "src": "13811:5:1",
-                            "valueSize": 1
-                          }
-                        },
                         {
                           "needle": {
                             "declaration": 906,
@@ -12561,11 +12543,29 @@
                           }
                         },
                         {
+                          "needle": {
+                            "declaration": 906,
+                            "isOffset": false,
+                            "isSlot": false,
+                            "src": "13737:6:1",
+                            "valueSize": 1
+                          }
+                        },
+                        {
                           "selfptr": {
                             "declaration": 920,
                             "isOffset": false,
                             "isSlot": false,
                             "src": "13828:7:1",
+                            "valueSize": 1
+                          }
+                        },
+                        {
+                          "equal": {
+                            "declaration": 939,
+                            "isOffset": false,
+                            "isSlot": false,
+                            "src": "13811:5:1",
                             "valueSize": 1
                           }
                         }
@@ -13152,15 +13152,6 @@
                                   }
                                 },
                                 {
-                                  "equal": {
-                                    "declaration": 974,
-                                    "isOffset": false,
-                                    "isSlot": false,
-                                    "src": "14581:5:1",
-                                    "valueSize": 1
-                                  }
-                                },
-                                {
                                   "needle": {
                                     "declaration": 949,
                                     "isOffset": false,
@@ -13175,6 +13166,15 @@
                                     "isOffset": false,
                                     "isSlot": false,
                                     "src": "14598:7:1",
+                                    "valueSize": 1
+                                  }
+                                },
+                                {
+                                  "equal": {
+                                    "declaration": 974,
+                                    "isOffset": false,
+                                    "isSlot": false,
+                                    "src": "14581:5:1",
                                     "valueSize": 1
                                   }
                                 }
@@ -13545,7 +13545,7 @@
                     ],
                     "id": 1012,
                     "name": "VariableDeclarationStatement",
-                    "src": "15029:9:1"
+                    "src": "15029:8:1"
                   },
                   {
                     "attributes": {
@@ -13584,7 +13584,7 @@
                     ],
                     "id": 1015,
                     "name": "VariableDeclarationStatement",
-                    "src": "15047:9:1"
+                    "src": "15047:8:1"
                   },
                   {
                     "attributes": {
@@ -13700,33 +13700,6 @@
                                     "attributes": {
                                       "externalReferences": [
                                         {
-                                          "needleptr": {
-                                            "declaration": 1005,
-                                            "isOffset": false,
-                                            "isSlot": false,
-                                            "src": "15359:9:1",
-                                            "valueSize": 1
-                                          }
-                                        },
-                                        {
-                                          "ptr": {
-                                            "declaration": 1011,
-                                            "isOffset": false,
-                                            "isSlot": false,
-                                            "src": "15598:3:1",
-                                            "valueSize": 1
-                                          }
-                                        },
-                                        {
-                                          "selfptr": {
-                                            "declaration": 1001,
-                                            "isOffset": false,
-                                            "isSlot": false,
-                                            "src": "15473:7:1",
-                                            "valueSize": 1
-                                          }
-                                        },
-                                        {
                                           "needlelen": {
                                             "declaration": 1003,
                                             "isOffset": false,
@@ -13736,20 +13709,11 @@
                                           }
                                         },
                                         {
-                                          "ptr": {
-                                            "declaration": 1011,
+                                          "needleptr": {
+                                            "declaration": 1005,
                                             "isOffset": false,
                                             "isSlot": false,
-                                            "src": "15552:3:1",
-                                            "valueSize": 1
-                                          }
-                                        },
-                                        {
-                                          "ptr": {
-                                            "declaration": 1011,
-                                            "isOffset": false,
-                                            "isSlot": false,
-                                            "src": "15466:3:1",
+                                            "src": "15359:9:1",
                                             "valueSize": 1
                                           }
                                         },
@@ -13785,6 +13749,60 @@
                                             "declaration": 1001,
                                             "isOffset": false,
                                             "isSlot": false,
+                                            "src": "15473:7:1",
+                                            "valueSize": 1
+                                          }
+                                        },
+                                        {
+                                          "ptr": {
+                                            "declaration": 1011,
+                                            "isOffset": false,
+                                            "isSlot": false,
+                                            "src": "15466:3:1",
+                                            "valueSize": 1
+                                          }
+                                        },
+                                        {
+                                          "ptr": {
+                                            "declaration": 1011,
+                                            "isOffset": false,
+                                            "isSlot": false,
+                                            "src": "15552:3:1",
+                                            "valueSize": 1
+                                          }
+                                        },
+                                        {
+                                          "ptr": {
+                                            "declaration": 1011,
+                                            "isOffset": false,
+                                            "isSlot": false,
+                                            "src": "15609:3:1",
+                                            "valueSize": 1
+                                          }
+                                        },
+                                        {
+                                          "ptr": {
+                                            "declaration": 1011,
+                                            "isOffset": false,
+                                            "isSlot": false,
+                                            "src": "15598:3:1",
+                                            "valueSize": 1
+                                          }
+                                        },
+                                        {
+                                          "ptr": {
+                                            "declaration": 1011,
+                                            "isOffset": false,
+                                            "isSlot": false,
+                                            "src": "15656:3:1",
+                                            "valueSize": 1
+                                          }
+                                        },
+                                        {
+                                          "selfptr": {
+                                            "declaration": 1001,
+                                            "isOffset": false,
+                                            "isSlot": false,
                                             "src": "15702:7:1",
                                             "valueSize": 1
                                           }
@@ -13804,24 +13822,6 @@
                                             "isOffset": false,
                                             "isSlot": false,
                                             "src": "15691:3:1",
-                                            "valueSize": 1
-                                          }
-                                        },
-                                        {
-                                          "ptr": {
-                                            "declaration": 1011,
-                                            "isOffset": false,
-                                            "isSlot": false,
-                                            "src": "15609:3:1",
-                                            "valueSize": 1
-                                          }
-                                        },
-                                        {
-                                          "ptr": {
-                                            "declaration": 1011,
-                                            "isOffset": false,
-                                            "isSlot": false,
-                                            "src": "15656:3:1",
                                             "valueSize": 1
                                           }
                                         }
@@ -13901,7 +13901,7 @@
                                     ],
                                     "id": 1028,
                                     "name": "VariableDeclarationStatement",
-                                    "src": "15878:13:1"
+                                    "src": "15878:12:1"
                                   },
                                   {
                                     "attributes": {
@@ -14207,20 +14207,11 @@
                                             ],
                                             "id": 1048,
                                             "name": "VariableDeclarationStatement",
-                                            "src": "16074:17:1"
+                                            "src": "16074:16:1"
                                           },
                                           {
                                             "attributes": {
                                               "externalReferences": [
-                                                {
-                                                  "testHash": {
-                                                    "declaration": 1047,
-                                                    "isOffset": false,
-                                                    "isSlot": false,
-                                                    "src": "16123:8:1",
-                                                    "valueSize": 1
-                                                  }
-                                                },
                                                 {
                                                   "ptr": {
                                                     "declaration": 1011,
@@ -14236,6 +14227,15 @@
                                                     "isOffset": false,
                                                     "isSlot": false,
                                                     "src": "16145:9:1",
+                                                    "valueSize": 1
+                                                  }
+                                                },
+                                                {
+                                                  "testHash": {
+                                                    "declaration": 1047,
+                                                    "isOffset": false,
+                                                    "isSlot": false,
+                                                    "src": "16123:8:1",
                                                     "valueSize": 1
                                                   }
                                                 }
@@ -14680,7 +14680,7 @@
                     ],
                     "id": 1086,
                     "name": "VariableDeclarationStatement",
-                    "src": "16611:9:1"
+                    "src": "16611:8:1"
                   },
                   {
                     "attributes": {
@@ -14796,42 +14796,6 @@
                                     "attributes": {
                                       "externalReferences": [
                                         {
-                                          "needleptr": {
-                                            "declaration": 1079,
-                                            "isOffset": false,
-                                            "isSlot": false,
-                                            "src": "16923:9:1",
-                                            "valueSize": 1
-                                          }
-                                        },
-                                        {
-                                          "ptr": {
-                                            "declaration": 1085,
-                                            "isOffset": false,
-                                            "isSlot": false,
-                                            "src": "17076:3:1",
-                                            "valueSize": 1
-                                          }
-                                        },
-                                        {
-                                          "ptr": {
-                                            "declaration": 1085,
-                                            "isOffset": false,
-                                            "isSlot": false,
-                                            "src": "17133:3:1",
-                                            "valueSize": 1
-                                          }
-                                        },
-                                        {
-                                          "selfptr": {
-                                            "declaration": 1075,
-                                            "isOffset": false,
-                                            "isSlot": false,
-                                            "src": "17226:7:1",
-                                            "valueSize": 1
-                                          }
-                                        },
-                                        {
                                           "needlelen": {
                                             "declaration": 1077,
                                             "isOffset": false,
@@ -14841,20 +14805,11 @@
                                           }
                                         },
                                         {
-                                          "ptr": {
-                                            "declaration": 1085,
+                                          "needleptr": {
+                                            "declaration": 1079,
                                             "isOffset": false,
                                             "isSlot": false,
-                                            "src": "16961:3:1",
-                                            "valueSize": 1
-                                          }
-                                        },
-                                        {
-                                          "ptr": {
-                                            "declaration": 1085,
-                                            "isOffset": false,
-                                            "isSlot": false,
-                                            "src": "17219:3:1",
+                                            "src": "16923:9:1",
                                             "valueSize": 1
                                           }
                                         },
@@ -14890,6 +14845,33 @@
                                             "declaration": 1085,
                                             "isOffset": false,
                                             "isSlot": false,
+                                            "src": "16961:3:1",
+                                            "valueSize": 1
+                                          }
+                                        },
+                                        {
+                                          "ptr": {
+                                            "declaration": 1085,
+                                            "isOffset": false,
+                                            "isSlot": false,
+                                            "src": "17076:3:1",
+                                            "valueSize": 1
+                                          }
+                                        },
+                                        {
+                                          "ptr": {
+                                            "declaration": 1085,
+                                            "isOffset": false,
+                                            "isSlot": false,
+                                            "src": "17133:3:1",
+                                            "valueSize": 1
+                                          }
+                                        },
+                                        {
+                                          "ptr": {
+                                            "declaration": 1085,
+                                            "isOffset": false,
+                                            "isSlot": false,
                                             "src": "17122:3:1",
                                             "valueSize": 1
                                           }
@@ -14908,7 +14890,25 @@
                                             "declaration": 1085,
                                             "isOffset": false,
                                             "isSlot": false,
-                                            "src": "17310:3:1",
+                                            "src": "17180:3:1",
+                                            "valueSize": 1
+                                          }
+                                        },
+                                        {
+                                          "selfptr": {
+                                            "declaration": 1075,
+                                            "isOffset": false,
+                                            "isSlot": false,
+                                            "src": "17226:7:1",
+                                            "valueSize": 1
+                                          }
+                                        },
+                                        {
+                                          "ptr": {
+                                            "declaration": 1085,
+                                            "isOffset": false,
+                                            "isSlot": false,
+                                            "src": "17219:3:1",
                                             "valueSize": 1
                                           }
                                         },
@@ -14935,7 +14935,7 @@
                                             "declaration": 1085,
                                             "isOffset": false,
                                             "isSlot": false,
-                                            "src": "17180:3:1",
+                                            "src": "17310:3:1",
                                             "valueSize": 1
                                           }
                                         }
@@ -15015,7 +15015,7 @@
                                     ],
                                     "id": 1099,
                                     "name": "VariableDeclarationStatement",
-                                    "src": "17495:13:1"
+                                    "src": "17495:12:1"
                                   },
                                   {
                                     "attributes": {
@@ -15279,20 +15279,11 @@
                                             ],
                                             "id": 1115,
                                             "name": "VariableDeclarationStatement",
-                                            "src": "17689:17:1"
+                                            "src": "17689:16:1"
                                           },
                                           {
                                             "attributes": {
                                               "externalReferences": [
-                                                {
-                                                  "testHash": {
-                                                    "declaration": 1114,
-                                                    "isOffset": false,
-                                                    "isSlot": false,
-                                                    "src": "17738:8:1",
-                                                    "valueSize": 1
-                                                  }
-                                                },
                                                 {
                                                   "ptr": {
                                                     "declaration": 1085,
@@ -15308,6 +15299,15 @@
                                                     "isOffset": false,
                                                     "isSlot": false,
                                                     "src": "17760:9:1",
+                                                    "valueSize": 1
+                                                  }
+                                                },
+                                                {
+                                                  "testHash": {
+                                                    "declaration": 1114,
+                                                    "isOffset": false,
+                                                    "isSlot": false,
+                                                    "src": "17738:8:1",
                                                     "valueSize": 1
                                                   }
                                                 }
@@ -20601,26 +20601,26 @@
                     ],
                     "id": 1495,
                     "name": "VariableDeclarationStatement",
-                    "src": "23617:12:1"
+                    "src": "23617:11:1"
                   },
                   {
                     "attributes": {
                       "externalReferences": [
-                        {
-                          "retptr": {
-                            "declaration": 1494,
-                            "isOffset": false,
-                            "isSlot": false,
-                            "src": "23649:6:1",
-                            "valueSize": 1
-                          }
-                        },
                         {
                           "ret": {
                             "declaration": 1483,
                             "isOffset": false,
                             "isSlot": false,
                             "src": "23663:3:1",
+                            "valueSize": 1
+                          }
+                        },
+                        {
+                          "retptr": {
+                            "declaration": 1494,
+                            "isOffset": false,
+                            "isSlot": false,
+                            "src": "23649:6:1",
                             "valueSize": 1
                           }
                         }
@@ -21771,26 +21771,26 @@
                     ],
                     "id": 1574,
                     "name": "VariableDeclarationStatement",
-                    "src": "24450:12:1"
+                    "src": "24450:11:1"
                   },
                   {
                     "attributes": {
                       "externalReferences": [
-                        {
-                          "retptr": {
-                            "declaration": 1573,
-                            "isOffset": false,
-                            "isSlot": false,
-                            "src": "24482:6:1",
-                            "valueSize": 1
-                          }
-                        },
                         {
                           "ret": {
                             "declaration": 1566,
                             "isOffset": false,
                             "isSlot": false,
                             "src": "24496:3:1",
+                            "valueSize": 1
+                          }
+                        },
+                        {
+                          "retptr": {
+                            "declaration": 1573,
+                            "isOffset": false,
+                            "isSlot": false,
+                            "src": "24482:6:1",
                             "valueSize": 1
                           }
                         }
@@ -22619,7 +22619,11 @@
     "name": "SourceUnit",
     "src": "0:24831:1"
   },
+  "compiler": {
+    "name": "solc",
+    "version": "0.4.18+commit.9cf6e910.Emscripten.clang"
+  },
   "networks": {},
-  "schemaVersion": "1.0.0",
-  "updatedAt": "2017-10-31T09:08:28.181Z"
+  "schemaVersion": "1.0.1",
+  "updatedAt": "2017-11-06T15:50:53.065Z"
 }

@@ -1,20 +1,36 @@
 var contract = require('truffle-contract');
-var ODLLDBConfigObject = require('../build/contracts/ODLLDB.json');
+var DBConfigObject = require('../build/contracts/DB.json');
 
-var ODLLUserWriter = artifacts.require("./odll/ODLLUserWriter.sol");
-var ODLLUserReader = artifacts.require("./odll/ODLLUserReader.sol");
-var ODLLSetter = artifacts.require("./odll/ODLLSetter.sol");
+var Setter = artifacts.require("./odll/Setter.sol");
 
-var ODLLDBContract = contract(ODLLDBConfigObject);
-ODLLDBContract.setProvider(web3.currentProvider);
+var UserWriter = artifacts.require("./odll/UserWriter.sol");
+var UserReader = artifacts.require("./odll/UserReader.sol");
 
-var dbAddress = ODLLDBContract.deployed()
+var ServiceWriter = artifacts.require("./odll/ServiceWriter.sol");
+var ServiceReader = artifacts.require("./odll/ServiceReader.sol");
+
+var ScanAppointmentWriter = artifacts.require("./odll/ScanAppointmentWriter.sol");
+var ScanApplicationWriter = artifacts.require("./odll/ScanApplicationWriter.sol");
+var TreatmentRequestWriter = artifacts.require("./odll/TreatmentRequestWriter.sol");
+
+var DBContract = contract(DBConfigObject);
+DBContract.setProvider(web3.currentProvider);
+
+var dbAddress = DBContract.deployed()
 .then(function(instance) {
   return instance.address;
 });
 
 module.exports = function (deployer) {
-  deployer.deploy(ODLLSetter, dbAddress);
-  deployer.deploy(ODLLUserWriter, dbAddress);
-  deployer.deploy(ODLLUserReader, dbAddress);
+  deployer.deploy(Setter, dbAddress);
+
+  deployer.deploy(UserWriter, dbAddress);
+  deployer.deploy(UserReader, dbAddress);
+
+  deployer.deploy(ServiceWriter, dbAddress);
+  deployer.deploy(ServiceReader, dbAddress);
+
+  deployer.deploy(ScanAppointmentWriter, dbAddress);
+  deployer.deploy(ScanApplicationWriter, dbAddress);
+  deployer.deploy(TreatmentRequestWriter, dbAddress);
 };
