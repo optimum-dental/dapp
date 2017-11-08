@@ -85,15 +85,16 @@ library userManager {
     address dbAddress,
     address userId,
     uint8 userType,
-    bytes32 name,
-    bytes32 email,
+    string name,
+    string email,
     bytes32 gravatar
   )
     internal
   {
-    // var nameLen = name.toSlice().len();
-    // require(nameLen <= getConfig(dbAddress, "max-user-name-length") && nameLen >= getConfig(dbAddress, "min-user-name-length"));
-    // require(email.toSlice().len() >= 5 && email.toSlice().len() <= 254);
+    var nameLen = name.toSlice().len();
+    var emailLen = email.toSlice().len();
+    require(nameLen <= getConfig(dbAddress, "max-user-name-length") && nameLen >= getConfig(dbAddress, "min-user-name-length"));
+    require(emailLen <= getConfig(dbAddress, "max-user-email-length") && emailLen >= getConfig(dbAddress, "min-user-email-length"));
 
     if (!userExists(dbAddress, userId)) {
       DB(dbAddress).setUIntValue(keccak256("user/created-on", userId), now);
@@ -109,8 +110,8 @@ library userManager {
     }
 
     DB(dbAddress).setUInt8Value(keccak256("user/type", userId), userType);
-    DB(dbAddress).setBytes32Value(keccak256("user/name", userId), name);
-    DB(dbAddress).setBytes32Value(keccak256("user/email", userId), email);
+    DB(dbAddress).setStringValue(keccak256("user/name", userId), name);
+    DB(dbAddress).setStringValue(keccak256("user/email", userId), email);
     DB(dbAddress).setBytes32Value(keccak256("user/gravatar", userId), gravatar);
   }
 
@@ -178,15 +179,17 @@ library userManager {
     address userId,
     bool isODLLDentist,
     bool isAvailable,
-    bytes32 companyName
+    string companyName
   )
     internal
   {
+    var companyNameLen = companyName.toSlice().len();
     require(userExists(dbAddress, userId));
     require(isActiveUser(dbAddress, userId));
+    require(companyNameLen <= getConfig(dbAddress, "max-company-name-length") && companyNameLen >= getConfig(dbAddress, "min-company-name-length"));
     DB(dbAddress).setBooleanValue(keccak256("user/is-odll-dentist?", userId), isODLLDentist);
     DB(dbAddress).setBooleanValue(keccak256("user/is-available?", userId), isAvailable);
-    DB(dbAddress).setBytes32Value(keccak256("dentist/company-name", userId), companyName);
+    DB(dbAddress).setStringValue(keccak256("dentist/company-name", userId), companyName);
   }
 
   function addODLLDentist (
@@ -344,15 +347,15 @@ library userManager {
 
   function hasScanResultAdverts (address dbAddress, address userId, uint scanResultAdverts) internal view returns (bool) {
       if (scanResultAdverts == 0) {
-          return true;
+        return true;
       }
       if (DB(dbAddress).getBooleanValue(keccak256("user.notification/disabled-all?", userId))) {
-          return false;
+        return false;
       }
 
       uint userScanResultAdverts = DB(dbAddress).getUInt8Value(keccak256("user.notification/job-recommendations", userId));
       if (userScanResultAdverts == 0 && scanResultAdverts == 1) { // default value
-          return true;
+        return true;
       }
 
       return userScanResultAdverts == scanResultAdverts;
@@ -362,69 +365,69 @@ library userManager {
     return DB(dbAddress).getBooleanValue(keccak256("dentist/is-available?", userId));
   }
 
-  function getUserIdentityData (address dbAddress, address userId)
-  internal
-  view
-  returns (
-    uint8 userType,
-    bytes32 name,
-    bytes32 email,
-    bytes32 gravatar,
-    uint8 status
-  ) {
-    userType = DB(dbAddress).getUInt8Value(keccak256("user/type", userId));
-    name = DB(dbAddress).getBytes32Value(keccak256("user/name", userId));
-    email = DB(dbAddress).getBytes32Value(keccak256("user/email", userId));
-    gravatar = DB(dbAddress).getBytes32Value(keccak256("user/gravatar", userId));
-    status = DB(dbAddress).getUInt8Value(keccak256("user/status", userId));
-  }
-
-  function getUserContactData (address dbAddress, address userId)
-  internal
-  view
-  returns (
-    bytes32 street,
-    bytes32 city,
-    bytes32 phoneNumber,
-    uint state,
-    bytes32 zipCode,
-    uint country
-  ) {
-    street = DB(dbAddress).getBytes32Value(keccak256("user/street", userId));
-    city = DB(dbAddress).getBytes32Value(keccak256("user/city", userId));
-    phoneNumber = DB(dbAddress).getBytes32Value(keccak256("user/phone-number", userId));
-    state = DB(dbAddress).getUIntValue(keccak256("user/state", userId));
-    zipCode = DB(dbAddress).getBytes32Value(keccak256("user/zip-code", userId));
-    country = DB(dbAddress).getUIntValue(keccak256("user/country", userId));
-  }
-
-  function getUserPersonalData (address dbAddress, address userId)
-  internal
-  view
-  returns (
-    uint8 gender,
-    bytes32 socialSecurityNumber,
-    bytes32 birthday
-  ) {
-    gender = DB(dbAddress).getUInt8Value(keccak256("user/gender", userId));
-    socialSecurityNumber = DB(dbAddress).getBytes32Value(keccak256("user/social-security-number", userId));
-    birthday = DB(dbAddress).getBytes32Value(keccak256("user/birthday", userId));
-  }
-
-  function writeUserDentistId (address dbAddress, address userId, address dentistId)
+  function writeUserDentist (address dbAddress, address userId, address dentistId)
     internal
   {
-    utilities.addIdArrayItem(dbAddress, userId, 'patient/dentist', 'patient/dentists-count', dentistId);
+    utilities.addRemovableIdItem(dbAddress, userId, 'patient/dentist', 'patient/dentists-count', 'patient/dentist-key', dentistId);
+    utilities.addRemovableIdItem(dbAddress, dentistId, 'dentist/patient', 'dentist/patient-key', 'dentist/patient-key', userId);
   }
 
-  function getUserDentistsIds (address dbAddress, address userId)
+  function fetchUserDentists (
+    address dbAddress,
+    address userId,
+    uint offset, // starting from offset: 0-based
+    uint limit, // not more than limit
+    uint seed // seed value to give the illusion of randomisation
+  )
     internal
     view
     returns (
+      uint totalNumberFound,
       address[] dentistsIds
     )
   {
     dentistsIds = utilities.getRemovableIdArrayAddressItems(dbAddress, userId, 'patient/dentist', 'patient/dentists-count', 'patient/dentist-key');
+    (totalNumberFound, dentistsIds) = utilities.getSlicedArray(dentistsIds, offset, limit, seed);
+  }
+
+  function blockUserDentist (
+    address dbAddress,
+    address userId,
+    address dentistId
+  )
+    internal
+  {
+    DB(dbAddress).setUInt8Value(keccak256("patient/dentist", userId, dentistId), 2);
+    DB(dbAddress).setUInt8Value(keccak256("dentist/patient", dentistId, userId), 2);
+  }
+
+  function unblockUserDentist (
+    address dbAddress,
+    address userId,
+    address dentistId
+  )
+    internal
+  {
+    DB(dbAddress).setUInt8Value(keccak256("patient/dentist", userId, dentistId), 1);
+    DB(dbAddress).setUInt8Value(keccak256("dentist/patient", dentistId, userId), 1);
+  }
+
+  function fetchUserPatients (
+    address dbAddress,
+    address userId,
+    uint offset, // starting from offset: 0-based
+    uint limit, // not more than limit
+    uint seed // seed value to give the illusion of randomisation
+  )
+    internal
+    view
+    returns (
+      uint totalNumberFound,
+      address[] patientsIds
+    )
+  {
+    patientsIds = utilities.getRemovableIdArrayAddressItems(dbAddress, userId, 'dentist/patient', 'dentist/patients-count', 'dentist/patient-key');
+    (totalNumberFound, patientsIds) = utilities.getSlicedArray(patientsIds, offset, limit, seed);
   }
 
   function findDentists (
@@ -449,28 +452,6 @@ library userManager {
     foundDentistsIds = utilities.intersectBudgetAndStateBasedDentists(dbAddress, budgetBasedDentistsIds, stateBasedDentistsIds);
 
     (totalNumberFound, foundDentistsIds) = utilities.getSlicedArray(foundDentistsIds, offset, limit, seed);
-  }
-
-  function getDentistIdentityData (address dbAddress, address dentistId)
-    internal
-    view
-    returns (
-      bool isODLLDentist,
-      bool isAvailable,
-      bytes32 companyName
-    ) {
-    isODLLDentist = DB(dbAddress).getBooleanValue(keccak256("user/is-odll-dentist?", dentistId));
-    isAvailable = DB(dbAddress).getBooleanValue(keccak256("user/is-available?", dentistId));
-    companyName = DB(dbAddress).getBytes32Value(keccak256("dentist/company-name", dentistId));
-  }
-
-  function getDentistFeeData (address dbAddress, uint serviceTypeId, uint serviceId, address dentistId)
-    internal
-    view
-    returns (
-      uint fee
-    ) {
-    fee = searchLibrary.getServiceFee(dbAddress, serviceTypeId, serviceId, dentistId);
   }
 
   function addOfficialToODLL (address dbAddress, address officialId, uint8 userType)
@@ -539,12 +520,10 @@ library userManager {
     view
     returns (
       uint totalNumberFound,
-      uint[] foundServiceIds,
-      uint[] foundFees
+      uint[] foundServiceIds
     )
   {
     (totalNumberFound, foundServiceIds) = fetchServices(dbAddress, userId, serviceTypeId, offset, limit, seed);
-    foundFees = searchLibrary.getServiceFees(dbAddress, serviceTypeId, foundServiceIds, userId);
   }
 
   function fetchServices (
@@ -643,7 +622,7 @@ library userManager {
   )
     internal
   {
-    servicesLibrary.expireScanRequest(dbAddress, patientId, scanRequestId);
+    servicesLibrary.expireScanRequest(dbAddress, scanRequestId);
   }
 
   function acceptScanRequest (
@@ -705,7 +684,7 @@ library userManager {
     internal
   {
     address ODLLId = DB(dbAddress).getAddressValue(keccak256("odll/payment-address"));
-    uint ODLLTreatmentPaymentPercentage = DB(dbAddress).getUIntValue(keccak256("odll/scan-payment-percentage"));
+    uint ODLLScanPaymentPercentage = DB(dbAddress).getUIntValue(keccak256("odll/scan-payment-percentage"));
     uint change = SafeMath.sub(amount, quote);
     uint ODLLFee = SafeMath.mul(SafeMath.div(ODLLScanPaymentPercentage, 100), quote);
     uint dentistFee = SafeMath.sub(quote, ODLLFee);
@@ -726,6 +705,7 @@ library userManager {
     addToODLLTotalEarned(dbAddress, ODLLId, tempODLLFee);
 
     servicesLibrary.acceptScanApplication(dbAddress, dentistId, patientId, scanApplicationId, quote);
+    writeUserDentist(dbAddress, patientId, dentistId);
 
     ODLLId.transfer(tempODLLFee);
     dentistId.transfer(tempDentistFee);
@@ -861,22 +841,10 @@ library userManager {
     view
     returns (
       uint totalNumberFound,
-      uint[] scanRequestsIds,
-      bytes32[] appointmentDates,
-      bytes32[] scanTimes,
-      bytes32[] scanInsurances,
-      bytes32[] comments,
-      uint8[] statuses,
-      uint[] createdOns
+      uint[] scanRequestsIds
     )
   {
-    (scanRequestsIds, appointmentDates, scanTimes, scanInsurances, comments, statuses, createdOns) = searchLibrary.getScanRequestsForPatient(dbAddress, patientId);
-    (totalNumberFound, appointmentDates) = utilities.getSlicedArray(appointmentDates, offset, limit, seed);
-    (totalNumberFound, scanTimes) = utilities.getSlicedArray(scanTimes, offset, limit, seed);
-    (totalNumberFound, scanInsurances) = utilities.getSlicedArray(scanInsurances, offset, limit, seed);
-    (totalNumberFound, comments) = utilities.getSlicedArray(comments, offset, limit, seed);
-    (totalNumberFound, statuses) = utilities.getSlicedArray(statuses, offset, limit, seed);
-    (totalNumberFound, createdOns) = utilities.getSlicedArray(createdOns, offset, limit, seed);
+    scanRequestsIds = searchLibrary.getScanRequestsForPatient(dbAddress, patientId);
     (totalNumberFound, scanRequestsIds) = utilities.getSlicedArray(scanRequestsIds, offset, limit, seed);
   }
 
@@ -891,24 +859,10 @@ library userManager {
     view
     returns (
       uint totalNumberFound,
-      uint[] scanRequestsIds,
-      bytes32[] appointmentDates,
-      bytes32[] scanTimes,
-      bytes32[] scanInsurances,
-      bytes32[] comments,
-      uint8[] statuses,
-      uint[] createdOns,
-      address[] dentistsIds
+      uint[] scanRequestsIds
     )
   {
-    (scanRequestsIds, appointmentDates, scanTimes, scanInsurances, comments, statuses, createdOns, dentistsIds) = searchLibrary.getAcceptedScanRequestsForPatient(dbAddress, patientId);
-    (totalNumberFound, appointmentDates) = utilities.getSlicedArray(appointmentDates, offset, limit, seed);
-    (totalNumberFound, scanTimes) = utilities.getSlicedArray(scanTimes, offset, limit, seed);
-    (totalNumberFound, scanInsurances) = utilities.getSlicedArray(scanInsurances, offset, limit, seed);
-    (totalNumberFound, comments) = utilities.getSlicedArray(comments, offset, limit, seed);
-    (totalNumberFound, statuses) = utilities.getSlicedArray(statuses, offset, limit, seed);
-    (totalNumberFound, createdOns) = utilities.getSlicedArray(createdOns, offset, limit, seed);
-    (totalNumberFound, dentistsIds) = utilities.getSlicedArray(dentistsIds, offset, limit, seed);
+    scanRequestsIds = searchLibrary.getAcceptedScanRequestsForPatient(dbAddress, patientId);
     (totalNumberFound, scanRequestsIds) = utilities.getSlicedArray(scanRequestsIds, offset, limit, seed);
   }
 
@@ -923,51 +877,27 @@ library userManager {
     view
     returns (
       uint totalNumberFound,
-      uint[] scanApplicationsIds,
-      address[] dentistsIds,
-      bytes32[] comments,
-      uint[] quotes,
-      uint8[] statuses,
-      uint[] createdOns
+      uint[] scanApplicationsIds
     )
   {
-    (scanApplicationsIds, dentistsIds, comments, quotes, statuses, createdOns) = searchLibrary.getScanApplicationsForPatient(dbAddress, patientId);
-    (totalNumberFound, dentistsIds) = utilities.getSlicedArray(dentistsIds, offset, limit, seed);
-    (totalNumberFound, comments) = utilities.getSlicedArray(comments, offset, limit, seed);
-    (totalNumberFound, quotes) = utilities.getSlicedArray(quotes, offset, limit, seed);
-    (totalNumberFound, statuses) = utilities.getSlicedArray(statuses, offset, limit, seed);
-    (totalNumberFound, createdOns) = utilities.getSlicedArray(createdOns, offset, limit, seed);
+    scanApplicationsIds = searchLibrary.getScanApplicationsForPatient(dbAddress, patientId);
     (totalNumberFound, scanApplicationsIds) = utilities.getSlicedArray(scanApplicationsIds, offset, limit, seed);
   }
 
   function fetchAllScanRequests (
+    address dbAddress,
     uint offset, // starting from offset: 0-based
     uint limit, // not more than limit
     uint seed // seed value to give the illusion of randomisation
   )
-    external
+    internal
     view
     returns (
       uint totalNumberFound,
-      uint[] scanRequestsIds,
-      address[] patientsIds,
-      bytes32[] appointmentDates,
-      bytes32[] scanTimes,
-      bytes32[] scanInsurances,
-      bytes32[] comments,
-      uint8[] statuses,
-      uint[] createdOns
+      uint[] scanRequestsIds
     )
   {
-    (scanRequestsIds, patientsIds, appointmentDates, scanTimes, scanInsurances, comments, quotes, statuses, createdOns) = searchLibrary.getAllScanRequests(dbAddress);
-
-    (totalNumberFound, patientsIds) = utilities.getSlicedArray(patientsIds, offset, limit, seed);
-    (totalNumberFound, appointmentDates) = utilities.getSlicedArray(appointmentDates, offset, limit, seed);
-    (totalNumberFound, scanTimes) = utilities.getSlicedArray(scanTimes, offset, limit, seed);
-    (totalNumberFound, scanInsurances) = utilities.getSlicedArray(scanInsurances, offset, limit, seed);
-    (totalNumberFound, comments) = utilities.getSlicedArray(comments, offset, limit, seed);
-    (totalNumberFound, statuses) = utilities.getSlicedArray(statuses, offset, limit, seed);
-    (totalNumberFound, createdOns) = utilities.getSlicedArray(createdOns, offset, limit, seed);
+    scanRequestsIds = searchLibrary.getAllScanRequests(dbAddress);
     (totalNumberFound, scanRequestsIds) = utilities.getSlicedArray(scanRequestsIds, offset, limit, seed);
   }
 
@@ -982,25 +912,10 @@ library userManager {
     view
     returns(
       uint totalNumberFound,
-      uint[] scanRequestsIds,
-      address[] patientsIds,
-      bytes32[] appointmentDates,
-      bytes32[] scanTimes,
-      bytes32[] scanInsurances,
-      bytes32[] comments,
-      uint8[] statuses,
-      uint[] createdOns
+      uint[] scanRequestsIds
     )
   {
-    (scanRequestsIds, patientsIds, appointmentDates, scanTimes, scanInsurances, comments, quotes, statuses, createdOns) = searchLibrary.getDirectScanRequestsForDentist(dbAddress, dentistId);
-
-    (totalNumberFound, patientsIds) = utilities.getSlicedArray(patientsIds, offset, limit, seed);
-    (totalNumberFound, appointmentDates) = utilities.getSlicedArray(appointmentDates, offset, limit, seed);
-    (totalNumberFound, scanTimes) = utilities.getSlicedArray(scanTimes, offset, limit, seed);
-    (totalNumberFound, scanInsurances) = utilities.getSlicedArray(scanInsurances, offset, limit, seed);
-    (totalNumberFound, comments) = utilities.getSlicedArray(comments, offset, limit, seed);
-    (totalNumberFound, statuses) = utilities.getSlicedArray(statuses, offset, limit, seed);
-    (totalNumberFound, createdOns) = utilities.getSlicedArray(createdOns, offset, limit, seed);
+    scanRequestsIds = searchLibrary.getDirectScanRequestsForDentist(dbAddress, dentistId);
     (totalNumberFound, scanRequestsIds) = utilities.getSlicedArray(scanRequestsIds, offset, limit, seed);
   }
 
@@ -1015,25 +930,10 @@ library userManager {
     view
     returns (
       uint totalNumberFound,
-      uint[] scanRequestsIds,
-      address[] patientsIds,
-      bytes32[] appointmentDates,
-      bytes32[] scanTimes,
-      bytes32[] scanInsurances,
-      bytes32[] comments,
-      uint8[] statuses,
-      uint[] createdOns
+      uint[] scanRequestsIds
     )
   {
-    (scanRequestsIds, patientsIds, appointmentDates, scanTimes, scanInsurances, comments, quotes, statuses, createdOns) = searchLibrary.getAceptedScanRequestsForDentist(dbAddress, dentistId);
-
-    (totalNumberFound, patientsIds) = utilities.getSlicedArray(patientsIds, offset, limit, seed);
-    (totalNumberFound, appointmentDates) = utilities.getSlicedArray(appointmentDates, offset, limit, seed);
-    (totalNumberFound, scanTimes) = utilities.getSlicedArray(scanTimes, offset, limit, seed);
-    (totalNumberFound, scanInsurances) = utilities.getSlicedArray(scanInsurances, offset, limit, seed);
-    (totalNumberFound, comments) = utilities.getSlicedArray(comments, offset, limit, seed);
-    (totalNumberFound, statuses) = utilities.getSlicedArray(statuses, offset, limit, seed);
-    (totalNumberFound, createdOns) = utilities.getSlicedArray(createdOns, offset, limit, seed);
+    scanRequestsIds = searchLibrary.getAcceptedScanRequestsForDentist(dbAddress, dentistId);
     (totalNumberFound, scanRequestsIds) = utilities.getSlicedArray(scanRequestsIds, offset, limit, seed);
   }
 
@@ -1049,19 +949,9 @@ library userManager {
     returns (
       uint totalNumberFound,
       uint[] scanApplicationsIds
-      address[] patientsIds,
-      bytes32[] comments,
-      uint[] quotes,
-      uint8[] statuses,
-      uint[] createdOns
     )
   {
-    (scanApplicationsIds, patientsIds, comments, quotes, statuses, createdOns) = searchLibrary.getScanApplicationsForDentist(dbAddress, dentistId);
-    (totalNumberFound, patientsIds) = utilities.getSlicedArray(patientsIds, offset, limit, seed);
-    (totalNumberFound, comments) = utilities.getSlicedArray(comments, offset, limit, seed);
-    (totalNumberFound, quotes) = utilities.getSlicedArray(quotes, offset, limit, seed);
-    (totalNumberFound, statuses) = utilities.getSlicedArray(statuses, offset, limit, seed);
-    (totalNumberFound, createdOns) = utilities.getSlicedArray(createdOns, offset, limit, seed);
+    scanApplicationsIds = searchLibrary.getScanApplicationsForDentist(dbAddress, dentistId);
     (totalNumberFound, scanApplicationsIds) = utilities.getSlicedArray(scanApplicationsIds, offset, limit, seed);
   }
 }

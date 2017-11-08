@@ -8,6 +8,7 @@ contract ScanApplicationWriter is Restrictor {
     dbAddress = _dbAddress;
   }
 
+  // Scan Application
   function applyToScan (
     address dentistId,
     address patientId,

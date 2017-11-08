@@ -9,13 +9,14 @@ contract TreatmentApplicationWriter is Restrictor {
     dbAddress = _dbAddress;
   }
 
+  // Treatment Application
   function applyToTreat (
     address patientId,
     uint treatmentRequestId,
     uint quote,
     bytes32 comment
   )
-    internal
+    external
   {
     userManager.applyToTreat(dbAddress, msg.sender, patientId, treatmentRequestId, quote, comment);
   }
@@ -24,7 +25,7 @@ contract TreatmentApplicationWriter is Restrictor {
     address patientId,
     uint treatmentApplicationId
   )
-    internal
+    external
   {
     userManager.cancelTreatmentApplication(dbAddress, msg.sender, patientId, treatmentApplicationId);
   }
@@ -34,7 +35,7 @@ contract TreatmentApplicationWriter is Restrictor {
     uint treatmentApplicationId,
     uint quote
   )
-    internal
+    external
   {
     if (msg.value < quote) {
       msg.sender.transfer(msg.value);
@@ -48,7 +49,7 @@ contract TreatmentApplicationWriter is Restrictor {
     address dentistId,
     uint treatmentId
   )
-    internal
+    external
   {
     userManager.cancelTreatment(dbAddress, dentistId, msg.sender, treatmentId);
   }
@@ -57,7 +58,7 @@ contract TreatmentApplicationWriter is Restrictor {
     address dentistId,
     uint treatmentId
   )
-    internal
+    external
   {
     userManager.markTreatmentDone(dbAddress, dentistId, msg.sender, treatmentId);
   }

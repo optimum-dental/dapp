@@ -90,7 +90,7 @@ library servicesLibrary {
     } else {
       DB(dbAddress).setBooleanValue(keccak256("scan-request/is-general?", scanRequestId), false);
       DB(dbAddress).setAddressValue(keccak256("scan-request/dentist", scanRequestId), dentistId);
-      utilities.addIdArrayItem(dbAddress, dentistId, "dentist/scan-request", "dentist/scan-requests-count" scanRequestId);
+      utilities.addIdArrayItem(dbAddress, dentistId, "dentist/scan-request", "dentist/scan-requests-count", scanRequestId);
     }
   }
 
@@ -105,7 +105,7 @@ library servicesLibrary {
   )
     internal
   {
-    utilities.addIdArrayItem(dbAddress, patientId, "patient/scan-request", "patient/scan-requests-count" scanRequestId);
+    utilities.addIdArrayItem(dbAddress, patientId, "patient/scan-request", "patient/scan-requests-count", scanRequestId);
     DB(dbAddress).setAddressValue(keccak256("scan-request/patient", scanRequestId), patientId);
     DB(dbAddress).setBytes32Value(keccak256("scan-request/appointment-date", scanRequestId), appointmentDate);
     DB(dbAddress).setBytes32Value(keccak256("scan-request/appointment-time", scanRequestId), scanTime);
@@ -208,24 +208,24 @@ library servicesLibrary {
     }
 
     initScanApplication(dbAddress, scanRequestId, scanApplicationId);
-    writeApplicationData(dbAddress, dentistId, patientId, scanRequestId, scanApplicationId, quote, comment);
+    writeScanApplicationData(dbAddress, dentistId, patientId, scanRequestId, scanApplicationId, quote, comment);
   }
 
-  function initScanApplication (address dbAddress, uint scanRequestId, uint scanApplicationId) {
+  function initScanApplication (address dbAddress, uint scanRequestId, uint scanApplicationId) internal {
     DB(dbAddress).setUInt8Value(keccak256("scan-application/status", scanApplicationId), 1);
     DB(dbAddress).setUIntValue(keccak256("scan-application/created-on", scanApplicationId), now);
     DB(dbAddress).setUIntValue(keccak256("scan-application/scan-request", scanApplicationId), scanRequestId);
     utilities.addArrayItem(dbAddress, "scan-application", "scan-applications-count", scanApplicationId); // scanApplicationId is currently just there for counter purpose
-    utilities.addIdArrayItem(dbAddress, scanRequestId, "scan-request/scan-application", "scan-request/scan-applications-count" scanApplicationId);
+    utilities.addIdArrayItem(dbAddress, scanRequestId, "scan-request/scan-application", "scan-request/scan-applications-count", scanApplicationId);
   }
 
-  function writeApplicationData (address dbAddress, address dentistId, address patientId, uint scanRequestId, uint scanApplicationId, uint quote, bytes32 comment) internal {
+  function writeScanApplicationData (address dbAddress, address dentistId, address patientId, uint scanRequestId, uint scanApplicationId, uint quote, bytes32 comment) internal {
     DB(dbAddress).setUIntValue(keccak256("scan-application/quote", scanApplicationId), quote);
     DB(dbAddress).setBytes32Value(keccak256("scan-application/comment", scanApplicationId), comment);
     DB(dbAddress).setAddressValue(keccak256("scan-application/dentist", scanApplicationId), dentistId);
     DB(dbAddress).setAddressValue(keccak256("scan-application/patient", scanApplicationId), patientId);
-    utilities.addIdArrayItem(dbAddress, dentistId, "dentist/scan-application", "dentist/scan-applications-count" scanApplicationId);
-    utilities.addIdArrayItem(dbAddress, patientId, "patient/scan-application", "patient/scan-applications-count" scanApplicationId);
+    utilities.addIdArrayItem(dbAddress, dentistId, "dentist/scan-application", "dentist/scan-applications-count", scanApplicationId);
+    utilities.addIdArrayItem(dbAddress, patientId, "patient/scan-application", "patient/scan-applications-count", scanApplicationId);
   }
 
   function cancelScanApplication (
@@ -237,7 +237,7 @@ library servicesLibrary {
     internal
   {
     require(DB(dbAddress).getUInt8Value(keccak256("scan-application/status", scanApplicationId)) == 1
-      && DB(dbAddress).getAddressValue(keccak256("scan-application/dentist", scanApplicationId)) == dentistId);
+      && DB(dbAddress).getAddressValue(keccak256("scan-application/dentist", scanApplicationId)) == dentistId
       && DB(dbAddress).getAddressValue(keccak256("scan-application/patient", scanApplicationId)) == patientId);
 
     DB(dbAddress).setUInt8Value(keccak256("scan-application/status", scanApplicationId), 3);
@@ -255,11 +255,11 @@ library servicesLibrary {
   {
 
     uint caseId = utilities.getArrayItemsCount(dbAddress, "scans-count");
-    uint8 scanRequestId = DB(dbAddress).getUIntValue(keccak("scan-application/scan-request", scanApplicationId));
+    uint scanRequestId = DB(dbAddress).getUIntValue(keccak256("scan-application/scan-request", scanApplicationId));
     require(DB(dbAddress).getUInt8Value(keccak256("case/status", caseId)) == 0
       && DB(dbAddress).getUInt8Value(keccak256("scan-application/status", scanApplicationId)) == 1
       && DB(dbAddress).getUInt8Value(keccak256("scan-request/status", scanRequestId)) == 1
-      && DB(dbAddress).getAddressValue(keccak256("scan-request/patient", scanRequestId)) == patientId);
+      && DB(dbAddress).getAddressValue(keccak256("scan-request/patient", scanRequestId)) == patientId
       && DB(dbAddress).getAddressValue(keccak256("scan-application/dentist", scanApplicationId)) == dentistId
       && DB(dbAddress).getAddressValue(keccak256("scan-application/patient", scanApplicationId)) == patientId
       && DB(dbAddress).getAddressValue(keccak256("odll/payment-address")) != 0x0);
@@ -272,8 +272,8 @@ library servicesLibrary {
     deactivateEveryOtherScanApplications(dbAddress, scanRequestId, scanApplicationId);
   }
 
-  function deactivateEveryOtherScanApplications (address dbAddress, uint scanRequestId, uint winningScanApplicationId) {
-    uint count = getIdArrayItemsCount(dbAddress, scanRequestId, "scan-request/scan-applications-count");
+  function deactivateEveryOtherScanApplications (address dbAddress, uint scanRequestId, uint winningScanApplicationId) internal {
+    uint count = utilities.getIdArrayItemsCount(dbAddress, scanRequestId, "scan-request/scan-applications-count");
     for (uint i = 0; i < count; i++) {
       var scanApplicationId = DB(dbAddress).getUIntValue(keccak256("scan-request/scan-application", scanRequestId, i));
       if (scanApplicationId != winningScanApplicationId) {
@@ -282,7 +282,7 @@ library servicesLibrary {
     }
   }
 
-  function initCase (address dbAddress, address dentistId, address patientId, uint scanRequestId, uint scanApplicationId, uint caseId) {
+  function initCase (address dbAddress, address dentistId, address patientId, uint scanRequestId, uint scanApplicationId, uint caseId) internal {
     DB(dbAddress).setUInt8Value(keccak256("case/status", caseId), 1);
     DB(dbAddress).setUIntValue(keccak256("case/created-on", caseId), now);
     DB(dbAddress).setAddressValue(keccak256("case/dentist", caseId), dentistId);
@@ -295,8 +295,8 @@ library servicesLibrary {
   function writeCaseData (address dbAddress, address dentistId, address patientId, uint caseId, uint amount) internal {
     DB(dbAddress).setUIntValue(keccak256("case/amount", caseId), amount);
     DB(dbAddress).setBooleanValue(keccak256("case/paid", caseId), true);
-    utilities.addIdArrayItem(dbAddress, dentistId, "dentist/case", "dentist/cases-count" caseId);
-    utilities.addIdArrayItem(dbAddress, patientId, "patient/case", "patient/cases-count" caseId);
+    utilities.addIdArrayItem(dbAddress, dentistId, "dentist/case", "dentist/cases-count", caseId);
+    utilities.addIdArrayItem(dbAddress, patientId, "patient/case", "patient/cases-count", caseId);
   }
 
   // treatment request status: 1 => pending, 2 => fulfilled, 3 => canceled
@@ -314,14 +314,14 @@ library servicesLibrary {
     internal
   {
     uint treatmentRequestId = utilities.getArrayItemsCount(dbAddress, "treatment-requests-count");
-    caseId = getCaseIfNecessary(hasCaseId);
+    caseId = getCaseIfNecessary(dbAddress, hasCaseId);
     require(DB(dbAddress).getUInt8Value(keccak256("treatment-request/status", treatmentRequestId)) == 0
       && DB(dbAddress).getUInt8Value(keccak256("case/status", caseId)) == 1);
 
     for (uint i = 0; i < treatmentRequestId; i++) {
       var treatmentRequest = DB(dbAddress).getUIntValue(keccak256("patient/treatment-request", patientId, i));
-      var case = DB(dbAddress).getUIntValue(keccak256("treatment-request/case", treatmentRequest));
-      if (case == caseId
+      var caseItem = DB(dbAddress).getUIntValue(keccak256("treatment-request/case", treatmentRequest));
+      if (caseItem == caseId
           && (DB(dbAddress).getUInt8Value(keccak256("treatment-request/status", treatmentRequest)) == 1
           || DB(dbAddress).getUInt8Value(keccak256("treatment-request/status", treatmentRequest)) == 2)) {
         return;
@@ -332,7 +332,7 @@ library servicesLibrary {
     addPatientToTreatmentRequest(dbAddress, patientId, treatmentRequestId, insurance, scanResults, comment);
   }
 
-  function getCaseIfNecessary (bool hasCaseId) internal view returns (uint caseId) {
+  function getCaseIfNecessary (address dbAddress, bool hasCaseId) internal view returns (uint caseId) {
     if (!hasCaseId) {
       caseId = utilities.getArrayItemsCount(dbAddress, "cases-count");
       DB(dbAddress).setUInt8Value(keccak256("case/status", caseId), 1);
@@ -344,7 +344,7 @@ library servicesLibrary {
     DB(dbAddress).setUIntValue(keccak256("treatment-request/created-on", treatmentRequestId), now);
     DB(dbAddress).setUIntValue(keccak256("treatment-request/case", treatmentRequestId), caseId);
     utilities.addArrayItem(dbAddress, "treatment-request", "treatment-requests-count", treatmentRequestId); // caseId is currently just there for counter purpose
-    utilities.addIdArrayItem(dbAddress, caseId, "case/treatment-request", "case/treatment-requests-count" treatmentRequestId);
+    utilities.addIdArrayItem(dbAddress, caseId, "case/treatment-request", "case/treatment-requests-count", treatmentRequestId);
   }
 
   function addPatientToTreatmentRequest (
@@ -357,7 +357,7 @@ library servicesLibrary {
   )
     internal
   {
-    utilities.addIdArrayItem(dbAddress, patientId, "patient/treatment-request", "patient/treatment-requests-count" treatmentRequestId);
+    utilities.addIdArrayItem(dbAddress, patientId, "patient/treatment-request", "patient/treatment-requests-count", treatmentRequestId);
     DB(dbAddress).setAddressValue(keccak256("treatment-request/patient", treatmentRequestId), patientId);
     DB(dbAddress).setBytes32Value(keccak256("treatment-request/insurance", treatmentRequestId), insurance);
     DB(dbAddress).setBytes32Value(keccak256("treatment-request/comment", treatmentRequestId), comment);
@@ -421,24 +421,24 @@ library servicesLibrary {
     }
 
     initTreatmentApplication(dbAddress, treatmentRequestId, treatmentApplicationId);
-    writeApplicationData(dbAddress, dentistId, patientId, treatmentRequestId, treatmentApplicationId, quote, comment);
+    writeTreatmentApplicationData(dbAddress, dentistId, patientId, treatmentRequestId, treatmentApplicationId, quote, comment);
   }
 
-  function initTreatmentApplication (address dbAddress, uint treatmentRequestId, uint treatmentApplicationId) {
+  function initTreatmentApplication (address dbAddress, uint treatmentRequestId, uint treatmentApplicationId) internal {
     DB(dbAddress).setUInt8Value(keccak256("treatment-application/status", treatmentApplicationId), 1);
     DB(dbAddress).setUIntValue(keccak256("treatment-application/created-on", treatmentApplicationId), now);
     DB(dbAddress).setUIntValue(keccak256("treatment-application/treatment-request", treatmentApplicationId), treatmentRequestId);
     utilities.addArrayItem(dbAddress, "treatment-application", "treatment-applications-count", treatmentApplicationId); // treatmentRequestId is currently just there for counter purpose
   }
 
-  function writeApplicationData (address dbAddress, address dentistId, address patientId, uint treatmentRequestId, uint treatmentApplicationId, uint quote, bytes32 comment) internal {
+  function writeTreatmentApplicationData (address dbAddress, address dentistId, address patientId, uint treatmentRequestId, uint treatmentApplicationId, uint quote, bytes32 comment) internal {
     DB(dbAddress).setUIntValue(keccak256("treatment-application/quote", treatmentApplicationId), quote);
     DB(dbAddress).setBytes32Value(keccak256("treatment-application/comment", treatmentApplicationId), comment);
     DB(dbAddress).setAddressValue(keccak256("treatment-application/dentist", treatmentApplicationId), dentistId);
     DB(dbAddress).setAddressValue(keccak256("treatment-application/patient", treatmentApplicationId), patientId);
-    utilities.addIdArrayItem(dbAddress, dentistId, "dentist/treatment-application", "dentist/treatment-applications-count" treatmentApplicationId);
-    utilities.addIdArrayItem(dbAddress, patientId, "patient/treatment-application", "patient/treatment-applications-count" treatmentApplicationId);
-    utilities.addIdArrayItem(dbAddress, treatmentRequestId, "treatment-request/treatment-application", "treatment-request/treatment-applications-count" treatmentApplicationId);
+    utilities.addIdArrayItem(dbAddress, dentistId, "dentist/treatment-application", "dentist/treatment-applications-count", treatmentApplicationId);
+    utilities.addIdArrayItem(dbAddress, patientId, "patient/treatment-application", "patient/treatment-applications-count", treatmentApplicationId);
+    utilities.addIdArrayItem(dbAddress, treatmentRequestId, "treatment-request/treatment-application", "treatment-request/treatment-applications-count", treatmentApplicationId);
   }
 
   function cancelTreatmentApplication (
@@ -450,7 +450,7 @@ library servicesLibrary {
     internal
   {
     require(DB(dbAddress).getUInt8Value(keccak256("treatment-application/status", treatmentApplicationId)) == 1
-      && DB(dbAddress).getAddressValue(keccak256("treatment-application/dentist", treatmentApplicationId)) == dentistId);
+      && DB(dbAddress).getAddressValue(keccak256("treatment-application/dentist", treatmentApplicationId)) == dentistId
       && DB(dbAddress).getAddressValue(keccak256("treatment-application/patient", treatmentApplicationId)) == patientId);
 
     DB(dbAddress).setUInt8Value(keccak256("treatment-application/status", treatmentApplicationId), 3);
@@ -468,11 +468,11 @@ library servicesLibrary {
   {
 
     uint treatmentId = utilities.getArrayItemsCount(dbAddress, "treatments-count");
-    uint8 treatmentRequestId = DB(dbAddress).getUIntValue(keccak("treatment-application/treatment-request", treatmentApplicationId));
+    uint treatmentRequestId = DB(dbAddress).getUIntValue(keccak256("treatment-application/treatment-request", treatmentApplicationId));
     require(DB(dbAddress).getUInt8Value(keccak256("treatment/status", treatmentId)) == 0
       && DB(dbAddress).getUInt8Value(keccak256("treatment-application/status", treatmentApplicationId)) == 1
       && DB(dbAddress).getUInt8Value(keccak256("treatment-request/status", treatmentRequestId)) == 1
-      && DB(dbAddress).getAddressValue(keccak256("treatment-request/patient", treatmentRequestId)) == patientId);
+      && DB(dbAddress).getAddressValue(keccak256("treatment-request/patient", treatmentRequestId)) == patientId
       && DB(dbAddress).getAddressValue(keccak256("treatment-application/dentist", treatmentApplicationId)) == dentistId
       && DB(dbAddress).getAddressValue(keccak256("treatment-application/patient", treatmentApplicationId)) == patientId
       && DB(dbAddress).getAddressValue(keccak256("odll/payment-address")) != 0x0);
@@ -485,8 +485,8 @@ library servicesLibrary {
     deactivateEveryOtherTreatmentApplications(dbAddress, treatmentRequestId, treatmentApplicationId);
   }
 
-  function deactivateEveryOtherTreatmentApplications (address dbAddress, uint treatmentRequestId, uint winningTreatmentApplicationId) {
-    uint count = getIdArrayItemsCount(dbAddress, treatmentRequestId, "treatment-request/treatment-applications-count");
+  function deactivateEveryOtherTreatmentApplications (address dbAddress, uint treatmentRequestId, uint winningTreatmentApplicationId) internal {
+    uint count = utilities.getIdArrayItemsCount(dbAddress, treatmentRequestId, "treatment-request/treatment-applications-count");
     for (uint i = 0; i < count; i++) {
       var treatmentApplicationId = DB(dbAddress).getUIntValue(keccak256("treatment-request/treatment-application", treatmentRequestId, i));
       if (treatmentApplicationId != winningTreatmentApplicationId) {
@@ -495,7 +495,7 @@ library servicesLibrary {
     }
   }
 
-  function initTreatment (address dbAddress, address dentistId, address patientId, uint treatmentRequestId, uint treatmentApplicationId, uint treatmentId) {
+  function initTreatment (address dbAddress, address dentistId, address patientId, uint treatmentRequestId, uint treatmentApplicationId, uint treatmentId) internal {
     DB(dbAddress).setUInt8Value(keccak256("treatment/status", treatmentId), 1);
     DB(dbAddress).setUIntValue(keccak256("treatment/created-on", treatmentId), now);
     DB(dbAddress).setAddressValue(keccak256("treatment/dentist", treatmentId), dentistId);
@@ -508,8 +508,8 @@ library servicesLibrary {
   function writeTreatmentData (address dbAddress, address dentistId, address patientId, uint treatmentId, uint amount) internal {
     DB(dbAddress).setUIntValue(keccak256("treatment/amount", treatmentId), amount);
     DB(dbAddress).setBooleanValue(keccak256("treatment/paid", treatmentId), true);
-    utilities.addIdArrayItem(dbAddress, dentistId, "dentist/treatment", "dentist/treatments-count" treatmentId);
-    utilities.addIdArrayItem(dbAddress, patientId, "patient/treatment", "patient/treatments-count" treatmentId);
+    utilities.addIdArrayItem(dbAddress, dentistId, "dentist/treatment", "dentist/treatments-count", treatmentId);
+    utilities.addIdArrayItem(dbAddress, patientId, "patient/treatment", "patient/treatments-count", treatmentId);
   }
 
   function cancelTreatment (
@@ -521,7 +521,7 @@ library servicesLibrary {
     internal
   {
     require(DB(dbAddress).getUInt8Value(keccak256("treatment/status", treatmentId)) == 1
-      && DB(dbAddress).getAddressValue(keccak256("treatment/dentist", treatmentId)) == dentistId);
+      && DB(dbAddress).getAddressValue(keccak256("treatment/dentist", treatmentId)) == dentistId
       && DB(dbAddress).getAddressValue(keccak256("treatment/patient", treatmentId)) == patientId);
 
     DB(dbAddress).setUInt8Value(keccak256("treatment/status", treatmentId), 3);
@@ -536,7 +536,7 @@ library servicesLibrary {
     internal
   {
     require(DB(dbAddress).getUInt8Value(keccak256("treatment/status", treatmentId)) == 1
-      && DB(dbAddress).getAddressValue(keccak256("treatment/dentist", treatmentId)) == dentistId);
+      && DB(dbAddress).getAddressValue(keccak256("treatment/dentist", treatmentId)) == dentistId
       && DB(dbAddress).getAddressValue(keccak256("treatment/patient", treatmentId)) == patientId);
 
     DB(dbAddress).setUInt8Value(keccak256("treatment/status", treatmentId), 2);

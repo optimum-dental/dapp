@@ -695,20 +695,20 @@
                           }
                         },
                         {
-                          "dest": {
-                            "declaration": 65,
-                            "isOffset": false,
-                            "isSlot": false,
-                            "src": "2598:4:1",
-                            "valueSize": 1
-                          }
-                        },
-                        {
                           "mask": {
                             "declaration": 91,
                             "isOffset": false,
                             "isSlot": false,
                             "src": "2573:4:1",
+                            "valueSize": 1
+                          }
+                        },
+                        {
+                          "dest": {
+                            "declaration": 65,
+                            "isOffset": false,
+                            "isSlot": false,
+                            "src": "2598:4:1",
                             "valueSize": 1
                           }
                         }
@@ -859,20 +859,20 @@
                     "attributes": {
                       "externalReferences": [
                         {
-                          "ptr": {
-                            "declaration": 111,
-                            "isOffset": false,
-                            "isSlot": false,
-                            "src": "2948:3:1",
-                            "valueSize": 1
-                          }
-                        },
-                        {
                           "self": {
                             "declaration": 105,
                             "isOffset": false,
                             "isSlot": false,
                             "src": "2959:4:1",
+                            "valueSize": 1
+                          }
+                        },
+                        {
+                          "ptr": {
+                            "declaration": 111,
+                            "isOffset": false,
+                            "isSlot": false,
+                            "src": "2948:3:1",
                             "valueSize": 1
                           }
                         }
@@ -3456,20 +3456,20 @@
                     "attributes": {
                       "externalReferences": [
                         {
-                          "retptr": {
-                            "declaration": 286,
-                            "isOffset": false,
-                            "isSlot": false,
-                            "src": "5270:6:1",
-                            "valueSize": 1
-                          }
-                        },
-                        {
                           "ret": {
                             "declaration": 278,
                             "isOffset": false,
                             "isSlot": false,
                             "src": "5284:3:1",
+                            "valueSize": 1
+                          }
+                        },
+                        {
+                          "retptr": {
+                            "declaration": 286,
+                            "isOffset": false,
+                            "isSlot": false,
+                            "src": "5270:6:1",
                             "valueSize": 1
                           }
                         }
@@ -22625,5 +22625,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-11-06T15:50:53.065Z"
+  "updatedAt": "2017-11-08T14:14:32.875Z"
 }

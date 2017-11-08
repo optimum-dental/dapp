@@ -2,12 +2,13 @@ pragma solidity 0.4.18;
 import "./Restrictor.sol";
 import "../lib/odll/userManager.sol";
 
-contract ScanAppointmentWriter is Restrictor {
-  function ScanAppointmentWriter(address _dbAddress) public {
+contract ScanRequestWriter is Restrictor {
+  function ScanRequestWriter(address _dbAddress) public {
     require(_dbAddress != 0x0);
     dbAddress = _dbAddress;
   }
 
+  // Scan Request
   function writeScanRequest (
     address dentistId,
     address patientId,

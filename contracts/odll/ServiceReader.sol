@@ -21,7 +21,6 @@ contract ServiceReader is Restrictor {
     view
     returns (
       uint,
-      uint[],
       uint[]
     )
   {
@@ -54,17 +53,11 @@ contract ServiceReader is Restrictor {
     external
     view
     returns (
-      uint totalNumberFound,
-      uint[] scanRequestsIds,
-      bytes32[] appointmentDates,
-      bytes32[] scanTimes,
-      bytes32[] scanInsurances,
-      bytes32[] comments,
-      uint8[] statuses,
-      uint[] createdOns
+      uint,
+      uint[]
     )
   {
-    return userManager.fetchScanAppointmentsForPatient(dbAddress, patientId, offset, limit, seed);
+    return userManager.fetchScanRequestsForPatient(dbAddress, patientId, offset, limit, seed);
   }
 
   function fetchAcceptedScanRequestsForPatient (
@@ -73,18 +66,11 @@ contract ServiceReader is Restrictor {
     uint limit, // not more than limit
     uint seed // seed value to give the illusion of randomisation
   )
-    internal
+    external
     view
     returns (
-      uint totalNumberFound,
-      uint[] scanRequestsIds,
-      bytes32[] appointmentDates,
-      bytes32[] scanTimes,
-      bytes32[] scanInsurances,
-      bytes32[] comments,
-      uint8[] statuses,
-      uint[] createdOns,
-      address[] dentistsIds
+      uint,
+      uint[]
     )
   {
     return userManager.fetchAcceptedScanRequestsForPatient(dbAddress, patientId, offset, limit, seed);
@@ -96,16 +82,11 @@ contract ServiceReader is Restrictor {
     uint limit, // not more than limit
     uint seed // seed value to give the illusion of randomisation
   )
-    internal
+    external
     view
     returns (
-      uint totalNumberFound,
-      uint[] scanApplicationsIds,
-      address[] dentistsIds,
-      bytes32[] comments,
-      uint[] quotes,
-      uint8[] statuses,
-      uint[] createdOns
+      uint,
+      uint[]
     )
   {
     return userManager.fetchScanApplicationsForPatient(dbAddress, patientId, offset, limit, seed);
@@ -119,15 +100,8 @@ contract ServiceReader is Restrictor {
     external
     view
     returns (
-      uint totalNumberFound,
-      uint[] scanRequestsIds,
-      address[] patientsIds,
-      bytes32[] appointmentDates,
-      bytes32[] scanTimes,
-      bytes32[] scanInsurances,
-      bytes32[] comments,
-      uint8[] statuses,
-      uint[] createdOns
+      uint,
+      uint[]
     )
   {
     return userManager.fetchAllScanRequests(dbAddress, offset, limit, seed);
@@ -140,18 +114,11 @@ contract ServiceReader is Restrictor {
     uint limit, // not more than limit
     uint seed // seed value to give the illusion of randomisation
   )
-    internal
+    external
     view
     returns(
-      uint totalNumberFound,
-      uint[] scanRequestsIds,
-      address[] patientsIds,
-      bytes32[] appointmentDates,
-      bytes32[] scanTimes,
-      bytes32[] scanInsurances,
-      bytes32[] comments,
-      uint8[] statuses,
-      uint[] createdOns
+      uint,
+      uint[]
     )
   {
     return userManager.fetchDirectScanRequestsForDentist(dbAddress, dentistId, offset, limit, seed);
@@ -163,18 +130,11 @@ contract ServiceReader is Restrictor {
     uint limit, // not more than limit
     uint seed // seed value to give the illusion of randomisation
   )
-    internal
+    external
     view
     returns (
-      uint totalNumberFound,
-      uint[] scanRequestsIds,
-      address[] patientsIds,
-      bytes32[] appointmentDates,
-      bytes32[] scanTimes,
-      bytes32[] scanInsurances,
-      bytes32[] comments,
-      uint8[] statuses,
-      uint[] createdOns
+      uint,
+      uint[]
     )
   {
     return userManager.fetchAcceptedScanRequestsForDentist(dbAddress, dentistId, offset, limit, seed);
@@ -186,16 +146,11 @@ contract ServiceReader is Restrictor {
     uint limit, // not more than limit
     uint seed // seed value to give the illusion of randomisation
   )
-    internal
+    external
     view
     returns (
-      uint totalNumberFound,
-      uint[] scanApplicationsIds
-      address[] patientsIds,
-      bytes32[] comments,
-      uint[] quotes,
-      uint8[] statuses,
-      uint[] createdOns
+      uint,
+      uint[]
     )
   {
     return userManager.fetchScanApplicationsForDentist(dbAddress, dentistId, offset, limit, seed);

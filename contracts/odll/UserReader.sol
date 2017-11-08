@@ -10,55 +10,20 @@ contract UserReader is Restrictor {
     dbAddress = _dbAddress;
   }
 
-  function getUserIdentityData(address userId)
+  function fetchUserDentists(
+    address userId,
+    uint offset, // starting from offset: 0-based
+    uint limit, // not more than limit
+    uint seed // seed value to give the illusion of randomisation
+  )
     external
     view
     returns (
-      uint8,
-      bytes32,
-      bytes32,
-      bytes32,
-      uint8
-    )
-  {
-    return userManager.getUserIdentityData(dbAddress, userId);
-  }
-
-  function getUserContactData(address userId)
-    external
-    view
-    returns (
-      bytes32,
-      bytes32,
-      bytes32,
       uint,
-      bytes32,
-      uint
+      address[]
     )
   {
-    return userManager.getUserContactData(dbAddress, userId);
-  }
-
-  function getUserPersonalData(address userId)
-    external
-    view
-    returns (
-      uint8 gender,
-      bytes32 socialSecurityNumber,
-      bytes32 birthday
-    )
-  {
-    (gender, socialSecurityNumber, birthday) = userManager.getUserPersonalData(dbAddress, userId);
-  }
-
-  function getUserDentistsIds(address userId)
-    external
-    view
-    returns (
-      address[] dentistsIds
-    )
-  {
-    dentistsIds = userManager.getUserDentistsIds(dbAddress, userId);
+    return userManager.fetchUserDentists(dbAddress, userId, offset, limit, seed);
   }
 
   function findDentists(
@@ -78,35 +43,6 @@ contract UserReader is Restrictor {
       )
   {
     return userManager.findDentists(dbAddress, stateId, serviceTypeId, serviceId, budget, offset, limit, seed);
-  }
-
-  function getDentistIdentityData(address dentistId)
-    external
-    view
-    returns (
-      bool,
-      bool,
-      bytes32
-    ) {
-    return userManager.getDentistIdentityData(dbAddress, dentistId);
-  }
-
-  function getDentistFeeData(uint serviceTypeId, uint serviceId, address dentistId)
-    external
-    view
-    returns (
-      uint fee
-    ) {
-    fee = userManager.getDentistFeeData(dbAddress, serviceTypeId, serviceId, dentistId);
-  }
-
-  function getDentistRatingData(address dentistId)
-    external
-    view
-    returns (
-      uint rating
-    ) {
-    rating = userManager.getDentistAverageRating(dbAddress, dentistId);
   }
 
   function fetchDentists(

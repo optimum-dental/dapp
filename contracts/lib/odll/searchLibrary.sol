@@ -125,14 +125,6 @@ library searchLibrary {
     return stateId == DB(dbAddress).getUIntValue(keccak256("user/state", userId));
   }
 
-  function patientScanConditionFunction (address dbAddress, string searchKey, address patientId, uint scanAppointmentId, uint patientScanAppointmentIndexNumber) internal view returns(bool) {
-    return DB(dbAddress).getBooleanValue(keccak256(searchKey, patientId, scanAppointmentId, patientScanAppointmentIndexNumber));
-  }
-
-  function dentistScanConditionFunction (address dbAddress, string searchKey, address dentistId, uint scanAppointmentId, uint patientScanAppointmentIndexNumber) internal view returns(bool) {
-    return DB(dbAddress).getBooleanValue(keccak256(searchKey, dentistId, scanAppointmentId, patientScanAppointmentIndexNumber));
-  }
-
   function getScanRequestsForPatient (
     address dbAddress,
     address patientId
@@ -140,32 +132,10 @@ library searchLibrary {
     internal
     view
     returns(
-      uint[] scanRequestsIds,
-      bytes32[] appointmentDates,
-      bytes32[] scanTimes,
-      bytes32[] scanInsurances,
-      bytes32[] comments,
-      uint8[] statuses,
-      uint[] createdOns
+      uint[] scanRequestsIds
     )
   {
     scanRequestsIds = utilities.getIdArray(dbAddress, patientId, "patient/scan-request", "patient/scan-requests-count");
-    var count = scanRequestsIds.length;
-    appointmentDates = new bytes32[](count);
-    scanTimes = new bytes32[](count);
-    scanInsurances = new bytes32[](count);
-    comments = new bytes32[](count);
-    statuses = new uint8[](count);
-    createdOns = new uint[](count);
-
-    for (uint i = 0; i < count; i++) {
-      appointmentDates[i] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-date", scanRequestsIds[i]));
-      scanTimes[i] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-time", scanRequestsIds[i]));
-      scanInsurances[i] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-insurance", scanRequestsIds[i]));
-      comments[i] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-comment", scanRequestsIds[i]));
-      statuses[i] = DB(dbAddress).getUInt8Value(keccak256("scan-request/status", scanRequestsIds[i]));
-      createdOns[i] = DB(dbAddress).getUIntValue(keccak256("scan-request/created-on", scanRequestsIds[i]));
-    }
   }
 
   function getAcceptedScanRequestsForPatient (
@@ -175,51 +145,22 @@ library searchLibrary {
     internal
     view
     returns (
-      uint[] scanRequestsIds,
-      bytes32[] appointmentDates,
-      bytes32[] scanTimes,
-      bytes32[] scanInsurances,
-      bytes32[] comments,
-      uint8[] statuses,
-      uint[] createdOns,
-      address dentistsIds
+      uint[] scanRequestsIds
     )
   {
-    uint[] allScanRequestsIds = utilities.getIdArray(dbAddress, patientId, "patient/scan-request", "patient/scan-requests-count");
+    var allScanRequestsIds = utilities.getIdArray(dbAddress, patientId, "patient/scan-request", "patient/scan-requests-count");
     var count = allScanRequestsIds.length;
-    scanRequestsIds = new uint[](count)
-    appointmentDates = new bytes32[](count);
-    scanTimes = new bytes32[](count);
-    scanInsurances = new bytes32[](count);
-    comments = new bytes32[](count);
-    statuses = new uint8[](count);
-    createdOns = new uint[](count);
-    dentistsIds = new address[](count);
+    scanRequestsIds = new uint[](count);
 
     uint j = 0;
     for (uint i = 0; i < count; i++) {
-      if (DB(dbAddress).getBytes32Value(keccak256("scan-request/is-accepted?", allScanRequestsIds[i]))) {
+      if (DB(dbAddress).getBooleanValue(keccak256("scan-request/is-accepted?", allScanRequestsIds[i]))) {
         scanRequestsIds[j] = allScanRequestsIds[i];
-        appointmentDates[j] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-date", allScanRequestsIds[i]));
-        scanTimes[j] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-time", allScanRequestsIds[i]));
-        scanInsurances[j] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-insurance", allScanRequestsIds[i]));
-        comments[j] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-comment", allScanRequestsIds[i]));
-        statuses[j] = DB(dbAddress).getUInt8Value(keccak256("scan-request/status", allScanRequestsIds[i]));
-        createdOns[j] = DB(dbAddress).getUIntValue(keccak256("scan-request/created-on", allScanRequestsIds[i]));
-        dentistsIds[j] = DB(dbAddress).getAddressValue(keccak256("scan-request/dentist", allScanRequestsIds[i]));
-
         j++;
       }
     }
 
     scanRequestsIds = utilities.take(j, scanRequestsIds);
-    appointmentDates = utilities.take(j, appointmentDates);
-    scanTimes = utilities.take(j, scanTimes);
-    scanInsurances = utilities.take(j, scanInsurances);
-    comments = utilities.take(j, comments);
-    statuses = utilities.take(j, statuses);
-    createdOns = utilities.take(j, createdOns);
-    dentistsIds = utilities.take(j, dentistsIds);
   }
 
   function getScanApplicationsForPatient (
@@ -230,78 +171,31 @@ library searchLibrary {
     view
     returns (
       uint[] scanApplicationsIds
-      address[] dentistsIds,
-      bytes32[] comments,
-      uint[] quotes,
-      uint8[] statuses,
-      uint[] createdOns
     )
   {
     scanApplicationsIds = utilities.getIdArray(dbAddress, patientId, "patient/scan-application", "patient/scan-applications-count");
-    var count = scanApplicationsIds.length;
-    dentistsIds = new address[](count);
-    comments = new bytes32[](count);
-    quotes = new uint[](count);
-    statuses = new uint8[](count);
-    createdOns = new uint[](count);
-
-    for (uint i = 0; i < count; i++) {
-      dentistsIds[i] = DB(dbAddress).getAddressValue(keccak256("scan-application/dentist", scanApplicationsIds[i]));
-      comments[i] = DB(dbAddress).getBytes32Value(keccak256("scan-application/comment", scanApplicationsIds[i]));
-      quotes[i] = DB(dbAddress).getUIntValue(keccak256("scan-application/quote", scanApplicationsIds[i]));
-      statuses[i] = DB(dbAddress).getUInt8Value(keccak256("scan-application/status", scanApplicationsIds[i]));
-      createdOns[i] = DB(dbAddress).getUIntValue(keccak256("scan-application/created-on", scanApplicationsIds[i]));
-    }
   }
 
   function getAllScanRequests (address dbAddress)
     internal
     view
     returns(
-      uint[] scanRequestsIds,
-      address[] patientsIds,
-      bytes32[] appointmentDates,
-      bytes32[] scanTimes,
-      bytes32[] scanInsurances,
-      bytes32[] comments,
-      uint8[] statuses,
-      uint[] createdOns
+      uint[] scanRequestsIds
     )
   {
-    uint[] allScanRequestsIds = utilities.getArrayItems(dbAddress, "patient/scan-request", "patient/scan-requests-count");
+    var allScanRequestsIds = utilities.getArrayItems(dbAddress, "patient/scan-request", "patient/scan-requests-count");
     var count = allScanRequestsIds.length;
     scanRequestsIds = new uint[](count);
-    patientsIds = new address[](count);
-    appointmentDates = new bytes32[](count);
-    scanTimes = new bytes32[](count);
-    scanInsurances = new bytes32[](count);
-    comments = new bytes32[](count);
-    statuses = new uint8[](count);
-    createdOns = new uint[](count);
 
     uint j = 0;
     for (uint i = 0; i < count; i++) {
       if (DB(dbAddress).getBooleanValue(keccak256("scan-request/is-general?"))) {
-        patientsIds[j] = DB(dbAddress).getAddressValue(keccak256("scan-request/patient", allScanRequestsIds[i]));
-        appointmentDates[j] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-date", allScanRequestsIds[i]));
-        scanTimes[j] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-time", allScanRequestsIds[i]));
-        scanInsurances[j] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-insurance", allScanRequestsIds[i]));
-        comments[j] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-comment", allScanRequestsIds[i]));
-        statuses[j] = DB(dbAddress).getUInt8Value(keccak256("scan-request/status", allScanRequestsIds[i]));
-        createdOns[j] = DB(dbAddress).getUIntValue(keccak256("scan-request/created-on", allScanRequestsIds[i]));
-
+        scanRequestsIds[j] = allScanRequestsIds[i];
         j++;
       }
     }
 
     scanRequestsIds = utilities.take(j, scanRequestsIds);
-    patientsIds = utilities.take(j, patientsIds);
-    appointmentDates = utilities.take(j, appointmentDates);
-    scanTimes = utilities.take(j, scanTimes);
-    scanInsurances = utilities.take(j, scanInsurances);
-    comments = utilities.take(j, comments);
-    statuses = utilities.take(j, statuses);
-    createdOns = utilities.take(j, createdOns);
   }
 
   function getDirectScanRequestsForDentist (
@@ -311,35 +205,10 @@ library searchLibrary {
     internal
     view
     returns(
-      uint[] scanRequestsIds,
-      address[] patientsIds,
-      bytes32[] appointmentDates,
-      bytes32[] scanTimes,
-      bytes32[] scanInsurances,
-      bytes32[] comments,
-      uint8[] statuses,
-      uint[] createdOns
+      uint[] scanRequestsIds
     )
   {
     scanRequestsIds = utilities.getIdArray(dbAddress, dentistId, "dentist/scan-request", "dentist/scan-requests-count");
-    var count = scanRequestsIds.length;
-    patientsIds = new address[](count);
-    appointmentDates = new bytes32[](count);
-    scanTimes = new bytes32[](count);
-    scanInsurances = new bytes32[](count);
-    comments = new bytes32[](count);
-    statuses = new uint8[](count);
-    createdOns = new uint[](count);
-
-    for (uint i = 0; i < count; i++) {
-      patientsIds[i] = DB(dbAddress).getBytes32Value(keccak256("scan-request/patient", scanRequestsIds[i]));
-      appointmentDates[i] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-date", scanRequestsIds[i]));
-      scanTimes[i] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-time", scanRequestsIds[i]));
-      scanInsurances[i] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-insurance", scanRequestsIds[i]));
-      comments[i] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-comment", scanRequestsIds[i]));
-      statuses[i] = DB(dbAddress).getUInt8Value(keccak256("scan-request/status", scanRequestsIds[i]));
-      createdOns[i] = DB(dbAddress).getUIntValue(keccak256("scan-request/created-on", scanRequestsIds[i]));
-    }
   }
 
   function getAcceptedScanRequestsForDentist (
@@ -349,50 +218,23 @@ library searchLibrary {
     internal
     view
     returns (
-      uint[] scanRequestsIds,
-      address[] patientsIds,
-      bytes32[] appointmentDates,
-      bytes32[] scanTimes,
-      bytes32[] scanInsurances,
-      bytes32[] comments,
-      uint8[] statuses,
-      uint[] createdOns
+      uint[] scanRequestsIds
     )
   {
-    uint[] allScanRequestsIds = utilities.getArrayItems(dbAddress, "dentist/scan-request", "dentist/scan-requests-count");
+    var allScanRequestsIds = utilities.getArrayItems(dbAddress, "dentist/scan-request", "dentist/scan-requests-count");
     var count = allScanRequestsIds.length;
     scanRequestsIds = new uint[](count);
-    patientsIds = new address[](count);
-    appointmentDates = new bytes32[](count);
-    scanTimes = new bytes32[](count);
-    scanInsurances = new bytes32[](count);
-    comments = new bytes32[](count);
-    statuses = new uint8[](count);
-    createdOns = new uint[](count);
 
     uint j = 0;
     for (uint i = 0; i < count; i++) {
       if (DB(dbAddress).getBooleanValue(keccak256("scan-request/is-accepted?"))) {
-        patientsIds[j] = DB(dbAddress).getAddressValue(keccak256("scan-request/patient", allScanRequestsIds[i]));
-        appointmentDates[j] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-date", allScanRequestsIds[i]));
-        scanTimes[j] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-time", allScanRequestsIds[i]));
-        scanInsurances[j] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-insurance", allScanRequestsIds[i]));
-        comments[j] = DB(dbAddress).getBytes32Value(keccak256("scan-request/appointment-comment", allScanRequestsIds[i]));
-        statuses[j] = DB(dbAddress).getUInt8Value(keccak256("scan-request/status", allScanRequestsIds[i]));
-        createdOns[j] = DB(dbAddress).getUIntValue(keccak256("scan-request/created-on", allScanRequestsIds[i]));
+        scanRequestsIds[j] = allScanRequestsIds[i];
 
         j++;
       }
     }
 
     scanRequestsIds = utilities.take(j, scanRequestsIds);
-    patientsIds = utilities.take(j, patientsIds);
-    appointmentDates = utilities.take(j, appointmentDates);
-    scanTimes = utilities.take(j, scanTimes);
-    scanInsurances = utilities.take(j, scanInsurances);
-    comments = utilities.take(j, comments);
-    statuses = utilities.take(j, statuses);
-    createdOns = utilities.take(j, createdOns);
   }
 
   function getScanApplicationsForDentist (
@@ -403,27 +245,8 @@ library searchLibrary {
     view
     returns (
       uint[] scanApplicationsIds
-      address[] patientsIds,
-      bytes32[] comments,
-      uint[] quotes,
-      uint8[] statuses,
-      uint[] createdOns
     )
   {
     scanApplicationsIds = utilities.getIdArray(dbAddress, dentistId, "dentist/scan-application", "dentist/scan-applications-count");
-    var count = scanApplicationsIds.length;
-    patientsIds = new address[](count);
-    comments = new bytes32[](count);
-    quotes = new uint[](count);
-    statuses = new uint8[](count);
-    createdOns = new uint[](count);
-
-    for (uint i = 0; i < count; i++) {
-      patientsIds[i] = DB(dbAddress).getAddressValue(keccak256("scan-application/patient", scanApplicationsIds[i]));
-      comments[i] = DB(dbAddress).getBytes32Value(keccak256("scan-application/comment", scanApplicationsIds[i]));
-      quotes[i] = DB(dbAddress).getUIntValue(keccak256("scan-application/quote", scanApplicationsIds[i]));
-      statuses[i] = DB(dbAddress).getUInt8Value(keccak256("scan-application/status", scanApplicationsIds[i]));
-      createdOns[i] = DB(dbAddress).getUIntValue(keccak256("scan-application/created-on", scanApplicationsIds[i]));
-    }
   }
 }

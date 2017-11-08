@@ -249,7 +249,7 @@ contract DB is Ownable {
   function getUIntTypesCount(uint8[] types) public pure returns(uint count) {
     count = 0;
     for (uint i = 0; i < types.length ; i++) {
-      if (types[i] != 7) {
+      if (types[i] != 7) { // type 7 is for strings
         count += 1;
       }
     }
@@ -258,13 +258,30 @@ contract DB is Ownable {
   }
 
   function getEntityList(bytes32[] records, uint8[] types)
-    public constant returns
+    external view returns
   (
     uint[] items,
     string strs
   )
   {
     uint uintTypesCount = getUIntTypesCount(types);
+    /*
+      itemsCount gives the number of entities we're basing the search on. Search may be needed for several entities for which types[] is the same for all of them. E.g. get the name, email, gender, and state of 5 people:
+      records: [
+        keccak256("user/name", "0x9838cdba..."), keccak256("user/email", "0x9838cdba..."), keccak256("user/gender", "0x9838cdba..."), keccak256("user/state", "0x9838cdba..."),
+
+        keccak256("user/name", "0xabc63533..."), keccak256("user/email", "0xabc63533..."), keccak256("user/gender", "0xabc63533..."), keccak256("user/state", "0xabc63533..."),
+
+        keccak256("user/name", "0x08253befd..."), keccak256("user/email", "0x08253befd..."), keccak256("user/gender", "0x08253befd..."), keccak256("user/state", "0x08253befd..."),
+
+        keccak256("user/name", "0x0b6354a..."), keccak256("user/email", "0x0b6354a..."), keccak256("user/gender", "0x0b6354a..."), keccak256("user/state", "0x0b6354a..."),
+
+        keccak256("user/name", "0x07352bac36..."), keccak256("user/email", "0x07352bac36..."), keccak256("user/gender", "0x07352bac36..."), keccak256("user/state", "0x07352bac36..."),
+
+      ],
+      types: [7, 7, 5, 3]
+      In this case, records.length = 20, types.length = 4 => itemsCount = 5 [the search is being done for 5 entities]
+    */
     uint itemsCount = records.length / types.length;
 
     items = new uint[](itemsCount * uintTypesCount);
@@ -274,13 +291,13 @@ contract DB is Ownable {
         uint r_i = (i * types.length) + j;
         if (types[j] == 7) {
           strs = strs.toSlice().concat(getStringValue(records[r_i]).toSlice());
-          strs = strs.toSlice().concat("99--ODLL--11".toSlice());
+          strs = strs.toSlice().concat("666--ODLL--666".toSlice());
         } else {
           items[k] = getUIntValueConverted(records[r_i], types[j]);
           k++;
         }
       }
-      strs = strs.toSlice().concat("99--ODLL-LIST--11".toSlice());
+      strs = strs.toSlice().concat("666--ODLL-LIST--666".toSlice());
     }
 
     return (items, strs);

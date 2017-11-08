@@ -9,6 +9,7 @@ contract TreatmentRequestWriter is Restrictor {
     dbAddress = _dbAddress;
   }
 
+  // Treatment Request
   function writeTreatmentRequest (
     address dentistId,
     address patientId,

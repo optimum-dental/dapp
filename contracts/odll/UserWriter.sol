@@ -16,8 +16,8 @@ contract UserWriter is Restrictor {
 
   function writeUser(
     uint8 userType,
-    bytes32 name,
-    bytes32 email,
+    string name,
+    string email,
     bytes32 gravatar,
     bytes32 street,
     bytes32 city,
@@ -41,7 +41,7 @@ contract UserWriter is Restrictor {
     determineEvent(userType);
   }
 
-  function writeUserIdentity(uint8 userType, bytes32 name, bytes32 email, bytes32 gravatar) public {
+  function writeUserIdentity(uint8 userType, string name, string email, bytes32 gravatar) public {
     userManager.setUserIdentity(dbAddress, msg.sender, userType, name, email, gravatar);
   }
 
@@ -66,7 +66,7 @@ contract UserWriter is Restrictor {
   function continueWritingDentist(
     bool isODLLDentist,
     bool isAvailable,
-    bytes32 companyName
+    string companyName
   )
     external
     onlyPermittedSmartContract
@@ -110,10 +110,6 @@ contract UserWriter is Restrictor {
   {
     require(dentistId != 0x0 && rating > 0);
     userManager.writeDentistRating(dbAddress, dentistId, rating);
-  }
-
-  function writeUserDentistId (address dentistId) external {
-    userManager.writeUserDentistId(dbAddress, msg.sender, dentistId);
   }
 
   function destroySelf(address callerAddress, address newContractAddress)
