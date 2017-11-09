@@ -5,21 +5,20 @@
       <div class="field">
         <label for="name" class="field-key">Last Name   First Name   Middle Name</label>
         <input type="text" class="field-value has-tip" id="name" placeholder="Last Name   First Name   Middle Name" @input="displayLabel" data-name="name">
-        <div class="tip">Write between 5 to 32 characters</div>
+        <div class="tip">Write between 5 to 50 characters</div>
       </div>
 
       <div class="field">
         <label for="email" class="field-key">Your Email</label>
         <input type="email" class="field-value has-tip" id="email" placeholder="Your Email" @input="setAvatar" data-name="email">
-        <div class="tip">Write between 5 to 32 characters</div>
+        <div class="tip">Write between 5 to 80 characters</div>
       </div>
 
       <div class="field avatar"></div>
 
       <div class="field">
         <label for="street" class="field-key">Street</label>
-        <input type="text" class="field-value has-tip" id="street" placeholder="Street" @input="displayLabel" data-name="street">
-        <div class="tip">Write between 5 to 32 characters</div>
+        <input type="text" class="field-value" id="street" placeholder="Street" @input="displayLabel" data-name="street">
       </div>
 
 

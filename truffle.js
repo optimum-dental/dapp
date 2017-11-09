@@ -40,21 +40,21 @@ module.exports = {
       network_id: 3,    // Official ropsten network id
       provider: engine, // Use our custom provider
       from: address,     // Use the address we derived
-      gas: 4700000
+      gas: 5700000
     },
     development: {
       host: "localhost",
       port: 8545,
       network_id: "*",
       from: address, //"0x13ba42b19c25c0f6ecb7ab1c5db8d736231ecb94",
-      gas: 4700000
+      gas: 5700000
     }
   },
   rpc: {
     // Use the default host and port when not using ropsten
     host: "localhost",
     port: 8545,
-    gas: 4700000
+    gas: 5700000
   }
   // solc: {
   //   optimizer: {

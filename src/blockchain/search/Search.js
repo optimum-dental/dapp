@@ -1,5 +1,5 @@
-import ODLLUserReaderContract from '../../../build/contracts/ODLLUserReader.json'
-import odllUser from '../odll/ODLLUser'
+import UserReaderContract from '../../../build/contracts/UserReader.json'
+import userManager from '../odll/UserManager'
 import blockchainManager from '../BlockchainManager'
 
 let search = null
@@ -13,17 +13,17 @@ class Search {
   getDentistDataFromFind (state = null, dataObject = {}) {
     return new Promise((resolve, reject) => {
       const userObject = {}
-      odllUser.getUserIdentityData(state, dataObject.dentistId)
+      userManager.getUserIdentityData(state, dataObject.dentistId)
       .then((result) => {
         result.coinbase = dataObject.dentistId
         Object.assign(userObject, result)
-        odllUser.getUserContactData(state, dataObject.dentistId)
+        userManager.getUserContactData(state, dataObject.dentistId)
         .then((result) => {
           Object.assign(userObject, result)
-          odllUser.getDentistFeeData(state, dataObject)
+          userManager.getDentistFeeData(state, dataObject)
           .then((result) => {
             Object.assign(userObject, result)
-            odllUser.getDentistRatingData(state, dataObject.dentistId)
+            userManager.getDentistRatingData(state, dataObject.dentistId)
             .then((result) => {
               Object.assign(userObject, result)
               resolve(userObject)
@@ -56,7 +56,7 @@ class Search {
     if (callOnEachParams) delete dataObject.callOnEachParams
     let queryParams = Object.values(dataObject)
     return blockchainManager.querySmartContract({
-      contractToUse: contractToUse || ODLLUserReaderContract,
+      contractToUse: contractToUse || UserReaderContract,
       smartContractMethod: fetchType,
       smartContractMethodParams: (coinbase) => {
         if (willUnshiftCoinbase) queryParams.unshift(coinbase)
@@ -86,11 +86,11 @@ class Search {
   getManager (state = null, dataObject = {}) {
     return new Promise((resolve, reject) => {
       const userObject = {}
-      odllUser.getUserIdentityData(state, dataObject.managerId)
+      userManager.getUserIdentityData(state, dataObject.managerId)
       .then((result) => {
         result.coinbase = dataObject.managerId
         Object.assign(userObject, result)
-        odllUser.getUserContactData(state, dataObject.managerId)
+        userManager.getUserContactData(state, dataObject.managerId)
         .then((result) => {
           Object.assign(userObject, result)
           resolve(userObject)
@@ -104,11 +104,11 @@ class Search {
   getDentist (state = null, dataObject = {}) {
     return new Promise((resolve, reject) => {
       const userObject = {}
-      odllUser.getUserIdentityData(state, dataObject.dentistId)
+      userManager.getUserIdentityData(state, dataObject.dentistId)
       .then((result) => {
         result.coinbase = dataObject.dentistId
         Object.assign(userObject, result)
-        odllUser.getUserContactData(state, dataObject.dentistId)
+        userManager.getUserContactData(state, dataObject.dentistId)
         .then((result) => {
           Object.assign(userObject, result)
           resolve(userObject)

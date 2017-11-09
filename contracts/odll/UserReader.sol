@@ -5,12 +5,12 @@ import "../lib/odll/userManager.sol";
 
 contract UserReader is Restrictor {
 
-  function UserReader(address _dbAddress) public {
+  function UserReader (address _dbAddress) public {
     require(_dbAddress != 0x0);
     dbAddress = _dbAddress;
   }
 
-  function fetchUserDentists(
+  function fetchUserDentists (
     address userId,
     uint offset, // starting from offset: 0-based
     uint limit, // not more than limit
@@ -26,7 +26,7 @@ contract UserReader is Restrictor {
     return userManager.fetchUserDentists(dbAddress, userId, offset, limit, seed);
   }
 
-  function findDentists(
+  function findDentists (
     uint stateId,
     uint serviceTypeId,
     uint serviceId,
@@ -45,7 +45,7 @@ contract UserReader is Restrictor {
     return userManager.findDentists(dbAddress, stateId, serviceTypeId, serviceId, budget, offset, limit, seed);
   }
 
-  function fetchDentists(
+  function fetchDentists (
     uint offset, // starting from offset: 0-based
     uint limit, // not more than limit
     uint seed // seed value to give the illusion of randomisation
@@ -60,7 +60,7 @@ contract UserReader is Restrictor {
     return userManager.fetchDentists(dbAddress, offset, limit, seed);
   }
 
-  function fetchManagers(
+  function fetchManagers (
     uint offset, // starting from offset: 0-based
     uint limit, // not more than limit
     uint seed // seed value to give the illusion of randomisation

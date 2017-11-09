@@ -1,13 +1,16 @@
-import ODLLUserReaderContract from '../../../build/contracts/ODLLUserReader.json'
+import DB from '../../../build/contracts/DB.json'
+import UserReaderContract from '../../../build/contracts/UserReader.json'
 import blockchainManager from '../BlockchainManager'
+import {getObjectFromResponse, getSlicedAddressString} from '../utilities'
 import {EXCHANGE_RATE_API} from '../../util/constants'
+import soliditySha3 from 'solidity-sha3'
 
-let odllUser = null
+let userManager = null
 
-class ODLLUser {
+class UserManager {
   constructor () {
-    odllUser = odllUser || this
-    return odllUser
+    userManager = userManager || this
+    return userManager
   }
 
   writeData (state = null, data = {}) {
@@ -61,43 +64,25 @@ class ODLLUser {
     })
   }
 
-  getUserDataFromTheBlockchain (state = null) {
+  getUserDataFromTheBlockchain (state = null, userObject = {}) {
     return new Promise((resolve, reject) => {
       const userObject = {}
-      odllUser.getUserIdentityData(state)
+      userManager.getUserData(state, null, userObject)
       .then((result) => {
         Object.assign(userObject, result)
-        odllUser.getUserContactData(state)
-        .then((result) => {
-          Object.assign(userObject, result)
-          odllUser.getUserPersonalData(state)
-          .then((result) => {
-            if (Number(userObject.type) === 1) {
-              odllUser.getUserDentistsIds(state)
-              .then((result) => {
-                Object.assign(userObject, result)
-                resolve(userObject)
-              })
-            } else {
-              Object.assign(userObject, result)
-              resolve(userObject)
-            }
-          })
-          .catch(error => reject(error))
-        })
-        .catch(error => reject(error))
+        resolve(userObject)
       })
       .catch(error => reject(error))
     })
   }
 
-  getUserIdentityData (state = null, userId = null) {
+  getUserData (state = null, userId = null, userObject = {}) {
     return blockchainManager.querySmartContract({
-      contractToUse: ODLLUserReaderContract,
-      smartContractMethod: 'getUserIdentityData',
-      smartContractMethodParams: (coinbase) => [userId || coinbase, {from: coinbase}],
+      contractToUse: DB,
+      smartContractMethod: 'getEntityList',
+      smartContractMethodParams: (coinbase) => [userObject.userRecordFields || userManager.userRecordFields(state, userId || coinbase), userObject.userRecordFieldTypes || userManager.userRecordFieldTypes(), {from: coinbase}],
       state,
-      smartContractResolve: result => odllUser.getUserObject(state, result, ['type', 'name', 'email', 'gravatar', 'status']),
+      smartContractResolve: result => getObjectFromResponse(state, result, 1, userObject.keys || userManager.userKeys(), userObject.userRecordFieldTypes || userManager.userRecordFieldTypes())[0],
       smartContractReject: (error) => ({
         error,
         isValid: true,
@@ -108,11 +93,11 @@ class ODLLUser {
 
   getUserContactData (state = null, userId = null) {
     return blockchainManager.querySmartContract({
-      contractToUse: ODLLUserReaderContract,
+      contractToUse: UserReaderContract,
       smartContractMethod: 'getUserContactData',
       smartContractMethodParams: (coinbase) => [userId || coinbase, {from: coinbase}],
       state,
-      smartContractResolve: result => odllUser.getUserObject(state, result, ['street', 'city', 'phoneNumber', 'state', 'zipCode', 'country']),
+      smartContractResolve: result => getObjectFromResponse(state, result, ['street', 'city', 'phoneNumber', 'state', 'zipCode', 'country']),
       smartContractReject: (error) => ({
         error,
         isValid: true,
@@ -123,11 +108,11 @@ class ODLLUser {
 
   getUserPersonalData (state = null, userId = null) {
     return blockchainManager.querySmartContract({
-      contractToUse: ODLLUserReaderContract,
+      contractToUse: UserReaderContract,
       smartContractMethod: 'getUserPersonalData',
       smartContractMethodParams: (coinbase) => [userId || coinbase, {from: coinbase}],
       state,
-      smartContractResolve: result => odllUser.getUserObject(state, result, ['gender', 'socialSecurityNumber', 'birthday']),
+      smartContractResolve: result => getObjectFromResponse(state, result, ['gender', 'socialSecurityNumber', 'birthday']),
       smartContractReject: (error) => ({
         error,
         isValid: true,
@@ -138,11 +123,11 @@ class ODLLUser {
 
   getUserDentistsIds (state = null, userId = null) {
     return blockchainManager.querySmartContract({
-      contractToUse: ODLLUserReaderContract,
+      contractToUse: UserReaderContract,
       smartContractMethod: 'getUserDentistsIds',
       smartContractMethodParams: (coinbase) => [userId || coinbase, {from: coinbase}],
       state,
-      smartContractResolve: result => odllUser.getUserObject(state, result, ['dentistsIds']),
+      smartContractResolve: result => getObjectFromResponse(state, result, ['dentistsIds']),
       smartContractReject: (error) => ({
         error,
         isValid: true,
@@ -154,7 +139,7 @@ class ODLLUser {
   getDentistFeeData (state = null, dataObject = {}) {
     const userId = dataObject.dentistId
     return blockchainManager.querySmartContract({
-      contractToUse: ODLLUserReaderContract,
+      contractToUse: UserReaderContract,
       smartContractMethod: 'getDentistFeeData',
       smartContractMethodParams: (coinbase) => [dataObject.serviceTypeId, dataObject.serviceId, userId || coinbase, {from: coinbase}],
       state,
@@ -169,7 +154,7 @@ class ODLLUser {
 
   getDentistRatingData (state = null, userId = null) {
     return blockchainManager.querySmartContract({
-      contractToUse: ODLLUserReaderContract,
+      contractToUse: UserReaderContract,
       smartContractMethod: 'getDentistRatingData',
       smartContractMethodParams: (coinbase) => [userId || coinbase, {from: coinbase}],
       state,
@@ -180,16 +165,6 @@ class ODLLUser {
         warningMessage: "We've encountered a problem getting dentist ratings from the blockchain. Please do try again in a few minutes."
       })
     })
-  }
-
-  getUserObject (state, results, keys) {
-    const arrayResult = state && state.web3 && state.web3.instance && results && results.length > 0 ? results : []
-    const userObject = keys.reduce((hash, key, index) => {
-      hash[key] = arrayResult[index] ? arrayResult[index].toString() : ''
-      return hash
-    }, {})
-
-    return userObject
   }
 
   defaultUserObject () {
@@ -203,7 +178,7 @@ class ODLLUser {
       gravatar: '',
       street: '',
       city: '',
-      state: 0,
+      state: '',
       zipCode: '',
       country: '',
       phoneNumber: '',
@@ -231,7 +206,51 @@ class ODLLUser {
       warningMessage: ''
     }
   }
+
+  userKeys () {
+    return [
+      'type',
+      'name',
+      'email',
+      'gravatar',
+      'street',
+      'city',
+      'state',
+      'zipCode',
+      'country',
+      'phoneNumber',
+      'socialSecurityNumber',
+      'birthday',
+      'gender'
+    ]
+  }
+
+  userRecordFields (state, userId) {
+    userId = getSlicedAddressString(state, userId)
+    console.log(soliditySha3(`${state.web3.instance().toHex('user/name')}${userId}`))
+
+    return [
+      soliditySha3(`${state.web3.instance().toHex('user/type')}${userId}`),
+      soliditySha3(`${state.web3.instance().toHex('user/name')}${userId}`),
+      soliditySha3(`${state.web3.instance().toHex('user/email')}${userId}`),
+      soliditySha3(`${state.web3.instance().toHex('user/gravatar')}${userId}`),
+      soliditySha3(`${state.web3.instance().toHex('user/street')}${userId}`),
+      soliditySha3(`${state.web3.instance().toHex('user/city')}${userId}`),
+      soliditySha3(`${state.web3.instance().toHex('user/state')}${userId}`),
+      soliditySha3(`${state.web3.instance().toHex('user/zip-code')}${userId}`),
+      soliditySha3(`${state.web3.instance().toHex('user/country')}${userId}`),
+      soliditySha3(`${state.web3.instance().toHex('user/phone-number')}${userId}`),
+      soliditySha3(`${state.web3.instance().toHex('user/social-security-number')}${userId}`),
+      soliditySha3(`${state.web3.instance().toHex('user/birthday')}${userId}`),
+      soliditySha3(`${state.web3.instance().toHex('user/gender')}${userId}`)
+    ]
+  }
+
+  userRecordFieldTypes () {
+    // types: 1 => boolean, 2 => uint8, 3 => uint, 4 => address, 5 => bytes32, 7 => string
+    return [2, 7, 7, 5, 5, 5, 3, 5, 3, 5, 5, 5, 2]
+  }
 }
 
-odllUser = new ODLLUser()
-export default odllUser
+userManager = new UserManager()
+export default userManager

@@ -1,8 +1,8 @@
 import contract from 'truffle-contract'
-import ODLLDB from '../../build/contracts/ODLLDB.json'
+import DB from '../../build/contracts/DB.json'
 import { APPROVED_BLOCKCHAIN_NETWORK_ID, NETWORKS } from '../util/constants'
 import soliditySha3 from 'solidity-sha3'
-import ODLLUserWriterContract from '../../build/contracts/ODLLUserWriter.json'
+import UserWriterContract from '../../build/contracts/UserWriter.json'
 // import ODLLUserReaderContract from '../../build/contracts/ODLLUserReader.json'
 
 let blockchainManager = null
@@ -10,15 +10,15 @@ let blockchainManager = null
 class BlockchainManager {
   constructor () {
     blockchainManager = blockchainManager || this
-    blockchainManager.ODLLDBContractAddress = '0x3599fb7676a98ade73fc7bff96ae51cbce59e268'
+    blockchainManager.DBContractAddress = '0x3599fb7676a98ade73fc7bff96ae51cbce59e268'
     return blockchainManager
   }
 
   getCurrentContractAddressForKey (dbContractKey, state, coinbase) {
     return new Promise((resolve, reject) => {
-      const ODLLDBContract = contract(ODLLDB)
-      ODLLDBContract.setProvider(state.web3.instance().currentProvider)
-      ODLLDBContract.deployed()
+      const DBContract = contract(DB)
+      DBContract.setProvider(state.web3.instance().currentProvider)
+      DBContract.deployed()
       .then((contractInstance) => {
         contractInstance.getAddressValue(soliditySha3(dbContractKey), { from: coinbase })
         .then((result) => {
@@ -49,13 +49,14 @@ class BlockchainManager {
             if (error) {
               reject({ error, warningMessage: 'Unable to get coinbase for this operation' })
             } else {
-              blockchainManager.getCurrentContractAddressForKey(dataObject.dbContractKey, state, coinbase)
-              .then((addressToUse) => {
-                blockchainManager.runBlockchainPromise(resolve, reject, { odllContract, addressToUse, method: dataObject.method, coinbase })
-              })
-              .catch((error) => {
-                reject(error)
-              })
+              // blockchainManager.getCurrentContractAddressForKey(dataObject.dbContractKey, state, coinbase)
+              // .then((addressToUse) => {
+              //   blockchainManager.runBlockchainPromise(resolve, reject, { odllContract, addressToUse, method: dataObject.method, coinbase })
+              // })
+              // .catch((error) => {
+              //   reject(error)
+              // })
+              blockchainManager.runBlockchainPromise(resolve, reject, { odllContract, method: dataObject.method, coinbase })
             }
           })
         } else {
@@ -86,7 +87,7 @@ class BlockchainManager {
     return new Promise((resolve, reject) => {
       blockchainManager.accessBlockChainWith({
         state: query.state,
-        contractToUse: query.contractToUse || ODLLUserWriterContract,
+        contractToUse: query.contractToUse || UserWriterContract,
         dbContractKey: query.dbContractKey || 'contract/odll-user',
         method: query.method || ((contractInstance, coinbase) => {
           return new Promise((resolve, reject) => {

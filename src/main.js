@@ -5,7 +5,7 @@ import store from './store'
 
 import { mapState, mapActions } from 'vuex'
 import { ACTION_TYPES } from './util/constants'
-import ODLLUser from './blockchain/odll/ODLLUser'
+import userManager from './blockchain/odll/UserManager'
 import Search from './blockchain/search/Search'
 import monitorWeb3 from './util/web3/monitorWeb3'
 
@@ -27,7 +27,7 @@ new Vue({
       monitorWeb3(state)
       this.$store.dispatch(ACTION_TYPES.UPDATE_USER_BLOCKCHAIN_STATUS)
       .then(() => {
-        ODLLUser.getUserDataFromTheBlockchain(state)
+        userManager.getUserDataFromTheBlockchain(state)
         .then((userObject) => {
           this.$store.dispatch(ACTION_TYPES.UPDATE_USER_STATE, {
             userObject
@@ -130,10 +130,9 @@ new Vue({
       this[ACTION_TYPES.UPDATE_USER_GRAVATAR](payload)
     },
     callToWriteUser (payload = null) {
-      ODLLUser.writeUser(this.$store.state, payload)
+      userManager.writeUser(this.$store.state, payload)
       .then((userData) => {
         this[ACTION_TYPES.UPDATE_USER_STATE]({
-          isRaw: true,
           userObject: payload.vueUserObject
         })
         .then(() => {
@@ -154,7 +153,7 @@ new Vue({
     callToDeleteService (payload) {
       const blockchainParams = Object.assign({}, payload)
       delete blockchainParams.callback
-      ODLLUser.deleteService(this.$store.state, blockchainParams)
+      userManager.deleteService(this.$store.state, blockchainParams)
       .then((dataObject) => {
         if (payload.callback) payload.callback(dataObject)
       })
@@ -190,7 +189,7 @@ new Vue({
     },
     callToWriteData (payload = null) {
       const actionParams = Object.assign({}, payload.requestParams, {methodName: payload.methodName})
-      ODLLUser.writeData(this.$store.state, actionParams)
+      userManager.writeData(this.$store.state, actionParams)
       .then((responseObject) => {
         if (payload.callback) payload.callback(responseObject)
       })

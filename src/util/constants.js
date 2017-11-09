@@ -8,7 +8,7 @@ export const NETWORKS = {
   '4447': 'Truffle Develop Network'
 }
 
-export const APPROVED_BLOCKCHAIN_NETWORK_ID = '4447'
+export const APPROVED_BLOCKCHAIN_NETWORK_ID = '666'
 
 export const MUTATION_TYPES = {
   CHANGE_CURRENT_ROUTE_TO: 'changeCurrentRouteTo',

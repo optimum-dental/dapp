@@ -231,6 +231,7 @@ contract DB is Ownable {
   }
 
   function getUIntValueConverted(bytes32 record, uint8 uintType) public view returns(uint) {
+    // types: 1 => boolean, 2 => uint8, 3 => uint, 4 => address, 5 => bytes32, 7 => string
     if (uintType == 1) {
       return booleanToUInt(getBooleanValue(record));
     } else if (uintType == 2) {
@@ -261,7 +262,7 @@ contract DB is Ownable {
     external view returns
   (
     uint[] items,
-    string strs
+    string strings
   )
   {
     uint uintTypesCount = getUIntTypesCount(types);
@@ -283,23 +284,22 @@ contract DB is Ownable {
       In this case, records.length = 20, types.length = 4 => itemsCount = 5 [the search is being done for 5 entities]
     */
     uint itemsCount = records.length / types.length;
-
     items = new uint[](itemsCount * uintTypesCount);
     uint k;
     for (uint i = 0; i < itemsCount; i++) {
       for (uint j = 0; j < types.length; j++) {
         uint r_i = (i * types.length) + j;
         if (types[j] == 7) {
-          strs = strs.toSlice().concat(getStringValue(records[r_i]).toSlice());
-          strs = strs.toSlice().concat("666--ODLL--666".toSlice());
+          strings = strings.toSlice().concat(getStringValue(records[r_i]).toSlice());
+          strings = strings.toSlice().concat("666--ODLL--666".toSlice());
         } else {
           items[k] = getUIntValueConverted(records[r_i], types[j]);
           k++;
         }
       }
-      strs = strs.toSlice().concat("666--ODLL-LIST--666".toSlice());
+      strings = strings.toSlice().concat("666--ODLL-LIST--666".toSlice());
     }
 
-    return (items, strs);
+    return (items, strings);
   }
 }

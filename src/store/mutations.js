@@ -39,14 +39,14 @@ function stringifyBytesData (state, dataObject, datakeys) {
   return result
 }
 
-function getRawData (dataObject, datakeys) {
-  let result = []
-  for (var i = datakeys.length - 1; i >= 0; i--) {
-    result[i] = dataObject[datakeys[i]]
-  }
+// function getRawData (dataObject, datakeys) {
+//   let result = []
+//   for (var i = datakeys.length - 1; i >= 0; i--) {
+//     result[i] = dataObject[datakeys[i]]
+//   }
 
-  return result
-}
+//   return result
+// }
 
 function getGravatarFor (payload = {}) {
   return new Promise(function (resolve, reject) {
@@ -160,41 +160,40 @@ export default {
   [MUTATION_TYPES.UPDATE_USER_STATE] (state, payload) {
     const userObject = payload.userObject
     const userCopy = state.user
-    const [ name, email, gravatar, zipCode, socialSecurityNumber, birthday, phoneNumber, city, street ] = payload.isRaw ? getRawData(userObject, [ 'name', 'email', 'gravatar', 'zipCode', 'socialSecurityNumber', 'birthday', 'phoneNumber', 'city', 'street' ]) : stringifyBytesData(state, userObject, [ 'name', 'email', 'gravatar', 'zipCode', 'socialSecurityNumber', 'birthday', 'phoneNumber', 'city', 'street' ])
-    const [lastName, firstName, middleName] = name.split(' ')
-    const [areaNumber, groupNumber, sequenceNumber] = socialSecurityNumber.split('-')
-    const [year, month, day] = birthday.split('/')
-
-    const gender = Number(userObject.gender) === 0 ? '' : userObject.gender
+    const [lastName, firstName, middleName] = userObject.name.split(' ')
+    const [areaNumber, groupNumber, sequenceNumber] = userObject.socialSecurityNumber.split('-')
+    const [year, month, day] = userObject.birthday.split('/')
 
     Object.assign(userCopy, userObject, {
+      type: userObject.type.toString(),
       isValid: true,
-      patientable: userObject.type === '0' || userObject.type === '1',
-      canBeNewPatient: userObject.type === '0',
-      isPatient: userObject.type === '1',
-      isDentist: userObject.type === '2',
-      isODLLManager: userObject.type === '3',
-      isODLLAdmin: userObject.type === '4',
-      name: name || '',
+      patientable: Number(userObject.type) === 0 || Number(userObject.type) === 1,
+      canBeNewPatient: Number(userObject.type) === 0,
+      isPatient: Number(userObject.type) === 1,
+      isDentist: Number(userObject.type) === 2,
+      isODLLManager: Number(userObject.type) === 3,
+      isODLLAdmin: Number(userObject.type) === 4,
+      name: userObject.name || '',
       lastName: lastName || '',
       firstName: firstName || '',
       middleName: middleName || '',
-      email: email || '',
-      gravatar: gravatar || '',
-      street: street || '',
-      city: city || '',
-      zipCode: zipCode || '',
-      country: userObject.country && userObject.country.toString() === '0' ? '' : userObject.country,
-      phoneNumber: phoneNumber && phoneNumber.toString().trim() === '' ? '' : phoneNumber,
-      socialSecurityNumber: socialSecurityNumber || '',
+      email: userObject.email || '',
+      gravatar: userObject.gravatar || '',
+      street: userObject.street || '',
+      city: userObject.city || '',
+      state: userObject.state.toString(),
+      zipCode: userObject.zipCode || '',
+      country: userObject.country && userObject.country.toString() === '0' ? '' : userObject.country.toString(),
+      phoneNumber: userObject.phoneNumber && userObject.phoneNumber.toString().trim() === '' ? '' : userObject.phoneNumber,
+      socialSecurityNumber: userObject.socialSecurityNumber || '',
       areaNumber: areaNumber || '',
       groupNumber: groupNumber || '',
       sequenceNumber: sequenceNumber || '',
-      birthday: birthday || '',
+      birthday: userObject.birthday || '',
       day: day || '',
       month: month || '',
       year: year || '',
-      gender: gender || '',
+      gender: Number(userObject.gender) === 0 ? '' : userObject.gender,
       dentistsIds: userObject.dentistsIds || []
     })
 
