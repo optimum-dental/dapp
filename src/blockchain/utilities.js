@@ -1,4 +1,5 @@
 import {chunkArray} from '../util/ArrayManager'
+import soliditySha3 from 'solidity-sha3'
 
 export function getObjectFromResponse (state, result, entitiesCount, keys, fieldTypes) {
   // types: 1 => boolean, 2 => uint8, 3 => uint, 4 => address, 5 => bytes32, 7 => string
@@ -25,10 +26,10 @@ export function getObjectFromResponse (state, result, entitiesCount, keys, field
         itemValue = state.web3.instance().toHex(entitiesIntsArrays[i][intValuesIndex])
         intValuesIndex += 1
       } else if (fieldTypes[index] === 5) {
-        itemValue = state.web3.instance().toUtf8(entitiesIntsArrays[i][intValuesIndex].toString())
+        itemValue = state.web3.instance().toUtf8(state.web3.instance().toHex(entitiesIntsArrays[i][intValuesIndex].toString())).slice(1)
         intValuesIndex += 1
       } else {
-        itemValue = entitiesStringsArrays[i][stringValuesIndex]
+        itemValue = entitiesStringsArrays[i][stringValuesIndex].slice(2)
         stringValuesIndex += 1
       }
 
@@ -44,4 +45,8 @@ export function getObjectFromResponse (state, result, entitiesCount, keys, field
 
 export function getSlicedAddressString (state, addressString) {
   return state.web3.instance().toHex(addressString).slice(2)
+}
+
+export function getSoliditySha3ForId (state, key, userId) {
+  return soliditySha3(`${state.web3.instance().toHex(key)}${userId}`)
 }

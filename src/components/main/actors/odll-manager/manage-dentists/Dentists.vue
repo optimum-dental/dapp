@@ -74,8 +74,8 @@
           offset,
           limit: this.perPage,
           seed: seed || Math.random(),
-          callOnEach: 'getDentist',
-          callOnEachParams: dentistId => ({dentistId})
+          callOnEach: 'getOfficial',
+          callOnEachParams: officialId => ({officialId})
         }
 
         this.$router.push({
@@ -286,8 +286,8 @@
         offset: Number(this.$route.query.o || 0),
         limit: Number(this.$route.query.l || this.perPage),
         seed: Number(this.$route.query.sd || Math.random()),
-        callOnEach: 'getDentist',
-        callOnEachParams: dentistId => ({dentistId})
+        callOnEach: 'getOfficial',
+        callOnEachParams: officialId => ({officialId})
       })
     }
   }

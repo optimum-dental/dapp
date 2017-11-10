@@ -1,9 +1,8 @@
 import DB from '../../../build/contracts/DB.json'
 import UserReaderContract from '../../../build/contracts/UserReader.json'
 import blockchainManager from '../BlockchainManager'
-import {getObjectFromResponse, getSlicedAddressString} from '../utilities'
+import {getObjectFromResponse, getSlicedAddressString, getSoliditySha3ForId} from '../utilities'
 import {EXCHANGE_RATE_API} from '../../util/constants'
-import soliditySha3 from 'solidity-sha3'
 
 let userManager = null
 
@@ -19,7 +18,7 @@ class UserManager {
     delete blockchainData.methodName
     return blockchainManager.querySmartContract({
       smartContractMethod: blockchainMethodName,
-      smartContractMethodParams: (coinbase) => [...(Object.values(blockchainData)), {from: coinbase, gas: 4444444}],
+      smartContractMethodParams: (coinbase) => [...(Object.values(blockchainData)), {from: coinbase, gas: 4444444, gasPrice: 666000000000}],
       state,
       smartContractResolve: result => data,
       smartContractReject: error => error
@@ -29,7 +28,7 @@ class UserManager {
   deleteService (state = null, data = {}) {
     return blockchainManager.querySmartContract({
       smartContractMethod: 'removeDentistFromService',
-      smartContractMethodParams: (coinbase) => [...(Object.values(data.serviceObject)), {from: coinbase, gas: 4444444}],
+      smartContractMethodParams: (coinbase) => [...(Object.values(data.serviceObject)), {from: coinbase, gas: 4444444, gasPrice: 666000000000}],
       state,
       smartContractResolve: result => data,
       smartContractReject: error => error
@@ -39,7 +38,7 @@ class UserManager {
   writeUser (state = null, data = {}) {
     return blockchainManager.querySmartContract({
       smartContractMethod: 'writeUser',
-      smartContractMethodParams: (coinbase) => [...(Object.values(data.userObject)), {from: coinbase, gas: 4444444}],
+      smartContractMethodParams: (coinbase) => [...(Object.values(data.userObject)), {from: coinbase, gas: 4444444, gasPrice: 666000000000}],
       state,
       smartContractResolve: result => data,
       smartContractReject: error => error
@@ -57,7 +56,7 @@ class UserManager {
 
     return blockchainManager.querySmartContract({
       smartContractMethod: 'acceptScanApplication',
-      smartContractMethodParams: (coinbase) => [...(Object.values(data.requestObject)), {from: coinbase, gas: 4444444, value: state.web3.instance().toWei(quoteInEther, 'ether')}],
+      smartContractMethodParams: (coinbase) => [...(Object.values(data.requestObject)), {from: coinbase, gas: 4444444, gasPrice: 666000000000, value: state.web3.instance().toWei(quoteInEther, 'ether')}],
       state,
       smartContractResolve: result => data,
       smartContractReject: error => error
@@ -82,41 +81,14 @@ class UserManager {
       smartContractMethod: 'getEntityList',
       smartContractMethodParams: (coinbase) => [userObject.userRecordFields || userManager.userRecordFields(state, userId || coinbase), userObject.userRecordFieldTypes || userManager.userRecordFieldTypes(), {from: coinbase}],
       state,
-      smartContractResolve: result => getObjectFromResponse(state, result, 1, userObject.keys || userManager.userKeys(), userObject.userRecordFieldTypes || userManager.userRecordFieldTypes())[0],
+      smartContractResolve: result => {
+        const userData = getObjectFromResponse(state, result, 1, userObject.keys || userManager.userKeys(), userObject.userRecordFieldTypes || userManager.userRecordFieldTypes())[0]
+        return userData
+      },
       smartContractReject: (error) => ({
         error,
         isValid: true,
         warningMessage: "We've encountered a problem fetching your identity information from the blockchain. Please do try again in a few minutes."
-      })
-    })
-  }
-
-  getUserContactData (state = null, userId = null) {
-    return blockchainManager.querySmartContract({
-      contractToUse: UserReaderContract,
-      smartContractMethod: 'getUserContactData',
-      smartContractMethodParams: (coinbase) => [userId || coinbase, {from: coinbase}],
-      state,
-      smartContractResolve: result => getObjectFromResponse(state, result, ['street', 'city', 'phoneNumber', 'state', 'zipCode', 'country']),
-      smartContractReject: (error) => ({
-        error,
-        isValid: true,
-        warningMessage: "We've encountered a problem fetching your contact information from the blockchain. Please do try again in a few minutes."
-      })
-    })
-  }
-
-  getUserPersonalData (state = null, userId = null) {
-    return blockchainManager.querySmartContract({
-      contractToUse: UserReaderContract,
-      smartContractMethod: 'getUserPersonalData',
-      smartContractMethodParams: (coinbase) => [userId || coinbase, {from: coinbase}],
-      state,
-      smartContractResolve: result => getObjectFromResponse(state, result, ['gender', 'socialSecurityNumber', 'birthday']),
-      smartContractReject: (error) => ({
-        error,
-        isValid: true,
-        warningMessage: "We've encountered a problem fetching your personal information from the blockchain. Please do try again in a few minutes."
       })
     })
   }
@@ -227,22 +199,21 @@ class UserManager {
 
   userRecordFields (state, userId) {
     userId = getSlicedAddressString(state, userId)
-    console.log(soliditySha3(`${state.web3.instance().toHex('user/name')}${userId}`))
 
     return [
-      soliditySha3(`${state.web3.instance().toHex('user/type')}${userId}`),
-      soliditySha3(`${state.web3.instance().toHex('user/name')}${userId}`),
-      soliditySha3(`${state.web3.instance().toHex('user/email')}${userId}`),
-      soliditySha3(`${state.web3.instance().toHex('user/gravatar')}${userId}`),
-      soliditySha3(`${state.web3.instance().toHex('user/street')}${userId}`),
-      soliditySha3(`${state.web3.instance().toHex('user/city')}${userId}`),
-      soliditySha3(`${state.web3.instance().toHex('user/state')}${userId}`),
-      soliditySha3(`${state.web3.instance().toHex('user/zip-code')}${userId}`),
-      soliditySha3(`${state.web3.instance().toHex('user/country')}${userId}`),
-      soliditySha3(`${state.web3.instance().toHex('user/phone-number')}${userId}`),
-      soliditySha3(`${state.web3.instance().toHex('user/social-security-number')}${userId}`),
-      soliditySha3(`${state.web3.instance().toHex('user/birthday')}${userId}`),
-      soliditySha3(`${state.web3.instance().toHex('user/gender')}${userId}`)
+      getSoliditySha3ForId(state, 'user/type', userId),
+      getSoliditySha3ForId(state, 'user/name', userId),
+      getSoliditySha3ForId(state, 'user/email', userId),
+      getSoliditySha3ForId(state, 'user/gravatar', userId),
+      getSoliditySha3ForId(state, 'user/street', userId),
+      getSoliditySha3ForId(state, 'user/city', userId),
+      getSoliditySha3ForId(state, 'user/state', userId),
+      getSoliditySha3ForId(state, 'user/zip-code', userId),
+      getSoliditySha3ForId(state, 'user/country', userId),
+      getSoliditySha3ForId(state, 'user/phone-number', userId),
+      getSoliditySha3ForId(state, 'user/social-security-number', userId),
+      getSoliditySha3ForId(state, 'user/birthday', userId),
+      getSoliditySha3ForId(state, 'user/gender', userId)
     ]
   }
 

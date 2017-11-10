@@ -13,8 +13,8 @@ library userManager {
   //    userType:
   //    { 1 => patient, 2 => dentist, 3 => manager, 4 => admin }
 
-  function getConfig (address dbAddress, bytes32 key) internal view returns(uint) {
-    return DB(dbAddress).getUIntValue(keccak256("config/", key));
+  function getConfig (address dbAddress, string key) internal view returns(uint) {
+    return DB(dbAddress).getUIntValue(keccak256(key));
   }
 
   function getUsersCount (address dbAddress) internal view returns(uint) {
@@ -93,9 +93,22 @@ library userManager {
   {
     var nameLen = name.toSlice().len();
     var emailLen = email.toSlice().len();
-    require(nameLen <= getConfig(dbAddress, "max-user-name-length") && nameLen >= getConfig(dbAddress, "min-user-name-length"));
-    require(emailLen <= getConfig(dbAddress, "max-user-email-length") && emailLen >= getConfig(dbAddress, "min-user-email-length"));
+    require(nameLen <= getConfig(dbAddress, "config/max-user-name-length") && nameLen >= getConfig(dbAddress, "config/min-user-name-length"));
+    require(emailLen <= getConfig(dbAddress, "config/max-user-email-length") && emailLen >= getConfig(dbAddress, "config/min-user-email-length"));
 
+    initUser(dbAddress, userId, userType);
+    DB(dbAddress).setStringValue(keccak256("user/name", userId), name);
+    DB(dbAddress).setStringValue(keccak256("user/email", userId), email);
+    DB(dbAddress).setBytes32Value(keccak256("user/gravatar", userId), gravatar);
+  }
+
+  function initUser (
+    address dbAddress,
+    address userId,
+    uint8 userType
+  )
+    internal
+  {
     if (!userExists(dbAddress, userId)) {
       DB(dbAddress).setUIntValue(keccak256("user/created-on", userId), now);
       DB(dbAddress).setUInt8Value(keccak256("user/status", userId), 1);
@@ -110,9 +123,6 @@ library userManager {
     }
 
     DB(dbAddress).setUInt8Value(keccak256("user/type", userId), userType);
-    DB(dbAddress).setStringValue(keccak256("user/name", userId), name);
-    DB(dbAddress).setStringValue(keccak256("user/email", userId), email);
-    DB(dbAddress).setBytes32Value(keccak256("user/gravatar", userId), gravatar);
   }
 
   function setUserLocation (
@@ -186,7 +196,7 @@ library userManager {
     var companyNameLen = companyName.toSlice().len();
     require(userExists(dbAddress, userId));
     require(isActiveUser(dbAddress, userId));
-    require(companyNameLen <= getConfig(dbAddress, "max-company-name-length") && companyNameLen >= getConfig(dbAddress, "min-company-name-length"));
+    require(companyNameLen <= getConfig(dbAddress, "config/max-company-name-length") && companyNameLen >= getConfig(dbAddress, "config/min-company-name-length"));
     DB(dbAddress).setBooleanValue(keccak256("user/is-odll-dentist?", userId), isODLLDentist);
     DB(dbAddress).setBooleanValue(keccak256("user/is-available?", userId), isAvailable);
     DB(dbAddress).setStringValue(keccak256("dentist/company-name", userId), companyName);
@@ -459,7 +469,7 @@ library userManager {
   {
     uint8 userTypeCheck = DB(dbAddress).getUInt8Value(keccak256('user/type', officialId));
     require(officialId != 0x0 && userType != 0 && userTypeCheck == 0);
-    setUserIdentity(dbAddress, officialId, userType, "", "", "");
+    initUser(dbAddress, officialId, userType);
   }
 
   function blockUser (address dbAddress, address userId)

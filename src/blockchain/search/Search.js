@@ -83,37 +83,14 @@ class Search {
     })
   }
 
-  getManager (state = null, dataObject = {}) {
+  getOfficial (state = null, dataObject = {}) {
     return new Promise((resolve, reject) => {
       const userObject = {}
-      userManager.getUserIdentityData(state, dataObject.managerId)
+      userManager.getUserData(state, dataObject.officialId)
       .then((result) => {
-        result.coinbase = dataObject.managerId
+        result.coinbase = dataObject.officialId
         Object.assign(userObject, result)
-        userManager.getUserContactData(state, dataObject.managerId)
-        .then((result) => {
-          Object.assign(userObject, result)
-          resolve(userObject)
-        })
-        .catch(error => reject(error))
-      })
-      .catch(error => reject(error))
-    })
-  }
-
-  getDentist (state = null, dataObject = {}) {
-    return new Promise((resolve, reject) => {
-      const userObject = {}
-      userManager.getUserIdentityData(state, dataObject.dentistId)
-      .then((result) => {
-        result.coinbase = dataObject.dentistId
-        Object.assign(userObject, result)
-        userManager.getUserContactData(state, dataObject.dentistId)
-        .then((result) => {
-          Object.assign(userObject, result)
-          resolve(userObject)
-        })
-        .catch(error => reject(error))
+        resolve(userObject)
       })
       .catch(error => reject(error))
     })

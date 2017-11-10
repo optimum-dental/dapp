@@ -74,8 +74,8 @@
           offset,
           limit: this.perPage,
           seed: seed || Math.random(),
-          callOnEach: 'getManager',
-          callOnEachParams: managerId => ({managerId})
+          callOnEach: 'getOfficial',
+          callOnEachParams: officialId => ({officialId})
         }
 
         this.$router.push({
@@ -273,8 +273,8 @@
         offset: Number(this.$route.query.o || 0),
         limit: Number(this.$route.query.l || this.perPage),
         seed: Number(this.$route.query.sd || Math.random()),
-        callOnEach: 'getManager',
-        callOnEachParams: managerId => ({managerId})
+        callOnEach: 'getOfficial',
+        callOnEachParams: officialId => ({officialId})
       })
     }
   }

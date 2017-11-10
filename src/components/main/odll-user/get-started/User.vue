@@ -159,7 +159,7 @@
       },
       populateCountries () {
         const countriesElement = document.getElementById('country')
-        const userCountryIndex = this.user.country ? Number(this.user.country) : countries.findIndex((country) => country.code === 'US')
+        const userCountryIndex = this.user.country && Number(this.user.country) !== 0 ? Number(this.user.country) : countries.findIndex((country) => country.code === 'US')
         countries.forEach((country, index) => {
           const optionElement = document.createElement('option')
           optionElement.text = country.name
@@ -293,7 +293,7 @@
         } else {
           this.scrollToTop()
           const userObject = {
-            type: this.type,
+            type: Number(this.type),
             name: `b${name}`,
             email: `b${email}`,
             gravatar: `b${this.user.gravatar || ''}`,
