@@ -47,6 +47,22 @@ export function getSlicedAddressString (state, addressString) {
   return state.web3.instance().toHex(addressString).slice(2)
 }
 
-export function getSoliditySha3ForId (state, key, userId) {
-  return soliditySha3(`${state.web3.instance().toHex(key)}${userId}`)
+export function getLeftPaddedNumber (state, numberValue, dataTypeIndex = 1) {
+  const hexNumber = state.web3.instance().toHex(numberValue)
+  const rightNumber = getSlicedAddressString(state, hexNumber)
+  const paddings = [2, 64] // 2 => uint8, 64 => uint256
+  const numberOfDigits = rightNumber.toString().length
+  const paddingSize = paddings[dataTypeIndex] - numberOfDigits
+  let paddedNumber = '0x'
+  for (let i = 0; i < paddingSize; i++) {
+    paddedNumber += '0'
+  }
+
+  paddedNumber += rightNumber.toString()
+  paddedNumber = paddedNumber.slice(0, (2 + paddings[dataTypeIndex]))
+  return paddedNumber
+}
+
+export function getSoliditySha3ForId (state, key, ...otherParams) {
+  return soliditySha3(`${state.web3.instance().toHex(key)}${otherParams.join('')}`)
 }

@@ -218,7 +218,7 @@
             offset,
             limit: this.perPage,
             seed: seed || Math.random(),
-            callOnEach: 'getDentistDataFromFind',
+            callOnEach: 'getOfficial',
             callOnEachParams: dentistId => ({dentistId, serviceTypeId: appointmentTypeId, serviceId: appointmentSubtypeId})
           }
 
@@ -268,6 +268,7 @@
         this.$root.callToFetchDataObjects({
           fetchQuery,
           preSaveCallback: (result) => {
+            console.log(result)
             Object.assign(result, {
               serviceTypeId: fetchQuery.appointmentTypeId,
               serviceId: fetchQuery.appointmentSubtypeId,
@@ -420,7 +421,7 @@
         offset: Number(this.$route.query.o),
         limit: Number(this.$route.query.l),
         seed: Number(this.$route.query.sd),
-        callOnEach: 'getDentistDataFromFind',
+        callOnEach: 'getOfficial',
         callOnEachParams: dentistId => ({dentistId, serviceTypeId: Number(this.$route.query.aTI), serviceId: Number(this.$route.query.aSI)})
       })
     }

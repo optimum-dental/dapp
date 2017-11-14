@@ -17,7 +17,7 @@ contract Setter is Restrictor {
     DB(dbAddress).setUIntValue(keccak256('config/max-user-name-length'), 50);
     DB(dbAddress).setUIntValue(keccak256('config/min-user-name-length'), 5);
     DB(dbAddress).setUIntValue(keccak256('config/max-user-email-length'), 80);
-    DB(dbAddress).setUIntValue(keccak256('config/min-user-email-length'), 5);
+    DB(dbAddress).setUIntValue(keccak256('config/min-user-email-length'), 0);
     DB(dbAddress).setUIntValue(keccak256('config/max-company-name-length'), 50);
     DB(dbAddress).setUIntValue(keccak256('config/min-company-name-length'), 5);
   }

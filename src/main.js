@@ -5,8 +5,9 @@ import store from './store'
 
 import { mapState, mapActions } from 'vuex'
 import { ACTION_TYPES } from './util/constants'
-import userManager from './blockchain/odll/UserManager'
-import Search from './blockchain/search/Search'
+import userManager from './blockchain/user/Manager'
+import searchManager from './blockchain/search/Manager'
+import serviceManager from './blockchain/service/Manager'
 import monitorWeb3 from './util/web3/monitorWeb3'
 
 Vue.config.devtools = true
@@ -166,7 +167,7 @@ new Vue({
       const fetchQuery = payload.fetchQuery
       const blockchainParams = Object.assign({}, fetchQuery)
       blockchainParams.seed = Math.ceil(blockchainParams.seed * 113)
-      Search.fetchDataObjects(this.$store.state, blockchainParams)
+      searchManager.fetchDataObjects(this.$store.state, blockchainParams)
       .then((fetchResult) => {
         this[ACTION_TYPES.SAVE_SEARCH_RESULT]({
           type: fetchQuery.type,
@@ -188,8 +189,13 @@ new Vue({
       })
     },
     callToWriteData (payload = null) {
+      const managers = [
+        userManager,
+        searchManager,
+        serviceManager
+      ]
       const actionParams = Object.assign({}, payload.requestParams, {methodName: payload.methodName})
-      userManager.writeData(this.$store.state, actionParams)
+      managers[payload.managerId || 0].writeData(this.$store.state, actionParams)
       .then((responseObject) => {
         if (payload.callback) payload.callback(responseObject)
       })

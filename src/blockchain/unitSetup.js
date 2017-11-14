@@ -2,7 +2,7 @@
 
 /*
 DB.at('0x997092b102c23da7256a998aa071537f6ee2070e').addPermittedContracts([
-  "0x8c66e79a2247e50538c63fdf8e18c9bf7afaf309", // Setter
+  "0x05a0320ca28e031812b358f9ed76b2410a3426f8", // Setter
   "0xed4b2724a6afef5c40d0a646346f8a9e7eba338f", // UserWriter
   "0x6ada7ab35b468c416d0b60465403c0b9baceb719", // UserReader
   "0xfeb8da07d0f0a2218b6793f533301bbd69d1cd28", // ServiceWriter
@@ -18,13 +18,13 @@ DB.at('0x997092b102c23da7256a998aa071537f6ee2070e').addPermittedContracts([
 ])
 */
 
-DB.at('0x997092b102c23da7256a998aa071537f6ee2070e').addPermittedContracts(["0x8c66e79a2247e50538c63fdf8e18c9bf7afaf309", "0xed4b2724a6afef5c40d0a646346f8a9e7eba338f", "0x6ada7ab35b468c416d0b60465403c0b9baceb719", "0xfeb8da07d0f0a2218b6793f533301bbd69d1cd28", "0x112bcca48274669d3f4ec8b8a91bd289127c2d7e", "0x53f88f0f20e428604343e14f5ca26388ab7985e0", "0xc3b3e9669dc0e50e49028e0c91f18cb22e94ddd2", "0x22589b369a939b9c36412b3c2cced62ce6de9e52", "0x7d2614cf19c118b2b3a40933372e3152739d7463", "0x92a182914779faf3170ce24c52a32192c9e9efba", "0xd373d066d93666d66f6b0bebeb9e9a2c7c98df11", "0xb73d190cf107afbebf0303ef1b54c002e82b0bd5", "0x92beb635b65636c277d186dce017949582bc46b3" ])
+DB.at('0x997092b102c23da7256a998aa071537f6ee2070e').addPermittedContracts(["0x05a0320ca28e031812b358f9ed76b2410a3426f8", "0xed4b2724a6afef5c40d0a646346f8a9e7eba338f", "0x6ada7ab35b468c416d0b60465403c0b9baceb719", "0xfeb8da07d0f0a2218b6793f533301bbd69d1cd28", "0x112bcca48274669d3f4ec8b8a91bd289127c2d7e", "0x53f88f0f20e428604343e14f5ca26388ab7985e0", "0xc3b3e9669dc0e50e49028e0c91f18cb22e94ddd2", "0x22589b369a939b9c36412b3c2cced62ce6de9e52", "0x7d2614cf19c118b2b3a40933372e3152739d7463", "0x92a182914779faf3170ce24c52a32192c9e9efba", "0xd373d066d93666d66f6b0bebeb9e9a2c7c98df11", "0xb73d190cf107afbebf0303ef1b54c002e82b0bd5", "0x92beb635b65636c277d186dce017949582bc46b3" ])
 
-Setter.at('0x8c66e79a2247e50538c63fdf8e18c9bf7afaf309').setOwner()
+Setter.at('0x05a0320ca28e031812b358f9ed76b2410a3426f8').setOwner()
 
-Setter.at('0x8c66e79a2247e50538c63fdf8e18c9bf7afaf309').setConfig()
+Setter.at('0x05a0320ca28e031812b358f9ed76b2410a3426f8').setConfig()
 
-Setter.at('0x8c66e79a2247e50538c63fdf8e18c9bf7afaf309').setFirstAdmin("0x13ba42b19c25c0f6ecb7ab1c5db8d736231ecb94") // Phoebe
+Setter.at('0x05a0320ca28e031812b358f9ed76b2410a3426f8').setFirstAdmin("0x13ba42b19c25c0f6ecb7ab1c5db8d736231ecb94") // Phoebe
 
 // UserWriter.at('0xed4b2724a6afef5c40d0a646346f8a9e7eba338f').addOfficialToODLL('0xe2761238fe59bc0dde7d2a15bad605cda6047c5a', 4) // Quadri
 // UserWriter.at('0xed4b2724a6afef5c40d0a646346f8a9e7eba338f').addOfficialToODLL('0xf0bc73eaa439392723f0dc653abfb9058112bee1', 4) // Tina
@@ -32,8 +32,8 @@ Setter.at('0x8c66e79a2247e50538c63fdf8e18c9bf7afaf309').setFirstAdmin("0x13ba42b
 
 
 /* Ignore
-// Setter.at('0x8c66e79a2247e50538c63fdf8e18c9bf7afaf309').setContract("contract/odll-user-writer", "0xed4b2724a6afef5c40d0a646346f8a9e7eba338f", { from: "0xa6976e0d32f99930641ced889143bf0ca99ee51d" })
-// Setter.at('0x8c66e79a2247e50538c63fdf8e18c9bf7afaf309').setContract("contract/odll-user-reader", "0x6ada7ab35b468c416d0b60465403c0b9baceb719", { from: "0xa6976e0d32f99930641ced889143bf0ca99ee51d" })
+// Setter.at('0x05a0320ca28e031812b358f9ed76b2410a3426f8').setContract("contract/odll-user-writer", "0xed4b2724a6afef5c40d0a646346f8a9e7eba338f", { from: "0xa6976e0d32f99930641ced889143bf0ca99ee51d" })
+// Setter.at('0x05a0320ca28e031812b358f9ed76b2410a3426f8').setContract("contract/odll-user-reader", "0x6ada7ab35b468c416d0b60465403c0b9baceb719", { from: "0xa6976e0d32f99930641ced889143bf0ca99ee51d" })
 */
 
 
@@ -51,3 +51,11 @@ DB.at('0x997092b102c23da7256a998aa071537f6ee2070e').getAddressValue('0xe901f0b43
 // DB.at('0x997092b102c23da7256a998aa071537f6ee2070e').getAddressValue('0xa2a70261844f353edc399d2fe91ce30b0e72f9cddd7ddaab87a3b0b66bc7390b') // check UserWriter Contract
 
 DB.at('0x997092b102c23da7256a998aa071537f6ee2070e').getAddressValue('0x0f6f723d4ae6fa8d6cb219977b9c034e21574f8183956d459a70e20897c43340') // check first admin
+
+DB.at('0x997092b102c23da7256a998aa071537f6ee2070e').getUIntValue('0xfdee3f0a67e1c0905d1d1b9edcca1bfcfb20fa50983fd6ec98ed3c4ec9ab8778') // check user max name length
+
+DB.at('0x997092b102c23da7256a998aa071537f6ee2070e').getUIntValue('0x27939fccc16d3a632345caa25742703dad1ced4093cdf33a23b64dcf70b4e01d') // check user min name length
+
+DB.at('0x997092b102c23da7256a998aa071537f6ee2070e').getUIntValue('0xf63344a14ef1f301f2ea2358926e73002ff132dff3be673f4bfbe98e83699fde') // check user max email length
+
+DB.at('0x997092b102c23da7256a998aa071537f6ee2070e').getUIntValue('0x11612b38ec30ac4f2241d9b322e33f7794d006d5981c6b43ff273a52c6fc051b') // check user min email length

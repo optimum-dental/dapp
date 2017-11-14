@@ -1,13 +1,22 @@
 import UserReaderContract from '../../../build/contracts/UserReader.json'
-import userManager from '../odll/UserManager'
+import ServiceReaderContract from '../../../build/contracts/ServiceReader.json'
+import userManager from '../user/Manager'
+import serviceManager from '../service/Manager'
 import blockchainManager from '../BlockchainManager'
 
-let search = null
+let searchManager = null
 
-class Search {
+class Manager {
   constructor () {
-    search = search || this
-    return search
+    searchManager = searchManager || this
+    return searchManager
+  }
+
+  availableContracts () {
+    return [
+      UserReaderContract,
+      ServiceReaderContract
+    ]
   }
 
   getDentistDataFromFind (state = null, dataObject = {}) {
@@ -45,7 +54,7 @@ class Search {
     if (dataObject.specials) {
       fetchType = dataObject.specials.callSmartContractWith || fetchType
       willUnshiftCoinbase = dataObject.specials.willUnshiftCoinbase
-      contractToUse = dataObject.specials.contractToUse
+      contractToUse = searchManager.availableContracts()[dataObject.specials.contractIndexToUse]
       delete dataObject.specials
     }
 
@@ -65,12 +74,12 @@ class Search {
       state,
       smartContractResolve: (results) => {
         if (callOnEach && callOnEachParams) {
-          const resultIds = results[1].map((resultId) => {
+          const resultData = results[1].map((resultId) => {
             return new Promise(function (resolve, reject) {
-              resolve(search[callOnEach](state, callOnEachParams(resultId)))
+              resolve(searchManager[callOnEach](state, callOnEachParams(resultId)))
             })
           })
-          return {totalNumberAvailable: results[0], results: resultIds}
+          return {totalNumberAvailable: results[0], results: resultData}
         } else {
           return {totalNumberAvailable: results[0], results}
         }
@@ -95,7 +104,19 @@ class Search {
       .catch(error => reject(error))
     })
   }
+
+  getServiceDetail (state = null, requestObject = {}) {
+    return new Promise((resolve, reject) => {
+      const dataObject = {}
+      serviceManager.getServiceDetail(state, requestObject)
+      .then((result) => {
+        Object.assign(dataObject, result)
+        resolve(dataObject)
+      })
+      .catch(error => reject(error))
+    })
+  }
 }
 
-search = new Search()
-export default search
+searchManager = new Manager()
+export default searchManager

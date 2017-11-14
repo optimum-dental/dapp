@@ -55,8 +55,8 @@
       user () {
         return this.$root.user
       },
-      isThereMore (serviceType) {
-        return this.$store.state.searchResult[serviceType === 1 ? 'fetchScanServices' : 'fetchTreatmentServices'].totalNumberAvailable > (this.pageNumber * this.perPage)
+      isThereMore () {
+        return this.$store.state.searchResult[Number(this.$route.query.sT || 1) === 1 ? 'fetchScanServices' : 'fetchTreatmentServices'].totalNumberAvailable > (this.pageNumber * this.perPage)
       },
       pageNumber () {
         return (Number(this.$route.query.o || 0) / this.perPage) + 1
@@ -224,6 +224,7 @@
               serviceSubtypeId,
               fee
             },
+            managerId: 2,
             methodName: 'writeServiceWithFee',
             callback: (status) => {
               this.endWait(document.querySelector('.wrapper'))
@@ -251,17 +252,20 @@
           }
         })
       },
-      fetchServices (evt, offset = 0, seed = null, direction = 1, serviceType = 1) {
+      fetchServices (evt, offset = 0, seed = null, direction = 1, serviceTypeId = 1) {
         const fetchQuery = {
-          type: serviceType === 1 ? 'fetchScanServices' : 'fetchTreatmentServices',
+          type: serviceTypeId === 1 ? 'fetchScanServices' : 'fetchTreatmentServices',
           specials: {
-            callSmartContractWith: 'fetchServicesWithFees',
-            willUnshiftCoinbase: true
+            contractIndexToUse: 1,
+            callSmartContractWith: 'fetchServices'
           },
-          serviceType,
+          userId: this.user.coinbase,
+          serviceTypeId,
           offset,
           limit: this.perPage,
-          seed: seed || Math.random()
+          seed: seed || Math.random(),
+          callOnEach: 'getServiceDetail',
+          callOnEachParams: serviceId => ({serviceTypeId, serviceId: serviceId.toNumber()})
         }
 
         this.$router.push({
@@ -270,12 +274,12 @@
             o: fetchQuery.offset,
             l: fetchQuery.limit,
             sd: fetchQuery.seed,
-            sT: serviceType
+            sT: serviceTypeId
           }
         })
         const offsetData = this.$store.state.searchResult[fetchQuery.type].data[offset]
         if (direction < 0 && offsetData && offsetData.length > 0) {
-          this.populateResults(offsetData, serviceType)
+          this.populateResults(offsetData, serviceTypeId)
         } else {
           this.getServices(evt, fetchQuery)
         }
@@ -284,32 +288,24 @@
         return document.getElementById('fee').value
       },
       getServices (evt, fetchQuery) {
-        const serviceType = fetchQuery.serviceType
-        const resultSection = document.querySelector(`.${serviceType === 1 ? 'scan-section' : 'treatment-section'}`)
+        const serviceTypeId = fetchQuery.serviceTypeId
+        const resultSection = document.querySelector(`.${serviceTypeId === 1 ? 'scan-section' : 'treatment-section'}`)
         this.clearDOMElementChildren(resultSection)
-        this.askUserToWaitWhileWeSearch(serviceType)
+        this.askUserToWaitWhileWeSearch(serviceTypeId)
         this.disableNecessaryButtons()
         this.$root.callToFetchDataObjects({
           fetchQuery,
-          saveCallback: (results, state) => {
-            const serviceTypeId = serviceType
-            const serviceIds = results[1]
-            const fees = results[2]
-            serviceIds.forEach((serviceId, index) => {
-              let result = {
-                serviceName: serviceTypes[serviceTypeId].subtypes[serviceId],
-                serviceFee: fees[index],
-                serviceTypeId,
-                serviceId
-              }
+          callback: (result = null, isCompleted = false) => {
+            // update result view
+            if (isCompleted) {
+              if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
+              this.enableNecessaryButtons()
+            }
 
+            if (result) {
               this.appendResult(result, serviceTypeId)
-              state.searchResult[fetchQuery.type].data[fetchQuery.offset].push(result)
-            })
-            if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
-            this.enableNecessaryButtons()
-            if (serviceIds.length === 0) {
-              this.informOfNoService(serviceType)
+            } else {
+              this.informOfNoService(serviceTypeId)
             }
           }
         })
@@ -335,42 +331,42 @@
         }
       },
       showNextPage () {
-        const serviceType = Number(this.route.query.sT || 1)
-        this.fetchServices(null, this.nextOffset, this.$store.state.searchResult[serviceType === 1 ? 'fetchScanServices' : 'fetchTreatmentServices'].seed, 1, serviceType)
+        const serviceTypeId = Number(this.$route.query.sT || 1)
+        this.fetchServices(null, this.nextOffset, this.$store.state.searchResult[serviceTypeId === 1 ? 'fetchScanServices' : 'fetchTreatmentServices'].seed, 1, serviceTypeId)
       },
       showPreviousPage () {
-        const serviceType = Number(this.route.query.sT || 1)
-        this.fetchServices(null, this.previousOffset, this.$store.state.searchResult[serviceType === 1 ? 'fetchScanServices' : 'fetchTreatmentServices'].seed, -1, serviceType)
+        const serviceTypeId = Number(this.$route.query.sT || 1)
+        this.fetchServices(null, this.previousOffset, this.$store.state.searchResult[serviceTypeId === 1 ? 'fetchScanServices' : 'fetchTreatmentServices'].seed, -1, serviceTypeId)
       },
       getPageIndex (offset = 0) {
         return offset / this.perPage
       },
-      askUserToWaitWhileWeSearch (serviceType = 1) {
+      askUserToWaitWhileWeSearch (serviceTypeId = 1) {
         if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
         if (document.querySelector('.no-service')) document.querySelector('.no-service').remove()
-        let waitOverlayDOMElement = this.createWaitOverlayDOMElement(serviceType)
+        let waitOverlayDOMElement = this.createWaitOverlayDOMElement(serviceTypeId)
         document.querySelector('.result-section').appendChild(waitOverlayDOMElement)
       },
-      informOfNoService (serviceType = 1) {
+      informOfNoService (serviceTypeId = 1) {
         if (document.querySelector('.no-service')) document.querySelector('.no-service').remove()
-        let noServiceDOMElement = this.createNoServiceDOMElement(serviceType)
+        let noServiceDOMElement = this.createNoServiceDOMElement(serviceTypeId)
         document.querySelector('.result-section').appendChild(noServiceDOMElement)
       },
-      createWaitOverlayDOMElement (serviceType = 1) {
+      createWaitOverlayDOMElement (serviceTypeId = 1) {
         const DOMELement = new DOMParser().parseFromString(`
           <div class="wait-overlay">
-            <div class="wait-message">Please Wait... We're searching the blockchain for your ${serviceType === 1 ? 'Scan' : 'Treatment'} services.</div>
+            <div class="wait-message">Please Wait... We're searching the blockchain for your ${serviceTypeId === 1 ? 'Scan' : 'Treatment'} services.</div>
             <div class="spin"></div>
           </div>
         `, 'text/html')
 
         return DOMELement.body.firstChild
       },
-      createNoServiceDOMElement (serviceType = 1) {
+      createNoServiceDOMElement (serviceTypeId = 1) {
         const DOMELement = new DOMParser().parseFromString(`
           <div class="no-service">
             <div class="no-service-message">
-              It appears you have no ${serviceType === 1 ? 'Scan' : 'Treatment'} service on the blockchain.
+              It appears you have no ${serviceTypeId === 1 ? 'Scan' : 'Treatment'} service on the blockchain.
             </div>
           </div>
         `, 'text/html')
@@ -418,19 +414,22 @@
       }
     },
     mounted: function () {
-      const serviceType = Number(this.$route.query.sT || 1)
+      const serviceTypeId = Number(this.$route.query.sT || 1)
       this.populateServiceTypes()
       this.setEventListeners()
       this.getServices(null, {
-        type: serviceType === 1 ? 'fetchScanServices' : 'fetchTreatmentServices',
+        type: serviceTypeId === 1 ? 'fetchScanServices' : 'fetchTreatmentServices',
         specials: {
-          callSmartContractWith: 'fetchServicesWithFees',
-          willUnshiftCoinbase: true
+          contractIndexToUse: 1,
+          callSmartContractWith: 'fetchServices'
         },
-        serviceType,
+        userId: this.user.coinbase,
+        serviceTypeId,
         offset: Number(this.$route.query.o || 0),
         limit: Number(this.$route.query.l || this.perPage),
-        seed: Number(this.$route.query.sd || Math.random())
+        seed: Number(this.$route.query.sd || Math.random()),
+        callOnEach: 'getServiceDetail',
+        callOnEachParams: serviceId => ({serviceTypeId, serviceId: serviceId.toNumber()})
       })
     }
   }

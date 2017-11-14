@@ -49,13 +49,6 @@ class BlockchainManager {
             if (error) {
               reject({ error, warningMessage: 'Unable to get coinbase for this operation' })
             } else {
-              // blockchainManager.getCurrentContractAddressForKey(dataObject.dbContractKey, state, coinbase)
-              // .then((addressToUse) => {
-              //   blockchainManager.runBlockchainPromise(resolve, reject, { odllContract, addressToUse, method: dataObject.method, coinbase })
-              // })
-              // .catch((error) => {
-              //   reject(error)
-              // })
               blockchainManager.runBlockchainPromise(resolve, reject, { odllContract, method: dataObject.method, coinbase })
             }
           })

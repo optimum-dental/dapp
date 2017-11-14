@@ -26,7 +26,7 @@ library searchLibrary {
   {
     if (serviceTypeId == 1) {
       return DB(dbAddress).getUIntValue(keccak256("dentist/scan-service/fee", userId, serviceId));
-    } else if (serviceTypeId == 2){
+    } else if (serviceTypeId == 2) {
       return DB(dbAddress).getUIntValue(keccak256("dentist/treatment-service/fee", userId, serviceId));
     } else {
       return 0;

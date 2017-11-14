@@ -24,20 +24,20 @@ function assignPropertyTo (hashObject, key, value) {
   })
 }
 
-function stringifyBytesData (state, dataObject, datakeys) {
-  // Remove the guard in front of the bytes32 encoding strings
-  let result = []
-  for (var i = datakeys.length - 1; i >= 0; i--) {
-    try {
-      let data = dataObject[datakeys[i]]
-      result[i] = data ? state.web3.instance().toUtf8(data).toString().slice(1) : ''
-    } catch (e) {
-      result[i] = ''
-    }
-  }
+// function stringifyBytesData (state, dataObject, datakeys) {
+//   // Remove the guard in front of the bytes32 encoding strings
+//   let result = []
+//   for (var i = datakeys.length - 1; i >= 0; i--) {
+//     try {
+//       let data = dataObject[datakeys[i]]
+//       result[i] = data ? state.web3.instance().toUtf8(data).toString().slice(1) : ''
+//     } catch (e) {
+//       result[i] = ''
+//     }
+//   }
 
-  return result
-}
+//   return result
+// }
 
 // function getRawData (dataObject, datakeys) {
 //   let result = []
@@ -238,21 +238,16 @@ export default {
     const searchResultCopy = state.searchResult
     searchResultCopy[payload.type].data[payload.offset] = []
     searchResultCopy[payload.type].seed = payload.seed
-    searchResultCopy[payload.type].totalNumberAvailable = payload.totalNumberAvailable
+    searchResultCopy[payload.type].totalNumberAvailable = payload.totalNumberAvailable.toNumber()
     if (results.length > 0) {
       Promise.all(results)
       .then((values) => {
-        if (payload.saveCallback) {
-          payload.saveCallback(values, state)
-        } else {
-          values.forEach((value, index) => {
-            if (payload.preSaveCallback) payload.preSaveCallback(value)
-            let userState = Number(value.state) !== 0 ? states[Number(value.state)].name : ''
-            let [ gravatar, name, companyName, email, street, city, zipCode, phoneNumber ] = stringifyBytesData(state, value, [ 'gravatar', 'name', 'companyName', 'email', 'street', 'city', 'zipCode', 'phoneNumber' ])
-            let address = street || city || userState ? `${street} ${city} ${userState}` : ''
-            Object.assign(value, {
-              SN: index, status: value.status, coinbase: value.coinbase, gravatar, name, companyName, email, street, city, address, zipCode, phoneNumber
-            })
+        values.forEach((value, index) => {
+          if (payload.preSaveCallback) payload.preSaveCallback(value)
+          if (value.coinbase) {
+            let userState = value.state && Number(value.state) !== 0 ? states[Number(value.state)].name : ''
+            let address = value.street || value.city || userState ? `${value.street} ${value.city} ${userState}` : ''
+            Object.assign(value, { SN: index, address })
             getGravatarFor({
               email: value.email,
               coinbase: value.coinbase
@@ -263,8 +258,12 @@ export default {
               state.searchResult = searchResultCopy
               if (payload.callback) payload.callback(value, results.length === index + 1)
             })
-          })
-        }
+          } else {
+            searchResultCopy[payload.type].data[payload.offset].push(value)
+            state.searchResult = searchResultCopy
+            if (payload.callback) payload.callback(value, results.length === index + 1)
+          }
+        })
       })
     } else {
       if (payload.callback) payload.callback(null, true)

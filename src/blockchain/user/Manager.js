@@ -6,7 +6,7 @@ import {EXCHANGE_RATE_API} from '../../util/constants'
 
 let userManager = null
 
-class UserManager {
+class Manager {
   constructor () {
     userManager = userManager || this
     return userManager
@@ -22,6 +22,36 @@ class UserManager {
       state,
       smartContractResolve: result => data,
       smartContractReject: error => error
+    })
+  }
+
+  getUserDataFromTheBlockchain (state = null, userObject = {}) {
+    return new Promise((resolve, reject) => {
+      const userObject = {}
+      userManager.getUserData(state, null, userObject)
+      .then((result) => {
+        Object.assign(userObject, result)
+        resolve(userObject)
+      })
+      .catch(error => reject(error))
+    })
+  }
+
+  getUserData (state = null, userId = null, userObject = {}) {
+    return blockchainManager.querySmartContract({
+      contractToUse: DB,
+      smartContractMethod: 'getEntityList',
+      smartContractMethodParams: (coinbase) => [userObject.userRecordFields || userManager.userRecordFields(state, userId || coinbase), userObject.userRecordFieldTypes || userManager.userRecordFieldTypes(), {from: coinbase}],
+      state,
+      smartContractResolve: result => {
+        const userData = getObjectFromResponse(state, result, 1, userObject.keys || userManager.userKeys(), userObject.userRecordFieldTypes || userManager.userRecordFieldTypes())[0]
+        return userData
+      },
+      smartContractReject: (error) => ({
+        error,
+        isValid: true,
+        warningMessage: "We've encountered a problem fetching your identity information from the blockchain. Please do try again in a few minutes."
+      })
     })
   }
 
@@ -60,36 +90,6 @@ class UserManager {
       state,
       smartContractResolve: result => data,
       smartContractReject: error => error
-    })
-  }
-
-  getUserDataFromTheBlockchain (state = null, userObject = {}) {
-    return new Promise((resolve, reject) => {
-      const userObject = {}
-      userManager.getUserData(state, null, userObject)
-      .then((result) => {
-        Object.assign(userObject, result)
-        resolve(userObject)
-      })
-      .catch(error => reject(error))
-    })
-  }
-
-  getUserData (state = null, userId = null, userObject = {}) {
-    return blockchainManager.querySmartContract({
-      contractToUse: DB,
-      smartContractMethod: 'getEntityList',
-      smartContractMethodParams: (coinbase) => [userObject.userRecordFields || userManager.userRecordFields(state, userId || coinbase), userObject.userRecordFieldTypes || userManager.userRecordFieldTypes(), {from: coinbase}],
-      state,
-      smartContractResolve: result => {
-        const userData = getObjectFromResponse(state, result, 1, userObject.keys || userManager.userKeys(), userObject.userRecordFieldTypes || userManager.userRecordFieldTypes())[0]
-        return userData
-      },
-      smartContractReject: (error) => ({
-        error,
-        isValid: true,
-        warningMessage: "We've encountered a problem fetching your identity information from the blockchain. Please do try again in a few minutes."
-      })
     })
   }
 
@@ -182,6 +182,7 @@ class UserManager {
   userKeys () {
     return [
       'type',
+      'status',
       'name',
       'email',
       'gravatar',
@@ -202,6 +203,7 @@ class UserManager {
 
     return [
       getSoliditySha3ForId(state, 'user/type', userId),
+      getSoliditySha3ForId(state, 'user/status', userId),
       getSoliditySha3ForId(state, 'user/name', userId),
       getSoliditySha3ForId(state, 'user/email', userId),
       getSoliditySha3ForId(state, 'user/gravatar', userId),
@@ -219,9 +221,9 @@ class UserManager {
 
   userRecordFieldTypes () {
     // types: 1 => boolean, 2 => uint8, 3 => uint, 4 => address, 5 => bytes32, 7 => string
-    return [2, 7, 7, 5, 5, 5, 3, 5, 3, 5, 5, 5, 2]
+    return [2, 2, 7, 7, 5, 5, 5, 3, 5, 3, 5, 5, 5, 2]
   }
 }
 
-userManager = new UserManager()
+userManager = new Manager()
 export default userManager
