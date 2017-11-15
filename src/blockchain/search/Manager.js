@@ -19,34 +19,6 @@ class Manager {
     ]
   }
 
-  getDentistDataFromFind (state = null, dataObject = {}) {
-    return new Promise((resolve, reject) => {
-      const userObject = {}
-      userManager.getUserIdentityData(state, dataObject.dentistId)
-      .then((result) => {
-        result.coinbase = dataObject.dentistId
-        Object.assign(userObject, result)
-        userManager.getUserContactData(state, dataObject.dentistId)
-        .then((result) => {
-          Object.assign(userObject, result)
-          userManager.getDentistFeeData(state, dataObject)
-          .then((result) => {
-            Object.assign(userObject, result)
-            userManager.getDentistRatingData(state, dataObject.dentistId)
-            .then((result) => {
-              Object.assign(userObject, result)
-              resolve(userObject)
-            })
-            .catch(error => reject(error))
-          })
-          .catch(error => reject(error))
-        })
-        .catch(error => reject(error))
-      })
-      .catch(error => reject(error))
-    })
-  }
-
   fetchDataObjects (state = null, dataObject = {}) {
     let fetchType = dataObject.type
     let willUnshiftCoinbase = false
@@ -95,7 +67,7 @@ class Manager {
   getOfficial (state = null, dataObject = {}) {
     return new Promise((resolve, reject) => {
       const userObject = {}
-      userManager.getUserData(state, dataObject.officialId)
+      userManager.getUserData(state, dataObject.officialId, dataObject)
       .then((result) => {
         result.coinbase = dataObject.officialId
         Object.assign(userObject, result)

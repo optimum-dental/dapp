@@ -129,7 +129,7 @@
           switch (true) {
             case target.classList.contains('only-patient'):
               const dentistId = _this.$store.state.searchResult.findDentists.data[_this.currentOffset][target.dataset.sn].coinbase
-              if (_this.user.isPatient && _this.user.dentists.includes(dentistId)) {
+              if (_this.user.isPatient && _this.user.dentistsIds.includes(dentistId)) {
                 const rating = target.dataset.rating
                 _this.writeDentistRating(evt, dentistId, rating)
               } else {
@@ -219,7 +219,14 @@
             limit: this.perPage,
             seed: seed || Math.random(),
             callOnEach: 'getOfficial',
-            callOnEachParams: dentistId => ({dentistId, serviceTypeId: appointmentTypeId, serviceId: appointmentSubtypeId})
+            callOnEachParams: dentistId => ({
+              officialId: dentistId,
+              serviceTypeId: appointmentTypeId,
+              serviceId: appointmentSubtypeId,
+              keys: this.officialKeys(),
+              recordFields: this.officialRecordFields(this.$store.state, dentistId, appointmentTypeId, appointmentSubtypeId),
+              recordFieldTypes: this.officialRecordFieldTypes()
+            })
           }
 
           let errors = [appointmentTypeId === 0 ? document.getElementById('appointment-type') : undefined, appointmentSubtypeId === 0 ? document.getElementById('appointment-sub-type') : undefined]
@@ -256,6 +263,52 @@
           document.getElementById('appointment-type').classList.add('error')
         }
       },
+      officialKeys () {
+        return [
+          'type',
+          'status',
+          'name',
+          'email',
+          'gravatar',
+          'street',
+          'city',
+          'state',
+          'zipCode',
+          'country',
+          'phoneNumber',
+          'socialSecurityNumber',
+          'birthday',
+          'gender',
+          'fee',
+          'rating'
+        ]
+      },
+      officialRecordFields (state, userId, serviceTypeId, serviceId) {
+        userId = getSlicedAddressString(state, userId)
+        serviceId = getSlicedAddressString(state, getLeftPaddedNumber(state, serviceId, 1))
+        return [
+          getSoliditySha3ForId(state, 'user/type', userId),
+          getSoliditySha3ForId(state, 'user/status', userId),
+          getSoliditySha3ForId(state, 'user/name', userId),
+          getSoliditySha3ForId(state, 'user/email', userId),
+          getSoliditySha3ForId(state, 'user/gravatar', userId),
+          getSoliditySha3ForId(state, 'user/street', userId),
+          getSoliditySha3ForId(state, 'user/city', userId),
+          getSoliditySha3ForId(state, 'user/state', userId),
+          getSoliditySha3ForId(state, 'user/zip-code', userId),
+          getSoliditySha3ForId(state, 'user/country', userId),
+          getSoliditySha3ForId(state, 'user/phone-number', userId),
+          getSoliditySha3ForId(state, 'user/social-security-number', userId),
+          getSoliditySha3ForId(state, 'user/birthday', userId),
+          getSoliditySha3ForId(state, 'user/gender', userId),
+          getSoliditySha3ForId(state, `dentist/${serviceTypeId === 1 ? 'scan' : 'treatment'}-service/fee`, userId, serviceId),
+          getSoliditySha3ForId(state, 'dentist/average-rating', userId)
+        ]
+      },
+      officialRecordFieldTypes () {
+        // types: 1 => boolean, 2 => uint8, 3 => uint, 4 => address, 5 => bytes32, 7 => string
+        return [2, 2, 7, 7, 5, 5, 5, 3, 5, 3, 5, 5, 5, 2, 3, 2]
+      },
       getBudget () {
         const index = document.getElementById('budget-range').selectedIndex - 1
         return index >= 0 ? [(index * budgetPivot), ((index + 1) * budgetPivot)] : [budgetMin, budgetMax]
@@ -268,13 +321,12 @@
         this.$root.callToFetchDataObjects({
           fetchQuery,
           preSaveCallback: (result) => {
-            console.log(result)
             Object.assign(result, {
               serviceTypeId: fetchQuery.appointmentTypeId,
               serviceId: fetchQuery.appointmentSubtypeId,
-              fee: result.fee.toNumber(),
-              averageRating: result.rating.toNumber(),
-              rating: result.rating.toNumber()
+              fee: result.fee,
+              averageRating: result.rating,
+              rating: result.rating
             })
           },
           callback: (result = null, isCompleted = false) => {
@@ -366,7 +418,7 @@
               ${averageRatingDOMElement.outerHTML}
               <div class="address">${result.address || 'Address: Not Supplied'}</div>
             </div>
-            ${this.user.isPatient ? '<div class="request-appointment-section"><a href="/#/request-appointment?o=' + this.currentOffset + 'sn=' + result.SN + '" class="link-to-appointment">Request Appointment</a></div>' : ''}
+            ${this.user.isPatient ? '<div class="request-appointment-section"><a href="/#/request-appointment?o=' + this.currentOffset + '&sn=' + result.SN + '" class="link-to-appointment">Request Appointment</a></div>' : ''}
           </div>
         `, 'text/html').body.firstChild
         return resultDOMElement
@@ -422,7 +474,14 @@
         limit: Number(this.$route.query.l),
         seed: Number(this.$route.query.sd),
         callOnEach: 'getOfficial',
-        callOnEachParams: dentistId => ({dentistId, serviceTypeId: Number(this.$route.query.aTI), serviceId: Number(this.$route.query.aSI)})
+        callOnEachParams: dentistId => ({
+          officialId: dentistId,
+          serviceTypeId: Number(this.$route.query.aTI),
+          serviceId: Number(this.$route.query.aSI),
+          keys: this.officialKeys(),
+          recordFields: this.officialRecordFields(this.$store.state, dentistId, Number(this.$route.query.aTI), Number(this.$route.query.aSI)),
+          recordFieldTypes: this.officialRecordFieldTypes()
+        })
       })
     }
   }
@@ -430,6 +489,7 @@
   import states from '../../../../../static/json/states/states.json'
   import appointmentTypes from '../../../../../static/json/appointment_types/appointment_types.json'
   import $ from 'jquery'
+  import {getSlicedAddressString, getSoliditySha3ForId, getLeftPaddedNumber} from '../../../../blockchain/utilities'
 </script>
 
 <style scoped>

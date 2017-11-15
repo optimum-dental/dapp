@@ -41,10 +41,10 @@ class Manager {
     return blockchainManager.querySmartContract({
       contractToUse: DB,
       smartContractMethod: 'getEntityList',
-      smartContractMethodParams: (coinbase) => [userObject.userRecordFields || userManager.userRecordFields(state, userId || coinbase), userObject.userRecordFieldTypes || userManager.userRecordFieldTypes(), {from: coinbase}],
+      smartContractMethodParams: (coinbase) => [userObject.recordFields || userManager.userRecordFields(state, userId || coinbase), userObject.recordFieldTypes || userManager.userRecordFieldTypes(), {from: coinbase}],
       state,
       smartContractResolve: result => {
-        const userData = getObjectFromResponse(state, result, 1, userObject.keys || userManager.userKeys(), userObject.userRecordFieldTypes || userManager.userRecordFieldTypes())[0]
+        const userData = getObjectFromResponse(state, result, 1, userObject.keys || userManager.userKeys(), userObject.recordFieldTypes || userManager.userRecordFieldTypes())[0]
         return userData
       },
       smartContractReject: (error) => ({
@@ -93,10 +93,10 @@ class Manager {
     })
   }
 
-  getUserDentistsIds (state = null, userId = null) {
+  fetchUserDentists (state = null, userId = null) {
     return blockchainManager.querySmartContract({
       contractToUse: UserReaderContract,
-      smartContractMethod: 'getUserDentistsIds',
+      smartContractMethod: 'fetchUserDentists',
       smartContractMethodParams: (coinbase) => [userId || coinbase, {from: coinbase}],
       state,
       smartContractResolve: result => getObjectFromResponse(state, result, ['dentistsIds']),
@@ -104,37 +104,6 @@ class Manager {
         error,
         isValid: true,
         warningMessage: "We've encountered a problem fetching your dentists from the blockchain. Please do try again in a few minutes."
-      })
-    })
-  }
-
-  getDentistFeeData (state = null, dataObject = {}) {
-    const userId = dataObject.dentistId
-    return blockchainManager.querySmartContract({
-      contractToUse: UserReaderContract,
-      smartContractMethod: 'getDentistFeeData',
-      smartContractMethodParams: (coinbase) => [dataObject.serviceTypeId, dataObject.serviceId, userId || coinbase, {from: coinbase}],
-      state,
-      smartContractResolve: result => ({fee: result}),
-      smartContractReject: (error) => ({
-        error,
-        isValid: true,
-        warningMessage: "We've encountered a problem getting dentist fee from the blockchain. Please do try again in a few minutes."
-      })
-    })
-  }
-
-  getDentistRatingData (state = null, userId = null) {
-    return blockchainManager.querySmartContract({
-      contractToUse: UserReaderContract,
-      smartContractMethod: 'getDentistRatingData',
-      smartContractMethodParams: (coinbase) => [userId || coinbase, {from: coinbase}],
-      state,
-      smartContractResolve: result => ({rating: result}),
-      smartContractReject: (error) => ({
-        error,
-        isValid: true,
-        warningMessage: "We've encountered a problem getting dentist ratings from the blockchain. Please do try again in a few minutes."
       })
     })
   }
