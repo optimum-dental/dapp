@@ -34,20 +34,21 @@ module.exports = {
       from: address,     // Use the address we derived
       gas: 5700000
     },
-    development: {
-      host: "localhost",
-      port: 7545,
-      network_id: "*",
-      from: "0x627306090abaB3A6e1400e9345bC60c78a8BEf57", //"0x13ba42b19c25c0f6ecb7ab1c5db8d736231ecb94",
-      gas: 5700000
-    }
     // development: {
     //   host: "localhost",
-    //   port: 8545,
+    //   port: 7545,
     //   network_id: "*",
-    //   from: "0xf378d4b0ef447b051fad06133615b33649423c0a",
+    //   from: "0x627306090abaB3A6e1400e9345bC60c78a8BEf57", //"0x13ba42b19c25c0f6ecb7ab1c5db8d736231ecb94",
     //   gas: 5700000
     // }
+    development: {
+      host: "localhost",
+      port: 8545,
+      network_id: "*",
+      from: "0xf378d4b0ef447b051fad06133615b33649423c0a",
+      gas: 5700000,
+      gasPrice: 2000000
+    }
   },
   rpc: {
     // Use the default host and port when not using ropsten
@@ -56,5 +57,3 @@ module.exports = {
     gas: 5700000
   }
 };
-
-

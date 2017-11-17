@@ -18,7 +18,7 @@ class Manager {
     delete blockchainData.methodName
     return blockchainManager.querySmartContract({
       smartContractMethod: blockchainMethodName,
-      smartContractMethodParams: (coinbase) => [...(Object.values(blockchainData)), {from: coinbase, gas: 4444444, gasPrice: 666000000000}],
+      smartContractMethodParams: (coinbase) => [...(Object.values(blockchainData)), {from: coinbase}],
       state,
       smartContractResolve: result => data,
       smartContractReject: error => error
@@ -58,7 +58,7 @@ class Manager {
   deleteService (state = null, data = {}) {
     return blockchainManager.querySmartContract({
       smartContractMethod: 'removeDentistFromService',
-      smartContractMethodParams: (coinbase) => [...(Object.values(data.serviceObject)), {from: coinbase, gas: 4444444, gasPrice: 666000000000}],
+      smartContractMethodParams: (coinbase) => [...(Object.values(data.serviceObject)), {from: coinbase}],
       state,
       smartContractResolve: result => data,
       smartContractReject: error => error
@@ -68,7 +68,7 @@ class Manager {
   writeUser (state = null, data = {}) {
     return blockchainManager.querySmartContract({
       smartContractMethod: 'writeUser',
-      smartContractMethodParams: (coinbase) => [...(Object.values(data.userObject)), {from: coinbase, gas: 4444444, gasPrice: 666000000000}],
+      smartContractMethodParams: (coinbase) => [...(Object.values(data.userObject)), {from: coinbase}],
       state,
       smartContractResolve: result => data,
       smartContractReject: error => error
@@ -86,7 +86,7 @@ class Manager {
 
     return blockchainManager.querySmartContract({
       smartContractMethod: 'acceptScanApplication',
-      smartContractMethodParams: (coinbase) => [...(Object.values(data.requestObject)), {from: coinbase, gas: 4444444, gasPrice: 666000000000, value: state.web3.instance().toWei(quoteInEther, 'ether')}],
+      smartContractMethodParams: (coinbase) => [...(Object.values(data.requestObject)), {from: coinbase, value: state.web3.instance().toWei(quoteInEther, 'ether')}],
       state,
       smartContractResolve: result => data,
       smartContractReject: error => error

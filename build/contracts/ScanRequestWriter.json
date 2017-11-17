@@ -2027,14 +2027,9 @@
     "666": {
       "events": {},
       "links": {},
-      "address": "0xc8fcb8e31e3dcce07e2e88de8de35b74d01ea4c9"
-    },
-    "5777": {
-      "events": {},
-      "links": {},
-      "address": "0xaa588d3737b611bafd7bd713445b314bd453a5c8"
+      "address": "0x077a7ffa0cdf1845cbff5d460f99fd85a43fa8b5"
     }
   },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-11-17T00:30:43.656Z"
+  "updatedAt": "2017-11-17T15:10:00.728Z"
 }

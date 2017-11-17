@@ -2338,14 +2338,9 @@
     "666": {
       "events": {},
       "links": {},
-      "address": "0x72045eb257fc0f232389cebc397615fad4e29fe8"
-    },
-    "5777": {
-      "events": {},
-      "links": {},
-      "address": "0x30753e4a8aad7f8597332e813735def5dd395028"
+      "address": "0x0497921631b5bdedc1ff86f8959d722355abcfbf"
     }
   },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-11-17T00:30:43.645Z"
+  "updatedAt": "2017-11-17T15:10:00.713Z"
 }

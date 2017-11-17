@@ -6675,14 +6675,9 @@
     "666": {
       "events": {},
       "links": {},
-      "address": "0x490cc5955d6ac7d62ce3180e1f8ad5afebf3dfa6"
-    },
-    "5777": {
-      "events": {},
-      "links": {},
-      "address": "0x8f0483125fcb9aaaefa9209d8e9d7b9c8b9fb90f"
+      "address": "0xa0551ce5a784c0b95123b3a06616439ae19cc2ba"
     }
   },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-11-17T00:30:43.589Z"
+  "updatedAt": "2017-11-17T15:10:00.698Z"
 }
