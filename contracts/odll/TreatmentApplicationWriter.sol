@@ -35,6 +35,7 @@ contract TreatmentApplicationWriter is Restrictor {
     uint treatmentApplicationId,
     uint quote
   )
+    payable
     external
   {
     if (msg.value < quote) {

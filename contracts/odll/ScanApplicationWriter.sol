@@ -10,7 +10,6 @@ contract ScanApplicationWriter is Restrictor {
 
   // Scan Application
   function applyToScan (
-    address dentistId,
     address patientId,
     uint scanRequestId,
     uint quote,
@@ -23,7 +22,6 @@ contract ScanApplicationWriter is Restrictor {
   }
 
   function cancelScanApplication (
-    address dentistId,
     address patientId,
     uint scanApplicationId
   )
@@ -34,7 +32,6 @@ contract ScanApplicationWriter is Restrictor {
 
   function acceptScanApplication (
     address dentistId,
-    address patientId,
     uint scanApplicationId,
     uint quote
   )

@@ -221,7 +221,7 @@ library searchLibrary {
       uint[] scanRequestsIds
     )
   {
-    var allScanRequestsIds = utilities.getArrayItems(dbAddress, "dentist/scan-request", "dentist/scan-requests-count");
+    var allScanRequestsIds = utilities.getIdArray(dbAddress, dentistId, "dentist/scan-request", "dentist/scan-requests-count");
     var count = allScanRequestsIds.length;
     scanRequestsIds = new uint[](count);
 

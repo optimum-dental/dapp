@@ -81,7 +81,7 @@ contract UserWriter is Restrictor {
     external
     onlyOwnerOrActiveAdminOrActiveManager
   {
-    userManager.addODLLDentist(dbAddress, msg.sender);
+    userManager.addODLLDentist(dbAddress, userId);
   }
 
   function addOfficialToODLL(address officialId, uint8 userType)

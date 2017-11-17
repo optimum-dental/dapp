@@ -259,7 +259,7 @@ contract DB is Ownable {
   }
 
   function getEntityList(bytes32[] records, uint8[] types)
-    external payable returns
+    external view returns
   (
     uint[] items,
     string strings

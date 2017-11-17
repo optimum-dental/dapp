@@ -17,19 +17,19 @@ export function getObjectFromResponse (state, result, entitiesCount, keys, field
     let stringValuesIndex = 0
     const entityObject = keys.reduce((hash, key, index) => {
       if (fieldTypes[index] === 1) {
-        itemValue = entitiesIntsArrays[i][intValuesIndex]
+        itemValue = entitiesIntsArrays[i] ? entitiesIntsArrays[i][intValuesIndex] : 0
         intValuesIndex += 1
       } else if ([2, 3].includes(fieldTypes[index])) {
-        itemValue = entitiesIntsArrays[i][intValuesIndex].toNumber()
+        itemValue = entitiesIntsArrays[i] ? entitiesIntsArrays[i][intValuesIndex].toNumber() : 0
         intValuesIndex += 1
       } else if (fieldTypes[index] === 4) {
-        itemValue = state.web3.instance().toHex(entitiesIntsArrays[i][intValuesIndex])
+        itemValue = entitiesIntsArrays[i] ? state.web3.instance().toHex(entitiesIntsArrays[i][intValuesIndex]) : '0x0'
         intValuesIndex += 1
       } else if (fieldTypes[index] === 5) {
-        itemValue = state.web3.instance().toUtf8(state.web3.instance().toHex(entitiesIntsArrays[i][intValuesIndex].toString())).slice(1)
+        itemValue = entitiesIntsArrays[i] ? state.web3.instance().toUtf8(state.web3.instance().toHex(entitiesIntsArrays[i][intValuesIndex].toString())).slice(1) : ''
         intValuesIndex += 1
       } else {
-        itemValue = entitiesStringsArrays[i][stringValuesIndex].slice(2)
+        itemValue = entitiesStringsArrays[i] ? entitiesStringsArrays[i][stringValuesIndex].slice(2) : ''
         stringValuesIndex += 1
       }
 

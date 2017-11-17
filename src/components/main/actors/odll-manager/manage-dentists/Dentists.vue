@@ -110,9 +110,15 @@
             },
             methodName: 'addOfficialToODLL',
             callback: (status = false) => {
-              this.endWait(document.querySelector('.wrapper'))
-              this.enableNecessaryButtons()
-              this.fetchDentists(null, this.currentOffset, this.$store.state.searchResult.fetchDentists.seed)
+              this.getDentists(null, {
+                type: 'fetchDentists',
+                offset: this.currentOffset,
+                limit: Number(this.$route.query.l || this.perPage),
+                seed: this.$store.state.searchResult.fetchDentists.seed,
+                callOnEach: 'getOfficial',
+                callOnEachParams: officialId => ({officialId})
+              })
+
               this.notify(status ? 'Dentist Successfully added' : 'Unable to add Dentist')
             }
           })
@@ -129,15 +135,17 @@
           fetchQuery,
           callback: (result = null, isCompleted = false) => {
             // update result view
-            if (isCompleted) {
-              if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
-              this.enableNecessaryButtons()
-            }
-
             if (result) {
               this.appendResult(result)
             } else {
               this.informOfNoOfficial()
+            }
+
+            if (isCompleted) {
+              if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
+
+              this.endWait(document.querySelector('.wrapper'))
+              this.enableNecessaryButtons()
             }
           }
         })
@@ -270,10 +278,10 @@
         console.log(message)
       },
       beginWait (target) {
-        target.classList.add('wait')
+        if (target.classList) target.classList.add('wait')
       },
       endWait (target) {
-        target.classList.remove('wait')
+        if (target.classList) target.classList.remove('wait')
       },
       scrollToTop () {
         $('html, body').animate({scrollTop: '0px'}, 500)

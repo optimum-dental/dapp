@@ -208,7 +208,7 @@ library servicesLibrary {
     }
 
     initScanApplication(dbAddress, scanRequestId, scanApplicationId);
-    writeScanApplicationData(dbAddress, dentistId, patientId, scanRequestId, scanApplicationId, quote, comment);
+    writeScanApplicationData(dbAddress, dentistId, patientId, scanApplicationId, quote, comment);
   }
 
   function initScanApplication (address dbAddress, uint scanRequestId, uint scanApplicationId) internal {
@@ -219,7 +219,7 @@ library servicesLibrary {
     utilities.addIdArrayItem(dbAddress, scanRequestId, "scan-request/scan-application", "scan-request/scan-applications-count", scanApplicationId);
   }
 
-  function writeScanApplicationData (address dbAddress, address dentistId, address patientId, uint scanRequestId, uint scanApplicationId, uint quote, bytes32 comment) internal {
+  function writeScanApplicationData (address dbAddress, address dentistId, address patientId, uint scanApplicationId, uint quote, bytes32 comment) internal {
     DB(dbAddress).setUIntValue(keccak256("scan-application/quote", scanApplicationId), quote);
     DB(dbAddress).setBytes32Value(keccak256("scan-application/comment", scanApplicationId), comment);
     DB(dbAddress).setAddressValue(keccak256("scan-application/dentist", scanApplicationId), dentistId);
@@ -303,7 +303,6 @@ library servicesLibrary {
   // treatment application status: 1 => pending, 2 => active, 3 => canceled, 4 => fulfilled, 5 => inactive
   function writeTreatmentRequest (
     address dbAddress,
-    address dentistId,
     address patientId,
     bool hasCaseId,
     uint caseId,

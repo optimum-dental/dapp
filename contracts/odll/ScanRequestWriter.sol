@@ -11,7 +11,6 @@ contract ScanRequestWriter is Restrictor {
   // Scan Request
   function writeScanRequest (
     address dentistId,
-    address patientId,
     uint scanAppointmentId,
     bytes32 appointmentDate,
     bytes32 scanTime,
@@ -25,7 +24,6 @@ contract ScanRequestWriter is Restrictor {
   }
 
   function cancelScanRequest (
-    address patientId,
     uint scanRequestId
   )
     external
@@ -44,7 +42,6 @@ contract ScanRequestWriter is Restrictor {
   }
 
   function acceptScanRequest (
-    address dentistId,
     address patientId,
     uint scanRequestId,
     uint quote,
@@ -57,7 +54,6 @@ contract ScanRequestWriter is Restrictor {
   }
 
   function rejectScanRequest (
-    address dentistId,
     address patientId,
     uint scanRequestId
   )

@@ -728,7 +728,6 @@ library userManager {
 
   function writeTreatmentRequest (
     address dbAddress,
-    address dentistId,
     address patientId,
     bool hasCaseId,
     uint caseId,
@@ -738,7 +737,7 @@ library userManager {
   )
     internal
   {
-    servicesLibrary.writeTreatmentRequest(dbAddress, dentistId, patientId, hasCaseId, caseId, insurance, scanResults, comment);
+    servicesLibrary.writeTreatmentRequest(dbAddress, patientId, hasCaseId, caseId, insurance, scanResults, comment);
   }
 
   function cancelTreatmentRequest (
