@@ -1,5 +1,16 @@
 import DB from '../../../build/contracts/DB.json'
-import UserReaderContract from '../../../build/contracts/UserReader.json'
+import UserWriter from '../../../build/contracts/UserWriter.json'
+import UserReader from '../../../build/contracts/UserReader.json'
+import ServiceWriter from '../../../build/contracts/ServiceWriter.json'
+import ServiceReader from '../../../build/contracts/ServiceReader.json'
+import ScanRequestWriter from '../../../build/contracts/ScanRequestWriter.json'
+import ScanRequestReader from '../../../build/contracts/ScanRequestReader.json'
+import ScanApplicationWriter from '../../../build/contracts/ScanApplicationWriter.json'
+import ScanApplicationReader from '../../../build/contracts/ScanApplicationReader.json'
+import TreatmentRequestWriter from '../../../build/contracts/TreatmentRequestWriter.json'
+import TreatmentRequestReader from '../../../build/contracts/TreatmentRequestReader.json'
+import TreatmentApplicationWriter from '../../../build/contracts/TreatmentApplicationWriter.json'
+import TreatmentApplicationReader from '../../../build/contracts/TreatmentApplicationReader.json'
 import blockchainManager from '../BlockchainManager'
 import {getObjectFromResponse, getSlicedAddressString, getSoliditySha3ForId} from '../utilities'
 import {EXCHANGE_RATE_API} from '../../util/constants'
@@ -12,11 +23,33 @@ class Manager {
     return userManager
   }
 
+  getContractToUse () {
+    return [
+      UserWriter,
+      UserReader,
+      ServiceWriter,
+      ServiceReader,
+      ScanRequestWriter,
+      ScanRequestReader,
+      ScanApplicationWriter,
+      ScanApplicationReader,
+      TreatmentRequestWriter,
+      TreatmentRequestReader,
+      TreatmentApplicationWriter,
+      TreatmentApplicationReader
+    ]
+  }
+
   writeData (state = null, data = {}) {
     const blockchainData = Object.assign({}, data)
+    const contractToUse = blockchainData.contractIndexToUse ? userManager.getContractToUse()[blockchainData.contractIndexToUse] : null
     const blockchainMethodName = blockchainData.methodName
+
+    delete blockchainData.contractIndexToUse
     delete blockchainData.methodName
+
     return blockchainManager.querySmartContract({
+      contractToUse: contractToUse || UserWriter,
       smartContractMethod: blockchainMethodName,
       smartContractMethodParams: (coinbase) => [...(Object.values(blockchainData)), {from: coinbase}],
       state,
@@ -65,16 +98,6 @@ class Manager {
     })
   }
 
-  writeUser (state = null, data = {}) {
-    return blockchainManager.querySmartContract({
-      smartContractMethod: 'writeUser',
-      smartContractMethodParams: (coinbase) => [...(Object.values(data.userObject)), {from: coinbase}],
-      state,
-      smartContractResolve: result => data,
-      smartContractReject: error => error
-    })
-  }
-
   acceptScanApplication (state = null, data = {}) {
     const quoteInEther = fetch(EXCHANGE_RATE_API)
     .then(response => response.json())
@@ -95,7 +118,7 @@ class Manager {
 
   fetchUserDentists (state = null, userId = null) {
     return blockchainManager.querySmartContract({
-      contractToUse: UserReaderContract,
+      contractToUse: UserReader,
       smartContractMethod: 'fetchUserDentists',
       smartContractMethodParams: (coinbase) => [userId || coinbase, {from: coinbase}],
       state,

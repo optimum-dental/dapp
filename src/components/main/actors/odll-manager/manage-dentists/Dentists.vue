@@ -109,6 +109,8 @@
               userType: 2
             },
             methodName: 'addOfficialToODLL',
+            contractIndexToUse: 0,
+            managerIndex: 0,
             callback: (status = false) => {
               this.getDentists(null, {
                 type: 'fetchDentists',
@@ -527,6 +529,10 @@
     font-size: 14px;
     text-align: left;
     width: 100%;
+  }
+
+  .average-rating {
+    width: 100% !important;
   }
 
   .average-rating > div {

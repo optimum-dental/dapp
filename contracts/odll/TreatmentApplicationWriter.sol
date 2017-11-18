@@ -14,7 +14,7 @@ contract TreatmentApplicationWriter is Restrictor {
     address patientId,
     uint treatmentRequestId,
     uint quote,
-    bytes32 comment
+    string comment
   )
     external
   {

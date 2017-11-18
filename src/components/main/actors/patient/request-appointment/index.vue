@@ -1,7 +1,7 @@
 <template>
   <div id="request-appointment">
     <section class="content" v-if="isDAppReady">
-      <appointment v-if="user && user.isValid && isValidUserBut === '0'" />
+      <appointment v-if="user && user.isValid && user.patientable && user.isPatient && isValidUserBut === '0'" />
 
       <guest-introduction v-else-if="isValidUserBut === '0'" />
 

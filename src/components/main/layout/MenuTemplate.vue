@@ -30,7 +30,12 @@
                 icon: '/static/images/teeth.png'
               },
               {
-                key: 'view-apppointment-requests',
+                key: 'view-patients',
+                text: 'View Your Patients',
+                icon: '/static/images/person.png'
+              },
+              {
+                key: 'view-appointment-requests',
                 text: 'View Appointment Requests',
                 icon: '/static/images/appointment.png'
               },

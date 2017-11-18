@@ -150,6 +150,8 @@
             rating
           },
           methodName: 'writeDentistRating',
+          contractIndexToUse: 0,
+          managerIndex: 0,
           callback: (status) => {
             this.endWait(document.querySelector('.wrapper'))
             this.enableNecessaryButtons(evt)
@@ -418,7 +420,7 @@
               ${averageRatingDOMElement.outerHTML}
               <div class="address">${result.address || 'Address: Not Supplied'}</div>
             </div>
-            ${this.user.isPatient ? '<div class="request-appointment-section"><a href="/#/request-appointment?o=' + this.currentOffset + '&sn=' + result.SN + '" class="link-to-appointment">Request Appointment</a></div>' : ''}
+            ${this.user.isPatient && result.serviceTypeId !== 2 ? '<div class="request-appointment-section"><a href="/#/request-appointment?o=' + this.currentOffset + '&sn=' + result.SN + '" class="link-to-appointment">Request Appointment</a></div>' : ''}
           </div>
         `, 'text/html').body.firstChild
         return resultDOMElement
@@ -728,7 +730,7 @@
   }
 
   .average-rating {
-    width: 100px !important;
+    width: 100% !important;
   }
 
   .average-rating > div {
@@ -784,4 +786,3 @@
     text-align: center;
   }
 </style>
-

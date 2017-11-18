@@ -608,8 +608,8 @@ library userManager {
     uint scanAppointmentId,
     bytes32 appointmentDate,
     bytes32 scanTime,
-    bytes32 scanInsurance,
-    bytes32 comment
+    string scanInsurance,
+    string comment
   )
     internal
   {
@@ -641,7 +641,7 @@ library userManager {
     address patientId,
     uint scanRequestId,
     uint quote,
-    bytes32 comment
+    string comment
   )
     internal
   {
@@ -665,7 +665,7 @@ library userManager {
     address patientId,
     uint scanRequestId,
     uint quote,
-    bytes32 comment
+    string comment
   )
     internal
   {
@@ -731,9 +731,9 @@ library userManager {
     address patientId,
     bool hasCaseId,
     uint caseId,
-    bytes32 insurance,
-    bytes32[] scanResults,
-    bytes32 comment
+    string insurance,
+    string scanResults,
+    string comment
   )
     internal
   {
@@ -756,7 +756,7 @@ library userManager {
     address patientId,
     uint treatmentRequestId,
     uint quote,
-    bytes32 comment
+    string comment
   )
     internal
   {

@@ -1,5 +1,14 @@
 import DB from '../../../build/contracts/DB.json'
 import ServiceWriter from '../../../build/contracts/ServiceWriter.json'
+import ServiceReader from '../../../build/contracts/ServiceReader.json'
+import ScanRequestWriter from '../../../build/contracts/ScanRequestWriter.json'
+import ScanRequestReader from '../../../build/contracts/ScanRequestReader.json'
+import ScanApplicationWriter from '../../../build/contracts/ScanApplicationWriter.json'
+import ScanApplicationReader from '../../../build/contracts/ScanApplicationReader.json'
+import TreatmentRequestWriter from '../../../build/contracts/TreatmentRequestWriter.json'
+import TreatmentRequestReader from '../../../build/contracts/TreatmentRequestReader.json'
+import TreatmentApplicationWriter from '../../../build/contracts/TreatmentApplicationWriter.json'
+import TreatmentApplicationReader from '../../../build/contracts/TreatmentApplicationReader.json'
 // import userManager from '../user/Manager'
 import {getObjectFromResponse, getSlicedAddressString, getSoliditySha3ForId, getLeftPaddedNumber} from '../utilities'
 import blockchainManager from '../BlockchainManager'
@@ -13,14 +22,32 @@ class Manager {
     return serviceManager
   }
 
+  getContractToUse () {
+    return [
+      ServiceWriter,
+      ServiceReader,
+      ScanRequestWriter,
+      ScanRequestReader,
+      ScanApplicationWriter,
+      ScanApplicationReader,
+      TreatmentRequestWriter,
+      TreatmentRequestReader,
+      TreatmentApplicationWriter,
+      TreatmentApplicationReader
+    ]
+  }
+
   writeData (state = null, data = {}) {
     const blockchainData = Object.assign({}, data)
     const blockchainMethodName = blockchainData.methodName
+    const contractToUse = blockchainData.contractIndexToUse ? serviceManager.getContractToUse()[blockchainData.contractIndexToUse] : null
+    delete blockchainData.managerId
     delete blockchainData.methodName
+    delete blockchainData.contractIndexToUse
     return blockchainManager.querySmartContract({
       smartContractMethod: blockchainMethodName,
-      contractToUse: ServiceWriter,
-      smartContractMethodParams: (coinbase) => [...(Object.values(blockchainData)), {from: coinbase, gas: 4444444, gasPrice: 666000000000}],
+      contractToUse: contractToUse || ServiceWriter,
+      smartContractMethodParams: (coinbase) => [...(Object.values(blockchainData)), {from: coinbase}],
       state,
       smartContractResolve: result => data,
       smartContractReject: error => error

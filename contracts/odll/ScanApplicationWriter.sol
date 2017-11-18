@@ -13,7 +13,7 @@ contract ScanApplicationWriter is Restrictor {
     address patientId,
     uint scanRequestId,
     uint quote,
-    bytes32 comment
+    string comment
   )
     external
     onlyPermittedSmartContract

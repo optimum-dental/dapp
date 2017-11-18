@@ -14,8 +14,8 @@ contract ScanRequestWriter is Restrictor {
     uint scanAppointmentId,
     bytes32 appointmentDate,
     bytes32 scanTime,
-    bytes32 scanInsurance,
-    bytes32 comment
+    string scanInsurance,
+    string comment
   )
     external
     onlyPermittedSmartContract
@@ -45,7 +45,7 @@ contract ScanRequestWriter is Restrictor {
     address patientId,
     uint scanRequestId,
     uint quote,
-    bytes32 comment
+    string comment
   )
     external
     onlyPermittedSmartContract

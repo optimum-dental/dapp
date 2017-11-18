@@ -1,7 +1,7 @@
 <template>
-  <div id="view-treatment-applications">
+  <div id="view-scan-applications">
     <section class="content" v-if="isDAppReady">
-      <treatment-applications v-if="user && user.isValid && isValidUserBut === '0'" />
+      <applications v-if="user && user.isValid && user.patientable && isValidUserBut === '0'" />
 
       <guest-introduction v-else-if="isValidUserBut === '0'" />
 
@@ -19,9 +19,9 @@
         return this.$root.user
       }
     },
-    name: 'view-treatment-applications',
+    name: 'view-applications',
     components: {
-      TreatmentApplications,
+      Applications,
       GuestIntroduction,
       Loading,
       Informant
@@ -29,14 +29,14 @@
     props: [ 'isDAppReady', 'isValidUserBut' ]
   }
 
-  import TreatmentApplications from './TreatmentApplications.vue'
+  import Applications from './Applications.vue'
   import GuestIntroduction from '../../../odll-user/get-started/Guest.vue'
   import Loading from '../../../utilities/loading'
   import Informant from '../../../utilities/informant'
 </script>
 
 <style scoped>
-  #view-treatment-applications {
+  #view-scan-applications {
     padding: 20px 50px;
     background: #eef0ef;
   }

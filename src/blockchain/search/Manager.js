@@ -1,5 +1,9 @@
-import UserReaderContract from '../../../build/contracts/UserReader.json'
-import ServiceReaderContract from '../../../build/contracts/ServiceReader.json'
+import UserReader from '../../../build/contracts/UserReader.json'
+import ServiceReader from '../../../build/contracts/ServiceReader.json'
+import ScanRequestReader from '../../../build/contracts/ScanRequestReader.json'
+import ScanApplicationReader from '../../../build/contracts/ScanApplicationReader.json'
+import TreatmentRequestReader from '../../../build/contracts/TreatmentRequestReader.json'
+import TreatmentApplicationReader from '../../../build/contracts/TreatmentApplicationReader.json'
 import userManager from '../user/Manager'
 import serviceManager from '../service/Manager'
 import blockchainManager from '../BlockchainManager'
@@ -12,23 +16,25 @@ class Manager {
     return searchManager
   }
 
-  availableContracts () {
+  getContractToUse () {
     return [
-      UserReaderContract,
-      ServiceReaderContract
+      UserReader,
+      ServiceReader,
+      ScanRequestReader,
+      ScanApplicationReader,
+      TreatmentRequestReader,
+      TreatmentApplicationReader
     ]
   }
 
   fetchDataObjects (state = null, dataObject = {}) {
-    let fetchType = dataObject.type
-    let willUnshiftCoinbase = false
-    let contractToUse = null
-    if (dataObject.specials) {
-      fetchType = dataObject.specials.callSmartContractWith || fetchType
-      willUnshiftCoinbase = dataObject.specials.willUnshiftCoinbase
-      contractToUse = searchManager.availableContracts()[dataObject.specials.contractIndexToUse]
-      delete dataObject.specials
-    }
+    const fetchType = dataObject.callSmartContractWith || dataObject.type
+    const willUnshiftCoinbase = dataObject.willUnshiftCoinbase
+    const contractToUse = dataObject.contractIndexToUse ? searchManager.getContractToUse()[dataObject.contractIndexToUse] : null
+
+    delete dataObject.callSmartContractWith
+    delete dataObject.willUnshiftCoinbase
+    delete dataObject.contractIndexToUse
 
     const callOnEach = dataObject.callOnEach
     const callOnEachParams = dataObject.callOnEachParams
@@ -37,7 +43,7 @@ class Manager {
     if (callOnEachParams) delete dataObject.callOnEachParams
     let queryParams = Object.values(dataObject)
     return blockchainManager.querySmartContract({
-      contractToUse: contractToUse || UserReaderContract,
+      contractToUse: contractToUse || UserReader,
       smartContractMethod: fetchType,
       smartContractMethodParams: (coinbase) => {
         if (willUnshiftCoinbase) queryParams.unshift(coinbase)

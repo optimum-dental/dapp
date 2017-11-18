@@ -81,6 +81,26 @@ export default {
       data: {},
       seed: null,
       totalNumberAvailable: 0
+    },
+    fetchScanApplications: {
+      data: {},
+      seed: null,
+      totalNumberAvailable: 0
+    },
+    fetchTreatmentApplications: {
+      data: {},
+      seed: null,
+      totalNumberAvailable: 0
+    },
+    fetchScanRequests: {
+      data: {},
+      seed: null,
+      totalNumberAvailable: 0
+    },
+    fetchTreatmentRequests: {
+      data: {},
+      seed: null,
+      totalNumberAvailable: 0
     }
   }
 }

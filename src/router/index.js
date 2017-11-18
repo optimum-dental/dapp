@@ -6,12 +6,15 @@ import GetStarted from '@/components/main/odll-user/get-started'
 import FindDentists from '@/components/main/odll-user/find-dentists'
 import ViewServices from '@/components/main/odll-user/view-services'
 import RequestAppointment from '@/components/main/actors/patient/request-appointment'
-import ViewScanApplications from '@/components/main/actors/patient/view-scan-applications'
-import ViewTreatmentApplications from '@/components/main/actors/patient/view-treatment-applications'
+import ViewApplications from '@/components/main/actors/patient/view-applications'
 
 import Managers from '@/components/main/actors/odll-admin/managers'
 import Dentists from '@/components/main/actors/odll-manager/manage-dentists'
 import ManageServices from '@/components/main/actors/dentist/manage-services'
+import ManageScanResults from '@/components/main/actors/dentist/manage-scan-results'
+import ViewAppointmentRequests from '@/components/main/actors/dentist/view-appointment-requests'
+import ViewPatients from '@/components/main/actors/dentist/view-patients'
+import ViewScanResults from '@/components/main/actors/dentist/view-scan-results'
 
 Vue.use(Router)
 
@@ -68,17 +71,10 @@ export default new Router({
     },
     {
       mode: 'history',
-      path: '/view-scan-applications',
-      name: 'ViewScanApplications',
+      path: '/view-applications',
+      name: 'ViewApplications',
       component: MainPage,
-      meta: { view: ViewScanApplications }
-    },
-    {
-      mode: 'history',
-      path: '/view-treatment-applications',
-      name: 'ViewTreatmentApplications',
-      component: MainPage,
-      meta: { view: ViewTreatmentApplications }
+      meta: { view: ViewApplications }
     },
     {
       mode: 'history',
@@ -100,6 +96,34 @@ export default new Router({
       name: 'ManageServices',
       component: MainPage,
       meta: { view: ManageServices }
+    },
+    {
+      mode: 'history',
+      path: '/manage-scan-results',
+      name: 'ManageScanResults',
+      component: MainPage,
+      meta: { view: ManageScanResults }
+    },
+    {
+      mode: 'history',
+      path: '/view-appointment-requests',
+      name: 'ViewAppointmentRequests',
+      component: MainPage,
+      meta: { view: ViewAppointmentRequests }
+    },
+    {
+      mode: 'history',
+      path: '/view-patients',
+      name: 'ViewPatients',
+      component: MainPage,
+      meta: { view: ViewPatients }
+    },
+    {
+      mode: 'history',
+      path: '/view-scan-results',
+      name: 'ViewScanResults',
+      component: MainPage,
+      meta: { view: ViewScanResults }
     }
   ]
 })

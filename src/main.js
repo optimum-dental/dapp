@@ -131,10 +131,19 @@ new Vue({
       this[ACTION_TYPES.UPDATE_USER_GRAVATAR](payload)
     },
     callToWriteUser (payload = null) {
-      userManager.writeUser(this.$store.state, payload)
+      const managers = [
+        userManager,
+        searchManager,
+        serviceManager
+      ]
+      const actionParams = Object.assign({}, payload.requestParams, {
+        methodName: payload.methodName,
+        contractIndexToUse: payload.contractIndexToUse
+      })
+      managers[payload.managerIndex || 0].writeData(this.$store.state, actionParams)
       .then((userData) => {
         this[ACTION_TYPES.UPDATE_USER_STATE]({
-          userObject: payload.vueUserObject
+          userObject: payload.vueObject
         })
         .then(() => {
           if (payload.callback) payload.callback(userData)
@@ -194,8 +203,11 @@ new Vue({
         searchManager,
         serviceManager
       ]
-      const actionParams = Object.assign({}, payload.requestParams, {methodName: payload.methodName})
-      managers[payload.managerId || 0].writeData(this.$store.state, actionParams)
+      const actionParams = Object.assign({}, payload.requestParams, {
+        methodName: payload.methodName,
+        contractIndexToUse: payload.contractIndexToUse
+      })
+      managers[payload.managerIndex || 0].writeData(this.$store.state, actionParams)
       .then((responseObject) => {
         if (payload.callback) payload.callback(responseObject)
       })

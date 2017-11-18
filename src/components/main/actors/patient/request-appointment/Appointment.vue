@@ -10,6 +10,11 @@
         </div>
 
         <div class="view-section">
+          <div class="official-info" v-if="officialSN >= 0 && official.fee >= 0">
+            <div class="official-name official-detail">Appointment with: <span>{{official.name}}</span></div>
+            <div class="official-fee official-detail">Fee: <span>${{official.fee}}</span></div>
+          </div>
+
           <div class="scan-section" :class="addClass(1, 'showing')" id="scan-section">
             <div class="entry-item">
               <div class="entry-param">Preferred Date *</div>
@@ -33,7 +38,7 @@
             <div class="entry-item">
               <div class="entry-param">Appointment For *</div>
               <div class="entry-value">
-                <select id="scan-appointment" class="list"></select>
+                <select id="scan-appointment" class="list" :disabled="officialSN >= 0 && official.fee >= 0"></select>
               </div>
             </div>
 
@@ -56,7 +61,7 @@
             </div>
 
             <div class="submit">
-              <input type="button" class='post button' value="Send" @click="writeScanAppointment">
+              <input type="button" class='post button' value="Send" @click="writeScanRequest">
             </div>
           </div>
 
@@ -108,6 +113,16 @@
     computed: {
       user () {
         return this.$root.user
+      },
+      official () {
+        let official = this.$store.state.searchResult.findDentists.data[this.officialOffset]
+        return official ? official[this.officialSN] : {}
+      },
+      officialOffset () {
+        return this.$route.query.o
+      },
+      officialSN () {
+        return this.$route.query.sn
       }
     },
     data: function () {
@@ -117,11 +132,6 @@
       }
     },
     methods: {
-      appointmentWith () {
-        const serialNumber = this.$route.query.sn
-        const offset = this.$route.query.o
-        return serialNumber !== undefined && offset !== undefined ? this.$store.state.searchResult.findDentists.data[offset][serialNumber].address : '0x0'
-      },
       setEventListeners () {
         const _this = this
         document.querySelector('#appointment').addEventListener('change', function (evt) {
@@ -189,10 +199,10 @@
         }
       },
       serviceTypeIndex () {
-        return Number(this.$route.query.sTI || 1)
+        return Number(this.official.serviceTypeId || this.$route.query.sTI || 1)
       },
       serviceSubtypeIndex () {
-        return Number(this.$route.query.sSI || 0)
+        return Number(this.official.serviceId || this.$route.query.sSI || 0)
       },
       addClass (check, value) {
         return this.serviceTypeIndex() === check || (!this.serviceTypeIndex() && check === 1) ? value : ''
@@ -248,7 +258,7 @@
           })
         }
       },
-      writeScanAppointment () {
+      writeScanRequest () {
         const appointmentDate = (+(this.scanDate)).toString()
         const scanTime = Number(document.getElementById('scan-time').selectedIndex)
         const scanAppointmentId = Number(document.getElementById('scan-appointment').selectedIndex)
@@ -267,14 +277,16 @@
           this.beginWait(document.querySelector('.wrapper'))
           this.$root.callToWriteData({
             requestParams: {
-              dentistId: this.appointmentWith(),
+              dentistId: this.official.coinbase,
               appointmentDate,
               scanTime,
               scanAppointmentId,
               scanInsurance,
               scanComment
             },
-            methodName: 'writeScanAppointment',
+            contractIndexToUse: 2,
+            methodName: 'writeScanRequest',
+            managerIndex: 2,
             callback: (status) => {
               this.endWait(document.querySelector('.wrapper'))
               this.enableNecessaryButtons()
@@ -585,6 +597,19 @@
     width: 100%;
     float: right;
   }
+
+  .official-info {
+    margin-top: 20px;
+  }
+
+  .official-detail {
+    font-weight: bold;
+    font-size: 16px;
+  }
+
+  .official-detail span {
+    color: #296c92;
+  }
 </style>
 
 <style>
@@ -660,4 +685,3 @@
     cursor: pointer;
   }
 </style>
-

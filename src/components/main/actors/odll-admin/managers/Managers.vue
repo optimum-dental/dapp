@@ -110,6 +110,8 @@
               userType: 3
             },
             methodName: 'addOfficialToODLL',
+            contractIndexToUse: 0,
+            managerIndex: 0,
             callback: (status = false) => {
               this.getManagers(null, {
                 type: 'fetchManagers',

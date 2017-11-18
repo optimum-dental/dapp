@@ -13,9 +13,9 @@ contract TreatmentRequestWriter is Restrictor {
   function writeTreatmentRequest (
     bool hasCaseId,
     uint caseId,
-    bytes32 insurance,
-    bytes32[] scanResults,
-    bytes32 comment
+    string insurance,
+    string scanResults,
+    string comment
   )
     external
     onlyPermittedSmartContract
