@@ -259,6 +259,7 @@ export default {
               if (payload.callback) payload.callback(value, results.length === index + 1)
             })
           } else {
+            Object.assign(value, { SN: index })
             searchResultCopy[payload.type].data[payload.offset].push(value)
             state.searchResult = searchResultCopy
             if (payload.callback) payload.callback(value, results.length === index + 1)

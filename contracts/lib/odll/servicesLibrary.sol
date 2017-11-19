@@ -207,6 +207,7 @@ library servicesLibrary {
       }
     }
 
+    DB(dbAddress).setBooleanValue(keccak256("dentist/scan-request", dentistId, scanRequestId), true);
     initScanApplication(dbAddress, scanRequestId, scanApplicationId);
     writeScanApplicationData(dbAddress, dentistId, patientId, scanApplicationId, quote, comment);
   }
@@ -416,6 +417,7 @@ library servicesLibrary {
       }
     }
 
+    DB(dbAddress).setBooleanValue(keccak256("dentist/treatment-request", dentistId, treatmentRequestId), true);
     initTreatmentApplication(dbAddress, treatmentRequestId, treatmentApplicationId);
     writeTreatmentApplicationData(dbAddress, dentistId, patientId, treatmentRequestId, treatmentApplicationId, quote, comment);
   }

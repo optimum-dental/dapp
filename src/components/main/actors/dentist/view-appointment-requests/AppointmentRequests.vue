@@ -3,6 +3,19 @@
     <div id="appointment-requests">
       <div class="title">Appointment Requests</div>
 
+      <div class="query-section">
+        <div class="entry-item">
+          <div class="entry-param">Request Type</div>
+          <div class="entry-value">
+            <select id="request-type" class="list">
+              <option>General Scan Requests</option>
+              <option>Direct Scan Request</option>
+              <option>Accepted Scan Request</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
       <div class="result-section"></div>
 
       <div class="navigation">
@@ -20,7 +33,7 @@
         return this.$root.user
       },
       isThereMore () {
-        return this.$store.state.searchResult[Number(this.$route.query.sT || 1) === 1 ? 'fetchScanRequests' : 'fetchTreatmentRequests'].totalNumberAvailable > (this.pageNumber * this.perPage)
+        return this.$store.state.searchResult[Number(this.$route.query.rTI || 0) === 1 ? 'fetchScanRequests' : 'fetchTreatmentRequests'].totalNumberAvailable > (this.pageNumber * this.perPage)
       },
       pageNumber () {
         return (Number(this.$route.query.o || 0) / this.perPage) + 1
@@ -39,222 +52,168 @@
       }
     },
     methods: {
-      addClass (check, value) {
-        return Number(this.$route.query.sT) === check || (!this.$route.query.sT && check === 1) ? value : ''
-      },
-      switchView (evt) {
-        const target = evt.target
-        if (!(target.classList.contains('active'))) {
-          document.querySelector('.showing').classList.remove('showing')
-          document.querySelector('.active').classList.remove('active')
-          target.classList.add('active')
-          document.querySelector(`.${target.dataset.open}`).classList.add('showing')
-          const serviceType = Number(target.dataset.type)
-          this.fetchRequests(null, this.currentOffset, this.$store.state.searchResult[serviceType === 1 ? 'fetchScanRequests' : 'fetchTreatmentRequests'].seed, 1, serviceType)
-        }
-      },
       populateRequestTypes () {
-        const serviceTypesElement = document.getElementById('service-type')
-        serviceTypes.forEach((serviceType, index) => {
-          const optionElement = document.createElement('option')
-          optionElement.text = serviceType.name
-          if (serviceTypesElement) {
-            serviceTypesElement.appendChild(optionElement)
-            if (index === Number(this.$route.query.sTI)) optionElement.selected = true
-          }
-        })
+        const requestTypeIndex = Number(this.$route.query.rTI || 0)
+        const requestTypeDOMElement = document.getElementById('request-type')
+        requestTypeDOMElement.options[requestTypeIndex].selected = true
       },
       setEventListeners () {
         const _this = this
-        const servicesPage = document.querySelector('#services')
-        servicesPage.addEventListener('change', function (evt) {
+        const appointmentRequestsPage = document.querySelector('#appointment-requests')
+        appointmentRequestsPage.addEventListener('change', function (evt) {
           let target = evt.target
           switch (target.id) {
-            case 'service-type':
-              _this.clearError(target)
-              let serviceSubtypesElement
-              serviceSubtypesElement = document.getElementById('service-subtype')
-              _this.populateRequestSubTypes(target.selectedIndex)
-              _this.dispatchEventFrom(serviceSubtypesElement, 'change')
-              serviceSubtypesElement.focus()
-              break
-            case 'service-subtype':
-              _this.clearError(target)
-              break
-            case 'fee':
-              _this.clearError(target)
+            case 'request-type':
+              _this.fetchRequests(evt, 0, null, 1, evt.target.selectedIndex)
               break
           }
         })
 
-        servicesPage.addEventListener('keyup', function (evt) {
-          let target = evt.target
-          switch (target.id) {
-            case 'fee':
-              _this.clearError(target)
-              break
-          }
-        })
-
-        servicesPage.addEventListener('click', function (evt) {
+        appointmentRequestsPage.addEventListener('click', function (evt) {
           let target = evt.target
           switch (true) {
-            case (target.classList.contains('edit-service')):
-              _this.scrollToTop()
-              let [serviceType, serviceSubtype, serviceFee] = target.dataset.params.split('%').map(param => Number(param))
-              let [serviceTypeDOMElement, serviceSubtypeDOMElement, serviceFeeDOMElement] = [document.getElementById('service-type'), document.getElementById('service-subtype'), document.getElementById('fee')]
-              serviceTypeDOMElement.options[serviceType].selected = true
-              _this.dispatchEventFrom(serviceTypeDOMElement, 'change')
-              serviceSubtypeDOMElement.options[serviceSubtype].selected = true
-              serviceFeeDOMElement.value = serviceFee
-              let updateButton = document.querySelector('.post')
-              updateButton.value = 'Update Request'
-              if (document.querySelector('.cancel')) document.querySelector('.cancel').remove()
-              document.querySelector('.submit').insertBefore(_this.cancelButton(), updateButton)
-              serviceTypeDOMElement.disabled = true
-              serviceSubtypeDOMElement.disabled = true
+            case (target.classList.contains('apply-to-scan')):
+              _this.showApplicationForm(evt)
               break
+          }
+        })
 
-            case (target.classList.contains('cancel')):
-              [serviceTypeDOMElement, serviceSubtypeDOMElement, serviceFeeDOMElement] = [document.getElementById('service-type'), document.getElementById('service-subtype'), document.getElementById('fee')]
-              serviceTypeDOMElement.options[0].selected = true
-              _this.dispatchEventFrom(serviceTypeDOMElement, 'change')
-              serviceFeeDOMElement.value = ''
-              let insertButton = document.querySelector('.post')
-              insertButton.value = 'Add Request'
-              document.querySelector('.cancel').remove()
-              serviceTypeDOMElement.disabled = false
-              serviceSubtypeDOMElement.disabled = false
+        document.body.addEventListener('click', function (evt) {
+          let target = evt.target
+          switch (true) {
+            case (target.classList.contains('apply-button')):
+              _this.applyToScan(evt)
               break
-
-            case (target.classList.contains('delete-service')):
-              [serviceType, serviceSubtype, serviceFee] = target.dataset.params.split('%').map(param => Number(param))
-              _this.deleteRequest(evt, serviceType, serviceSubtype)
+            case (target.classList.contains('cancel-apply-button')):
+              const applicationForm = document.querySelector('.modal')
+              if (applicationForm) applicationForm.remove()
               break
           }
         })
       },
-      dispatchEventFrom (DOMElement, eventType) {
-        const eventObject = document.createEvent('HTMLEvents')
-        eventObject.initEvent(eventType, true, true)
-        DOMElement.dispatchEvent(eventObject)
+      showApplicationForm (evt) {
+        const sn = evt.target.dataset.params
+        const scanRequest = this.$store.state.searchResult['fetchScanRequests'].data[this.currentOffset][sn]
+        const applicationForm = this.getApplicationFormDOMElement(scanRequest)
+        document.body.appendChild(applicationForm)
       },
-      cancelButton () {
-        const DOMELement = new DOMParser().parseFromString(`<input type="button" class="button cancel" value="Cancel">`, 'text/html')
-        return DOMELement.body.firstChild
-      },
-      clearError (target) {
-        target.classList.remove('error')
-      },
-      populateRequestSubTypes (serviceTypeIndex) {
-        const serviceSubtypesElement = document.getElementById('service-subtype')
-        if (serviceTypeIndex === 0) {
-          while (serviceSubtypesElement.hasChildNodes()) serviceSubtypesElement.firstChild.remove()
-          serviceSubtypesElement.closest('.entry-item').querySelector('.entry-param').innerHTML = ''
-        } else {
-          serviceSubtypesElement.closest('.entry-item').querySelector('.entry-param').innerHTML = serviceTypes[serviceTypeIndex].subtypes[0]
-          while (serviceSubtypesElement.firstChild) {
-            serviceSubtypesElement.removeChild(serviceSubtypesElement.firstChild)
-          }
+      getApplicationFormDOMElement (scanRequest = {}) {
+        return new DOMParser().parseFromString(`
+          <div class='modal'>
+            <div class='application-form'>
+              <div class='modal-entry'>
+                <label>Application for: ${scanRequest.serviceName}</label>
+              </div>
 
-          const serviceSubtypes = serviceTypes[serviceTypeIndex].subtypes
-          serviceSubtypes.forEach((serviceSubtype, index) => {
-            const optionElement = document.createElement('option')
-            optionElement.text = serviceSubtype
-            if (serviceSubtypesElement) {
-              serviceSubtypesElement.appendChild(optionElement)
-              if (index === Number(this.$route.query.sSI)) optionElement.selected = true
-            }
-          })
-        }
+              <div class='modal-entry'>
+                <label for='quote'>Quote [USD]</label>
+                <input type='number' id='quote' placeholder='Quote in USD'>
+              </div>
+
+              <div class='modal-entry'>
+                <label for='comment'>Comment</label>
+                <textarea id='comment'></textarea>
+              </div>
+
+              <div class='modal-entry'>
+                <input type='button' class='cancel-apply-button' value='Cancel'>
+                <input type='button' class='apply-button' value='Send' data-params='${scanRequest.SN}'>
+              </div>
+            </div>
+          </div>
+        `, 'text/html').body.firstChild
       },
-      writeRequestWithFee (evt) {
-        const serviceTypeId = Number(document.getElementById('service-type').selectedIndex)
-        const serviceSubtypeId = Number(document.getElementById('service-subtype').selectedIndex)
-        const fee = this.getFee()
-        let errors = [serviceTypeId === 0 ? document.getElementById('service-type') : undefined, serviceSubtypeId === 0 ? document.getElementById('service-subtype') : undefined, fee === '' ? document.getElementById('fee') : undefined]
-        errors = errors.filter(entry => entry !== undefined)
-        if (errors.length > 0) {
-          errors.forEach((item) => {
-            item.classList.add('error')
-          })
-        } else {
-          this.scrollToTop()
-          this.disableNecessaryButtons(evt)
-          this.beginWait(document.querySelector('.wrapper'))
-          this.$root.callToWriteData({
-            requestParams: {
-              serviceTypeId,
-              serviceSubtypeId,
-              fee
-            },
-            managerIndex: 2, // which of the contract managers to use
-            contractIndexToUse: 0,
-            methodName: 'writeRequestWithFee',
-            callback: (status) => {
-              this.endWait(document.querySelector('.wrapper'))
-              this.enableNecessaryButtons(evt)
-              if (status) this.fetchRequests(null, this.currentOffset, this.$store.state.searchResult[serviceTypeId === 1 ? 'fetchScanRequests' : 'fetchTreatmentRequests'].seed, 1, serviceTypeId)
-              this.notify(status ? 'Request Successfully added' : 'Unable to add Request')
-            }
-          })
-        }
-      },
-      deleteRequest (evt, serviceTypeId, serviceSubtypeId) {
+      applyToScan (evt) {
+        const sn = evt.target.dataset.params
+        const scanRequest = this.$store.state.searchResult['fetchScanRequests'].data[this.currentOffset][sn]
+        const patientId = scanRequest.patientId
+        const requestId = scanRequest.requestId
+        const quote = Number(document.getElementById('quote').value) || 0
+        const comment = document.getElementById('comment').value
+
         this.scrollToTop()
-        this.beginWait(document.querySelector('.wrapper'))
         this.disableNecessaryButtons(evt)
-        this.$root.callToDeleteRequest({
-          serviceObject: {
-            serviceTypeId,
-            serviceSubtypeId
+        this.beginWait(document.querySelector('.wrapper'))
+        this.$root.callToWriteData({
+          requestParams: {
+            patientId,
+            requestId,
+            quote,
+            comment
           },
+          managerIndex: 2, // which of the contract managers to use
+          contractIndexToUse: 4,
+          methodName: 'applyToScan',
           callback: (status) => {
             this.endWait(document.querySelector('.wrapper'))
             this.enableNecessaryButtons(evt)
-            if (status) this.fetchRequests(null, this.currentOffset, this.$store.state.searchResult[serviceTypeId === 1 ? 'fetchScanRequests' : 'fetchTreatmentRequests'].seed, 1, serviceTypeId)
-            this.notify(status ? 'Request Successfully deleted' : 'Unable to delete Request')
+            if (status) this.fetchRequests(null, this.currentOffset, this.$store.state.searchResult['fetchScanRequests'].seed, 1, this.$route.query.rTI)
+            this.notify(status ? 'Application Successfully added' : 'Unable to add Application')
+            const applicationForm = document.querySelector('.modal')
+            if (applicationForm) applicationForm.remove()
           }
         })
       },
-      fetchRequests (evt, offset = 0, seed = null, direction = 1, serviceTypeId = 1) {
+      fetchRequests (evt, offset = 0, seed = null, direction = 1, requestTypeIndex = 0) {
         const fetchQuery = {
-          type: serviceTypeId === 1 ? 'fetchScanRequests' : 'fetchTreatmentRequests',
-          callSmartContractWith: 'fetchRequests',
+          type: 'fetchScanRequests',
+          requestParams: this.getSmartContractMethodParams(offset, this.perPage, seed || Math.random())[requestTypeIndex],
+          managerIndex: 1, // which of the contract managers to use
           contractIndexToUse: 1,
-          userId: this.user.coinbase,
-          serviceTypeId,
-          offset,
-          limit: this.perPage,
-          seed: seed || Math.random(),
+          methodName: this.getSmartContractMethodName()[requestTypeIndex],
           callOnEach: 'getRequestDetail',
-          callOnEachParams: serviceId => ({serviceTypeId, serviceId: serviceId.toNumber()})
+          callOnEachParams: requestId => ({requestTypeId: 1, requestId: requestId.toNumber(), dentistId: this.user.coinbase})
         }
 
         this.$router.push({
-          path: '/manage-services',
+          path: '/view-appointment-requests',
           query: {
-            o: fetchQuery.offset,
-            l: fetchQuery.limit,
-            sd: fetchQuery.seed,
-            sT: serviceTypeId
+            o: fetchQuery.requestParams.offset,
+            l: fetchQuery.requestParams.limit,
+            sd: fetchQuery.requestParams.seed,
+            rTI: requestTypeIndex
           }
         })
         const offsetData = this.$store.state.searchResult[fetchQuery.type].data[offset]
         if (direction < 0 && offsetData && offsetData.length > 0) {
-          this.populateResults(offsetData, serviceTypeId)
+          this.populateResults(offsetData)
         } else {
           this.getRequests(evt, fetchQuery)
         }
       },
-      getFee () {
-        return document.getElementById('fee').value
+      getSmartContractMethodName () {
+        return [
+          'fetchAllScanRequests',
+          'fetchDirectScanRequestsForDentist',
+          'fetchAcceptedScanRequestsForDentist'
+        ]
+      },
+      getSmartContractMethodParams (offset, limit, seed) {
+        return [
+          {
+            offset,
+            limit,
+            seed
+          },
+          {
+            dbAddress: '0xc5668d26804abff30ca97dcf0eb4b14be11ab474',
+            userId: this.user.coinbase,
+            offset,
+            limit,
+            seed
+          },
+          {
+            userId: this.user.coinbase,
+            offset,
+            limit,
+            seed
+          }
+        ]
       },
       getRequests (evt, fetchQuery) {
-        const serviceTypeId = fetchQuery.serviceTypeId
-        const resultSection = document.querySelector(`.${serviceTypeId === 1 ? 'scan-section' : 'treatment-section'}`)
+        const resultSection = document.querySelector('.result-section')
         this.clearDOMElementChildren(resultSection)
-        this.askUserToWaitWhileWeSearch(serviceTypeId)
+        this.askUserToWaitWhileWeSearch()
         this.disableNecessaryButtons()
         this.$root.callToFetchDataObjects({
           fetchQuery,
@@ -266,26 +225,24 @@
             }
 
             if (result) {
-              this.appendResult(result, serviceTypeId)
+              this.appendResult(result)
             } else {
-              this.informOfNoRequest(serviceTypeId)
+              this.informOfNoRequest()
             }
           }
         })
       },
-      populateResults (results, resultType = 1) {
-        if (typeof resultType === 'object' && resultType.toNumber) resultType = resultType.toNumber()
-        const resultSection = document.querySelector(`.${resultType === 1 ? 'scan-section' : 'treatment-section'}`)
+      populateResults (results) {
+        const resultSection = document.querySelector('.result-section')
         this.clearDOMElementChildren(resultSection)
         results.forEach((result) => {
           const resultDOMElement = this.createResultDOMElement(result)
           resultSection.appendChild(resultDOMElement)
         })
       },
-      appendResult (result, resultType = 1) {
-        if (typeof resultType === 'object' && resultType.toNumber) resultType = resultType.toNumber()
+      appendResult (result) {
         const resultDOMElement = this.createResultDOMElement(result)
-        const resultSection = document.querySelector(`.${Number(resultType) === 1 ? 'scan-section' : 'treatment-section'}`)
+        const resultSection = document.querySelector('.result-section')
         resultSection.appendChild(resultDOMElement)
       },
       clearDOMElementChildren (DOMElement) {
@@ -294,42 +251,42 @@
         }
       },
       showNextPage () {
-        const serviceTypeId = Number(this.$route.query.sT || 1)
-        this.fetchRequests(null, this.nextOffset, this.$store.state.searchResult[serviceTypeId === 1 ? 'fetchScanRequests' : 'fetchTreatmentRequests'].seed, 1, serviceTypeId)
+        const requestTypeIndex = Number(this.$route.query.rTI || 0)
+        this.fetchRequests(null, this.nextOffset, this.$store.state.searchResult['fetchScanRequests'].seed, 1, requestTypeIndex)
       },
       showPreviousPage () {
-        const serviceTypeId = Number(this.$route.query.sT || 1)
-        this.fetchRequests(null, this.previousOffset, this.$store.state.searchResult[serviceTypeId === 1 ? 'fetchScanRequests' : 'fetchTreatmentRequests'].seed, -1, serviceTypeId)
+        const requestTypeIndex = Number(this.$route.query.rTI || 0)
+        this.fetchRequests(null, this.previousOffset, this.$store.state.searchResult['fetchScanRequests'].seed, -1, requestTypeIndex)
       },
       getPageIndex (offset = 0) {
         return offset / this.perPage
       },
-      askUserToWaitWhileWeSearch (serviceTypeId = 1) {
+      askUserToWaitWhileWeSearch () {
         if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
         if (document.querySelector('.no-service')) document.querySelector('.no-service').remove()
-        let waitOverlayDOMElement = this.createWaitOverlayDOMElement(serviceTypeId)
+        let waitOverlayDOMElement = this.createWaitOverlayDOMElement()
         document.querySelector('.result-section').appendChild(waitOverlayDOMElement)
       },
-      informOfNoRequest (serviceTypeId = 1) {
+      informOfNoRequest () {
         if (document.querySelector('.no-service')) document.querySelector('.no-service').remove()
-        let noRequestDOMElement = this.createNoRequestDOMElement(serviceTypeId)
+        let noRequestDOMElement = this.createNoRequestDOMElement()
         document.querySelector('.result-section').appendChild(noRequestDOMElement)
       },
-      createWaitOverlayDOMElement (serviceTypeId = 1) {
+      createWaitOverlayDOMElement () {
         const DOMELement = new DOMParser().parseFromString(`
           <div class="wait-overlay">
-            <div class="wait-message">Please Wait... We're searching the blockchain for your ${serviceTypeId === 1 ? 'Scan' : 'Treatment'} services.</div>
+            <div class="wait-message">Please Wait... We're searching the blockchain for Scan requests.</div>
             <div class="spin"></div>
           </div>
         `, 'text/html')
 
         return DOMELement.body.firstChild
       },
-      createNoRequestDOMElement (serviceTypeId = 1) {
+      createNoRequestDOMElement () {
         const DOMELement = new DOMParser().parseFromString(`
-          <div class="no-service">
-            <div class="no-service-message">
-              It appears you have no ${serviceTypeId === 1 ? 'Scan' : 'Treatment'} service on the blockchain.
+          <div class="no-request">
+            <div class="no-request-message">
+              It appears patients have not made any Scan request for now.
             </div>
           </div>
         `, 'text/html')
@@ -339,10 +296,12 @@
       createResultDOMElement (result) {
         const resultDOMElement = new DOMParser().parseFromString(`
           <div class="result">
-            <div class="service-name">${result.serviceName}</div>
-            <div class="service-fee">$ ${result.serviceFee}</div>
-            <input type="button" value="Edit" class="button edit-service" data-params="${result.serviceTypeId}%${result.serviceId}%${result.serviceFee}">
-            <input type="button" value="Delete" class="button delete-service" data-params="${result.serviceTypeId}%${result.serviceId}%${result.serviceFee}">
+            <div class="appointment-for appointment-data">Request for: <span>${serviceTypes[1].subtypes[result.serviceId]}</span></div>
+            <div class="appointment-date appointment-data">Date: <span>${formatDate(new Date(Number(result.date)))}</span></div>
+            <div class="appointment-time appointment-data">Time: <span>${result.time}</span></div>
+            <div class="appointment-insurance appointment-data">Insurance: <span>${result.insurance}</span></div>
+            <div class="appointment-comment appointment-data">Comment: <span>${result.comment}</span></div>
+            <input type="button" value="Apply" class="button apply-to-scan" data-params="${result.SN}">
           </div>
         `, 'text/html').body.firstChild
         return resultDOMElement
@@ -377,25 +336,23 @@
       }
     },
     mounted: function () {
-      const serviceTypeId = Number(this.$route.query.sT || 1)
-      this.populateRequestTypes()
+      const requestTypeIndex = Number(this.$route.query.rTI || 0)
       this.setEventListeners()
+      this.populateRequestTypes()
       this.getRequests(null, {
-        type: serviceTypeId === 1 ? 'fetchScanRequests' : 'fetchTreatmentRequests',
-        callSmartContractWith: 'fetchRequests',
+        type: 'fetchScanRequests',
+        requestParams: this.getSmartContractMethodParams(Number(this.$route.query.o || 0), Number(this.$route.query.l || this.perPage), Number(this.$route.query.sd || Math.random()))[requestTypeIndex],
+        managerIndex: 1, // which of the contract managers to use
         contractIndexToUse: 1,
-        userId: this.user.coinbase,
-        serviceTypeId,
-        offset: Number(this.$route.query.o || 0),
-        limit: Number(this.$route.query.l || this.perPage),
-        seed: Number(this.$route.query.sd || Math.random()),
+        methodName: this.getSmartContractMethodName()[requestTypeIndex],
         callOnEach: 'getRequestDetail',
-        callOnEachParams: serviceId => ({serviceTypeId, serviceId: serviceId.toNumber()})
+        callOnEachParams: requestId => ({requestTypeId: 1, requestId: requestId.toNumber(), dentistId: this.user.coinbase})
       })
     }
   }
 
   import serviceTypes from '../../../../../../static/json/appointment_types/appointment_types.json'
+  import {formatDate} from '../../../../../util/others'
   import $ from 'jquery'
 </script>
 
@@ -527,7 +484,7 @@
 </style>
 
 <style>
-  .no-official {
+  .no-request {
     position: relative;
     width: 100%;
     min-height: 300px;
@@ -535,7 +492,7 @@
     font-size: 16px;
   }
 
-  .no-official-message {
+  .no-request-message {
     height: 30px;
     position: relative;
     top: 110px;
@@ -589,6 +546,9 @@
     border-bottom: 1px solid #a7a7a7;
     min-height: 180px;
     padding: 10px 0px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 
   .gravatar-section {
@@ -651,5 +611,73 @@
     cursor: pointer;
     font-size: 14px;
     text-align: center;
+  }
+
+  .appointment-data {
+    font-weight: bold;
+  }
+
+  .appointment-data span {
+    font-weight: normal;
+    color: #115588;
+  }
+
+  .apply-to-scan, .cancel-apply-button, .apply-button {
+    background: #29aae1;
+    cursor: pointer;
+    width: 80px;
+    outline: none;
+  }
+
+  .modal {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0px;
+    left: 0px;
+    background: rgba(0, 0, 0, 0.56);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 999999
+  }
+
+  .application-form {
+    width: 500px;
+    height: 500px;
+    background: #ffffff;
+    position: relative;
+    margin: auto;
+    left: 128px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .application-form .modal-entry {
+    display: block;
+    margin-bottom: 30px;
+    width: 80%;
+  }
+
+  .application-form label {
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  .application-form input[type='number'], .application-form textarea {
+    display: block;
+    width: 100%;
+    outline: none;
+  }
+
+  .application-form textarea {
+    display: block;
+    max-width: 100%;
+    min-width: 100%;
+    max-height: 200px;
+    min-height: 200px;
   }
 </style>

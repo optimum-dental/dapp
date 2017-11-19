@@ -174,14 +174,25 @@ new Vue({
     },
     callToFetchDataObjects (payload) {
       const fetchQuery = payload.fetchQuery
-      const blockchainParams = Object.assign({}, fetchQuery)
-      blockchainParams.seed = Math.ceil(blockchainParams.seed * 113)
-      searchManager.fetchDataObjects(this.$store.state, blockchainParams)
+      const managers = [
+        userManager,
+        searchManager,
+        serviceManager
+      ]
+      const actionParams = Object.assign({}, fetchQuery.requestParams, {
+        methodName: fetchQuery.methodName,
+        contractIndexToUse: fetchQuery.contractIndexToUse,
+        seed: Math.ceil(fetchQuery.requestParams.seed * 113),
+        callOnEach: fetchQuery.callOnEach,
+        callOnEachParams: fetchQuery.callOnEachParams
+      })
+
+      managers[fetchQuery.managerIndex || 0].fetchDataObjects(this.$store.state, actionParams)
       .then((fetchResult) => {
         this[ACTION_TYPES.SAVE_SEARCH_RESULT]({
           type: fetchQuery.type,
-          seed: fetchQuery.seed,
-          offset: fetchQuery.offset,
+          seed: fetchQuery.requestParams.seed,
+          offset: fetchQuery.requestParams.offset,
           results: fetchResult.results,
           totalNumberAvailable: fetchResult.totalNumberAvailable,
           preSaveCallback: payload.preSaveCallback,

@@ -28,11 +28,11 @@ class Manager {
   }
 
   fetchDataObjects (state = null, dataObject = {}) {
-    const fetchType = dataObject.callSmartContractWith || dataObject.type
+    const fetchType = dataObject.methodName || dataObject.type
     const willUnshiftCoinbase = dataObject.willUnshiftCoinbase
     const contractToUse = dataObject.contractIndexToUse ? searchManager.getContractToUse()[dataObject.contractIndexToUse] : null
 
-    delete dataObject.callSmartContractWith
+    delete dataObject.methodName
     delete dataObject.willUnshiftCoinbase
     delete dataObject.contractIndexToUse
 
@@ -87,6 +87,18 @@ class Manager {
     return new Promise((resolve, reject) => {
       const dataObject = {}
       serviceManager.getServiceDetail(state, requestObject)
+      .then((result) => {
+        Object.assign(dataObject, result)
+        resolve(dataObject)
+      })
+      .catch(error => reject(error))
+    })
+  }
+
+  getRequestDetail (state = null, requestObject = {}) {
+    return new Promise((resolve, reject) => {
+      const dataObject = {}
+      serviceManager.getRequestDetail(state, requestObject)
       .then((result) => {
         Object.assign(dataObject, result)
         resolve(dataObject)

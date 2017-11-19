@@ -17,7 +17,8 @@ export function getObjectFromResponse (state, result, entitiesCount, keys, field
     let stringValuesIndex = 0
     const entityObject = keys.reduce((hash, key, index) => {
       if (fieldTypes[index] === 1) {
-        itemValue = entitiesIntsArrays[i] ? entitiesIntsArrays[i][intValuesIndex] : 0
+        itemValue = entitiesIntsArrays[i] ? entitiesIntsArrays[i][intValuesIndex].toNumber() : 0
+        itemValue = !(itemValue === 0)
         intValuesIndex += 1
       } else if ([2, 3].includes(fieldTypes[index])) {
         itemValue = entitiesIntsArrays[i] ? entitiesIntsArrays[i][intValuesIndex].toNumber() : 0

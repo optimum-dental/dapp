@@ -58,7 +58,6 @@ contract ScanRequestReader is Restrictor {
   }
 
   function fetchDirectScanRequestsForDentist (
-    address dbAddress,
     address dentistId,
     uint offset, // starting from offset: 0-based
     uint limit, // not more than limit

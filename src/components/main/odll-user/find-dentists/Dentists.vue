@@ -162,7 +162,7 @@
       },
       updateRating (rating, target) {
         const averageRatingDOMElement = this.createAverageRatingDOMElement(rating, target.dataset.sn)
-        document.querySelector('.about-section').replaceChild(averageRatingDOMElement, document.querySelector('.average-rating'))
+        document.querySelector('.find-dentist-about-section').replaceChild(averageRatingDOMElement, document.querySelector('.average-rating'))
       },
       clearError (target) {
         target.classList.remove('error')
@@ -213,13 +213,18 @@
           const appointmentSubtypeId = Number(document.getElementById('appointment-sub-type').selectedIndex)
           const searchQuery = {
             type: 'findDentists',
-            state: Number(document.getElementById('state').selectedIndex),
-            appointmentTypeId,
-            appointmentSubtypeId,
-            budget: this.getBudget(),
-            offset,
-            limit: this.perPage,
-            seed: seed || Math.random(),
+            requestParams: {
+              state: Number(document.getElementById('state').selectedIndex),
+              appointmentTypeId,
+              appointmentSubtypeId,
+              budget: this.getBudget(),
+              offset,
+              limit: this.perPage,
+              seed: seed || Math.random()
+            },
+            managerIndex: 1, // which of the contract managers to use
+            methodName: 'findDentists',
+            contractIndexToUse: 0,
             callOnEach: 'getOfficial',
             callOnEachParams: dentistId => ({
               officialId: dentistId,
@@ -242,14 +247,14 @@
             this.$router.push({
               path: '/find-dentists',
               query: {
-                o: searchQuery.offset,
-                l: searchQuery.limit,
-                sd: searchQuery.seed,
-                st: searchQuery.state,
-                aTI: searchQuery.appointmentTypeId,
-                aSI: searchQuery.appointmentSubtypeId,
-                bl: searchQuery.budget[0],
-                br: searchQuery.budget[1]
+                o: searchQuery.requestParams.offset,
+                l: searchQuery.requestParams.limit,
+                sd: searchQuery.requestParams.seed,
+                st: searchQuery.requestParams.state,
+                aTI: searchQuery.requestParams.appointmentTypeId,
+                aSI: searchQuery.requestParams.appointmentSubtypeId,
+                bl: searchQuery.requestParams.budget[0],
+                br: searchQuery.requestParams.budget[1]
               }
             })
             const offsetData = this.$store.state.searchResult[searchQuery.type].data[offset]
@@ -324,8 +329,8 @@
           fetchQuery,
           preSaveCallback: (result) => {
             Object.assign(result, {
-              serviceTypeId: fetchQuery.appointmentTypeId,
-              serviceId: fetchQuery.appointmentSubtypeId,
+              serviceTypeId: fetchQuery.requestParams.appointmentTypeId,
+              serviceId: fetchQuery.requestParams.appointmentSubtypeId,
               fee: result.fee,
               averageRating: result.rating,
               rating: result.rating
@@ -412,7 +417,7 @@
         const resultDOMElement = new DOMParser().parseFromString(`
           <div class="result">
             <div class="gravatar-section"></div>
-            <div class="about-section">
+            <div class="find-dentist-about-section">
               <div class="name">${result.name || 'Name: Not Supplied'}</div>
               <div class="company-name">${result.companyName || 'Company Name: Not Supplied'}</div>
               <div class="service">${appointmentTypes[result.serviceTypeId].subtypes[result.serviceId]}</div>
@@ -468,13 +473,18 @@
       this.setEventListeners()
       this.getDentists(null, {
         type: 'findDentists',
-        state: Number(this.$route.query.st),
-        appointmentTypeId: Number(this.$route.query.aTI),
-        appointmentSubtypeId: Number(this.$route.query.aSI),
-        budget: [Number(this.$route.query.bl), Number(this.$route.query.br)],
-        offset: Number(this.$route.query.o),
-        limit: Number(this.$route.query.l),
-        seed: Number(this.$route.query.sd),
+        requestParams: {
+          state: Number(this.$route.query.st),
+          appointmentTypeId: Number(this.$route.query.aTI),
+          appointmentSubtypeId: Number(this.$route.query.aSI),
+          budget: [Number(this.$route.query.bl), Number(this.$route.query.br)],
+          offset: Number(this.$route.query.o),
+          limit: Number(this.$route.query.l),
+          seed: Number(this.$route.query.sd)
+        },
+        managerIndex: 1, // which of the contract managers to use
+        methodName: 'findDentists',
+        contractIndexToUse: 0,
         callOnEach: 'getOfficial',
         callOnEachParams: dentistId => ({
           officialId: dentistId,
@@ -707,17 +717,17 @@
     border-radius: 6px;
   }
 
-  .about-section {
+  .find-dentist-about-section {
     width: 250px;
     height: 150px;
     display: inline-block;
     float: left;
   }
 
-  .about-section > div {
+  .find-dentist-about-section > div {
     display: block;
-    height: 20px;
-    line-height: 20px;
+    height: 20px !important;
+    line-height: 20px !important;
     font-size: 14px;
     text-align: left;
     width: 100%;

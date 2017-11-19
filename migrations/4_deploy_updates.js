@@ -1,9 +1,9 @@
 var contract = require('truffle-contract');
 var DBConfigObject = require('../build/contracts/DB.json');
 
-var ScanRequestWriter = artifacts.require("./odll/ScanRequestWriter.sol");
+var ScanApplicationWriter = artifacts.require("./odll/ScanApplicationWriter.sol");
 
-var TreatmentRequestWriter = artifacts.require("./odll/TreatmentRequestWriter.sol");
+var TreatmentApplicationWriter = artifacts.require("./odll/TreatmentApplicationWriter.sol");
 
 var DBContract = contract(DBConfigObject);
 DBContract.setProvider(web3.currentProvider);
@@ -14,7 +14,7 @@ var dbAddress = DBContract.deployed()
 });
 
 module.exports = function (deployer) {
-  deployer.deploy(ScanRequestWriter, dbAddress);
+  deployer.deploy(ScanApplicationWriter, dbAddress);
 
-  deployer.deploy(TreatmentRequestWriter, dbAddress);
+  deployer.deploy(TreatmentApplicationWriter, dbAddress);
 };

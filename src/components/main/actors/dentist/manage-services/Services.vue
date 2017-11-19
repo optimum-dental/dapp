@@ -256,13 +256,16 @@
       fetchServices (evt, offset = 0, seed = null, direction = 1, serviceTypeId = 1) {
         const fetchQuery = {
           type: serviceTypeId === 1 ? 'fetchScanServices' : 'fetchTreatmentServices',
-          callSmartContractWith: 'fetchServices',
+          requestParams: {
+            userId: this.user.coinbase,
+            serviceTypeId,
+            offset,
+            limit: this.perPage,
+            seed: seed || Math.random()
+          },
+          managerIndex: 1, // which of the contract managers to use
+          methodName: 'fetchServices',
           contractIndexToUse: 1,
-          userId: this.user.coinbase,
-          serviceTypeId,
-          offset,
-          limit: this.perPage,
-          seed: seed || Math.random(),
           callOnEach: 'getServiceDetail',
           callOnEachParams: serviceId => ({serviceTypeId, serviceId: serviceId.toNumber()})
         }
@@ -270,9 +273,9 @@
         this.$router.push({
           path: '/manage-services',
           query: {
-            o: fetchQuery.offset,
-            l: fetchQuery.limit,
-            sd: fetchQuery.seed,
+            o: fetchQuery.requestParams.offset,
+            l: fetchQuery.requestParams.limit,
+            sd: fetchQuery.requestParams.seed,
             sT: serviceTypeId
           }
         })
@@ -287,7 +290,7 @@
         return document.getElementById('fee').value
       },
       getServices (evt, fetchQuery) {
-        const serviceTypeId = fetchQuery.serviceTypeId
+        const serviceTypeId = fetchQuery.requestParams.serviceTypeId
         const resultSection = document.querySelector(`.${serviceTypeId === 1 ? 'scan-section' : 'treatment-section'}`)
         this.clearDOMElementChildren(resultSection)
         this.askUserToWaitWhileWeSearch(serviceTypeId)
@@ -418,13 +421,16 @@
       this.setEventListeners()
       this.getServices(null, {
         type: serviceTypeId === 1 ? 'fetchScanServices' : 'fetchTreatmentServices',
-        callSmartContractWith: 'fetchServices',
+        requestParams: {
+          userId: this.user.coinbase,
+          serviceTypeId,
+          offset: Number(this.$route.query.o || 0),
+          limit: Number(this.$route.query.l || this.perPage),
+          seed: Number(this.$route.query.sd || Math.random())
+        },
+        managerIndex: 1, // which of the contract managers to use
+        methodName: 'fetchServices',
         contractIndexToUse: 1,
-        userId: this.user.coinbase,
-        serviceTypeId,
-        offset: Number(this.$route.query.o || 0),
-        limit: Number(this.$route.query.l || this.perPage),
-        seed: Number(this.$route.query.sd || Math.random()),
         callOnEach: 'getServiceDetail',
         callOnEachParams: serviceId => ({serviceTypeId, serviceId: serviceId.toNumber()})
       })

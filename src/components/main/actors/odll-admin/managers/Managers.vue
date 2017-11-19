@@ -71,9 +71,14 @@
       fetchManagers (evt = null, offset = 0, seed = undefined, direction = 1) {
         const fetchQuery = {
           type: 'fetchManagers',
-          offset,
-          limit: this.perPage,
-          seed: seed || Math.random(),
+          requestParams: {
+            offset,
+            limit: this.perPage,
+            seed: seed || Math.random()
+          },
+          managerIndex: 1, // which of the contract managers to use
+          methodName: 'fetchManagers',
+          contractIndexToUse: 0,
           callOnEach: 'getOfficial',
           callOnEachParams: officialId => ({officialId})
         }
@@ -81,9 +86,9 @@
         this.$router.push({
           path: '/managers',
           query: {
-            o: fetchQuery.offset,
-            l: fetchQuery.limit,
-            sd: fetchQuery.seed
+            o: fetchQuery.requestParams.offset,
+            l: fetchQuery.requestParams.limit,
+            sd: fetchQuery.requestParams.seed
           }
         })
         const offsetData = this.$store.state.searchResult[fetchQuery.type].data[offset]
@@ -113,14 +118,7 @@
             contractIndexToUse: 0,
             managerIndex: 0,
             callback: (status = false) => {
-              this.getManagers(null, {
-                type: 'fetchManagers',
-                offset: this.currentOffset,
-                limit: Number(this.$route.query.l || this.perPage),
-                seed: this.$store.state.searchResult.fetchManagers.seed,
-                callOnEach: 'getOfficial',
-                callOnEachParams: officialId => ({officialId})
-              })
+              this.fetchManagers(evt, this.currentOffset, this.$store.state.searchResult['fetchManagers'].seed, 1)
               this.notify(status ? 'Manager Successfully added' : 'Unable to add Manager')
             }
           })
@@ -279,9 +277,14 @@
       this.setEventListeners()
       this.getManagers(null, {
         type: 'fetchManagers',
-        offset: Number(this.$route.query.o || 0),
-        limit: Number(this.$route.query.l || this.perPage),
-        seed: Number(this.$route.query.sd || Math.random()),
+        requestParams: {
+          offset: Number(this.$route.query.o || 0),
+          limit: Number(this.$route.query.l || this.perPage),
+          seed: Number(this.$route.query.sd || Math.random())
+        },
+        managerIndex: 1, // which of the contract managers to use
+        methodName: 'fetchManagers',
+        contractIndexToUse: 0,
         callOnEach: 'getOfficial',
         callOnEachParams: officialId => ({officialId})
       })

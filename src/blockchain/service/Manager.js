@@ -78,6 +78,31 @@ class Manager {
     })
   }
 
+  getRequestDetail (state = null, dataObject = {}) {
+    const {requestTypeId, requestId, dentistId} = dataObject
+    return blockchainManager.querySmartContract({
+      contractToUse: DB,
+      smartContractMethod: 'getEntityList',
+      smartContractMethodParams: (coinbase) => [serviceManager.requestRecordFields(state, dentistId, requestId), serviceManager.requestRecordFieldTypes(), {from: coinbase}],
+      state,
+      smartContractResolve: result => {
+        const dataObject = getObjectFromResponse(state, result, 1, serviceManager.requestKeys(), serviceManager.requestRecordFieldTypes())[0]
+        Object.assign(dataObject, {
+          serviceName: serviceTypes[requestTypeId].subtypes[dataObject.serviceId],
+          requestTypeId,
+          requestId,
+          dentistId
+        })
+        return dataObject
+      },
+      smartContractReject: (error) => ({
+        error,
+        isValid: true,
+        warningMessage: "We've encountered a problem fetching your service information from the blockchain. Please do try again in a few minutes."
+      })
+    })
+  }
+
   keys () {
     return [
       'serviceFee'
@@ -96,6 +121,39 @@ class Manager {
   recordFieldTypes () {
     // types: 1 => boolean, 2 => uint8, 3 => uint, 4 => address, 5 => bytes32, 7 => string
     return [3]
+  }
+
+  requestKeys () {
+    return [
+      'hasDentistApplied',
+      'status',
+      'patientId',
+      'serviceId',
+      'date',
+      'time',
+      'insurance',
+      'comment'
+    ]
+  }
+
+  requestRecordFields (state, dentistId, scanRequestId) {
+    dentistId = getSlicedAddressString(state, dentistId)
+    scanRequestId = getSlicedAddressString(state, getLeftPaddedNumber(state, scanRequestId, 1))
+    return [
+      getSoliditySha3ForId(state, 'dentist/scan-request', dentistId, scanRequestId),
+      getSoliditySha3ForId(state, 'scan-request/status', scanRequestId),
+      getSoliditySha3ForId(state, 'scan-request/patient', scanRequestId),
+      getSoliditySha3ForId(state, 'scan-request/scan-service', scanRequestId),
+      getSoliditySha3ForId(state, 'scan-request/appointment-date', scanRequestId),
+      getSoliditySha3ForId(state, 'scan-request/appointment-time', scanRequestId),
+      getSoliditySha3ForId(state, 'scan-request/appointment-insurance', scanRequestId),
+      getSoliditySha3ForId(state, 'scan-request/appointment-comment', scanRequestId)
+    ]
+  }
+
+  requestRecordFieldTypes () {
+    // types: 1 => boolean, 2 => uint8, 3 => uint, 4 => address, 5 => bytes32, 7 => string
+    return [1, 2, 4, 3, 5, 5, 7, 7]
   }
 }
 

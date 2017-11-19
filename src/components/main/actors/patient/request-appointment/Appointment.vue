@@ -260,7 +260,7 @@
       },
       writeScanRequest () {
         const appointmentDate = (+(this.scanDate)).toString()
-        const scanTime = Number(document.getElementById('scan-time').selectedIndex)
+        const scanTime = document.getElementById('scan-time').options[document.getElementById('scan-time').selectedIndex].value
         const scanAppointmentId = Number(document.getElementById('scan-appointment').selectedIndex)
         const scanInsuranceQuery = Number(document.getElementById('scan-insurance-query').selectedIndex)
         const scanInsurance = scanInsuranceQuery === 1 ? document.getElementById('scan-insurance').value : ''
@@ -277,12 +277,12 @@
           this.beginWait(document.querySelector('.wrapper'))
           this.$root.callToWriteData({
             requestParams: {
-              dentistId: this.official.coinbase,
-              appointmentDate,
-              scanTime,
+              dentistId: this.official.coinbase || '0x0',
               scanAppointmentId,
-              scanInsurance,
-              scanComment
+              appointmentDate: `b${appointmentDate}`,
+              scanTime: `b${scanTime}`,
+              scanInsurance: `b${scanInsurance}`,
+              scanComment: `b${scanComment}`
             },
             contractIndexToUse: 2,
             methodName: 'writeScanRequest',
