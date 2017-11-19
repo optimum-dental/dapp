@@ -11,7 +11,8 @@
       "Extraoral Radiographs",
       "Panoramic X-rays",
       "Cephalometric Projections",
-      "Cone-beam computed tomograph"
+      "Cone-beam computed tomograph",
+      "Computerized axial tomography"
     ]
   },
   {
@@ -19,7 +20,8 @@
     "subtypes": [
       "Treatment",
       "Teeth Whitening",
-      "Fluoride Treatment"
+      "Bonding",
+      "Filling"
     ]
   }
 ]
