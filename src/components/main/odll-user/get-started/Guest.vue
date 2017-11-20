@@ -63,7 +63,7 @@
           {
             id: 2,
             title: 'Register on Oral Data Link',
-            link: 'https://www.youtube.com/embed/aerf7R2KzIY'
+            link: 'https://www.youtube.com/embed/lwRQb9t3nIM'
           },
           {
             id: 3,
@@ -74,11 +74,6 @@
             id: 4,
             title: 'Find a dentist',
             link: 'https://www.youtube.com/embed/aerf7R2KzIY'
-          },
-          {
-            id: 5,
-            title: 'Register as a patient',
-            link: 'https://www.youtube.com/embed/lwRQb9t3nIM'
           }
         ]
       }
