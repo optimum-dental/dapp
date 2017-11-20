@@ -48,5 +48,6 @@ import UseApp from '../sections/UseApp'
 <style scoped>
   #body-template {
     width: 100%;
+    background: #ffffff;
   }
 </style>

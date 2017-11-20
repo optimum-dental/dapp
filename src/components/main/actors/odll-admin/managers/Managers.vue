@@ -200,12 +200,12 @@
         if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
         if (document.querySelector('.no-official')) document.querySelector('.no-official').remove()
         let waitOverlayDOMElement = this.createWaitOverlayDOMElement()
-        document.querySelector('.result-section').insertBefore(waitOverlayDOMElement, document.querySelector('.result'))
+        document.querySelector('.result-section').insertBefore(waitOverlayDOMElement, document.querySelector('.managers-result'))
       },
       informOfNoOfficial () {
         if (document.querySelector('.no-official')) document.querySelector('.no-official').remove()
         let noDentistDOMElement = this.createNoOfficialDOMElement()
-        document.querySelector('.result-section').insertBefore(noDentistDOMElement, document.querySelector('.result'))
+        document.querySelector('.result-section').insertBefore(noDentistDOMElement, document.querySelector('.managers-result'))
       },
       createWaitOverlayDOMElement () {
         const DOMELement = new DOMParser().parseFromString(`
@@ -230,7 +230,7 @@
       },
       createResultDOMElement (result) {
         const resultDOMElement = new DOMParser().parseFromString(`
-          <div class="result">
+          <div class="managers-result">
             <div class="gravatar-section"></div>
             <div class="about-section">
               <div class="name">${result.name || 'Name: Not Supplied'}</div>
@@ -479,7 +479,7 @@
     }
   }
 
-  .result {
+  .managers-result {
     width: 95%;
     border-bottom: 1px solid #a7a7a7;
     min-height: 180px;

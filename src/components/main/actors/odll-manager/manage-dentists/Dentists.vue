@@ -204,7 +204,7 @@
       informOfNoOfficial () {
         if (document.querySelector('.no-official')) document.querySelector('.no-official').remove()
         let noDentistDOMElement = this.createNoOfficialDOMElement()
-        document.querySelector('.result-section').insertBefore(noDentistDOMElement, document.querySelector('.result'))
+        document.querySelector('.result-section').insertBefore(noDentistDOMElement, document.querySelector('.dentists-result'))
       },
       createWaitOverlayDOMElement () {
         const DOMELement = new DOMParser().parseFromString(`
@@ -230,7 +230,7 @@
       createResultDOMElement (result) {
         const averageRatingDOMElement = this.createAverageRatingDOMElement(result.averageRating)
         const resultDOMElement = new DOMParser().parseFromString(`
-          <div class="result">
+          <div class="dentists-result">
             <div class="gravatar-section"></div>
             <div class="about-section">
               <div class="name">${result.name || 'Name: Not Supplied'}</div>
@@ -492,7 +492,7 @@
     }
   }
 
-  .result {
+  .dentists-result {
     width: 95%;
     border-bottom: 1px solid #a7a7a7;
     min-height: 180px;
