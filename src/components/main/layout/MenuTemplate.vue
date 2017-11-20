@@ -111,17 +111,16 @@
                 text: 'Request Appointment',
                 icon: '/static/images/calendar.png'
               },
-
               {
                 key: 'view-applications',
                 text: 'View Applications',
                 icon: '/static/images/file.png'
               },
-              {
-                key: 'notifications',
-                text: 'Notifications',
-                icon: '/static/images/notifications.png'
-              },
+              // {
+              //   key: 'notifications',
+              //   text: 'Notifications',
+              //   icon: '/static/images/notifications.png'
+              // },
               profile
             ]
         }
