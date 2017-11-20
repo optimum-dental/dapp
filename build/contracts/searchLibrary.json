@@ -31,7 +31,7 @@
       },
       {
         "attributes": {
-          "SourceUnit": 13211,
+          "SourceUnit": 13235,
           "absolutePath": "/Users/danielokwufulueze/dev/vue/apps/oraldatalink/contracts/lib/odll/utilities.sol",
           "file": "./utilities.sol",
           "scope": 2482,
@@ -198,7 +198,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "getAddressArray",
-                              "referencedDeclaration": 8961,
+                              "referencedDeclaration": 8985,
                               "type": "function (address,string memory,string memory) view returns (address[] memory)"
                             },
                             "children": [
@@ -208,7 +208,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 13210,
+                                  "referencedDeclaration": 13234,
                                   "type": "type(library utilities)",
                                   "value": "utilities"
                                 },
@@ -425,7 +425,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "getAddressArray",
-                              "referencedDeclaration": 8961,
+                              "referencedDeclaration": 8985,
                               "type": "function (address,string memory,string memory) view returns (address[] memory)"
                             },
                             "children": [
@@ -435,7 +435,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 13210,
+                                  "referencedDeclaration": 13234,
                                   "type": "type(library utilities)",
                                   "value": "utilities"
                                 },
@@ -766,7 +766,7 @@
                                       "isPure": false,
                                       "lValueRequested": false,
                                       "member_name": "getUIntValue",
-                                      "referencedDeclaration": 13486,
+                                      "referencedDeclaration": 13510,
                                       "type": "function (bytes32) view external returns (uint256)"
                                     },
                                     "children": [
@@ -796,7 +796,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 14102,
+                                              "referencedDeclaration": 14126,
                                               "type": "type(contract DB)",
                                               "value": "DB"
                                             },
@@ -862,7 +862,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 16896,
+                                          "referencedDeclaration": 16966,
                                           "type": "function () pure returns (bytes32)",
                                           "value": "keccak256"
                                         },
@@ -1023,7 +1023,7 @@
                                           "isPure": false,
                                           "lValueRequested": false,
                                           "member_name": "getUIntValue",
-                                          "referencedDeclaration": 13486,
+                                          "referencedDeclaration": 13510,
                                           "type": "function (bytes32) view external returns (uint256)"
                                         },
                                         "children": [
@@ -1053,7 +1053,7 @@
                                                   "overloadedDeclarations": [
                                                     null
                                                   ],
-                                                  "referencedDeclaration": 14102,
+                                                  "referencedDeclaration": 14126,
                                                   "type": "type(contract DB)",
                                                   "value": "DB"
                                                 },
@@ -1119,7 +1119,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 16896,
+                                              "referencedDeclaration": 16966,
                                               "type": "function () pure returns (bytes32)",
                                               "value": "keccak256"
                                             },
@@ -2503,7 +2503,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "take",
-                                  "referencedDeclaration": 12393,
+                                  "referencedDeclaration": 12417,
                                   "type": "function (uint256,address[] memory) pure returns (address[] memory)"
                                 },
                                 "children": [
@@ -2513,7 +2513,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 13210,
+                                      "referencedDeclaration": 13234,
                                       "type": "type(library utilities)",
                                       "value": "utilities"
                                     },
@@ -3589,7 +3589,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "take",
-                                  "referencedDeclaration": 12393,
+                                  "referencedDeclaration": 12417,
                                   "type": "function (uint256,address[] memory) pure returns (address[] memory)"
                                 },
                                 "children": [
@@ -3599,7 +3599,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 13210,
+                                      "referencedDeclaration": 13234,
                                       "type": "type(library utilities)",
                                       "value": "utilities"
                                     },
@@ -3916,7 +3916,7 @@
                                       "isPure": false,
                                       "lValueRequested": false,
                                       "member_name": "getRemovableIdArrayAddressItems",
-                                      "referencedDeclaration": 10728,
+                                      "referencedDeclaration": 10752,
                                       "type": "function (address,uint256,string memory,string memory,string memory) view returns (address[] memory)"
                                     },
                                     "children": [
@@ -3926,7 +3926,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 13210,
+                                          "referencedDeclaration": 13234,
                                           "type": "type(library utilities)",
                                           "value": "utilities"
                                         },
@@ -4140,7 +4140,7 @@
                                           "isPure": false,
                                           "lValueRequested": false,
                                           "member_name": "getRemovableIdArrayAddressItems",
-                                          "referencedDeclaration": 10728,
+                                          "referencedDeclaration": 10752,
                                           "type": "function (address,uint256,string memory,string memory,string memory) view returns (address[] memory)"
                                         },
                                         "children": [
@@ -4150,7 +4150,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 13210,
+                                              "referencedDeclaration": 13234,
                                               "type": "type(library utilities)",
                                               "value": "utilities"
                                             },
@@ -4528,7 +4528,7 @@
                                       "isPure": false,
                                       "lValueRequested": false,
                                       "member_name": "getRemovableIdArrayItems",
-                                      "referencedDeclaration": 10322,
+                                      "referencedDeclaration": 10346,
                                       "type": "function (address,address,string memory,string memory,string memory) view returns (uint256[] memory)"
                                     },
                                     "children": [
@@ -4538,7 +4538,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 13210,
+                                          "referencedDeclaration": 13234,
                                           "type": "type(library utilities)",
                                           "value": "utilities"
                                         },
@@ -4752,7 +4752,7 @@
                                           "isPure": false,
                                           "lValueRequested": false,
                                           "member_name": "getRemovableIdArrayItems",
-                                          "referencedDeclaration": 10322,
+                                          "referencedDeclaration": 10346,
                                           "type": "function (address,address,string memory,string memory,string memory) view returns (uint256[] memory)"
                                         },
                                         "children": [
@@ -4762,7 +4762,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 13210,
+                                              "referencedDeclaration": 13234,
                                               "type": "type(library utilities)",
                                               "value": "utilities"
                                             },
@@ -5878,7 +5878,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "getUIntValue",
-                                  "referencedDeclaration": 13486,
+                                  "referencedDeclaration": 13510,
                                   "type": "function (bytes32) view external returns (uint256)"
                                 },
                                 "children": [
@@ -5908,7 +5908,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 14102,
+                                          "referencedDeclaration": 14126,
                                           "type": "type(contract DB)",
                                           "value": "DB"
                                         },
@@ -5970,7 +5970,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 16896,
+                                      "referencedDeclaration": 16966,
                                       "type": "function () pure returns (bytes32)",
                                       "value": "keccak256"
                                     },
@@ -6332,7 +6332,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "getUIntValue",
-                                  "referencedDeclaration": 13486,
+                                  "referencedDeclaration": 13510,
                                   "type": "function (bytes32) view external returns (uint256)"
                                 },
                                 "children": [
@@ -6362,7 +6362,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 14102,
+                                          "referencedDeclaration": 14126,
                                           "type": "type(contract DB)",
                                           "value": "DB"
                                         },
@@ -6424,7 +6424,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 16896,
+                                      "referencedDeclaration": 16966,
                                       "type": "function () pure returns (bytes32)",
                                       "value": "keccak256"
                                     },
@@ -6681,7 +6681,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "getIdArray",
-                                  "referencedDeclaration": 9418,
+                                  "referencedDeclaration": 9442,
                                   "type": "function (address,address,string memory,string memory) view returns (uint256[] memory)"
                                 },
                                 "children": [
@@ -6691,7 +6691,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 13210,
+                                      "referencedDeclaration": 13234,
                                       "type": "type(library utilities)",
                                       "value": "utilities"
                                     },
@@ -6976,7 +6976,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "getIdArray",
-                              "referencedDeclaration": 9418,
+                              "referencedDeclaration": 9442,
                               "type": "function (address,address,string memory,string memory) view returns (uint256[] memory)"
                             },
                             "children": [
@@ -6986,7 +6986,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 13210,
+                                  "referencedDeclaration": 13234,
                                   "type": "type(library utilities)",
                                   "value": "utilities"
                                 },
@@ -7475,7 +7475,7 @@
                                       "isPure": false,
                                       "lValueRequested": false,
                                       "member_name": "getBooleanValue",
-                                      "referencedDeclaration": 13762,
+                                      "referencedDeclaration": 13786,
                                       "type": "function (bytes32) view external returns (bool)"
                                     },
                                     "children": [
@@ -7505,7 +7505,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 14102,
+                                              "referencedDeclaration": 14126,
                                               "type": "type(contract DB)",
                                               "value": "DB"
                                             },
@@ -7567,7 +7567,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 16896,
+                                          "referencedDeclaration": 16966,
                                           "type": "function () pure returns (bytes32)",
                                           "value": "keccak256"
                                         },
@@ -7873,7 +7873,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "take",
-                                  "referencedDeclaration": 12293,
+                                  "referencedDeclaration": 12317,
                                   "type": "function (uint256,uint256[] memory) pure returns (uint256[] memory)"
                                 },
                                 "children": [
@@ -7883,7 +7883,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 13210,
+                                      "referencedDeclaration": 13234,
                                       "type": "type(library utilities)",
                                       "value": "utilities"
                                     },
@@ -8137,7 +8137,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "getIdArray",
-                                  "referencedDeclaration": 9418,
+                                  "referencedDeclaration": 9442,
                                   "type": "function (address,address,string memory,string memory) view returns (uint256[] memory)"
                                 },
                                 "children": [
@@ -8147,7 +8147,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 13210,
+                                      "referencedDeclaration": 13234,
                                       "type": "type(library utilities)",
                                       "value": "utilities"
                                     },
@@ -8402,7 +8402,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "getArrayItems",
-                              "referencedDeclaration": 8902,
+                              "referencedDeclaration": 8926,
                               "type": "function (address,string memory,string memory) view returns (uint256[] memory)"
                             },
                             "children": [
@@ -8412,7 +8412,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 13210,
+                                  "referencedDeclaration": 13234,
                                   "type": "type(library utilities)",
                                   "value": "utilities"
                                 },
@@ -8887,7 +8887,7 @@
                                       "isPure": false,
                                       "lValueRequested": false,
                                       "member_name": "getBooleanValue",
-                                      "referencedDeclaration": 13762,
+                                      "referencedDeclaration": 13786,
                                       "type": "function (bytes32) view external returns (bool)"
                                     },
                                     "children": [
@@ -8917,7 +8917,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 14102,
+                                              "referencedDeclaration": 14126,
                                               "type": "type(contract DB)",
                                               "value": "DB"
                                             },
@@ -8975,7 +8975,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 16896,
+                                          "referencedDeclaration": 16966,
                                           "type": "function () pure returns (bytes32)",
                                           "value": "keccak256"
                                         },
@@ -9238,7 +9238,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "take",
-                                  "referencedDeclaration": 12293,
+                                  "referencedDeclaration": 12317,
                                   "type": "function (uint256,uint256[] memory) pure returns (uint256[] memory)"
                                 },
                                 "children": [
@@ -9248,7 +9248,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 13210,
+                                      "referencedDeclaration": 13234,
                                       "type": "type(library utilities)",
                                       "value": "utilities"
                                     },
@@ -9502,7 +9502,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "getIdArray",
-                                  "referencedDeclaration": 9418,
+                                  "referencedDeclaration": 9442,
                                   "type": "function (address,address,string memory,string memory) view returns (uint256[] memory)"
                                 },
                                 "children": [
@@ -9512,7 +9512,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 13210,
+                                      "referencedDeclaration": 13234,
                                       "type": "type(library utilities)",
                                       "value": "utilities"
                                     },
@@ -9797,7 +9797,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "getIdArray",
-                              "referencedDeclaration": 9418,
+                              "referencedDeclaration": 9442,
                               "type": "function (address,address,string memory,string memory) view returns (uint256[] memory)"
                             },
                             "children": [
@@ -9807,7 +9807,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 13210,
+                                  "referencedDeclaration": 13234,
                                   "type": "type(library utilities)",
                                   "value": "utilities"
                                 },
@@ -10296,7 +10296,7 @@
                                       "isPure": false,
                                       "lValueRequested": false,
                                       "member_name": "getBooleanValue",
-                                      "referencedDeclaration": 13762,
+                                      "referencedDeclaration": 13786,
                                       "type": "function (bytes32) view external returns (bool)"
                                     },
                                     "children": [
@@ -10326,7 +10326,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 14102,
+                                              "referencedDeclaration": 14126,
                                               "type": "type(contract DB)",
                                               "value": "DB"
                                             },
@@ -10384,7 +10384,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 16896,
+                                          "referencedDeclaration": 16966,
                                           "type": "function () pure returns (bytes32)",
                                           "value": "keccak256"
                                         },
@@ -10647,7 +10647,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "take",
-                                  "referencedDeclaration": 12293,
+                                  "referencedDeclaration": 12317,
                                   "type": "function (uint256,uint256[] memory) pure returns (uint256[] memory)"
                                 },
                                 "children": [
@@ -10657,7 +10657,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 13210,
+                                      "referencedDeclaration": 13234,
                                       "type": "type(library utilities)",
                                       "value": "utilities"
                                     },
@@ -10911,7 +10911,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "getIdArray",
-                                  "referencedDeclaration": 9418,
+                                  "referencedDeclaration": 9442,
                                   "type": "function (address,address,string memory,string memory) view returns (uint256[] memory)"
                                 },
                                 "children": [
@@ -10921,7 +10921,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 13210,
+                                      "referencedDeclaration": 13234,
                                       "type": "type(library utilities)",
                                       "value": "utilities"
                                     },
@@ -11209,7 +11209,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "getIdArray",
-                                  "referencedDeclaration": 9418,
+                                  "referencedDeclaration": 9442,
                                   "type": "function (address,address,string memory,string memory) view returns (uint256[] memory)"
                                 },
                                 "children": [
@@ -11219,7 +11219,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 13210,
+                                      "referencedDeclaration": 13234,
                                       "type": "type(library utilities)",
                                       "value": "utilities"
                                     },
@@ -11477,7 +11477,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "getArrayItems",
-                                  "referencedDeclaration": 8902,
+                                  "referencedDeclaration": 8926,
                                   "type": "function (address,string memory,string memory) view returns (uint256[] memory)"
                                 },
                                 "children": [
@@ -11487,7 +11487,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 13210,
+                                      "referencedDeclaration": 13234,
                                       "type": "type(library utilities)",
                                       "value": "utilities"
                                     },
@@ -11761,7 +11761,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "getIdArray",
-                                  "referencedDeclaration": 9418,
+                                  "referencedDeclaration": 9442,
                                   "type": "function (address,address,string memory,string memory) view returns (uint256[] memory)"
                                 },
                                 "children": [
@@ -11771,7 +11771,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 13210,
+                                      "referencedDeclaration": 13234,
                                       "type": "type(library utilities)",
                                       "value": "utilities"
                                     },
@@ -12059,7 +12059,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "getIdArray",
-                                  "referencedDeclaration": 9418,
+                                  "referencedDeclaration": 9442,
                                   "type": "function (address,address,string memory,string memory) view returns (uint256[] memory)"
                                 },
                                 "children": [
@@ -12069,7 +12069,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 13210,
+                                      "referencedDeclaration": 13234,
                                       "type": "type(library utilities)",
                                       "value": "utilities"
                                     },
@@ -12185,5 +12185,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-11-19T11:48:43.484Z"
+  "updatedAt": "2017-11-20T09:34:51.826Z"
 }

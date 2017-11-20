@@ -20,7 +20,7 @@ contract TreatmentApplicationWriter is Restrictor {
   {
     userManager.applyToTreat(dbAddress, msg.sender, patientId, treatmentRequestId, quote, comment);
   }
-
+  
   function cancelTreatmentApplication (
     address patientId,
     uint treatmentApplicationId
@@ -28,22 +28,6 @@ contract TreatmentApplicationWriter is Restrictor {
     external
   {
     userManager.cancelTreatmentApplication(dbAddress, msg.sender, patientId, treatmentApplicationId);
-  }
-
-  function acceptTreatmentApplication (
-    address dentistId,
-    uint treatmentApplicationId,
-    uint quote
-  )
-    payable
-    external
-  {
-    if (msg.value < quote) {
-      msg.sender.transfer(msg.value);
-      return;
-    }
-
-    userManager.acceptTreatmentApplication(dbAddress, dentistId, msg.sender, treatmentApplicationId, msg.value, quote);
   }
 
   function cancelTreatment (

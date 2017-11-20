@@ -29,21 +29,4 @@ contract ScanApplicationWriter is Restrictor {
   {
     userManager.cancelScanApplication(dbAddress, msg.sender, patientId, scanApplicationId);
   }
-
-  function acceptScanApplication (
-    address dentistId,
-    uint scanApplicationId,
-    uint quote
-  )
-    external
-    payable
-    onlyPermittedSmartContract
-  {
-    if (msg.value < quote) {
-      msg.sender.transfer(msg.value);
-      return;
-    }
-
-    userManager.acceptScanApplication(dbAddress, dentistId, msg.sender, scanApplicationId, msg.value, quote);
-  }
 }

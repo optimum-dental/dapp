@@ -6,10 +6,12 @@ import ServiceReader from '../../../build/contracts/ServiceReader.json'
 import ScanRequestWriter from '../../../build/contracts/ScanRequestWriter.json'
 import ScanRequestReader from '../../../build/contracts/ScanRequestReader.json'
 import ScanApplicationWriter from '../../../build/contracts/ScanApplicationWriter.json'
+import ScanApplicationWriter2 from '../../../build/contracts/ScanApplicationWriter2.json'
 import ScanApplicationReader from '../../../build/contracts/ScanApplicationReader.json'
 import TreatmentRequestWriter from '../../../build/contracts/TreatmentRequestWriter.json'
 import TreatmentRequestReader from '../../../build/contracts/TreatmentRequestReader.json'
 import TreatmentApplicationWriter from '../../../build/contracts/TreatmentApplicationWriter.json'
+import TreatmentApplicationWriter2 from '../../../build/contracts/TreatmentApplicationWriter2.json'
 import TreatmentApplicationReader from '../../../build/contracts/TreatmentApplicationReader.json'
 import blockchainManager from '../BlockchainManager'
 import {getObjectFromResponse, getSlicedAddressString, getSoliditySha3ForId} from '../utilities'
@@ -32,10 +34,12 @@ class Manager {
       ScanRequestWriter,
       ScanRequestReader,
       ScanApplicationWriter,
+      ScanApplicationWriter2,
       ScanApplicationReader,
       TreatmentRequestWriter,
       TreatmentRequestReader,
       TreatmentApplicationWriter,
+      TreatmentApplicationWriter2,
       TreatmentApplicationReader
     ]
   }

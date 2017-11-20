@@ -32,7 +32,7 @@ module.exports = {
       network_id: 3,    // Official ropsten network id
       provider: engine, // Use our custom provider
       from: address,     // Use the address we derived
-      gas: 5700000
+      gas: 4700000
     },
     // development: {
     //   host: "localhost",
@@ -45,9 +45,7 @@ module.exports = {
       host: "localhost",
       port: 8545,
       network_id: "*",
-      from: "0xf378d4b0ef447b051fad06133615b33649423c0a",
-      gas: 5700000,
-      gasPrice: 2000000
+      from: "0xf378d4b0ef447b051fad06133615b33649423c0a"
     }
   },
   rpc: {
