@@ -11,8 +11,9 @@
       </section>
       <section class='footer'>
         <div class='social-links'>
-          <a href='http://www.facebook.com' class='item facebook'></a>
-          <a href='http://www.twitter.com' class='item twitter'></a>
+          <a href="http://www.facebook.com" target="_blank" class="item facebook"></a>
+          <a href="https://twitter.com/OralDataLink" target="_blank" class="item twitter"></a>
+          <a href="https://www.instagram.com/oraldatalink/" target="_blank" class="item instagram"></a>
         </div>
         <a href='#' class='help-link'>Help</a>
       </section>
@@ -157,6 +158,10 @@
 
   .social-links .twitter {
     background: url(/static/images/twitter.png) no-repeat;
+  }
+
+  .social-links .instagram {
+    background: url(/static/images/instagram.png) no-repeat;
   }
 
   .help-link {

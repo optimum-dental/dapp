@@ -14,8 +14,9 @@
       </div>
 
       <div class="social">
-        <a href="https://facebook.com/oral-data-link" class="facebook"></a>
-        <a href="https://twitter.com/oral-data-link" class="twitter"></a>
+        <a href="https://facebook.com/oral-data-link" target="_blank" class="facebook"></a>
+        <a href="https://twitter.com/OralDataLink" target="_blank" class="twitter"></a>
+        <a href="https://www.instagram.com/oraldatalink/" target="_blank" class="instagram"></a>
       </div>
     </div>
   </div>
@@ -90,6 +91,15 @@
     margin: 0px 0px 0px 30px;
     height: 20px;
     background: url('/static/images/twitter.png') no-repeat;
+    background-size: contain;
+  }
+
+  .instagram {
+    display: inline-block;
+    width: 20px;
+    margin: 0px 0px 0px 30px;
+    height: 20px;
+    background: url('/static/images/instagram.png') no-repeat;
     background-size: contain;
   }
 </style>
