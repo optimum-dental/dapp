@@ -395,6 +395,7 @@
   .result-section {
     position: relative;
     min-height: 300px;
+    margin-top: 20px;
   }
 
   .navigation {

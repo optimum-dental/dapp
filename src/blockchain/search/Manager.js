@@ -51,6 +51,7 @@ class Manager {
       },
       state,
       smartContractResolve: (results) => {
+        console.log(results)
         if (callOnEach && callOnEachParams) {
           const resultData = results[1].map((resultId) => {
             return new Promise(function (resolve, reject) {

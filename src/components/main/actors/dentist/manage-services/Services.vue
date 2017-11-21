@@ -380,8 +380,10 @@
           <div class="result">
             <div class="service-name">${result.serviceName}</div>
             <div class="service-fee">$ ${result.serviceFee}</div>
-            <input type="button" value="Edit" class="button edit-service" data-params="${result.serviceTypeId}%${result.serviceId}%${result.serviceFee}">
-            <input type="button" value="Delete" class="button delete-service" data-params="${result.serviceTypeId}%${result.serviceId}%${result.serviceFee}">
+            <div class="action-buttons">
+              <input type="button" value="Edit" class="button edit-service" data-params="${result.serviceTypeId}%${result.serviceId}%${result.serviceFee}">
+              <input type="button" value="Delete" class="button delete-service" data-params="${result.serviceTypeId}%${result.serviceId}%${result.serviceFee}">
+            </div>
           </div>
         `, 'text/html').body.firstChild
         return resultDOMElement
@@ -492,8 +494,7 @@
 
   .query-section {
     width: 100%;
-    height: 70px;
-    margin-bottom: 30px;
+    height: 65px;
     background: #ffffff;
     display: flex;
     flex-direction: row;
@@ -504,7 +505,7 @@
     height: 60px;
     display: inline-block;
     /*margin-right: 10px;*/
-    margin-bottom: 30px;
+    margin-bottom: 0px;
     justify-content: center;
     min-width: 33%;
   }
@@ -532,7 +533,7 @@
 
   .submit {
     position: relative;
-    top: -35px;
+    top: 0px;
     width: 100%;
     height: 30px;
     text-align: right;
@@ -555,6 +556,7 @@
   .result-section {
     position: relative;
     min-height: 300px;
+    margin-top: 20px;
   }
 
   .trigger-section {

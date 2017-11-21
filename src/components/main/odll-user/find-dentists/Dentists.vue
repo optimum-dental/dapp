@@ -384,12 +384,12 @@
         if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
         if (document.querySelector('.no-dentist')) document.querySelector('.no-dentist').remove()
         let waitOverlayDOMElement = this.createWaitOverlayDOMElement()
-        document.querySelector('.result-section').insertBefore(waitOverlayDOMElement, document.querySelector('.result'))
+        document.querySelector('.result-section').insertBefore(waitOverlayDOMElement, document.querySelector('.find-dentists-result'))
       },
       informOfNoOfficial () {
         if (document.querySelector('.no-dentist')) document.querySelector('.no-dentist').remove()
         let noDentistDOMElement = this.createNoDentistDOMElement()
-        document.querySelector('.result-section').insertBefore(noDentistDOMElement, document.querySelector('.result'))
+        document.querySelector('.result-section').insertBefore(noDentistDOMElement, document.querySelector('.find-dentists-result'))
       },
       createWaitOverlayDOMElement () {
         const DOMELement = new DOMParser().parseFromString(`
@@ -415,7 +415,7 @@
       createResultDOMElement (result) {
         const averageRatingDOMElement = this.createAverageRatingDOMElement(result.averageRating, result.SN)
         const resultDOMElement = new DOMParser().parseFromString(`
-          <div class="result">
+          <div class="find-dentists-result">
             <div class="gravatar-section"></div>
             <div class="find-dentist-about-section">
               <div class="name">${result.name || 'Name: Not Supplied'}</div>
@@ -536,8 +536,7 @@
 
   .query-section {
     width: 100%;
-    height: 70px;
-    margin-bottom: 30px;
+    height: 65px;
     background: #ffffff;
     display: flex;
     flex-direction: row;
@@ -559,7 +558,7 @@
     height: 60px;
     display: inline-block;
     /*margin-right: 10px;*/
-    margin-bottom: 30px;
+    margin-bottom: 0px;
     justify-content: center;
     min-width: 24%;
   }
@@ -587,7 +586,7 @@
 
   .submit {
     position: relative;
-    top: -35px;
+    top: 0px;
     width: 100%;
     height: 30px;
   }
@@ -609,6 +608,7 @@
   .result-section {
     position: relative;
     min-height: 300px;
+    margin-top: 20px;
   }
 
   .navigation {
@@ -693,7 +693,7 @@
     }
   }
 
-  .result {
+  .find-dentists-result {
     width: 95%;
     border-bottom: 1px solid #a7a7a7;
     min-height: 180px;

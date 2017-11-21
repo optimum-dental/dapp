@@ -183,13 +183,13 @@ library searchLibrary {
       uint[] scanRequestsIds
     )
   {
-    var allScanRequestsIds = utilities.getArrayItems(dbAddress, "patient/scan-request", "patient/scan-requests-count");
+    var allScanRequestsIds = utilities.getArrayItems(dbAddress, "scan-request", "scan-requests-count");
     var count = allScanRequestsIds.length;
     scanRequestsIds = new uint[](count);
 
     uint j = 0;
     for (uint i = 0; i < count; i++) {
-      if (DB(dbAddress).getBooleanValue(keccak256("scan-request/is-general?"))) {
+      if (DB(dbAddress).getBooleanValue(keccak256("scan-request/is-general?", allScanRequestsIds[i]))) {
         scanRequestsIds[j] = allScanRequestsIds[i];
         j++;
       }
@@ -227,9 +227,8 @@ library searchLibrary {
 
     uint j = 0;
     for (uint i = 0; i < count; i++) {
-      if (DB(dbAddress).getBooleanValue(keccak256("scan-request/is-accepted?"))) {
+      if (DB(dbAddress).getBooleanValue(keccak256("scan-request/is-accepted?", allScanRequestsIds[i]))) {
         scanRequestsIds[j] = allScanRequestsIds[i];
-
         j++;
       }
     }
@@ -272,7 +271,7 @@ library searchLibrary {
       uint[] treatmentRequestsIds
     )
   {
-    treatmentRequestsIds = utilities.getArrayItems(dbAddress, "patient/treatment-request", "patient/treatment-requests-count");
+    treatmentRequestsIds = utilities.getArrayItems(dbAddress, "treatment-request", "treatment-requests-count");
   }
 
   function getTreatmentApplicationsForPatient (
