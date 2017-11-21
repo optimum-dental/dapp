@@ -163,7 +163,7 @@ new Vue({
     callToDeleteService (payload) {
       const blockchainParams = Object.assign({}, payload)
       delete blockchainParams.callback
-      userManager.deleteService(this.$store.state, blockchainParams)
+      serviceManager.deleteService(this.$store.state, blockchainParams)
       .then((dataObject) => {
         if (payload.callback) payload.callback(dataObject)
       })

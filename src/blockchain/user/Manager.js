@@ -92,16 +92,6 @@ class Manager {
     })
   }
 
-  deleteService (state = null, data = {}) {
-    return blockchainManager.querySmartContract({
-      smartContractMethod: 'removeDentistFromService',
-      smartContractMethodParams: (coinbase) => [...(Object.values(data.serviceObject)), {from: coinbase}],
-      state,
-      smartContractResolve: result => data,
-      smartContractReject: error => error
-    })
-  }
-
   acceptScanApplication (state = null, data = {}) {
     const quoteInEther = fetch(EXCHANGE_RATE_API)
     .then(response => response.json())

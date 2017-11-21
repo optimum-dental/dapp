@@ -58,6 +58,17 @@ class Manager {
     })
   }
 
+  deleteService (state = null, data = {}) {
+    return blockchainManager.querySmartContract({
+      contractToUse: ServiceWriter,
+      smartContractMethod: 'removeDentistFromService',
+      smartContractMethodParams: (coinbase) => [...(Object.values(data.serviceObject)), {from: coinbase}],
+      state,
+      smartContractResolve: result => data,
+      smartContractReject: error => error
+    })
+  }
+
   getServiceDetail (state = null, dataObject = {}) {
     const {serviceTypeId, serviceId} = dataObject
     return blockchainManager.querySmartContract({

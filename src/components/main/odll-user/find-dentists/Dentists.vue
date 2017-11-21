@@ -50,8 +50,8 @@
 
 <script>
   const budgetMin = 0
-  const budgetMax = 2000
-  const budgetPivot = 200
+  const budgetMax = 5000
+  const budgetPivot = 500
   export default {
     computed: {
       user () {
@@ -191,8 +191,8 @@
       populateBudgets () {
         const budgetRangeElement = document.getElementById('budget-range')
         const budgetRange = [Number(this.$route.query.bl), Number(this.$route.query.br)]
-        const numberOfOptions = 10
-        let budgetRangeText = 'All Prices [$0 - $2000]'
+        const numberOfOptions = budgetMax / 500
+        let budgetRangeText = `All Prices [$${budgetMin} - $${budgetMax}]`
         let optionElement = document.createElement('option')
         optionElement.text = budgetRangeText
         if (budgetRangeElement) budgetRangeElement.appendChild(optionElement)

@@ -35,7 +35,7 @@
 <script type="text/javascript">
   require('../../../../../static/css/nouislider.css')
   const budgetMin = 0
-  const budgetMax = 2000
+  const budgetMax = 5000
   let budgetRangeArray = [budgetMin, budgetMax]
 
   export default {
