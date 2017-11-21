@@ -559,6 +559,7 @@
     display: inline-block;
     /*margin-right: 10px;*/
     margin-bottom: 0px;
+    margin-top: 0px;
     justify-content: center;
     min-width: 24%;
   }

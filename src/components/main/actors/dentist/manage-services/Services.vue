@@ -3,7 +3,7 @@
     <div id="services">
       <div class="title">Manage Services</div>
 
-      <div class="query-section">
+      <div class="service-query-section">
         <div class="entry-item">
           <div class="entry-param">Service Type</div>
           <div class="entry-value">
@@ -492,7 +492,7 @@
     margin-bottom: 10px;
   }
 
-  .query-section {
+  .service-query-section {
     width: 100%;
     height: 65px;
     background: #ffffff;
@@ -506,6 +506,7 @@
     display: inline-block;
     /*margin-right: 10px;*/
     margin-bottom: 0px;
+    margin-top: 0px;
     justify-content: center;
     min-width: 33%;
   }
