@@ -632,7 +632,12 @@
     background: #29aae1;
     cursor: pointer;
     width: 80px;
+    margin-left: 0px;
+    margin-top: 10px;
+    height: 20px;
+    line-height: 0px;
     outline: none;
+    color: #ffffff;
   }
 
   .modal {
