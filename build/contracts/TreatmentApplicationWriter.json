@@ -1588,8 +1588,13 @@
       "events": {},
       "links": {},
       "address": "0x8c48092ce22636dd94654830a41022f7f09343dc"
+    },
+    "666": {
+      "events": {},
+      "links": {},
+      "address": "0x70b9e2426d5b06e107075d2ad722f13b47616436"
     }
   },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-11-21T10:48:56.439Z"
+  "updatedAt": "2017-11-21T21:46:52.921Z"
 }

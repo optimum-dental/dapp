@@ -142,7 +142,7 @@
             comment
           },
           managerIndex: 2, // which of the contract managers to use
-          contractIndexToUse: 4,
+          contractIndexToUse: 5,
           methodName: 'applyToScan',
           callback: (status) => {
             this.endWait(document.querySelector('.wrapper'))
@@ -159,7 +159,7 @@
           type: 'fetchScanRequests',
           requestParams: this.getSmartContractMethodParams(offset, this.perPage, seed || Math.random())[requestTypeIndex],
           managerIndex: 1, // which of the contract managers to use
-          contractIndexToUse: 1,
+          contractIndexToUse: requestTypeIndex === 0 ? 3 : 2,
           methodName: this.getSmartContractMethodName()[requestTypeIndex],
           callOnEach: 'getRequestDetail',
           callOnEachParams: requestId => ({requestTypeId: 1, requestId: requestId.toNumber(), dentistId: this.user.coinbase})
@@ -196,7 +196,6 @@
             seed
           },
           {
-            dbAddress: '0xc5668d26804abff30ca97dcf0eb4b14be11ab474',
             userId: this.user.coinbase,
             offset,
             limit,
@@ -225,7 +224,7 @@
             }
 
             if (result) {
-              this.appendResult(result)
+              if (!result.hasDentistApplied) this.appendResult(result)
             } else {
               this.informOfNoRequest()
             }
@@ -283,10 +282,16 @@
         return DOMELement.body.firstChild
       },
       createNoRequestDOMElement () {
+        const requestTypeIndex = Number(this.$route.query.rTI || 0)
+        const message = [
+          'It appears patients have not made any Scan request for now.',
+          'It appears you have no direct Scan request from any patient for now.',
+          'It appears you haven\'t accepted any Scan request for now.'
+        ]
         const DOMELement = new DOMParser().parseFromString(`
           <div class="no-request">
             <div class="no-request-message">
-              It appears patients have not made any Scan request for now.
+              ${message[requestTypeIndex]}
             </div>
           </div>
         `, 'text/html')
@@ -343,7 +348,7 @@
         type: 'fetchScanRequests',
         requestParams: this.getSmartContractMethodParams(Number(this.$route.query.o || 0), Number(this.$route.query.l || this.perPage), Number(this.$route.query.sd || Math.random()))[requestTypeIndex],
         managerIndex: 1, // which of the contract managers to use
-        contractIndexToUse: 1,
+        contractIndexToUse: requestTypeIndex === 0 ? 3 : 2,
         methodName: this.getSmartContractMethodName()[requestTypeIndex],
         callOnEach: 'getRequestDetail',
         callOnEachParams: requestId => ({requestTypeId: 1, requestId: requestId.toNumber(), dentistId: this.user.coinbase})

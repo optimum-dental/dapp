@@ -5,11 +5,13 @@ import ServiceWriter from '../../../build/contracts/ServiceWriter.json'
 import ServiceReader from '../../../build/contracts/ServiceReader.json'
 import ScanRequestWriter from '../../../build/contracts/ScanRequestWriter.json'
 import ScanRequestReader from '../../../build/contracts/ScanRequestReader.json'
+import ScanRequestReader2 from '../../../build/contracts/ScanRequestReader2.json'
 import ScanApplicationWriter from '../../../build/contracts/ScanApplicationWriter.json'
 import ScanApplicationWriter2 from '../../../build/contracts/ScanApplicationWriter2.json'
 import ScanApplicationReader from '../../../build/contracts/ScanApplicationReader.json'
 import TreatmentRequestWriter from '../../../build/contracts/TreatmentRequestWriter.json'
 import TreatmentRequestReader from '../../../build/contracts/TreatmentRequestReader.json'
+import TreatmentRequestReader2 from '../../../build/contracts/TreatmentRequestReader2.json'
 import TreatmentApplicationWriter from '../../../build/contracts/TreatmentApplicationWriter.json'
 import TreatmentApplicationWriter2 from '../../../build/contracts/TreatmentApplicationWriter2.json'
 import TreatmentApplicationReader from '../../../build/contracts/TreatmentApplicationReader.json'
@@ -33,11 +35,13 @@ class Manager {
       ServiceReader,
       ScanRequestWriter,
       ScanRequestReader,
+      ScanRequestReader2,
       ScanApplicationWriter,
       ScanApplicationWriter2,
       ScanApplicationReader,
       TreatmentRequestWriter,
       TreatmentRequestReader,
+      TreatmentRequestReader2,
       TreatmentApplicationWriter,
       TreatmentApplicationWriter2,
       TreatmentApplicationReader

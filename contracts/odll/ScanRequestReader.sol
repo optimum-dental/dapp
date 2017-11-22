@@ -42,21 +42,6 @@ contract ScanRequestReader is Restrictor {
     return userManager.fetchAcceptedScanRequestsForPatient(dbAddress, patientId, offset, limit, seed);
   }
 
-  function fetchAllScanRequests (
-    uint offset, // starting from offset: 0-based
-    uint limit, // not more than limit
-    uint seed // seed value to give the illusion of randomisation
-  )
-    external
-    view
-    returns (
-      uint,
-      uint[]
-    )
-  {
-    return userManager.fetchAllScanRequests(dbAddress, offset, limit, seed);
-  }
-
   function fetchDirectScanRequestsForDentist (
     address dentistId,
     uint offset, // starting from offset: 0-based

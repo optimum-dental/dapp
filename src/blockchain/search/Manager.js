@@ -1,8 +1,10 @@
 import UserReader from '../../../build/contracts/UserReader.json'
 import ServiceReader from '../../../build/contracts/ServiceReader.json'
 import ScanRequestReader from '../../../build/contracts/ScanRequestReader.json'
+import ScanRequestReader2 from '../../../build/contracts/ScanRequestReader2.json'
 import ScanApplicationReader from '../../../build/contracts/ScanApplicationReader.json'
 import TreatmentRequestReader from '../../../build/contracts/TreatmentRequestReader.json'
+import TreatmentRequestReader2 from '../../../build/contracts/TreatmentRequestReader2.json'
 import TreatmentApplicationReader from '../../../build/contracts/TreatmentApplicationReader.json'
 import userManager from '../user/Manager'
 import serviceManager from '../service/Manager'
@@ -21,8 +23,10 @@ class Manager {
       UserReader,
       ServiceReader,
       ScanRequestReader,
+      ScanRequestReader2,
       ScanApplicationReader,
       TreatmentRequestReader,
+      TreatmentRequestReader2,
       TreatmentApplicationReader
     ]
   }
@@ -51,7 +55,6 @@ class Manager {
       },
       state,
       smartContractResolve: (results) => {
-        console.log(results)
         if (callOnEach && callOnEachParams) {
           const resultData = results[1].map((resultId) => {
             return new Promise(function (resolve, reject) {
