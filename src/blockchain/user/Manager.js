@@ -16,8 +16,9 @@ import TreatmentApplicationWriter from '../../../build/contracts/TreatmentApplic
 import TreatmentApplicationWriter2 from '../../../build/contracts/TreatmentApplicationWriter2.json'
 import TreatmentApplicationReader from '../../../build/contracts/TreatmentApplicationReader.json'
 import blockchainManager from '../BlockchainManager'
-import {getObjectFromResponse, getSlicedAddressString, getSoliditySha3ForId} from '../utilities'
-import {EXCHANGE_RATE_API} from '../../util/constants'
+import {getObjectFromResponse, getSlicedAddressString, getSoliditySha3ForId, getGravatarFor} from '../utilities'
+// import {EXCHANGE_RATE_API} from '../../util/constants'
+import states from '../../../static/json/states/states.json'
 
 let userManager = null
 
@@ -66,13 +67,15 @@ class Manager {
     })
   }
 
-  getUserDataFromTheBlockchain (state = null, userObject = {}) {
+  getUserDataFromTheBlockchain (state = null, userParams = {}) {
     return new Promise((resolve, reject) => {
       const userObject = {}
-      userManager.getUserData(state, null, userObject)
+      userManager.getUserData(state, userParams.userId, userParams)
       .then((result) => {
         Object.assign(userObject, result)
-        resolve(userObject)
+        userManager.refineUserData(userObject, () => {
+          resolve(userObject)
+        })
       })
       .catch(error => reject(error))
     })
@@ -82,10 +85,14 @@ class Manager {
     return blockchainManager.querySmartContract({
       contractToUse: DB,
       smartContractMethod: 'getEntityList',
-      smartContractMethodParams: (coinbase) => [userObject.recordFields || userManager.userRecordFields(state, userId || coinbase), userObject.recordFieldTypes || userManager.userRecordFieldTypes(), {from: coinbase}],
+      smartContractMethodParams: (coinbase) => {
+        userId = userId || coinbase
+        return [userObject.recordFields || userManager.userRecordFields(state, userId), userObject.recordFieldTypes || userManager.userRecordFieldTypes(), {from: coinbase}]
+      },
       state,
       smartContractResolve: result => {
         const userData = getObjectFromResponse(state, result, 1, userObject.keys || userManager.userKeys(), userObject.recordFieldTypes || userManager.userRecordFieldTypes())[0]
+        userData.coinbase = userData.coinbase || userId
         return userData
       },
       smartContractReject: (error) => ({
@@ -96,23 +103,37 @@ class Manager {
     })
   }
 
-  acceptScanApplication (state = null, data = {}) {
-    const quoteInEther = fetch(EXCHANGE_RATE_API)
-    .then(response => response.json())
-    .then((JSONResponse) => {
-      const USDExchange = JSONResponse[0].price_usd
-      return (data.requestObject.quote / USDExchange)
+  refineUserData (userObject, callback = null) {
+    let userState = userObject.state && Number(userObject.state) !== 0 ? states[Number(userObject.state)].name : ''
+    let address = userObject.street || userObject.city || userState ? `${userObject.street} ${userObject.city} ${userState}` : ''
+    Object.assign(userObject, { address })
+    getGravatarFor({
+      email: userObject.email,
+      coinbase: userObject.coinbase
     })
-    .catch((e) => console.error(e))
-
-    return blockchainManager.querySmartContract({
-      smartContractMethod: 'acceptScanApplication',
-      smartContractMethodParams: (coinbase) => [...(Object.values(data.requestObject)), {from: coinbase, value: state.web3.instance().toWei(quoteInEther, 'ether')}],
-      state,
-      smartContractResolve: result => data,
-      smartContractReject: error => error
+    .then((avatarCanvas) => {
+      userObject.avatarCanvas = avatarCanvas
+      if (callback) callback(userObject)
     })
   }
+
+  // acceptScanApplication (state = null, data = {}) {
+  //   const quoteInEther = fetch(EXCHANGE_RATE_API)
+  //   .then(response => response.json())
+  //   .then((JSONResponse) => {
+  //     const USDExchange = JSONResponse[0].price_usd
+  //     return (data.requestObject.quote / USDExchange)
+  //   })
+  //   .catch((e) => console.error(e))
+  //
+  //   return blockchainManager.querySmartContract({
+  //     smartContractMethod: 'acceptScanApplication',
+  //     smartContractMethodParams: (coinbase) => [...(Object.values(data.requestObject)), {from: coinbase, value: state.web3.instance().toWei(quoteInEther, 'ether')}],
+  //     state,
+  //     smartContractResolve: result => data,
+  //     smartContractReject: error => error
+  //   })
+  // }
 
   fetchUserDentists (state = null, userId = null) {
     return blockchainManager.querySmartContract({

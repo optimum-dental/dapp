@@ -1,4 +1,7 @@
 import {chunkArray} from '../util/ArrayManager'
+import ethereumBlockies from 'ethereum-blockies'
+import { avatarCanvasElement } from '../util/DOMManipulator'
+import { IDENTICON_COLORS } from '../util/constants'
 import soliditySha3 from 'solidity-sha3'
 
 export function getObjectFromResponse (state, result, entitiesCount, keys, fieldTypes) {
@@ -66,4 +69,50 @@ export function getLeftPaddedNumber (state, numberValue, dataTypeIndex = 1) {
 
 export function getSoliditySha3ForId (state, key, ...otherParams) {
   return soliditySha3(`${state.web3.instance().toHex(key)}${otherParams.join('')}`)
+}
+
+export function getHash (stringValue = '') {
+  let hash = 0
+  let characterCode
+
+  if (stringValue.length === 0) return hash
+
+  for (let i = 0; i < stringValue.length; i++) {
+    characterCode = stringValue.charCodeAt(i)
+    hash = ((hash << 5) - hash) + characterCode
+    hash |= 0 // Convert to 32-bit integer
+  }
+
+  return hash
+}
+
+export function getGravatarFor (payload = {}) {
+  return new Promise(function (resolve, reject) {
+    if (payload.email && payload.email.trim() !== '') {
+      getGravatarFromEmail(payload, resolve, reject)
+    } else {
+      getGravatarFromCoinbase(payload, resolve, reject)
+    }
+  })
+}
+
+export function getGravatarFromEmail (payload = {}, resolve, reject) {
+  avatarCanvasElement(payload.email)
+  .then((avatarCanvas, gravatar) => {
+    resolve(avatarCanvas)
+  })
+}
+
+export function getGravatarFromCoinbase (payload = {}, resolve, reject) {
+  const colorPosition = Math.abs(getHash(payload.coinbase) % IDENTICON_COLORS.length)
+  const identiconColor = IDENTICON_COLORS[colorPosition]
+  const avatarCanvas = ethereumBlockies.create({
+    seed: payload.coinbase.toString(),
+    color: identiconColor.color,
+    bgcolor: identiconColor.bgColor,
+    size: 8,
+    scale: 13,
+    spotcolor: identiconColor.spotColor
+  })
+  resolve(avatarCanvas)
 }

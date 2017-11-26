@@ -23,6 +23,8 @@ var TreatmentApplicationWriter = artifacts.require("./odll/TreatmentApplicationW
 var TreatmentApplicationWriter2 = artifacts.require("./odll/TreatmentApplicationWriter2.sol");
 var TreatmentApplicationReader = artifacts.require("./odll/TreatmentApplicationReader.sol");
 
+var Escrow = artifacts.require("./odll/Escrow.sol");
+
 var DBContract = contract(DBConfigObject);
 DBContract.setProvider(web3.currentProvider);
 
@@ -53,4 +55,6 @@ module.exports = function (deployer) {
   deployer.deploy(TreatmentApplicationWriter, dbAddress);
   deployer.deploy(TreatmentApplicationWriter2, dbAddress);
   deployer.deploy(TreatmentApplicationReader, dbAddress);
+
+  deployer.deploy(Escrow, dbAddress);
 };

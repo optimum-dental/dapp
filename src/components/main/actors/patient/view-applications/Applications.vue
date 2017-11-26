@@ -29,7 +29,7 @@
         return this.$root.user
       },
       isThereMore () {
-        return this.$store.state.searchResult[Number(this.$route.query.sT || 1) === 1 ? 'fetchScanApplications' : 'fetchTreatmentApplications'].totalNumberAvailable > (this.pageNumber * this.perPage)
+        return this.$store.state.searchResult[Number(this.$route.query.aTI || 1) === 1 ? 'fetchScanApplications' : 'fetchTreatmentApplications'].totalNumberAvailable > (this.pageNumber * this.perPage)
       },
       pageNumber () {
         return (Number(this.$route.query.o || 0) / this.perPage) + 1
@@ -49,7 +49,7 @@
     },
     methods: {
       addClass (check, value) {
-        return Number(this.$route.query.sT) === check || (!this.$route.query.sT && check === 1) ? value : ''
+        return Number(this.$route.query.aTI) === check || (!this.$route.query.aTI && check === 1) ? value : ''
       },
       switchView (evt) {
         const target = evt.target
@@ -62,159 +62,90 @@
           this.fetchApplications(null, this.currentOffset, this.$store.state.searchResult[serviceType === 1 ? 'fetchScanApplications' : 'fetchTreatmentApplications'].seed, 1, serviceType)
         }
       },
-      populateServiceTypes () {
-        const serviceTypesElement = document.getElementById('service-type')
-        serviceTypes.forEach((serviceType, index) => {
-          const optionElement = document.createElement('option')
-          optionElement.text = serviceType.name
-          if (serviceTypesElement) {
-            serviceTypesElement.appendChild(optionElement)
-            if (index === Number(this.$route.query.sTI)) optionElement.selected = true
-          }
-        })
-      },
       setEventListeners () {
         const _this = this
         const servicesPage = document.querySelector('#services')
-        servicesPage.addEventListener('change', function (evt) {
-          let target = evt.target
-          switch (target.id) {
-            case 'service-type':
-              _this.clearError(target)
-              let serviceSubtypesElement
-              serviceSubtypesElement = document.getElementById('service-subtype')
-              _this.populateServiceSubTypes(target.selectedIndex)
-              _this.dispatchEventFrom(serviceSubtypesElement, 'change')
-              serviceSubtypesElement.focus()
-              break
-            case 'service-subtype':
-              _this.clearError(target)
-              break
-            case 'fee':
-              _this.clearError(target)
-              break
-          }
-        })
-
-        servicesPage.addEventListener('keyup', function (evt) {
-          let target = evt.target
-          switch (target.id) {
-            case 'fee':
-              _this.clearError(target)
-              break
-          }
-        })
-
         servicesPage.addEventListener('click', function (evt) {
           let target = evt.target
           switch (true) {
-            case (target.classList.contains('edit-service')):
-              _this.scrollToTop()
-              let [serviceType, serviceSubtype, serviceFee] = target.dataset.params.split('%').map(param => Number(param))
-              let [serviceTypeDOMElement, serviceSubtypeDOMElement, serviceFeeDOMElement] = [document.getElementById('service-type'), document.getElementById('service-subtype'), document.getElementById('fee')]
-              serviceTypeDOMElement.options[serviceType].selected = true
-              _this.dispatchEventFrom(serviceTypeDOMElement, 'change')
-              serviceSubtypeDOMElement.options[serviceSubtype].selected = true
-              serviceFeeDOMElement.value = serviceFee
-              let updateButton = document.querySelector('.post')
-              updateButton.value = 'Update Service'
-              if (document.querySelector('.cancel')) document.querySelector('.cancel').remove()
-              document.querySelector('.submit').insertBefore(_this.cancelButton(), updateButton)
-              serviceTypeDOMElement.disabled = true
-              serviceSubtypeDOMElement.disabled = true
-              break
-
-            case (target.classList.contains('cancel')):
-              [serviceTypeDOMElement, serviceSubtypeDOMElement, serviceFeeDOMElement] = [document.getElementById('service-type'), document.getElementById('service-subtype'), document.getElementById('fee')]
-              serviceTypeDOMElement.options[0].selected = true
-              _this.dispatchEventFrom(serviceTypeDOMElement, 'change')
-              serviceFeeDOMElement.value = ''
-              let insertButton = document.querySelector('.post')
-              insertButton.value = 'Add Service'
-              document.querySelector('.cancel').remove()
-              serviceTypeDOMElement.disabled = false
-              serviceSubtypeDOMElement.disabled = false
-              break
-
-            case (target.classList.contains('delete-service')):
-              [serviceType, serviceSubtype, serviceFee] = target.dataset.params.split('%').map(param => Number(param))
-              _this.deleteService(evt, serviceType, serviceSubtype)
+            case (target.classList.contains('accept-application')):
+              _this.acceptApplication(evt)
               break
           }
         })
       },
-      dispatchEventFrom (DOMElement, eventType) {
-        const eventObject = document.createEvent('HTMLEvents')
-        eventObject.initEvent(eventType, true, true)
-        DOMElement.dispatchEvent(eventObject)
-      },
-      cancelButton () {
-        const DOMELement = new DOMParser().parseFromString(`<input type="button" class="button cancel" value="Cancel">`, 'text/html')
-        return DOMELement.body.firstChild
-      },
-      clearError (target) {
-        target.classList.remove('error')
-      },
-      populateServiceSubTypes (serviceTypeIndex) {
-        const serviceSubtypesElement = document.getElementById('service-subtype')
-        if (serviceTypeIndex === 0) {
-          while (serviceSubtypesElement.hasChildNodes()) serviceSubtypesElement.firstChild.remove()
-          serviceSubtypesElement.closest('.entry-item').querySelector('.entry-param').innerHTML = ''
-        } else {
-          serviceSubtypesElement.closest('.entry-item').querySelector('.entry-param').innerHTML = serviceTypes[serviceTypeIndex].subtypes[0]
-          while (serviceSubtypesElement.firstChild) {
-            serviceSubtypesElement.removeChild(serviceSubtypesElement.firstChild)
-          }
+      acceptApplication (evt) {
+        const sn = evt.target.dataset.params
+        const applicationTypeId = Number(this.$route.query.aTI || 1)
+        const application = this.$store.state.searchResult[applicationTypeId === 1 ? 'fetchScanApplications' : 'fetchTreatmentApplications'].data[this.currentOffset][sn]
 
-          const serviceSubtypes = serviceTypes[serviceTypeIndex].subtypes
-          serviceSubtypes.forEach((serviceSubtype, index) => {
-            const optionElement = document.createElement('option')
-            optionElement.text = serviceSubtype
-            if (serviceSubtypesElement) {
-              serviceSubtypesElement.appendChild(optionElement)
-              if (index === Number(this.$route.query.sSI)) optionElement.selected = true
+        fetch(EXCHANGE_RATE_API)
+        .then(response => response.json())
+        .then((JSONResponse) => {
+          const USDExchange = JSONResponse[0].price_usd
+          const quoteInEther = application.quote / USDExchange
+          const quoteInWei = this.$store.state.web3.instance().toWei(quoteInEther, 'ether')
+          console.log(quoteInEther, quoteInWei, Math.ceil(quoteInEther))
+
+          this.scrollToTop()
+          this.disableNecessaryButtons(evt)
+          this.beginWait(document.querySelector('.wrapper'))
+          this.$root.callToWriteData({
+            requestParams: {
+              dentistId: application.userId,
+              applicationId: application.applicationId,
+              quote: quoteInWei
+            },
+            managerIndex: 2, // which of the contract managers to use
+            contractIndexToUse: applicationTypeId === 1 ? 6 : 12,
+            methodName: applicationTypeId === 1 ? 'acceptScanApplication' : 'acceptTreatmentApplication',
+            callback: (status) => {
+              this.endWait(document.querySelector('.wrapper'))
+              this.enableNecessaryButtons(evt)
+              if (status) this.fetchApplications(null, this.currentOffset, this.$store.state.searchResult[applicationTypeId === 1 ? 'fetchScanApplications' : 'fetchTreatmentApplications'].seed, 1, this.$route.query.aTI)
+              this.notify(status ? 'Application Successfully accepted' : 'Unable to accept Application')
             }
           })
-        }
+        })
+        .catch((e) => console.error(e))
       },
-      fetchApplications (evt, offset = 0, seed = null, direction = 1, serviceTypeId = 1) {
+      fetchApplications (evt, offset = 0, seed = null, direction = 1, applicationTypeId = 1) {
         const fetchQuery = {
-          type: serviceTypeId === 1 ? 'fetchScanApplications' : 'fetchTreatmentApplications',
-          callSmartContractWith: 'fetchApplications',
-          contractIndexToUse: 1,
-          userId: this.user.coinbase,
-          serviceTypeId,
-          offset,
-          limit: this.perPage,
-          seed: seed || Math.random(),
+          type: applicationTypeId === 1 ? 'fetchScanApplications' : 'fetchTreatmentApplications',
+          requestParams: {
+            userId: this.user.coinbase,
+            offset,
+            limit: this.perPage,
+            seed: seed || Math.random()
+          },
+          managerIndex: 1, // which of the contract managers to use
+          contractIndexToUse: applicationTypeId === 1 ? 4 : 7,
+          methodName: applicationTypeId === 1 ? 'fetchScanApplicationsForPatient' : 'fetchTreatmentApplicationsForPatient',
           callOnEach: 'getApplicationDetail',
-          callOnEachParams: serviceId => ({serviceTypeId, serviceId: serviceId.toNumber()})
+          callOnEachParams: applicationId => ({applicationTypeId, applicationId: applicationId.toNumber()})
         }
 
         this.$router.push({
-          path: '/manage-services',
+          path: '/view-applications',
           query: {
             o: fetchQuery.offset,
             l: fetchQuery.limit,
             sd: fetchQuery.seed,
-            sT: serviceTypeId
+            aTI: applicationTypeId
           }
         })
         const offsetData = this.$store.state.searchResult[fetchQuery.type].data[offset]
         if (direction < 0 && offsetData && offsetData.length > 0) {
-          this.populateResults(offsetData, serviceTypeId)
+          this.populateResults(offsetData, applicationTypeId)
         } else {
           this.getApplications(evt, fetchQuery)
         }
       },
-      getFee () {
-        return document.getElementById('fee').value
-      },
       getApplications (evt, fetchQuery) {
-        const serviceTypeId = fetchQuery.serviceTypeId
-        const resultSection = document.querySelector(`.${serviceTypeId === 1 ? 'scan-section' : 'treatment-section'}`)
+        const applicationTypeId = Number(this.$route.query.aTI || 1)
+        const resultSection = document.querySelector(`.${applicationTypeId === 1 ? 'scan-section' : 'treatment-section'}`)
         this.clearDOMElementChildren(resultSection)
-        this.askUserToWaitWhileWeSearch(serviceTypeId)
+        this.askUserToWaitWhileWeSearch(applicationTypeId)
         this.disableNecessaryButtons()
         this.$root.callToFetchDataObjects({
           fetchQuery,
@@ -226,9 +157,9 @@
             }
 
             if (result) {
-              this.appendResult(result, serviceTypeId)
+              this.appendResult(result, applicationTypeId)
             } else {
-              this.informOfNoApplication(serviceTypeId)
+              this.informOfNoApplication(applicationTypeId)
             }
           }
         })
@@ -240,6 +171,7 @@
         results.forEach((result) => {
           const resultDOMElement = this.createResultDOMElement(result)
           resultSection.appendChild(resultDOMElement)
+          resultDOMElement.querySelector('.gravatar-section').appendChild(result.userObject.avatarCanvas)
         })
       },
       appendResult (result, resultType = 1) {
@@ -247,6 +179,7 @@
         const resultDOMElement = this.createResultDOMElement(result)
         const resultSection = document.querySelector(`.${Number(resultType) === 1 ? 'scan-section' : 'treatment-section'}`)
         resultSection.appendChild(resultDOMElement)
+        if (resultDOMElement.querySelector('.gravatar-section')) resultDOMElement.querySelector('.gravatar-section').appendChild(result.userObject.avatarCanvas)
       },
       clearDOMElementChildren (DOMElement) {
         while (DOMElement.hasChildNodes()) {
@@ -254,42 +187,42 @@
         }
       },
       showNextPage () {
-        const serviceTypeId = Number(this.$route.query.sT || 1)
-        this.fetchApplications(null, this.nextOffset, this.$store.state.searchResult[serviceTypeId === 1 ? 'fetchScanApplications' : 'fetchTreatmentApplications'].seed, 1, serviceTypeId)
+        const applicationTypeId = Number(this.$route.query.aTI || 1)
+        this.fetchApplications(null, this.nextOffset, this.$store.state.searchResult[applicationTypeId === 1 ? 'fetchScanApplications' : 'fetchTreatmentApplications'].seed, 1, applicationTypeId)
       },
       showPreviousPage () {
-        const serviceTypeId = Number(this.$route.query.sT || 1)
-        this.fetchApplications(null, this.previousOffset, this.$store.state.searchResult[serviceTypeId === 1 ? 'fetchScanApplications' : 'fetchTreatmentApplications'].seed, -1, serviceTypeId)
+        const applicationTypeId = Number(this.$route.query.aTI || 1)
+        this.fetchApplications(null, this.previousOffset, this.$store.state.searchResult[applicationTypeId === 1 ? 'fetchScanApplications' : 'fetchTreatmentApplications'].seed, -1, applicationTypeId)
       },
       getPageIndex (offset = 0) {
         return offset / this.perPage
       },
-      askUserToWaitWhileWeSearch (serviceTypeId = 1) {
+      askUserToWaitWhileWeSearch (applicationTypeId = 1) {
         if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
         if (document.querySelector('.no-service')) document.querySelector('.no-service').remove()
-        let waitOverlayDOMElement = this.createWaitOverlayDOMElement(serviceTypeId)
+        let waitOverlayDOMElement = this.createWaitOverlayDOMElement(applicationTypeId)
         document.querySelector('.result-section').appendChild(waitOverlayDOMElement)
       },
-      informOfNoApplication (serviceTypeId = 1) {
+      informOfNoApplication (applicationTypeId = 1) {
         if (document.querySelector('.no-service')) document.querySelector('.no-service').remove()
-        let noServiceDOMElement = this.createNoApplicationDOMElement(serviceTypeId)
-        document.querySelector('.result-section').appendChild(noServiceDOMElement)
+        let noServiceDOMElement = this.createNoApplicationDOMElement(applicationTypeId)
+        if (document.querySelector('.result-section')) document.querySelector('.result-section').appendChild(noServiceDOMElement)
       },
-      createWaitOverlayDOMElement (serviceTypeId = 1) {
+      createWaitOverlayDOMElement (applicationTypeId = 1) {
         const DOMELement = new DOMParser().parseFromString(`
           <div class="wait-overlay">
-            <div class="wait-message">Please Wait... We're searching the blockchain for your ${serviceTypeId === 1 ? 'Scan' : 'Treatment'} applications.</div>
+            <div class="wait-message">Please Wait... We're searching the blockchain for your ${applicationTypeId === 1 ? 'Scan' : 'Treatment'} applications.</div>
             <div class="spin"></div>
           </div>
         `, 'text/html')
 
         return DOMELement.body.firstChild
       },
-      createNoApplicationDOMElement (serviceTypeId = 1) {
+      createNoApplicationDOMElement (applicationTypeId = 1) {
         const DOMELement = new DOMParser().parseFromString(`
           <div class="no-service">
             <div class="no-service-message">
-              It appears you have no ${serviceTypeId === 1 ? 'Scan' : 'Treatment'} application on the blockchain.
+              It appears you have no ${applicationTypeId === 1 ? 'Scan' : 'Treatment'} application on the blockchain.
             </div>
           </div>
         `, 'text/html')
@@ -297,12 +230,19 @@
         return DOMELement.body.firstChild
       },
       createResultDOMElement (result) {
+        const userObject = result.userObject
         const resultDOMElement = new DOMParser().parseFromString(`
-          <div class="result">
-            <div class="service-name">${result.serviceName}</div>
-            <div class="service-fee">$ ${result.serviceFee}</div>
-            <input type="button" value="Edit" class="button edit-service" data-params="${result.serviceTypeId}%${result.serviceId}%${result.serviceFee}">
-            <input type="button" value="Delete" class="button delete-service" data-params="${result.serviceTypeId}%${result.serviceId}%${result.serviceFee}">
+          <div class="applications-result">
+            <div class="gravatar-section"></div>
+            <div class="application-about-section">
+              <div class="service-name">Application for: <span>${result.serviceName}</span></div>
+              <div class="name">Dentist: <span>${userObject.name || 'Name: Not Supplied'}</span></div>
+              <div class="company-name">Company: <span>${userObject.companyName || 'Not Supplied'}</span></div>
+              <div class="address">Address: <span>${userObject.address || 'Not Supplied'}</span></div>
+              <div class="quote">Quote: <span>$${result.quote}</span></div>
+              <div class="comment">Comment: <span>${result.comment}</span></div>
+              <input type="button" value="Accept" class="button accept-application" data-params="${result.SN}">
+            </div>
           </div>
         `, 'text/html').body.firstChild
         return resultDOMElement
@@ -337,28 +277,27 @@
       }
     },
     mounted: function () {
-      const serviceTypeId = Number(this.$route.query.sT || 1)
-      this.populateServiceTypes()
+      const applicationTypeId = Number(this.$route.query.aTI || 1)
       this.setEventListeners()
       this.getApplications(null, {
-        type: serviceTypeId === 1 ? 'fetchScanApplications' : 'fetchTreatmentApplications',
-        specials: {
-          contractIndexToUse: 1,
-          callSmartContractWith: 'fetchApplications'
+        type: applicationTypeId === 1 ? 'fetchScanApplications' : 'fetchTreatmentApplications',
+        requestParams: {
+          userId: this.user.coinbase,
+          offset: Number(this.$route.query.o || 0),
+          limit: Number(this.$route.query.l || this.perPage),
+          seed: Number(this.$route.query.sd || Math.random())
         },
-        userId: this.user.coinbase,
-        serviceTypeId,
-        offset: Number(this.$route.query.o || 0),
-        limit: Number(this.$route.query.l || this.perPage),
-        seed: Number(this.$route.query.sd || Math.random()),
+        managerIndex: 1, // which of the contract managers to use
+        contractIndexToUse: applicationTypeId === 1 ? 4 : 7,
+        methodName: applicationTypeId === 1 ? 'fetchScanApplicationsForPatient' : 'fetchTreatmentApplicationsForPatient',
         callOnEach: 'getApplicationDetail',
-        callOnEachParams: serviceId => ({serviceTypeId, serviceId: serviceId.toNumber()})
+        callOnEachParams: applicationId => ({applicationTypeId, applicationId: applicationId.toNumber()})
       })
     }
   }
 
-  import serviceTypes from '../../../../../../static/json/appointment_types/appointment_types.json'
   import $ from 'jquery'
+  import {EXCHANGE_RATE_API} from '../../../../../util/constants'
 </script>
 
 <style scoped>
@@ -602,11 +541,13 @@
     }
   }
 
-  .result {
+  .applications-result {
     width: 95%;
     border-bottom: 1px solid #a7a7a7;
     min-height: 180px;
     padding: 10px 0px;
+    display: block;
+    float: left;
   }
 
   .gravatar-section {
@@ -626,61 +567,34 @@
     border-radius: 6px;
   }
 
-  .about-section {
-    width: 250px;
-    height: 150px;
+  .application-about-section {
+    width: 80%;
     display: inline-block;
     float: left;
   }
 
-  .about-section > div {
+  .application-about-section > div {
     display: block;
     height: 20px;
     line-height: 20px;
     font-size: 14px;
     text-align: left;
     width: 100%;
+    font-weight: bold;
+  }
+
+  .application-about-section > div span {
+    font-weight: normal;
+  }
+
+  .application-about-section > .comment {
+    height: auto;
   }
 
   .profile-link {
     font-size: 10px !important;
     color: #bfced9;
     cursor: pointer;
-  }
-
-  .average-rating > div {
-    background: url(/static/images/star_line.png) no-repeat;
-    background-size: contain;
-    height: 20px;
-    width: 20px;
-    display: inline-block;
-    float: left;
-    margin: 0px 5px;
-  }
-
-  .average-rating > .filled {
-    background: url(/static/images/star.png) no-repeat;
-    background-size: contain;
-  }
-
-  .request-service-section {
-    width: auto;
-    height: 150px;
-    line-height: 150px;
-    display: inline-block;
-    float: right;
-  }
-
-  .link-to-service {
-    width: 200px;
-    height: 40px;
-    line-height: 40px;
-    color: #ffffff;
-    background: #3285b1;
-    display: inline-block;
-    text-decoration: none;
-    font-size: 14px;
-    text-align: center;
   }
 
   .service-name {
@@ -690,7 +604,11 @@
     line-height: 40px;
   }
 
-  .service-fee {
+  .service-name span {
+    color: #115588;
+  }
+
+  .quote {
     width: 50%;
     height: 40px;
     font-size: 16px;
@@ -698,7 +616,7 @@
   }
 
   .button {
-    padding: 2px;
+    padding: 0px 2px;
     text-align: center;
     outline: 0px;
     border: 0px;
@@ -712,9 +630,9 @@
     display: inline-block;
   }
 
-  .edit-service, .delete-service {
+  .accept-application {
     background: #3285b1 !important;
     text-decoration: none;
-    margin: 0px 10px 0px 0px !important;
+    margin: 20px 10px 0px 0px !important;
   }
 </style>

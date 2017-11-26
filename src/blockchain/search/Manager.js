@@ -77,9 +77,11 @@ class Manager {
   getOfficial (state = null, dataObject = {}) {
     return new Promise((resolve, reject) => {
       const userObject = {}
-      userManager.getUserData(state, dataObject.officialId, dataObject)
+      dataObject.userId = dataObject.officialId
+      delete dataObject.officialId
+      userManager.getUserDataFromTheBlockchain(state, dataObject)
       .then((result) => {
-        result.coinbase = dataObject.officialId
+        result.coinbase = dataObject.userId
         Object.assign(userObject, result)
         resolve(userObject)
       })
@@ -106,6 +108,24 @@ class Manager {
       .then((result) => {
         Object.assign(dataObject, result)
         resolve(dataObject)
+      })
+      .catch(error => reject(error))
+    })
+  }
+
+  getApplicationDetail (state = null, applicationObject = {}) {
+    return new Promise((resolve, reject) => {
+      const dataObject = {}
+      serviceManager.getApplicationDetail(state, applicationObject)
+      .then((result) => {
+        Object.assign(dataObject, result)
+        userManager.getUserDataFromTheBlockchain(state, dataObject)
+        .then((result) => {
+          result.coinbase = dataObject.userId
+          dataObject.userObject = result
+          resolve(dataObject)
+        })
+        .catch(error => reject(error))
       })
       .catch(error => reject(error))
     })

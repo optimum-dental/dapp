@@ -3,6 +3,7 @@ pragma solidity 0.4.18;
 import "./utilities.sol";
 import "./servicesLibrary.sol";
 import "./searchLibrary.sol";
+import "../../odll/Escrow.sol";
 
 library userManager {
   using strings for *;
@@ -184,11 +185,9 @@ library userManager {
     }
   }
 
-  function setDentist (
+  function setDentistCompany (
     address dbAddress,
     address userId,
-    bool isODLLDentist,
-    bool isAvailable,
     string companyName
   )
     internal
@@ -197,20 +196,36 @@ library userManager {
     require(userExists(dbAddress, userId));
     require(isActiveUser(dbAddress, userId));
     require(companyNameLen <= getConfig(dbAddress, "config/max-company-name-length") && companyNameLen >= getConfig(dbAddress, "config/min-company-name-length"));
-    DB(dbAddress).setBooleanValue(keccak256("user/is-odll-dentist?", userId), isODLLDentist);
-    DB(dbAddress).setBooleanValue(keccak256("user/is-available?", userId), isAvailable);
     DB(dbAddress).setStringValue(keccak256("dentist/company-name", userId), companyName);
   }
 
-  function addODLLDentist (
+  function setODLLDentist (
     address dbAddress,
-    address userId
+    address userId,
+    bool odllDentistValue
   )
     internal
   {
     require(userExists(dbAddress, userId));
     require(isActiveUser(dbAddress, userId));
-    DB(dbAddress).setBooleanValue(keccak256("user/is-odll-dentist?", userId), true);
+    DB(dbAddress).setBooleanValue(keccak256("user/is-odll-dentist?", userId), odllDentistValue);
+  }
+
+  function setODLLDentists (
+    address dbAddress,
+    address[] userIds,
+    bool odllDentistValue
+  )
+    internal
+  {
+    for (uint i = 0; i < userIds.length; i++) {
+      require(userExists(dbAddress, userIds[i]));
+      require(isActiveUser(dbAddress, userIds[i]));
+    }
+
+    for (i = 0; i < userIds.length; i++) {
+      DB(dbAddress).setBooleanValue(keccak256("user/is-odll-dentist?", userIds[i]), odllDentistValue);
+    }
   }
 
   function hasStatus (address dbAddress, address userId, uint8 status) internal view returns(bool) {
@@ -308,6 +323,16 @@ library userManager {
     DB(dbAddress).addUIntValue(keccak256("dentists/treatment-total-earned"), amount);
   }
 
+  function addToDentistTotalDue (address dbAddress, address userId, uint amount) internal {
+    DB(dbAddress).addUIntValue(keccak256("dentist/total-due", userId), amount);
+    DB(dbAddress).addUIntValue(keccak256("dentists/total-due"), amount);
+  }
+
+  function subtractFromDentistTotalDue (address dbAddress, address userId, uint amount) internal {
+    DB(dbAddress).subUIntValue(keccak256("dentist/total-due", userId), amount);
+    DB(dbAddress).subUIntValue(keccak256("dentists/total-due"), amount);
+  }
+
   function addToODLLTotalEarned (address dbAddress, address userId, uint amount) internal {
     DB(dbAddress).addUIntValue(keccak256("odll/total-earned", userId), amount);
     DB(dbAddress).addUIntValue(keccak256("odll/total-earned"), amount);
@@ -321,6 +346,16 @@ library userManager {
   function addToODLLTreatmentTotalEarned (address dbAddress, address userId, uint amount) internal {
     DB(dbAddress).addUIntValue(keccak256("odll/treatment-total-earned", userId), amount);
     DB(dbAddress).addUIntValue(keccak256("odll/treatment-total-earned"), amount);
+  }
+
+  function addToODLLTotalDue (address dbAddress, address userId, uint amount) internal {
+    DB(dbAddress).addUIntValue(keccak256("odll/total-due", userId), amount);
+    DB(dbAddress).addUIntValue(keccak256("odll/total-due"), amount);
+  }
+
+  function subtractFromODLLTotalDue (address dbAddress, address userId, uint amount) internal {
+    DB(dbAddress).subUIntValue(keccak256("odll/total-due", userId), amount);
+    DB(dbAddress).subUIntValue(keccak256("odll/total-due"), amount);
   }
 
   function isFromCountry (address dbAddress, address userId, uint countryId) internal view returns(bool) {
@@ -688,6 +723,19 @@ library userManager {
     address dentistId,
     address patientId,
     uint scanApplicationId,
+    uint paymentId,
+    uint quote
+  )
+    internal
+  {
+    servicesLibrary.acceptScanApplication(dbAddress, dentistId, patientId, scanApplicationId, paymentId, quote);
+  }
+
+  function releaseFundForScan (
+    address dbAddress,
+    address dentistId,
+    address patientId,
+    uint scanApplicationId,
     uint amount,
     uint quote
   )
@@ -714,7 +762,6 @@ library userManager {
     addToODLLScanTotalEarned(dbAddress, ODLLId, tempODLLFee);
     addToODLLTotalEarned(dbAddress, ODLLId, tempODLLFee);
 
-    servicesLibrary.acceptScanApplication(dbAddress, dentistId, patientId, scanApplicationId, quote);
     writeUserDentist(dbAddress, patientId, dentistId);
 
     ODLLId.transfer(tempODLLFee);
@@ -780,6 +827,19 @@ library userManager {
     address dentistId,
     address patientId,
     uint treatmentApplicationId,
+    uint paymentId,
+    uint quote
+  )
+    internal
+  {
+    servicesLibrary.acceptTreatmentApplication(dbAddress, dentistId, patientId, treatmentApplicationId, paymentId, quote);
+  }
+
+  function releaseFundForTreatment (
+    address dbAddress,
+    address dentistId,
+    address patientId,
+    uint treatmentApplicationId,
     uint amount,
     uint quote
   )
@@ -806,7 +866,7 @@ library userManager {
     addToODLLTreatmentTotalEarned(dbAddress, ODLLId, tempODLLFee);
     addToODLLTotalEarned(dbAddress, ODLLId, tempODLLFee);
 
-    servicesLibrary.acceptTreatmentApplication(dbAddress, dentistId, patientId, treatmentApplicationId, quote);
+    writeUserDentist(dbAddress, patientId, dentistId);
 
     ODLLId.transfer(tempODLLFee);
     dentistId.transfer(tempDentistFee);

@@ -29,6 +29,13 @@ contract Setter is Restrictor {
     DB(dbAddress).setAddressValue(keccak256('odll/owner'), owner);
   }
 
+  function setEscrowAddress(address escrowAddress)
+    external
+    onlyOwnerCanCall(msg.sender)
+  {
+    DB(dbAddress).setAddressValue(keccak256('odll/escrow-address'), escrowAddress);
+  }
+
   function setPaymentAddress(address paymentAddress)
     external
     onlyOwnerCanCall(msg.sender)
@@ -94,13 +101,4 @@ contract Setter is Restrictor {
     require(newContractAddress != 0x0);
     DB(dbAddress).setAddressValue(record, newContractAddress);
   }
-
-  function getContractAddress(bytes32 record)
-    external
-    onlyOwnerCanCall(msg.sender)
-    view returns (address)
-  {
-    DB(dbAddress).getAddressValue(record);
-  }
 }
-

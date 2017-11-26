@@ -9,7 +9,7 @@ export const NETWORKS = {
   '5777': 'Ganache Blockchain'
 }
 
-export const APPROVED_BLOCKCHAIN_NETWORK_ID = '3'
+export const APPROVED_BLOCKCHAIN_NETWORK_ID = '666'
 
 export const MUTATION_TYPES = {
   CHANGE_CURRENT_ROUTE_TO: 'changeCurrentRouteTo',
@@ -114,4 +114,5 @@ export const IDENTICON_COLORS = [
   }
 ]
 
-export const EXCHANGE_RATE_API = 'https://api.coinmarketcap.com/v1/ticker/ethereum'
+const corsAnywhere = 'https://cors-anywhere.herokuapp.com/'
+export const EXCHANGE_RATE_API = `${corsAnywhere}https://api.coinmarketcap.com/v1/ticker/ethereum`

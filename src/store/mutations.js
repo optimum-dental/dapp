@@ -1,7 +1,6 @@
 import ethereumBlockies from 'ethereum-blockies'
 import { avatarCanvasElement } from '../util/DOMManipulator'
 import { MUTATION_TYPES, APPROVED_BLOCKCHAIN_NETWORK_ID, IDENTICON_COLORS, NETWORKS } from '../util/constants'
-import states from '../../static/json/states/states.json'
 
 function getHash (stringValue) {
   let hash = 0
@@ -47,37 +46,6 @@ function assignPropertyTo (hashObject, key, value) {
 
 //   return result
 // }
-
-function getGravatarFor (payload = {}) {
-  return new Promise(function (resolve, reject) {
-    if (payload.email && payload.email.trim() !== '') {
-      getGravatarFromEmail(payload, resolve, reject)
-    } else {
-      getGravatarFromCoinbase(payload, resolve, reject)
-    }
-  })
-}
-
-function getGravatarFromEmail (payload = {}, resolve, reject) {
-  avatarCanvasElement(payload.email)
-  .then((avatarCanvas, gravatar) => {
-    resolve(avatarCanvas)
-  })
-}
-
-function getGravatarFromCoinbase (payload = {}, resolve, reject) {
-  const colorPosition = Math.abs(getHash(payload.coinbase) % IDENTICON_COLORS.length)
-  const identiconColor = IDENTICON_COLORS[colorPosition]
-  const avatarCanvas = ethereumBlockies.create({
-    seed: payload.coinbase.toString(),
-    color: identiconColor.color,
-    bgcolor: identiconColor.bgColor,
-    size: 8,
-    scale: 13,
-    spotcolor: identiconColor.spotColor
-  })
-  resolve(avatarCanvas)
-}
 
 function updateUserGravatar (state, userCopy, payload = null) {
   if (payload.email && payload.email.trim() !== '') {
@@ -244,26 +212,10 @@ export default {
       .then((values) => {
         values.forEach((value, index) => {
           if (payload.preSaveCallback) payload.preSaveCallback(value)
-          if (value.coinbase) {
-            let userState = value.state && Number(value.state) !== 0 ? states[Number(value.state)].name : ''
-            let address = value.street || value.city || userState ? `${value.street} ${value.city} ${userState}` : ''
-            Object.assign(value, { SN: index, address })
-            getGravatarFor({
-              email: value.email,
-              coinbase: value.coinbase
-            })
-            .then((avatarCanvas) => {
-              value.avatarCanvas = avatarCanvas
-              searchResultCopy[payload.type].data[payload.offset].push(value)
-              state.searchResult = searchResultCopy
-              if (payload.callback) payload.callback(value, results.length === index + 1)
-            })
-          } else {
-            Object.assign(value, { SN: index })
-            searchResultCopy[payload.type].data[payload.offset].push(value)
-            state.searchResult = searchResultCopy
-            if (payload.callback) payload.callback(value, results.length === index + 1)
-          }
+          Object.assign(value, { SN: index })
+          searchResultCopy[payload.type].data[payload.offset].push(value)
+          state.searchResult = searchResultCopy
+          if (payload.callback) payload.callback(value, results.length === index + 1)
         })
       })
     } else {

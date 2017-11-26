@@ -129,7 +129,7 @@
         const patientId = scanRequest.patientId
         const requestId = scanRequest.requestId
         const quote = Number(document.getElementById('quote').value) || 0
-        const comment = document.getElementById('comment').value
+        const comment = `b${document.getElementById('comment').value}`
 
         this.scrollToTop()
         this.disableNecessaryButtons(evt)

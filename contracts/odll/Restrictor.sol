@@ -54,6 +54,41 @@ contract Restrictor is Ownable {
     require(hasStatus(msg.sender, 1));
     _;
   }
+  
+  modifier onlyActiveAdminId(address userId) {
+    require(isActiveAdmin(userId));
+    _;
+  }
+
+  modifier onlyActiveManagerId(address userId) {
+    require(isActiveManager(userId));
+    _;
+  }
+
+  modifier onlyOwnerOrActiveAdminOrActiveManagerId(address userId) {
+    require(userId == owner || isActiveAdmin(userId) || isActiveManager(userId));
+    _;
+  }
+
+  modifier onlyOwnerOrActiveAdminId(address userId) {
+    require(userId == owner || isActiveAdmin(userId));
+    _;
+  }
+
+  modifier onlyActiveDentistId(address userId) {
+    require(isActiveDentist(userId));
+    _;
+  }
+
+  modifier onlyActivePatientId(address userId) {
+    require(isActivePatient(userId));
+    _;
+  }
+
+  modifier onlyActiveUserId(address userId) {
+    require(hasStatus(userId, 1));
+    _;
+  }
 
   function setSmartContractStatus(
     uint8 _status

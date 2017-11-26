@@ -122,6 +122,31 @@ class Manager {
     })
   }
 
+  getApplicationDetail (state = null, dataObject = {}) {
+    const {applicationTypeId, applicationId} = dataObject
+    return blockchainManager.querySmartContract({
+      contractToUse: DB,
+      smartContractMethod: 'getEntityList',
+      smartContractMethodParams: (coinbase) => [serviceManager.applicationRecordFields(state, applicationId), serviceManager.applicationRecordFieldTypes(), {from: coinbase}],
+      state,
+      smartContractResolve: result => {
+        const dataObject = getObjectFromResponse(state, result, 1, serviceManager.applicationKeys(), serviceManager.applicationRecordFieldTypes())[0]
+        Object.assign(dataObject, {
+          serviceName: serviceTypes[applicationTypeId].subtypes[dataObject.serviceId],
+          applicationTypeId,
+          applicationId
+        })
+
+        return dataObject
+      },
+      smartContractReject: (error) => ({
+        error,
+        isValid: true,
+        warningMessage: "We've encountered a problem fetching your service information from the blockchain. Please do try again in a few minutes."
+      })
+    })
+  }
+
   keys () {
     return [
       'serviceFee'
@@ -173,6 +198,32 @@ class Manager {
   requestRecordFieldTypes () {
     // types: 1 => boolean, 2 => uint8, 3 => uint, 4 => address, 5 => bytes32, 7 => string
     return [1, 2, 4, 3, 5, 5, 7, 7]
+  }
+
+  applicationKeys () {
+    return [
+      'status',
+      'userId',
+      'serviceId',
+      'quote',
+      'comment'
+    ]
+  }
+
+  applicationRecordFields (state, scanApplicationId) {
+    scanApplicationId = getSlicedAddressString(state, getLeftPaddedNumber(state, scanApplicationId, 1))
+    return [
+      getSoliditySha3ForId(state, 'scan-application/status', scanApplicationId),
+      getSoliditySha3ForId(state, 'scan-application/dentist', scanApplicationId),
+      getSoliditySha3ForId(state, 'scan-application/scan-service', scanApplicationId),
+      getSoliditySha3ForId(state, 'scan-application/quote', scanApplicationId),
+      getSoliditySha3ForId(state, 'scan-application/comment', scanApplicationId)
+    ]
+  }
+
+  applicationRecordFieldTypes () {
+    // types: 1 => boolean, 2 => uint8, 3 => uint, 4 => address, 5 => bytes32, 7 => string
+    return [3, 4, 3, 3, 7]
   }
 }
 

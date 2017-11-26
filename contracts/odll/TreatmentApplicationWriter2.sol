@@ -1,6 +1,7 @@
 pragma solidity 0.4.18;
 import "./Restrictor.sol";
 import "../lib/odll/userManager.sol";
+import "./Escrow.sol";
 
 contract TreatmentApplicationWriter2 is Restrictor {
 
@@ -18,11 +19,17 @@ contract TreatmentApplicationWriter2 is Restrictor {
     payable
     external
   {
-    if (msg.value < quote) {
-      msg.sender.transfer(msg.value);
+    require(DB(dbAddress).getAddressValue(keccak256("odll/escrow-address", treatmentApplicationId)) != 0x0);
+    uint amount = msg.value;
+    if (amount < quote) {
+      msg.sender.transfer(amount);
       return;
     }
 
-    userManager.acceptTreatmentApplication(dbAddress, dentistId, msg.sender, treatmentApplicationId, msg.value, quote);
+    uint paymentId = utilities.getArrayItemsCount(dbAddress, "payments-count");
+    DB(dbAddress).setUIntValue(keccak256("payment/for-type", paymentId), 2);
+    userManager.acceptTreatmentApplication(dbAddress, dentistId, msg.sender, treatmentApplicationId, paymentId, quote);
+    DB(dbAddress).getAddressValue(keccak256("odll/escrow-address")).transfer(amount);
+    Escrow(DB(dbAddress).getAddressValue(keccak256("odll/escrow-address"))).lockPayment(msg.sender, paymentId);
   }
 }

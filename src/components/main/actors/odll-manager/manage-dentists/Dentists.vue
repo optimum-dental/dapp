@@ -65,6 +65,20 @@
               target.classList.remove('unblock')
               target.classList.add('block')
               break
+
+            case (target.classList.contains('add')):
+              userId = _this.$store.state.searchResult.fetchDentists.data[_this.currentOffset][Number(target.dataset.sn)].coinbase
+              _this.manageODLLDentist(userId, 'add')
+              target.classList.remove('add')
+              target.classList.add('remove')
+              break
+
+            case (target.classList.contains('remove')):
+              userId = _this.$store.state.searchResult.fetchDentists.data[_this.currentOffset][Number(target.dataset.sn)].coinbase
+              _this.manageODLLDentist(userId, 'remove')
+              target.classList.remove('remove')
+              target.classList.add('add')
+              break
           }
         })
       },
@@ -166,6 +180,25 @@
           }
         })
       },
+      manageODLLDentist (userId, action) {
+        console.log(userId, action)
+        this.scrollToTop()
+        this.beginWait(document.querySelector('.wrapper'))
+        this.disableNecessaryButtons()
+        this.$root.callToWriteData({
+          requestParams: {
+            address: userId,
+            ODLLDentistValue: action === 'add'
+          },
+          methodName: 'setODLLDentist',
+          callback: (status = false) => {
+            this.endWait(document.querySelector('.wrapper'))
+            this.enableNecessaryButtons()
+            this.fetchDentists(null, this.currentOffset, this.$store.state.searchResult.fetchDentists.seed)
+            this.notify(status ? `${action} successful for Dentist` : `${action} unsuccessful for Dentist`)
+          }
+        })
+      },
       populateResults (results) {
         const resultSection = document.querySelector('.result-section')
         this.clearDOMElementChildren(resultSection)
@@ -240,6 +273,7 @@
             </div>
             <div class="action-section">
               <input type="button" value="${Number(result.status) === 2 ? 'Unblock Dentist' : 'Block Dentist'}" class="action-button ${Number(result.status) === 2 ? 'unblock' : 'block'} button" data-sn="${result.SN}">
+              <input type="button" value="${Number(result.isODLLDentist) ? 'Unmake ODLL Dentist' : 'Make ODLL Dentist'}" class="action-button ${Number(result.isODLLDentist) ? 'remove' : 'add'} button" data-sn="${result.SN}">
             </div>
           </div>
         `, 'text/html').body.firstChild
@@ -560,24 +594,27 @@
   }
 
   .action-section {
-    width: auto;
+    width: 260px;
     height: 150px;
     line-height: 150px;
-    display: inline-block;
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
     float: right;
   }
 
   .action-button {
-    width: 130px;
-    height: 40px;
-    line-height: 40px;
+    width: 125px;
+    height: 30px;
+    line-height: 30px;
     color: #ffffff;
     background: #3285b1 !important;
     display: inline-block;
     outline: none;
     border: 0px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 12px;
     text-align: center;
   }
 </style>

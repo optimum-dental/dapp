@@ -5,7 +5,7 @@ import "../lib/odll/userManager.sol";
 
 contract UserWriter is Restrictor {
   event OnAdminAdded(address userId);
-  event OnDentistAdded(address userId);
+  event OnDentistCompanySet(address userId);
   event OnManagerAdded(address userId);
   event OnPatientAdded(address userId);
 
@@ -63,25 +63,32 @@ contract UserWriter is Restrictor {
     }
   }
 
-  function continueWritingDentist(
-    bool isODLLDentist,
-    bool isAvailable,
+  function setDentistCompany (
     string companyName
   )
     external
     onlyPermittedSmartContract
   {
-    userManager.setDentist(dbAddress, msg.sender, isODLLDentist, isAvailable, companyName);
-    OnDentistAdded(msg.sender);
+    userManager.setDentistCompany(dbAddress, msg.sender, companyName);
+    OnDentistCompanySet(msg.sender);
   }
 
-  function addODLLDentist(
-    address userId
+  function setODLLDentist (
+    address userId,
+    bool odllDentistValue
   )
     external
-    onlyOwnerOrActiveAdminOrActiveManager
   {
-    userManager.addODLLDentist(dbAddress, userId);
+    userManager.setODLLDentist(dbAddress, userId, odllDentistValue);
+  }
+
+  function setODLLDentists (
+    address[] userIds,
+    bool odllDentistValue
+  )
+    external
+  {
+    userManager.setODLLDentists(dbAddress, userIds, odllDentistValue);
   }
 
   function addOfficialToODLL(address officialId, uint8 userType)
@@ -119,4 +126,3 @@ contract UserWriter is Restrictor {
     selfdestruct(newContractAddress);
   }
 }
-
