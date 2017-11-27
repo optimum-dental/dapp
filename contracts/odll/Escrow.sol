@@ -40,7 +40,7 @@ contract Escrow is Restrictor {
     uint amount = DB(dbAddress).getUIntValue(keccak256("case/amount", caseId));
     uint quote = DB(dbAddress).getUIntValue(keccak256("case/quote", caseId));
 
-    require(amount != 0);
+    require(amount >= 0);
     require(this.balance >= amount);
 
     DB(dbAddress).setUInt8Value(keccak256("payment/state", paymentId), 3);
@@ -60,7 +60,7 @@ contract Escrow is Restrictor {
     uint amount = DB(dbAddress).getUIntValue(keccak256("treatment/amount", treatmentId));
     uint quote = DB(dbAddress).getUIntValue(keccak256("treatment/quote", treatmentId));
 
-    require(amount != 0);
+    require(amount >= 0);
     require(this.balance >= amount);
 
     DB(dbAddress).setUInt8Value(keccak256("payment/state", paymentId), 3);
@@ -77,7 +77,7 @@ contract Escrow is Restrictor {
     uint paymentForType = DB(dbAddress).getUInt8Value(keccak256("payment/for-type", paymentId));
     uint amount = paymentForType == 1 ? DB(dbAddress).getUIntValue(keccak256("case/amount", paymentId)) : DB(dbAddress).getUIntValue(keccak256("treatment/amount", paymentId));
 
-    require(amount != 0);
+    require(amount >= 0);
     require(this.balance >= amount);
 
     DB(dbAddress).setUInt8Value(keccak256("payment/state", paymentId), 3);

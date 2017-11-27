@@ -45,17 +45,22 @@ class Manager {
     ]
   }
 
-  writeData (state = null, data = {}) {
+  writeData (state = null, data = {}, value = null) {
     const blockchainData = Object.assign({}, data)
     const blockchainMethodName = blockchainData.methodName
     const contractToUse = blockchainData.contractIndexToUse ? serviceManager.getContractToUse()[blockchainData.contractIndexToUse] : null
     delete blockchainData.managerId
     delete blockchainData.methodName
     delete blockchainData.contractIndexToUse
+    delete blockchainData.value
+    const blockchainParams = (coinbase) => {
+      return value ? {from: coinbase, value} : {from: coinbase}
+    }
+    console.log(blockchainData, value)
     return blockchainManager.querySmartContract({
       smartContractMethod: blockchainMethodName,
       contractToUse: contractToUse || ServiceWriter,
-      smartContractMethodParams: (coinbase) => [...(Object.values(blockchainData)), {from: coinbase}],
+      smartContractMethodParams: (coinbase) => [...(Object.values(blockchainData)), blockchainParams(coinbase)],
       state,
       smartContractResolve: result => data,
       smartContractReject: error => error

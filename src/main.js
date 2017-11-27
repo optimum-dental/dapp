@@ -218,7 +218,8 @@ new Vue({
         methodName: payload.methodName,
         contractIndexToUse: payload.contractIndexToUse
       })
-      managers[payload.managerIndex || 0].writeData(this.$store.state, actionParams)
+      const value = payload.value
+      managers[payload.managerIndex || 0].writeData(this.$store.state, actionParams, value)
       .then((responseObject) => {
         if (payload.callback) payload.callback(responseObject)
       })

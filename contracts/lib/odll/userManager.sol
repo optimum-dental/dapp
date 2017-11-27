@@ -724,11 +724,12 @@ library userManager {
     address patientId,
     uint scanApplicationId,
     uint paymentId,
+    uint amount,
     uint quote
   )
     internal
   {
-    servicesLibrary.acceptScanApplication(dbAddress, dentistId, patientId, scanApplicationId, paymentId, quote);
+    servicesLibrary.acceptScanApplication(dbAddress, dentistId, patientId, scanApplicationId, paymentId, amount, quote);
   }
 
   function releaseFundForScan (
@@ -828,11 +829,12 @@ library userManager {
     address patientId,
     uint treatmentApplicationId,
     uint paymentId,
+    uint amount,
     uint quote
   )
     internal
   {
-    servicesLibrary.acceptTreatmentApplication(dbAddress, dentistId, patientId, treatmentApplicationId, paymentId, quote);
+    servicesLibrary.acceptTreatmentApplication(dbAddress, dentistId, patientId, treatmentApplicationId, paymentId, amount, quote);
   }
 
   function releaseFundForTreatment (

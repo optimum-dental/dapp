@@ -12729,6 +12729,13 @@
                             "isSlot": false,
                             "src": "13913:7:0",
                             "valueSize": 1
+                          },
+                          "equal": {
+                            "declaration": 882,
+                            "isOffset": false,
+                            "isSlot": false,
+                            "src": "13896:5:0",
+                            "valueSize": 1
                           }
                         },
                         {
@@ -12743,7 +12750,7 @@
                             "declaration": 849,
                             "isOffset": false,
                             "isSlot": false,
-                            "src": "13822:6:0",
+                            "src": "13869:6:0",
                             "valueSize": 1
                           },
                           "selfptr": {
@@ -12759,7 +12766,7 @@
                             "declaration": 849,
                             "isOffset": false,
                             "isSlot": false,
-                            "src": "13869:6:0",
+                            "src": "13822:6:0",
                             "valueSize": 1
                           },
                           "selfptr": {
@@ -14009,7 +14016,7 @@
                                             "declaration": 944,
                                             "isOffset": false,
                                             "isSlot": false,
-                                            "src": "15502:7:0",
+                                            "src": "15563:7:0",
                                             "valueSize": 1
                                           }
                                         },
@@ -14213,7 +14220,7 @@
                                             "declaration": 954,
                                             "isOffset": false,
                                             "isSlot": false,
-                                            "src": "15781:3:0",
+                                            "src": "15746:3:0",
                                             "valueSize": 1
                                           }
                                         }
@@ -15307,7 +15314,7 @@
                                             "declaration": 1028,
                                             "isOffset": false,
                                             "isSlot": false,
-                                            "src": "17309:3:0",
+                                            "src": "17051:3:0",
                                             "valueSize": 1
                                           },
                                           "selfptr": {
@@ -15408,7 +15415,7 @@
                                             "declaration": 1028,
                                             "isOffset": false,
                                             "isSlot": false,
-                                            "src": "17223:3:0",
+                                            "src": "17212:3:0",
                                             "valueSize": 1
                                           },
                                           "selfptr": {
@@ -15463,7 +15470,7 @@
                                             "declaration": 1028,
                                             "isOffset": false,
                                             "isSlot": false,
-                                            "src": "17400:3:0",
+                                            "src": "17411:3:0",
                                             "valueSize": 1
                                           },
                                           "needlelen": {
@@ -23234,5 +23241,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-11-26T19:58:26.754Z"
+  "updatedAt": "2017-11-27T01:21:26.156Z"
 }

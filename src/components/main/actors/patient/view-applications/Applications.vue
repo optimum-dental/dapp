@@ -98,11 +98,12 @@
             },
             managerIndex: 2, // which of the contract managers to use
             contractIndexToUse: applicationTypeId === 1 ? 6 : 12,
+            value: this.$store.state.web3.instance().toWei(Math.ceil(quoteInEther), 'ether'),
             methodName: applicationTypeId === 1 ? 'acceptScanApplication' : 'acceptTreatmentApplication',
             callback: (status) => {
               this.endWait(document.querySelector('.wrapper'))
               this.enableNecessaryButtons(evt)
-              if (status) this.fetchApplications(null, this.currentOffset, this.$store.state.searchResult[applicationTypeId === 1 ? 'fetchScanApplications' : 'fetchTreatmentApplications'].seed, 1, this.$route.query.aTI)
+              if (status) this.fetchApplications(null, this.currentOffset, this.$store.state.searchResult[applicationTypeId === 1 ? 'fetchScanApplications' : 'fetchTreatmentApplications'].seed, 1, Number(this.$route.query.aTI))
               this.notify(status ? 'Application Successfully accepted' : 'Unable to accept Application')
             }
           })

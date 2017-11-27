@@ -5,7 +5,6 @@
 /*
 DB.at('0xc5668d26804abff30ca97dcf0eb4b14be11ab474').addPermittedContracts([
   "0xd1ba29ebc79e3fcda240165667af7f4c1d5da399", // Setter
-  "0x6fae820d9c62903fa93dfe989edf0c8228eb4659", // Escrow
   "0x50241f79166ad2f7247fe0a76d035af405a4905f", // UserWriter
   "0x00a0caa2d19f1c0532119fd68fdb48b29479ecb3", // UserReader
   "0xdfe8976bbed822e7e006b11e143c7d93ef9c3b03", // ServiceWriter
@@ -14,14 +13,15 @@ DB.at('0xc5668d26804abff30ca97dcf0eb4b14be11ab474').addPermittedContracts([
   "0xbbb635b46505f9719b4f6533212becdc0af508e6", // ScanRequestReader
   "0x490cc5955d6ac7d62ce3180e1f8ad5afebf3dfa6", // ScanRequestReader2
   "0xbf126c35b9da432d849bbdcff42bddc1510ab9eb", // ScanApplicationWriter
-  "0x8436b4aab0dbccdc7599d9adde2cb1190b296178", // ScanApplicationWriter2
+  "0x5ea3a9387f39351449943d0fa18236923d9e86b1", // ScanApplicationWriter2
   "0x72045eb257fc0f232389cebc397615fad4e29fe8", // ScanApplicationReader
   "0x5a4a87fb24c5ebaa59d849ce049a8387f027287f", // TreatmentRequestWriter
   "0xc8fcb8e31e3dcce07e2e88de8de35b74d01ea4c9", // TreatmentRequestReader
   "0xfe5303d40746eda3c2cc4ead865854e440f3b1f7", // TreatmentRequestReader2
   "0x00ce8b9f6eb6c6d5e2b12928011737cf3e807825", // TreatmentApplicationWriter
-  "0x3135711196a2daae0cc0e596c50f27d95ccad600", // TreatmentApplicationWriter2
+  "0x071f3fc1169b077f15ae01497c91504abe6c69a2", // TreatmentApplicationWriter2
   "0x5730b38102b96ef4dd6b0b4a482fe6b2d56e38d6", // TreatmentApplicationReader
+  "0x2872390c76c835c89a28dcb998c6e3e0cb3ec4e6", // Escrow
 ])
 */
 
@@ -29,14 +29,22 @@ DB.at('0xc5668d26804abff30ca97dcf0eb4b14be11ab474').addPermittedContracts([
 DB.at('0xc5668d26804abff30ca97dcf0eb4b14be11ab474').addPermittedContracts(["0xd1ba29ebc79e3fcda240165667af7f4c1d5da399"])
 
 // Add user contracts
-DB.at('0xc5668d26804abff30ca97dcf0eb4b14be11ab474').addPermittedContracts(["0x6fae820d9c62903fa93dfe989edf0c8228eb4659", "0x50241f79166ad2f7247fe0a76d035af405a4905f", "0x00a0caa2d19f1c0532119fd68fdb48b29479ecb3", "0xdfe8976bbed822e7e006b11e143c7d93ef9c3b03", "0x12720895a61f279401674a6e489a313c78feac69", "0xfa857fe158a9f4a7745296b4d98c7a35eaa14447", "0xbbb635b46505f9719b4f6533212becdc0af508e6", "0x490cc5955d6ac7d62ce3180e1f8ad5afebf3dfa6", "0xbf126c35b9da432d849bbdcff42bddc1510ab9eb", "0x8436b4aab0dbccdc7599d9adde2cb1190b296178", "0x72045eb257fc0f232389cebc397615fad4e29fe8", "0x5a4a87fb24c5ebaa59d849ce049a8387f027287f", "0xc8fcb8e31e3dcce07e2e88de8de35b74d01ea4c9", "0xfe5303d40746eda3c2cc4ead865854e440f3b1f7", "0x00ce8b9f6eb6c6d5e2b12928011737cf3e807825", "0x3135711196a2daae0cc0e596c50f27d95ccad600", "0x5730b38102b96ef4dd6b0b4a482fe6b2d56e38d6"])
+DB.at('0xc5668d26804abff30ca97dcf0eb4b14be11ab474').addPermittedContracts(["0x50241f79166ad2f7247fe0a76d035af405a4905f", "0x00a0caa2d19f1c0532119fd68fdb48b29479ecb3", "0xdfe8976bbed822e7e006b11e143c7d93ef9c3b03", "0x12720895a61f279401674a6e489a313c78feac69", "0xfa857fe158a9f4a7745296b4d98c7a35eaa14447", "0xbbb635b46505f9719b4f6533212becdc0af508e6", "0x490cc5955d6ac7d62ce3180e1f8ad5afebf3dfa6", "0xbf126c35b9da432d849bbdcff42bddc1510ab9eb", "0x5ea3a9387f39351449943d0fa18236923d9e86b1", "0x72045eb257fc0f232389cebc397615fad4e29fe8", "0x5a4a87fb24c5ebaa59d849ce049a8387f027287f", "0xc8fcb8e31e3dcce07e2e88de8de35b74d01ea4c9", "0xfe5303d40746eda3c2cc4ead865854e440f3b1f7", "0x00ce8b9f6eb6c6d5e2b12928011737cf3e807825", "0x071f3fc1169b077f15ae01497c91504abe6c69a2", "0x5730b38102b96ef4dd6b0b4a482fe6b2d56e38d6", "0x2872390c76c835c89a28dcb998c6e3e0cb3ec4e6"])
+
+
+
+// misc
+DB.at('0xc5668d26804abff30ca97dcf0eb4b14be11ab474').addPermittedContracts(["0x5ea3a9387f39351449943d0fa18236923d9e86b1", "0x071f3fc1169b077f15ae01497c91504abe6c69a2", "0x2872390c76c835c89a28dcb998c6e3e0cb3ec4e6"])
+
+
+
 
 Setter.at('0xd1ba29ebc79e3fcda240165667af7f4c1d5da399').setOwner()
 
 Setter.at('0xd1ba29ebc79e3fcda240165667af7f4c1d5da399').setConfig()
 
 Setter.at('0xd1ba29ebc79e3fcda240165667af7f4c1d5da399').setFirstAdmin("0xe1eb3251dce3d8ba0bf186bffeba19cbc7c1ddf4") // Phoebe
-Setter.at('0xd1ba29ebc79e3fcda240165667af7f4c1d5da399').setEscrowAddress("0x6fae820d9c62903fa93dfe989edf0c8228eb4659")
+Setter.at('0xd1ba29ebc79e3fcda240165667af7f4c1d5da399').setEscrowAddress("0x2872390c76c835c89a28dcb998c6e3e0cb3ec4e6")
 
 // UserWriter.at('0x50241f79166ad2f7247fe0a76d035af405a4905f').addOfficialToODLL('0xe2761238fe59bc0dde7d2a15bad605cda6047c5a', 4) // Quadri
 // UserWriter.at('0x50241f79166ad2f7247fe0a76d035af405a4905f').addOfficialToODLL('0xf0bc73eaa439392723f0dc653abfb9058112bee1', 4) // Tina

@@ -19,16 +19,18 @@ contract ScanApplicationWriter2 is Restrictor {
     payable
     onlyPermittedSmartContract
   {
-    require(DB(dbAddress).getAddressValue(keccak256("odll/escrow-address", scanApplicationId)) != 0x0);
+    require(DB(dbAddress).getAddressValue(keccak256("odll/escrow-address")) != 0x0);
     uint amount = msg.value;
-    if (amount < quote) {
-      msg.sender.transfer(amount);
-      return;
+    require(amount >= quote);
+    if (amount > quote) {
+      uint tempAmount = amount;
+      amount = quote;
+      msg.sender.transfer(SafeMath.sub(tempAmount, quote));
     }
 
     uint paymentId = utilities.getArrayItemsCount(dbAddress, "payments-count");
     DB(dbAddress).setUIntValue(keccak256("payment/for-type", paymentId), 1);
-    userManager.acceptScanApplication(dbAddress, dentistId, msg.sender, scanApplicationId, paymentId, quote);
+    userManager.acceptScanApplication(dbAddress, dentistId, msg.sender, scanApplicationId, paymentId, amount, quote);
 
     /*var idx = DB(dbAddress).getUIntValue(keccak256(countKey));
     DB(dbAddress).setAddressValue(keccak256(key, idx), val);

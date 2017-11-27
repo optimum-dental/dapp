@@ -253,7 +253,8 @@ library servicesLibrary {
     address patientId,
     uint scanApplicationId,
     uint paymentId,
-    uint amount // the quote as stated by the dentist
+    uint amount,
+    uint quote
   )
     internal
   {
@@ -269,7 +270,7 @@ library servicesLibrary {
 
     uint scanServiceId = DB(dbAddress).getUIntValue(keccak256("scan-application/scan-service", scanApplicationId));
     initCase(dbAddress, dentistId, patientId, scanServiceId, scanRequestId, scanApplicationId, caseId);
-    writeCaseData(dbAddress, dentistId, patientId, caseId, paymentId, amount);
+    writeCaseData(dbAddress, dentistId, patientId, caseId, paymentId, amount, quote);
 
     DB(dbAddress).setUInt8Value(keccak256("scan-request/status", scanRequestId), 4);
     DB(dbAddress).setUInt8Value(keccak256("scan-application/status", scanApplicationId), 4);
@@ -297,8 +298,9 @@ library servicesLibrary {
     utilities.addArrayItem(dbAddress, "case", "cases-count", caseId); // caseId is currently just there for counter purpose
   }
 
-  function writeCaseData (address dbAddress, address dentistId, address patientId, uint caseId, uint paymentId, uint amount) internal {
+  function writeCaseData (address dbAddress, address dentistId, address patientId, uint caseId, uint paymentId, uint amount, uint quote) internal {
     DB(dbAddress).setUIntValue(keccak256("case/amount", caseId), amount);
+    DB(dbAddress).setUIntValue(keccak256("case/quote", caseId), quote);
     DB(dbAddress).setBooleanValue(keccak256("case/paid", caseId), true);
     DB(dbAddress).setUIntValue(keccak256("case/payment", caseId), paymentId);
     DB(dbAddress).setUIntValue(keccak256("payment/case", paymentId), caseId);
@@ -468,7 +470,8 @@ library servicesLibrary {
     address patientId,
     uint treatmentApplicationId,
     uint paymentId,
-    uint amount // the quote as stated by the dentist
+    uint amount,
+    uint quote
   )
     internal
   {
@@ -483,7 +486,7 @@ library servicesLibrary {
       && DB(dbAddress).getAddressValue(keccak256("treatment-application/patient", treatmentApplicationId)) == patientId);
 
     initTreatment(dbAddress, dentistId, patientId, treatmentRequestId, treatmentApplicationId, treatmentId);
-    writeTreatmentData(dbAddress, dentistId, patientId, treatmentId, paymentId, amount);
+    writeTreatmentData(dbAddress, dentistId, patientId, treatmentId, paymentId, amount, quote);
 
     DB(dbAddress).setUInt8Value(keccak256("treatment-request/status", treatmentRequestId), 2);
     DB(dbAddress).setUInt8Value(keccak256("treatment-application/status", treatmentApplicationId), 4);
@@ -510,8 +513,9 @@ library servicesLibrary {
     utilities.addArrayItem(dbAddress, "treatment", "treatments-count", treatmentId); // treatmentId is currently just there for counter purpose
   }
 
-  function writeTreatmentData (address dbAddress, address dentistId, address patientId, uint treatmentId, uint paymentId, uint amount) internal {
+  function writeTreatmentData (address dbAddress, address dentistId, address patientId, uint treatmentId, uint paymentId, uint amount, uint quote) internal {
     DB(dbAddress).setUIntValue(keccak256("treatment/amount", treatmentId), amount);
+    DB(dbAddress).setUIntValue(keccak256("treatment/quote", treatmentId), quote);
     DB(dbAddress).setBooleanValue(keccak256("treatment/paid", treatmentId), true);
     DB(dbAddress).setUIntValue(keccak256("treatment/payment", treatmentId), paymentId);
     DB(dbAddress).setUIntValue(keccak256("payment/treatment", paymentId), treatmentId);
