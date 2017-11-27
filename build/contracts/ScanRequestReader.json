@@ -2440,7 +2440,7 @@
     "3": {
       "events": {},
       "links": {},
-      "address": "0x7d3c9a693fea510bd0dc837c052b044b079659e4"
+      "address": "0x6a8bfeca8525473da83d87e5aa12550b08f0bf13"
     },
     "666": {
       "events": {},
@@ -2449,5 +2449,5 @@
     }
   },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-11-26T14:39:38.568Z"
+  "updatedAt": "2017-11-27T12:38:50.324Z"
 }

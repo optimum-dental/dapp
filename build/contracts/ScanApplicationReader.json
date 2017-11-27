@@ -1227,7 +1227,7 @@
     "3": {
       "events": {},
       "links": {},
-      "address": "0x98f24b7894e3379e2a6be3fa4b1b2b7f1e7419d4"
+      "address": "0x3532f5bb5f2b7dbb647080bd398fbf64cc681d46"
     },
     "666": {
       "events": {},
@@ -1236,5 +1236,5 @@
     }
   },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-11-26T14:39:38.583Z"
+  "updatedAt": "2017-11-27T12:38:50.331Z"
 }

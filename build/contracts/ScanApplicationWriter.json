@@ -1082,7 +1082,7 @@
     "3": {
       "events": {},
       "links": {},
-      "address": "0x936ea5f2a88deb61bef51fa1db905a30b254b560"
+      "address": "0xb005d7c38b3735a08a7ed0de3c27367732d68122"
     },
     "666": {
       "events": {},
@@ -1091,5 +1091,5 @@
     }
   },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-11-26T14:39:38.556Z"
+  "updatedAt": "2017-11-27T12:38:50.329Z"
 }
