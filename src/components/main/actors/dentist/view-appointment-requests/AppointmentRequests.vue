@@ -69,24 +69,30 @@
           }
         })
 
-        appointmentRequestsPage.addEventListener('click', function (evt) {
+        // appointmentRequestsPage.addEventListener('click', function (evt) {
+        //   let target = evt.target
+        //   switch (true) {
+        //     case (target.classList.contains('apply-to-scan')):
+        //       _this.showApplicationForm(evt)
+        //       break
+        //   }
+        // })
+
+        document.body.addEventListener('click', function (evt) {
           let target = evt.target
           switch (true) {
             case (target.classList.contains('apply-to-scan')):
               _this.showApplicationForm(evt)
               break
-          }
-        })
-
-        document.body.addEventListener('click', function (evt) {
-          let target = evt.target
-          switch (true) {
             case (target.classList.contains('apply-button')):
               _this.applyToScan(evt)
               break
             case (target.classList.contains('cancel-apply-button')):
               const applicationForm = document.querySelector('.modal')
-              if (applicationForm) applicationForm.remove()
+              if (applicationForm) {
+                applicationForm.remove()
+                document.body.style.overflow = 'visible'
+              }
               break
           }
         })
@@ -96,6 +102,8 @@
         const scanRequest = this.$store.state.searchResult['fetchScanRequests'].data[this.currentOffset][sn]
         const applicationForm = this.getApplicationFormDOMElement(scanRequest)
         document.body.appendChild(applicationForm)
+        applicationForm.style.top = `${window.pageYOffset}px`
+        document.body.style.overflow = 'hidden'
       },
       getApplicationFormDOMElement (scanRequest = {}) {
         return new DOMParser().parseFromString(`
@@ -107,7 +115,7 @@
 
               <div class='modal-entry'>
                 <label for='quote'>Quote [USD]</label>
-                <input type='number' id='quote' placeholder='Quote in USD'>
+                <input type='number' id='quote' placeholder='Quote in USD' value='${scanRequest.fee}'>
               </div>
 
               <div class='modal-entry'>
@@ -132,6 +140,8 @@
         const comment = `b${document.getElementById('comment').value}`
 
         this.scrollToTop()
+        const applicationForm = document.querySelector('.modal')
+        if (applicationForm) applicationForm.style.top = '0px'
         this.disableNecessaryButtons(evt)
         this.beginWait(document.querySelector('.wrapper'))
         this.$root.callToWriteData({
@@ -149,8 +159,10 @@
             this.enableNecessaryButtons(evt)
             if (status) this.fetchRequests(null, this.currentOffset, this.$store.state.searchResult['fetchScanRequests'].seed, 1, this.$route.query.rTI)
             this.notify(status ? 'Application Successfully added' : 'Unable to add Application')
-            const applicationForm = document.querySelector('.modal')
-            if (applicationForm) applicationForm.remove()
+            if (applicationForm) {
+              applicationForm.remove()
+              document.body.style.overflow = 'visible'
+            }
           }
         })
       },
@@ -302,6 +314,7 @@
         const resultDOMElement = new DOMParser().parseFromString(`
           <div class="result">
             <div class="appointment-for appointment-data">Request for: <span>${serviceTypes[1].subtypes[result.serviceId]}</span></div>
+            <div class="appointment-for appointment-data">Original Quote: <span>$${result.fee}</span></div>
             <div class="appointment-date appointment-data">Date: <span>${formatDate(new Date(Number(result.date)))}</span></div>
             <div class="appointment-time appointment-data">Time: <span>${result.time}</span></div>
             <div class="appointment-insurance appointment-data">Insurance: <span>${result.insurance}</span></div>

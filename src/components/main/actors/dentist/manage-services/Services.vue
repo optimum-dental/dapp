@@ -767,14 +767,14 @@
   }
 
   .service-name {
-    width: 50%;
+    width: 90%;
     height: 40px;
     font-size: 20px;
     line-height: 40px;
   }
 
   .service-fee {
-    width: 50%;
+    width: 90%;
     height: 40px;
     font-size: 16px;
     line-height: 40px;

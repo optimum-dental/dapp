@@ -679,7 +679,7 @@
                             "declaration": 8,
                             "isOffset": false,
                             "isSlot": false,
-                            "src": "2571:4:0",
+                            "src": "2603:4:0",
                             "valueSize": 1
                           },
                           "mask": {
@@ -719,6 +719,13 @@
                             "isOffset": false,
                             "isSlot": false,
                             "src": "2578:4:0",
+                            "valueSize": 1
+                          },
+                          "src": {
+                            "declaration": 10,
+                            "isOffset": false,
+                            "isSlot": false,
+                            "src": "2516:3:0",
                             "valueSize": 1
                           }
                         },
@@ -757,7 +764,7 @@
                             "declaration": 34,
                             "isOffset": false,
                             "isSlot": false,
-                            "src": "2526:4:0",
+                            "src": "2578:4:0",
                             "valueSize": 1
                           },
                           "src": {
@@ -3532,6 +3539,13 @@
                             "isSlot": false,
                             "src": "5314:3:0",
                             "valueSize": 1
+                          },
+                          "retptr": {
+                            "declaration": 229,
+                            "isOffset": false,
+                            "isSlot": false,
+                            "src": "5300:6:0",
+                            "valueSize": 1
                           }
                         },
                         {
@@ -3540,6 +3554,13 @@
                             "isOffset": false,
                             "isSlot": false,
                             "src": "5300:6:0",
+                            "valueSize": 1
+                          },
+                          "ret": {
+                            "declaration": 221,
+                            "isOffset": false,
+                            "isSlot": false,
+                            "src": "5314:3:0",
                             "valueSize": 1
                           }
                         }
@@ -11891,6 +11912,13 @@
                                     "isSlot": false,
                                     "src": "12966:6:0",
                                     "valueSize": 1
+                                  },
+                                  "equal": {
+                                    "declaration": 814,
+                                    "isOffset": false,
+                                    "isSlot": false,
+                                    "src": "12997:5:0",
+                                    "valueSize": 1
                                   }
                                 },
                                 {
@@ -11906,6 +11934,13 @@
                                     "isOffset": false,
                                     "isSlot": false,
                                     "src": "12997:5:0",
+                                    "valueSize": 1
+                                  },
+                                  "self": {
+                                    "declaration": 797,
+                                    "isOffset": false,
+                                    "isSlot": false,
+                                    "src": "12910:4:0",
                                     "valueSize": 1
                                   }
                                 }
@@ -12720,7 +12755,7 @@
                             "declaration": 849,
                             "isOffset": false,
                             "isSlot": false,
-                            "src": "13869:6:0",
+                            "src": "13822:6:0",
                             "valueSize": 1
                           },
                           "selfptr": {
@@ -23241,5 +23276,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-11-27T01:21:26.156Z"
+  "updatedAt": "2017-11-30T08:47:18.818Z"
 }

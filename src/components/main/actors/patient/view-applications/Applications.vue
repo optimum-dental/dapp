@@ -85,7 +85,6 @@
           const USDExchange = JSONResponse[0].price_usd
           const quoteInEther = application.quote / USDExchange
           const quoteInWei = this.$store.state.web3.instance().toWei(quoteInEther, 'ether')
-          console.log(quoteInEther, quoteInWei, Math.ceil(quoteInEther))
 
           this.scrollToTop()
           this.disableNecessaryButtons(evt)
@@ -158,7 +157,7 @@
             }
 
             if (result) {
-              this.appendResult(result, applicationTypeId)
+              if (result.status === 1) this.appendResult(result, applicationTypeId)
             } else {
               this.informOfNoApplication(applicationTypeId)
             }
@@ -170,9 +169,11 @@
         const resultSection = document.querySelector(`.${resultType === 1 ? 'scan-section' : 'treatment-section'}`)
         this.clearDOMElementChildren(resultSection)
         results.forEach((result) => {
-          const resultDOMElement = this.createResultDOMElement(result)
-          resultSection.appendChild(resultDOMElement)
-          resultDOMElement.querySelector('.gravatar-section').appendChild(result.userObject.avatarCanvas)
+          if (result.status === 1) {
+            const resultDOMElement = this.createResultDOMElement(result)
+            resultSection.appendChild(resultDOMElement)
+            resultDOMElement.querySelector('.gravatar-section').appendChild(result.userObject.avatarCanvas)
+          }
         })
       },
       appendResult (result, resultType = 1) {

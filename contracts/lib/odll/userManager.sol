@@ -3,7 +3,6 @@ pragma solidity 0.4.18;
 import "./utilities.sol";
 import "./servicesLibrary.sol";
 import "./searchLibrary.sol";
-import "../../odll/Escrow.sol";
 
 library userManager {
   using strings for *;
@@ -736,7 +735,6 @@ library userManager {
     address dbAddress,
     address dentistId,
     address patientId,
-    uint scanApplicationId,
     uint amount,
     uint quote
   )
@@ -841,7 +839,6 @@ library userManager {
     address dbAddress,
     address dentistId,
     address patientId,
-    uint treatmentApplicationId,
     uint amount,
     uint quote
   )

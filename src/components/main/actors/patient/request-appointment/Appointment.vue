@@ -78,11 +78,11 @@
             </div>
 
             <div class="entry-item">
-              <div class="entry-param">Scan Result *</div>
+              <div class="entry-param">Scan Results *</div>
               <div class="entry-value">
                 <label for="scan-result" class="scan-result-trigger list">
                   <span class="icon"></span>
-                  <span class="text">Choose Scan Result</span>
+                  <span class="text">Choose Scan Results</span>
                 </label>
                 <input id="scan-result" type="file" accept="image/*" multiple></select>
               </div>

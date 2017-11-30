@@ -19,7 +19,8 @@ contract TreatmentApplicationWriter2 is Restrictor {
     payable
     external
   {
-    require(DB(dbAddress).getAddressValue(keccak256("odll/escrow-address")) != 0x0);
+    address escrowAddress = DB(dbAddress).getAddressValue(keccak256("odll/escrow-address"));
+    require(escrowAddress != 0x0);
     uint amount = msg.value;
     require(amount >= quote);
     if (amount > quote) {
@@ -31,7 +32,8 @@ contract TreatmentApplicationWriter2 is Restrictor {
     uint paymentId = utilities.getArrayItemsCount(dbAddress, "payments-count");
     DB(dbAddress).setUIntValue(keccak256("payment/for-type", paymentId), 2);
     userManager.acceptTreatmentApplication(dbAddress, dentistId, msg.sender, treatmentApplicationId, paymentId, amount, quote);
-    DB(dbAddress).getAddressValue(keccak256("odll/escrow-address")).transfer(amount);
-    Escrow(DB(dbAddress).getAddressValue(keccak256("odll/escrow-address"))).lockPayment(msg.sender, paymentId);
+
+    Escrow(escrowAddress).lockPayment(msg.sender, paymentId);
+    escrowAddress.transfer(amount);
   }
 }

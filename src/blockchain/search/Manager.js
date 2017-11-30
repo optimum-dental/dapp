@@ -107,7 +107,11 @@ class Manager {
       serviceManager.getRequestDetail(state, requestObject)
       .then((result) => {
         Object.assign(dataObject, result)
-        resolve(dataObject)
+        serviceManager.getServiceFee(state, dataObject)
+        .then((result) => {
+          Object.assign(dataObject, result)
+          resolve(dataObject)
+        })
       })
       .catch(error => reject(error))
     })

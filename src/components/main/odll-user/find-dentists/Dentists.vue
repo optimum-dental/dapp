@@ -137,6 +137,15 @@
               }
 
               break
+            case target.classList.contains('link-to-appointment'):
+              _this.$router.push({
+                path: '/request-appointment',
+                query: {
+                  o: _this.currentOffset,
+                  sn: target.dataset.sn
+                }
+              })
+              break
           }
         })
       },
@@ -425,7 +434,7 @@
               ${averageRatingDOMElement.outerHTML}
               <div class="address">${result.address || 'Address: Not Supplied'}</div>
             </div>
-            ${this.user.isPatient && result.serviceTypeId !== 2 ? '<div class="request-appointment-section"><a href="/#/request-appointment?o=' + this.currentOffset + '&sn=' + result.SN + '" class="link-to-appointment">Request Appointment</a></div>' : ''}
+            ${this.user.isPatient && result.serviceTypeId !== 2 ? '<div class="request-appointment-section"><div class="link-to-appointment" data-sn="' + result.SN + '">Request Appointment</div></div>' : ''}
           </div>
         `, 'text/html').body.firstChild
         return resultDOMElement
@@ -795,5 +804,6 @@
     text-decoration: none;
     font-size: 14px;
     text-align: center;
+    cursor: pointer;
   }
 </style>
