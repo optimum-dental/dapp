@@ -53,6 +53,6 @@ module.exports = {
     // Use the default host and port when not using ropsten
     host: "localhost",
     port: 8545,
-    gas: 5700000
+    gas: 4700000
   }
 };

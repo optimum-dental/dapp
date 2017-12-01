@@ -1,7 +1,6 @@
 pragma solidity 0.4.18;
 import "./Restrictor.sol";
 import "../lib/odll/userManager.sol";
-import "./Escrow.sol";
 
 contract ScanApplicationWriter2 is Restrictor {
   function ScanApplicationWriter2 (address _dbAddress) public {
@@ -33,7 +32,7 @@ contract ScanApplicationWriter2 is Restrictor {
     DB(dbAddress).setUIntValue(keccak256("payment/for-type", paymentId), 1);
     userManager.acceptScanApplication(dbAddress, dentistId, msg.sender, scanApplicationId, paymentId, amount, quote);
 
-    Escrow(escrowAddress).lockPayment(msg.sender, paymentId);
+    lockPayment(msg.sender, paymentId);
     escrowAddress.transfer(amount);
   }
 }

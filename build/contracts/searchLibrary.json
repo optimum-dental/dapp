@@ -1,18 +1,18 @@
 {
   "contractName": "searchLibrary",
   "abi": [],
-  "bytecode": "0x60606040523415600e57600080fd5b603580601b6000396000f3006060604052600080fd00a165627a7a72305820dbe8a8fbedd16c6654a71b4f51d2203370a23eb696f1fda41adae125bab0e8910029",
-  "deployedBytecode": "0x6060604052600080fd00a165627a7a72305820dbe8a8fbedd16c6654a71b4f51d2203370a23eb696f1fda41adae125bab0e8910029",
-  "sourceMap": "52:8602:1:-;;;;;;;;;;;;;;;;;",
-  "deployedSourceMap": "52:8602:1:-;;;;;",
-  "source": "pragma solidity 0.4.18;\n\nimport \"./utilities.sol\";\n\nlibrary searchLibrary {\n  function getDentists(address dbAddress)\n    internal\n    view\n    returns (address[])\n  {\n    return utilities.getAddressArray(dbAddress, \"dentists/ids\", \"dentists/count\");\n  }\n\n  function getManagers(address dbAddress)\n    internal\n    view\n    returns (address[])\n  {\n    return utilities.getAddressArray(dbAddress, \"managers/ids\", \"managers/count\");\n  }\n\n  function getServiceFee(address dbAddress, uint serviceTypeId, uint serviceId, address userId)\n    internal\n    view\n    returns (uint)\n  {\n    if (serviceTypeId == 1) {\n      return DB(dbAddress).getUIntValue(keccak256(\"dentist/scan-service/fee\", userId, serviceId));\n    } else if (serviceTypeId == 2) {\n      return DB(dbAddress).getUIntValue(keccak256(\"dentist/treatment-service/fee\", userId, serviceId));\n    } else {\n      return 0;\n    }\n  }\n\n  function getServiceDentistsByBudget(address dbAddress, uint serviceTypeId, uint serviceId, uint[] budget)\n    internal\n    view\n    returns (\n      address[] foundDentists\n    ) {\n    var allDentistsRenderingService = getDentistsByService(dbAddress, serviceTypeId, serviceId);\n    foundDentists = new address[](allDentistsRenderingService.length);\n    uint j = 0;\n    for (uint i = 0; i < allDentistsRenderingService.length; i++) {\n      address dentistId = allDentistsRenderingService[i];\n      uint dentistFee = getServiceFee(dbAddress, serviceTypeId, serviceId, dentistId);\n      if (dentistFee >= budget[0] && dentistFee <= budget[1]) {\n        foundDentists[j] = dentistId;\n        j++;\n      }\n    }\n\n    foundDentists = utilities.take(j, foundDentists);\n  }\n\n  function getServiceDentistsByState(address dbAddress, uint serviceTypeId, uint serviceId, uint stateId)\n    internal\n    view\n    returns (\n      address[] foundDentists\n  ) {\n    var allDentistsRenderingService = getDentistsByService(dbAddress, serviceTypeId, serviceId);\n    foundDentists = new address[](allDentistsRenderingService.length);\n    uint j = 0;\n    for (uint i = 0; i < allDentistsRenderingService.length; i++) {\n      address dentistId = allDentistsRenderingService[i];\n      if (isFromState(dbAddress, dentistId, stateId)) {\n        foundDentists[j] = dentistId;\n        j++;\n      }\n    }\n\n    foundDentists = utilities.take(j, foundDentists);\n  }\n\n  function getDentistsByService(address dbAddress, uint serviceTypeId, uint serviceId)\n    internal\n    view\n    returns (\n      address[]\n  ) {\n    if (serviceTypeId == 1) {\n      return utilities.getRemovableIdArrayAddressItems(dbAddress, serviceId, \"scan-service/dentist\", \"scan-service/dentists-count\", \"scan-service/dentist-key\");\n    } else if (serviceTypeId == 2){\n      return utilities.getRemovableIdArrayAddressItems(dbAddress, serviceId, \"treatment-service/dentist\", \"treatment-service/dentists-count\", \"treatment-service/dentist-key\");\n    }\n  }\n\n  function getServices(address dbAddress, uint serviceTypeId, address userId)\n  internal\n  view\n  returns (uint[]) {\n    if (serviceTypeId == 1) {\n      return utilities.getRemovableIdArrayItems(dbAddress, userId, \"dentist/scan-service\", \"dentist/scan-services-count\", \"dentist/scan-service-key\");\n    } else if (serviceTypeId == 2){\n      return utilities.getRemovableIdArrayItems(dbAddress, userId, \"dentist/treatment-service\", \"dentist/treatment-services-count\", \"dentist/treatment-service-key\");\n    }\n  }\n\n  function getServiceFees(address dbAddress, uint serviceTypeId, uint[] serviceIds, address userId)\n    internal\n    view\n    returns (uint[] fees)\n  {\n    fees = new uint[](serviceIds.length);\n    for (uint i = 0; i < serviceIds.length; i++) {\n      fees[i] = getServiceFee(dbAddress, serviceTypeId, serviceIds[i], userId);\n    }\n  }\n\n  function isFromCountry(address dbAddress, address userId, uint countryId) internal view returns(bool) {\n    if (countryId == 0) {\n      return true;\n    }\n\n    return countryId == DB(dbAddress).getUIntValue(keccak256(\"user/country\", userId));\n  }\n\n  function isFromState(address dbAddress, address userId, uint stateId) internal view returns(bool) {\n    if (stateId == 0) {\n      return true;\n    }\n\n    return stateId == DB(dbAddress).getUIntValue(keccak256(\"user/state\", userId));\n  }\n\n  function getScanRequestsForPatient (\n    address dbAddress,\n    address patientId\n  )\n    internal\n    view\n    returns(\n      uint[] scanRequestsIds\n    )\n  {\n    scanRequestsIds = utilities.getIdArray(dbAddress, patientId, \"patient/scan-request\", \"patient/scan-requests-count\");\n  }\n\n  function getAcceptedScanRequestsForPatient (\n    address dbAddress,\n    address patientId\n  )\n    internal\n    view\n    returns (\n      uint[] scanRequestsIds\n    )\n  {\n    var allScanRequestsIds = utilities.getIdArray(dbAddress, patientId, \"patient/scan-request\", \"patient/scan-requests-count\");\n    var count = allScanRequestsIds.length;\n    scanRequestsIds = new uint[](count);\n\n    uint j = 0;\n    for (uint i = 0; i < count; i++) {\n      if (DB(dbAddress).getBooleanValue(keccak256(\"scan-request/is-accepted?\", allScanRequestsIds[i]))) {\n        scanRequestsIds[j] = allScanRequestsIds[i];\n        j++;\n      }\n    }\n\n    scanRequestsIds = utilities.take(j, scanRequestsIds);\n  }\n\n  function getScanApplicationsForPatient (\n    address dbAddress,\n    address patientId\n  )\n    internal\n    view\n    returns (\n      uint[] scanApplicationsIds\n    )\n  {\n    scanApplicationsIds = utilities.getIdArray(dbAddress, patientId, \"patient/scan-application\", \"patient/scan-applications-count\");\n  }\n\n  function getAllScanRequests (address dbAddress)\n    internal\n    view\n    returns(\n      uint[] scanRequestsIds\n    )\n  {\n    var allScanRequestsIds = utilities.getArrayItems(dbAddress, \"scan-request\", \"scan-requests-count\");\n    var count = allScanRequestsIds.length;\n    scanRequestsIds = new uint[](count);\n\n    uint j = 0;\n    for (uint i = 0; i < count; i++) {\n      if (DB(dbAddress).getBooleanValue(keccak256(\"scan-request/is-general?\", allScanRequestsIds[i]))) {\n        scanRequestsIds[j] = allScanRequestsIds[i];\n        j++;\n      }\n    }\n\n    scanRequestsIds = utilities.take(j, scanRequestsIds);\n  }\n\n  function getDirectScanRequestsForDentist (\n    address dbAddress,\n    address dentistId\n  )\n    internal\n    view\n    returns(\n      uint[] scanRequestsIds\n    )\n  {\n    scanRequestsIds = utilities.getIdArray(dbAddress, dentistId, \"dentist/scan-request\", \"dentist/scan-requests-count\");\n  }\n\n  function getAcceptedScanRequestsForDentist (\n    address dbAddress,\n    address dentistId\n  )\n    internal\n    view\n    returns (\n      uint[] scanRequestsIds\n    )\n  {\n    var allScanRequestsIds = utilities.getIdArray(dbAddress, dentistId, \"dentist/scan-request\", \"dentist/scan-requests-count\");\n    var count = allScanRequestsIds.length;\n    scanRequestsIds = new uint[](count);\n\n    uint j = 0;\n    for (uint i = 0; i < count; i++) {\n      if (DB(dbAddress).getBooleanValue(keccak256(\"scan-request/is-accepted?\", allScanRequestsIds[i]))) {\n        scanRequestsIds[j] = allScanRequestsIds[i];\n        j++;\n      }\n    }\n\n    scanRequestsIds = utilities.take(j, scanRequestsIds);\n  }\n\n  function getScanApplicationsForDentist (\n    address dbAddress,\n    address dentistId\n  )\n    internal\n    view\n    returns (\n      uint[] scanApplicationsIds\n    )\n  {\n    scanApplicationsIds = utilities.getIdArray(dbAddress, dentistId, \"dentist/scan-application\", \"dentist/scan-applications-count\");\n  }\n\n  function getTreatmentRequestsForPatient (\n    address dbAddress,\n    address patientId\n  )\n    internal\n    view\n    returns (\n      uint[] treatmentRequestsIds\n    )\n  {\n    treatmentRequestsIds = utilities.getIdArray(dbAddress, patientId, \"patient/treatment-request\", \"patient/treatment-requests-count\");\n  }\n\n  function getAllTreatmentRequests (\n    address dbAddress\n  )\n    internal\n    view\n    returns (\n      uint[] treatmentRequestsIds\n    )\n  {\n    treatmentRequestsIds = utilities.getArrayItems(dbAddress, \"treatment-request\", \"treatment-requests-count\");\n  }\n\n  function getTreatmentApplicationsForPatient (\n    address dbAddress,\n    address patientId\n  )\n    internal\n    view\n    returns (\n      uint[] treatmentApplicationsIds\n    )\n  {\n    treatmentApplicationsIds = utilities.getIdArray(dbAddress, patientId, \"patient/treatment-application\", \"patient/treatment-applications-count\");\n  }\n\n  function getTreatmentApplicationsForDentist (\n    address dbAddress,\n    address dentistId\n  )\n    internal\n    view\n    returns (\n      uint[] treatmentApplicationsIds\n    )\n  {\n    treatmentApplicationsIds = utilities.getIdArray(dbAddress, dentistId, \"dentist/treatment-application\", \"dentist/treatment-applications-count\");\n  }\n}\n",
+  "bytecode": "0x60606040523415600e57600080fd5b603580601b6000396000f3006060604052600080fd00a165627a7a723058204e78b3a369637d0a50324d2dda3c738f1907c9f3cf6b19050180063f6ba1806f0029",
+  "deployedBytecode": "0x6060604052600080fd00a165627a7a723058204e78b3a369637d0a50324d2dda3c738f1907c9f3cf6b19050180063f6ba1806f0029",
+  "sourceMap": "52:10067:1:-;;;;;;;;;;;;;;;;;",
+  "deployedSourceMap": "52:10067:1:-;;;;;",
+  "source": "pragma solidity 0.4.18;\n\nimport \"./utilities.sol\";\n\nlibrary searchLibrary {\n  function getDentists(address dbAddress)\n    internal\n    view\n    returns (address[])\n  {\n    return utilities.getAddressArray(dbAddress, \"dentists/ids\", \"dentists/count\");\n  }\n\n  function getManagers(address dbAddress)\n    internal\n    view\n    returns (address[])\n  {\n    return utilities.getAddressArray(dbAddress, \"managers/ids\", \"managers/count\");\n  }\n\n  function getServiceFee(address dbAddress, uint serviceTypeId, uint serviceId, address userId)\n    internal\n    view\n    returns (uint)\n  {\n    if (serviceTypeId == 1) {\n      return DB(dbAddress).getUIntValue(keccak256(\"dentist/scan-service/fee\", userId, serviceId));\n    } else if (serviceTypeId == 2) {\n      return DB(dbAddress).getUIntValue(keccak256(\"dentist/treatment-service/fee\", userId, serviceId));\n    } else {\n      return 0;\n    }\n  }\n\n  function getServiceDentistsByBudget(address dbAddress, uint serviceTypeId, uint serviceId, uint[] budget)\n    internal\n    view\n    returns (\n      address[] foundDentists\n    ) {\n    var allDentistsRenderingService = getDentistsByService(dbAddress, serviceTypeId, serviceId);\n    foundDentists = new address[](allDentistsRenderingService.length);\n    uint j = 0;\n    for (uint i = 0; i < allDentistsRenderingService.length; i++) {\n      address dentistId = allDentistsRenderingService[i];\n      uint dentistFee = getServiceFee(dbAddress, serviceTypeId, serviceId, dentistId);\n      if (dentistFee >= budget[0] && dentistFee <= budget[1]) {\n        foundDentists[j] = dentistId;\n        j++;\n      }\n    }\n\n    foundDentists = utilities.take(j, foundDentists);\n  }\n\n  function getServiceDentistsByState(address dbAddress, uint serviceTypeId, uint serviceId, uint stateId)\n    internal\n    view\n    returns (\n      address[] foundDentists\n  ) {\n    var allDentistsRenderingService = getDentistsByService(dbAddress, serviceTypeId, serviceId);\n    foundDentists = new address[](allDentistsRenderingService.length);\n    uint j = 0;\n    for (uint i = 0; i < allDentistsRenderingService.length; i++) {\n      address dentistId = allDentistsRenderingService[i];\n      if (isFromState(dbAddress, dentistId, stateId)) {\n        foundDentists[j] = dentistId;\n        j++;\n      }\n    }\n\n    foundDentists = utilities.take(j, foundDentists);\n  }\n\n  function getDentistsByService(address dbAddress, uint serviceTypeId, uint serviceId)\n    internal\n    view\n    returns (\n      address[]\n  ) {\n    if (serviceTypeId == 1) {\n      return utilities.getRemovableIdArrayAddressItems(dbAddress, serviceId, \"scan-service/dentist\", \"scan-service/dentists-count\", \"scan-service/dentist-key\");\n    } else if (serviceTypeId == 2){\n      return utilities.getRemovableIdArrayAddressItems(dbAddress, serviceId, \"treatment-service/dentist\", \"treatment-service/dentists-count\", \"treatment-service/dentist-key\");\n    }\n  }\n\n  function getServices(address dbAddress, uint serviceTypeId, address userId)\n  internal\n  view\n  returns (uint[]) {\n    if (serviceTypeId == 1) {\n      return utilities.getRemovableIdArrayItems(dbAddress, userId, \"dentist/scan-service\", \"dentist/scan-services-count\", \"dentist/scan-service-key\");\n    } else if (serviceTypeId == 2){\n      return utilities.getRemovableIdArrayItems(dbAddress, userId, \"dentist/treatment-service\", \"dentist/treatment-services-count\", \"dentist/treatment-service-key\");\n    }\n  }\n\n  function getServiceFees(address dbAddress, uint serviceTypeId, uint[] serviceIds, address userId)\n    internal\n    view\n    returns (uint[] fees)\n  {\n    fees = new uint[](serviceIds.length);\n    for (uint i = 0; i < serviceIds.length; i++) {\n      fees[i] = getServiceFee(dbAddress, serviceTypeId, serviceIds[i], userId);\n    }\n  }\n\n  function isFromCountry(address dbAddress, address userId, uint countryId) internal view returns(bool) {\n    if (countryId == 0) {\n      return true;\n    }\n\n    return countryId == DB(dbAddress).getUIntValue(keccak256(\"user/country\", userId));\n  }\n\n  function isFromState(address dbAddress, address userId, uint stateId) internal view returns(bool) {\n    if (stateId == 0) {\n      return true;\n    }\n\n    return stateId == DB(dbAddress).getUIntValue(keccak256(\"user/state\", userId));\n  }\n\n  function getScanRequestsForPatient (\n    address dbAddress,\n    address patientId\n  )\n    internal\n    view\n    returns(\n      uint[] scanRequestsIds\n    )\n  {\n    scanRequestsIds = utilities.getIdArray(dbAddress, patientId, \"patient/scan-request\", \"patient/scan-requests-count\");\n  }\n\n  function getAcceptedScanRequestsForPatient (\n    address dbAddress,\n    address patientId\n  )\n    internal\n    view\n    returns (\n      uint[] scanRequestsIds\n    )\n  {\n    var allScanRequestsIds = utilities.getIdArray(dbAddress, patientId, \"patient/scan-request\", \"patient/scan-requests-count\");\n    var count = allScanRequestsIds.length;\n    scanRequestsIds = new uint[](count);\n\n    uint j = 0;\n    for (uint i = 0; i < count; i++) {\n      if (DB(dbAddress).getBooleanValue(keccak256(\"scan-request/is-accepted?\", allScanRequestsIds[i]))) {\n        scanRequestsIds[j] = allScanRequestsIds[i];\n        j++;\n      }\n    }\n\n    scanRequestsIds = utilities.take(j, scanRequestsIds);\n  }\n\n  function getScanApplicationsForPatient (\n    address dbAddress,\n    address patientId\n  )\n    internal\n    view\n    returns (\n      uint[] scanApplicationsIds\n    )\n  {\n    scanApplicationsIds = utilities.getIdArray(dbAddress, patientId, \"patient/scan-application\", \"patient/scan-applications-count\");\n  }\n\n  function getAllScanRequests (address dbAddress)\n    internal\n    view\n    returns(\n      uint[] scanRequestsIds\n    )\n  {\n    var allScanRequestsIds = utilities.getArrayItems(dbAddress, \"scan-request\", \"scan-requests-count\");\n    var count = allScanRequestsIds.length;\n    scanRequestsIds = new uint[](count);\n\n    uint j = 0;\n    for (uint i = 0; i < count; i++) {\n      if (DB(dbAddress).getBooleanValue(keccak256(\"scan-request/is-general?\", allScanRequestsIds[i]))) {\n        scanRequestsIds[j] = allScanRequestsIds[i];\n        j++;\n      }\n    }\n\n    scanRequestsIds = utilities.take(j, scanRequestsIds);\n  }\n\n  function getDirectScanRequestsForDentist (\n    address dbAddress,\n    address dentistId\n  )\n    internal\n    view\n    returns(\n      uint[] scanRequestsIds\n    )\n  {\n    scanRequestsIds = utilities.getIdArray(dbAddress, dentistId, \"dentist/scan-request\", \"dentist/scan-requests-count\");\n  }\n\n  function getAcceptedScanRequestsForDentist (\n    address dbAddress,\n    address dentistId\n  )\n    internal\n    view\n    returns (\n      uint[] scanRequestsIds\n    )\n  {\n    var allScanRequestsIds = utilities.getIdArray(dbAddress, dentistId, \"dentist/scan-request\", \"dentist/scan-requests-count\");\n    var count = allScanRequestsIds.length;\n    scanRequestsIds = new uint[](count);\n\n    uint j = 0;\n    for (uint i = 0; i < count; i++) {\n      if (DB(dbAddress).getBooleanValue(keccak256(\"scan-request/is-accepted?\", allScanRequestsIds[i]))) {\n        scanRequestsIds[j] = allScanRequestsIds[i];\n        j++;\n      }\n    }\n\n    scanRequestsIds = utilities.take(j, scanRequestsIds);\n  }\n\n  function getScanApplicationsForDentist (\n    address dbAddress,\n    address dentistId\n  )\n    internal\n    view\n    returns (\n      uint[] scanApplicationsIds\n    )\n  {\n    scanApplicationsIds = utilities.getIdArray(dbAddress, dentistId, \"dentist/scan-application\", \"dentist/scan-applications-count\");\n  }\n\n  function getTreatmentRequestsForPatient (\n    address dbAddress,\n    address patientId\n  )\n    internal\n    view\n    returns (\n      uint[] treatmentRequestsIds\n    )\n  {\n    treatmentRequestsIds = utilities.getIdArray(dbAddress, patientId, \"patient/treatment-request\", \"patient/treatment-requests-count\");\n  }\n\n  function getAllTreatmentRequests (\n    address dbAddress\n  )\n    internal\n    view\n    returns (\n      uint[] treatmentRequestsIds\n    )\n  {\n    treatmentRequestsIds = utilities.getArrayItems(dbAddress, \"treatment-request\", \"treatment-requests-count\");\n  }\n\n  function getTreatmentApplicationsForPatient (\n    address dbAddress,\n    address patientId\n  )\n    internal\n    view\n    returns (\n      uint[] treatmentApplicationsIds\n    )\n  {\n    treatmentApplicationsIds = utilities.getIdArray(dbAddress, patientId, \"patient/treatment-application\", \"patient/treatment-applications-count\");\n  }\n\n  function getTreatmentApplicationsForDentist (\n    address dbAddress,\n    address dentistId\n  )\n    internal\n    view\n    returns (\n      uint[] treatmentApplicationsIds\n    )\n  {\n    treatmentApplicationsIds = utilities.getIdArray(dbAddress, dentistId, \"dentist/treatment-application\", \"dentist/treatment-applications-count\");\n  }\n\n  function getCasesForPatient (\n    address dbAddress,\n    address patientId\n  )\n    internal\n    view\n    returns (\n      uint[] casesIds\n    )\n  {\n    casesIds = utilities.getIdArray(dbAddress, patientId, \"patient/case\", \"patient/cases-count\");\n  }\n\n  function getCasesForDentist (\n    address dbAddress,\n    address dentistId\n  )\n    internal\n    view\n    returns (\n      uint[] casesIds\n    )\n  {\n    casesIds = utilities.getIdArray(dbAddress, dentistId, \"dentist/case\", \"dentist/cases-count\");\n  }\n\n  function getAllCases (\n    address dbAddress\n  )\n    internal\n    view\n    returns (\n      uint[] casesIds\n    )\n  {\n    casesIds = utilities.getArrayItems(dbAddress, \"case\", \"cases-count\");\n  }\n\n  function getTreatmentsForPatient (\n    address dbAddress,\n    address patientId\n  )\n    internal\n    view\n    returns (\n      uint[] treatmentIds\n    )\n  {\n    treatmentIds = utilities.getIdArray(dbAddress, patientId, \"patient/treatment\", \"patient/treatments-count\");\n  }\n\n  function getTreatmentsForDentist (\n    address dbAddress,\n    address dentistId\n  )\n    internal\n    view\n    returns (\n      uint[] treatmentIds\n    )\n  {\n    treatmentIds = utilities.getIdArray(dbAddress, dentistId, \"dentist/treatment\", \"dentist/treatments-count\");\n  }\n\n  function getAllTreatments (\n    address dbAddress\n  )\n    internal\n    view\n    returns (\n      uint[] casesIds\n    )\n  {\n    casesIds = utilities.getArrayItems(dbAddress, \"treatment\", \"treatments-count\");\n  }\n}\n",
   "sourcePath": "/Users/danielokwufulueze/dev/vue/apps/oraldatalink/contracts/lib/odll/searchLibrary.sol",
   "ast": {
     "attributes": {
       "absolutePath": "/Users/danielokwufulueze/dev/vue/apps/oraldatalink/contracts/lib/odll/searchLibrary.sol",
       "exportedSymbols": {
         "searchLibrary": [
-          2430
+          2550
         ]
       }
     },
@@ -31,10 +31,10 @@
       },
       {
         "attributes": {
-          "SourceUnit": 13550,
+          "SourceUnit": 13986,
           "absolutePath": "/Users/danielokwufulueze/dev/vue/apps/oraldatalink/contracts/lib/odll/utilities.sol",
           "file": "./utilities.sol",
-          "scope": 2431,
+          "scope": 2551,
           "symbolAliases": [
             null
           ],
@@ -56,10 +56,10 @@
           "documentation": null,
           "fullyImplemented": true,
           "linearizedBaseContracts": [
-            2430
+            2550
           ],
           "name": "searchLibrary",
-          "scope": 2431
+          "scope": 2551
         },
         "children": [
           {
@@ -72,7 +72,7 @@
               ],
               "name": "getDentists",
               "payable": false,
-              "scope": 2430,
+              "scope": 2550,
               "stateMutability": "view",
               "superFunction": null,
               "visibility": "internal"
@@ -198,7 +198,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "getAddressArray",
-                              "referencedDeclaration": 9300,
+                              "referencedDeclaration": 9736,
                               "type": "function (address,string memory,string memory) view returns (address[] memory)"
                             },
                             "children": [
@@ -208,7 +208,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 13549,
+                                  "referencedDeclaration": 13985,
                                   "type": "type(library utilities)",
                                   "value": "utilities"
                                 },
@@ -299,7 +299,7 @@
               ],
               "name": "getManagers",
               "payable": false,
-              "scope": 2430,
+              "scope": 2550,
               "stateMutability": "view",
               "superFunction": null,
               "visibility": "internal"
@@ -425,7 +425,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "getAddressArray",
-                              "referencedDeclaration": 9300,
+                              "referencedDeclaration": 9736,
                               "type": "function (address,string memory,string memory) view returns (address[] memory)"
                             },
                             "children": [
@@ -435,7 +435,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 13549,
+                                  "referencedDeclaration": 13985,
                                   "type": "type(library utilities)",
                                   "value": "utilities"
                                 },
@@ -526,7 +526,7 @@
               ],
               "name": "getServiceFee",
               "payable": false,
-              "scope": 2430,
+              "scope": 2550,
               "stateMutability": "view",
               "superFunction": null,
               "visibility": "internal"
@@ -766,7 +766,7 @@
                                       "isPure": false,
                                       "lValueRequested": false,
                                       "member_name": "getUIntValue",
-                                      "referencedDeclaration": 13825,
+                                      "referencedDeclaration": 14261,
                                       "type": "function (bytes32) view external returns (uint256)"
                                     },
                                     "children": [
@@ -796,7 +796,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 14441,
+                                              "referencedDeclaration": 14877,
                                               "type": "type(contract DB)",
                                               "value": "DB"
                                             },
@@ -862,7 +862,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 15705,
+                                          "referencedDeclaration": 15905,
                                           "type": "function () pure returns (bytes32)",
                                           "value": "keccak256"
                                         },
@@ -1023,7 +1023,7 @@
                                           "isPure": false,
                                           "lValueRequested": false,
                                           "member_name": "getUIntValue",
-                                          "referencedDeclaration": 13825,
+                                          "referencedDeclaration": 14261,
                                           "type": "function (bytes32) view external returns (uint256)"
                                         },
                                         "children": [
@@ -1053,7 +1053,7 @@
                                                   "overloadedDeclarations": [
                                                     null
                                                   ],
-                                                  "referencedDeclaration": 14441,
+                                                  "referencedDeclaration": 14877,
                                                   "type": "type(contract DB)",
                                                   "value": "DB"
                                                 },
@@ -1119,7 +1119,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 15705,
+                                              "referencedDeclaration": 15905,
                                               "type": "function () pure returns (bytes32)",
                                               "value": "keccak256"
                                             },
@@ -1256,7 +1256,7 @@
               ],
               "name": "getServiceDentistsByBudget",
               "payable": false,
-              "scope": 2430,
+              "scope": 2550,
               "stateMutability": "view",
               "superFunction": null,
               "visibility": "internal"
@@ -2503,7 +2503,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "take",
-                                  "referencedDeclaration": 12732,
+                                  "referencedDeclaration": 13168,
                                   "type": "function (uint256,address[] memory) pure returns (address[] memory)"
                                 },
                                 "children": [
@@ -2513,7 +2513,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 13549,
+                                      "referencedDeclaration": 13985,
                                       "type": "type(library utilities)",
                                       "value": "utilities"
                                     },
@@ -2589,7 +2589,7 @@
               ],
               "name": "getServiceDentistsByState",
               "payable": false,
-              "scope": 2430,
+              "scope": 2550,
               "stateMutability": "view",
               "superFunction": null,
               "visibility": "internal"
@@ -3589,7 +3589,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "take",
-                                  "referencedDeclaration": 12732,
+                                  "referencedDeclaration": 13168,
                                   "type": "function (uint256,address[] memory) pure returns (address[] memory)"
                                 },
                                 "children": [
@@ -3599,7 +3599,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 13549,
+                                      "referencedDeclaration": 13985,
                                       "type": "type(library utilities)",
                                       "value": "utilities"
                                     },
@@ -3675,7 +3675,7 @@
               ],
               "name": "getDentistsByService",
               "payable": false,
-              "scope": 2430,
+              "scope": 2550,
               "stateMutability": "view",
               "superFunction": null,
               "visibility": "internal"
@@ -3916,7 +3916,7 @@
                                       "isPure": false,
                                       "lValueRequested": false,
                                       "member_name": "getRemovableIdArrayAddressItems",
-                                      "referencedDeclaration": 11067,
+                                      "referencedDeclaration": 11503,
                                       "type": "function (address,uint256,string memory,string memory,string memory) view returns (address[] memory)"
                                     },
                                     "children": [
@@ -3926,7 +3926,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 13549,
+                                          "referencedDeclaration": 13985,
                                           "type": "type(library utilities)",
                                           "value": "utilities"
                                         },
@@ -4140,7 +4140,7 @@
                                           "isPure": false,
                                           "lValueRequested": false,
                                           "member_name": "getRemovableIdArrayAddressItems",
-                                          "referencedDeclaration": 11067,
+                                          "referencedDeclaration": 11503,
                                           "type": "function (address,uint256,string memory,string memory,string memory) view returns (address[] memory)"
                                         },
                                         "children": [
@@ -4150,7 +4150,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 13549,
+                                              "referencedDeclaration": 13985,
                                               "type": "type(library utilities)",
                                               "value": "utilities"
                                             },
@@ -4287,7 +4287,7 @@
               ],
               "name": "getServices",
               "payable": false,
-              "scope": 2430,
+              "scope": 2550,
               "stateMutability": "view",
               "superFunction": null,
               "visibility": "internal"
@@ -4528,7 +4528,7 @@
                                       "isPure": false,
                                       "lValueRequested": false,
                                       "member_name": "getRemovableIdArrayItems",
-                                      "referencedDeclaration": 10661,
+                                      "referencedDeclaration": 11097,
                                       "type": "function (address,address,string memory,string memory,string memory) view returns (uint256[] memory)"
                                     },
                                     "children": [
@@ -4538,7 +4538,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 13549,
+                                          "referencedDeclaration": 13985,
                                           "type": "type(library utilities)",
                                           "value": "utilities"
                                         },
@@ -4752,7 +4752,7 @@
                                           "isPure": false,
                                           "lValueRequested": false,
                                           "member_name": "getRemovableIdArrayItems",
-                                          "referencedDeclaration": 10661,
+                                          "referencedDeclaration": 11097,
                                           "type": "function (address,address,string memory,string memory,string memory) view returns (uint256[] memory)"
                                         },
                                         "children": [
@@ -4762,7 +4762,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 13549,
+                                              "referencedDeclaration": 13985,
                                               "type": "type(library utilities)",
                                               "value": "utilities"
                                             },
@@ -4899,7 +4899,7 @@
               ],
               "name": "getServiceFees",
               "payable": false,
-              "scope": 2430,
+              "scope": 2550,
               "stateMutability": "view",
               "superFunction": null,
               "visibility": "internal"
@@ -5595,7 +5595,7 @@
               ],
               "name": "isFromCountry",
               "payable": false,
-              "scope": 2430,
+              "scope": 2550,
               "stateMutability": "view",
               "superFunction": null,
               "visibility": "internal"
@@ -5878,7 +5878,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "getUIntValue",
-                                  "referencedDeclaration": 13825,
+                                  "referencedDeclaration": 14261,
                                   "type": "function (bytes32) view external returns (uint256)"
                                 },
                                 "children": [
@@ -5908,7 +5908,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 14441,
+                                          "referencedDeclaration": 14877,
                                           "type": "type(contract DB)",
                                           "value": "DB"
                                         },
@@ -5970,7 +5970,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 15705,
+                                      "referencedDeclaration": 15905,
                                       "type": "function () pure returns (bytes32)",
                                       "value": "keccak256"
                                     },
@@ -6049,7 +6049,7 @@
               ],
               "name": "isFromState",
               "payable": false,
-              "scope": 2430,
+              "scope": 2550,
               "stateMutability": "view",
               "superFunction": null,
               "visibility": "internal"
@@ -6332,7 +6332,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "getUIntValue",
-                                  "referencedDeclaration": 13825,
+                                  "referencedDeclaration": 14261,
                                   "type": "function (bytes32) view external returns (uint256)"
                                 },
                                 "children": [
@@ -6362,7 +6362,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 14441,
+                                          "referencedDeclaration": 14877,
                                           "type": "type(contract DB)",
                                           "value": "DB"
                                         },
@@ -6424,7 +6424,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 15705,
+                                      "referencedDeclaration": 15905,
                                       "type": "function () pure returns (bytes32)",
                                       "value": "keccak256"
                                     },
@@ -6503,7 +6503,7 @@
               ],
               "name": "getScanRequestsForPatient",
               "payable": false,
-              "scope": 2430,
+              "scope": 2550,
               "stateMutability": "view",
               "superFunction": null,
               "visibility": "internal"
@@ -6681,7 +6681,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "getIdArray",
-                                  "referencedDeclaration": 9757,
+                                  "referencedDeclaration": 10193,
                                   "type": "function (address,address,string memory,string memory) view returns (uint256[] memory)"
                                 },
                                 "children": [
@@ -6691,7 +6691,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 13549,
+                                      "referencedDeclaration": 13985,
                                       "type": "type(library utilities)",
                                       "value": "utilities"
                                     },
@@ -6801,7 +6801,7 @@
               ],
               "name": "getAcceptedScanRequestsForPatient",
               "payable": false,
-              "scope": 2430,
+              "scope": 2550,
               "stateMutability": "view",
               "superFunction": null,
               "visibility": "internal"
@@ -6976,7 +6976,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "getIdArray",
-                              "referencedDeclaration": 9757,
+                              "referencedDeclaration": 10193,
                               "type": "function (address,address,string memory,string memory) view returns (uint256[] memory)"
                             },
                             "children": [
@@ -6986,7 +6986,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 13549,
+                                  "referencedDeclaration": 13985,
                                   "type": "type(library utilities)",
                                   "value": "utilities"
                                 },
@@ -7475,7 +7475,7 @@
                                       "isPure": false,
                                       "lValueRequested": false,
                                       "member_name": "getBooleanValue",
-                                      "referencedDeclaration": 14101,
+                                      "referencedDeclaration": 14537,
                                       "type": "function (bytes32) view external returns (bool)"
                                     },
                                     "children": [
@@ -7505,7 +7505,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 14441,
+                                              "referencedDeclaration": 14877,
                                               "type": "type(contract DB)",
                                               "value": "DB"
                                             },
@@ -7567,7 +7567,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 15705,
+                                          "referencedDeclaration": 15905,
                                           "type": "function () pure returns (bytes32)",
                                           "value": "keccak256"
                                         },
@@ -7873,7 +7873,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "take",
-                                  "referencedDeclaration": 12632,
+                                  "referencedDeclaration": 13068,
                                   "type": "function (uint256,uint256[] memory) pure returns (uint256[] memory)"
                                 },
                                 "children": [
@@ -7883,7 +7883,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 13549,
+                                      "referencedDeclaration": 13985,
                                       "type": "type(library utilities)",
                                       "value": "utilities"
                                     },
@@ -7959,7 +7959,7 @@
               ],
               "name": "getScanApplicationsForPatient",
               "payable": false,
-              "scope": 2430,
+              "scope": 2550,
               "stateMutability": "view",
               "superFunction": null,
               "visibility": "internal"
@@ -8137,7 +8137,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "getIdArray",
-                                  "referencedDeclaration": 9757,
+                                  "referencedDeclaration": 10193,
                                   "type": "function (address,address,string memory,string memory) view returns (uint256[] memory)"
                                 },
                                 "children": [
@@ -8147,7 +8147,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 13549,
+                                      "referencedDeclaration": 13985,
                                       "type": "type(library utilities)",
                                       "value": "utilities"
                                     },
@@ -8257,7 +8257,7 @@
               ],
               "name": "getAllScanRequests",
               "payable": false,
-              "scope": 2430,
+              "scope": 2550,
               "stateMutability": "view",
               "superFunction": null,
               "visibility": "internal"
@@ -8402,7 +8402,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "getArrayItems",
-                              "referencedDeclaration": 9241,
+                              "referencedDeclaration": 9677,
                               "type": "function (address,string memory,string memory) view returns (uint256[] memory)"
                             },
                             "children": [
@@ -8412,7 +8412,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 13549,
+                                  "referencedDeclaration": 13985,
                                   "type": "type(library utilities)",
                                   "value": "utilities"
                                 },
@@ -8887,7 +8887,7 @@
                                       "isPure": false,
                                       "lValueRequested": false,
                                       "member_name": "getBooleanValue",
-                                      "referencedDeclaration": 14101,
+                                      "referencedDeclaration": 14537,
                                       "type": "function (bytes32) view external returns (bool)"
                                     },
                                     "children": [
@@ -8917,7 +8917,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 14441,
+                                              "referencedDeclaration": 14877,
                                               "type": "type(contract DB)",
                                               "value": "DB"
                                             },
@@ -8979,7 +8979,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 15705,
+                                          "referencedDeclaration": 15905,
                                           "type": "function () pure returns (bytes32)",
                                           "value": "keccak256"
                                         },
@@ -9285,7 +9285,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "take",
-                                  "referencedDeclaration": 12632,
+                                  "referencedDeclaration": 13068,
                                   "type": "function (uint256,uint256[] memory) pure returns (uint256[] memory)"
                                 },
                                 "children": [
@@ -9295,7 +9295,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 13549,
+                                      "referencedDeclaration": 13985,
                                       "type": "type(library utilities)",
                                       "value": "utilities"
                                     },
@@ -9371,7 +9371,7 @@
               ],
               "name": "getDirectScanRequestsForDentist",
               "payable": false,
-              "scope": 2430,
+              "scope": 2550,
               "stateMutability": "view",
               "superFunction": null,
               "visibility": "internal"
@@ -9549,7 +9549,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "getIdArray",
-                                  "referencedDeclaration": 9757,
+                                  "referencedDeclaration": 10193,
                                   "type": "function (address,address,string memory,string memory) view returns (uint256[] memory)"
                                 },
                                 "children": [
@@ -9559,7 +9559,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 13549,
+                                      "referencedDeclaration": 13985,
                                       "type": "type(library utilities)",
                                       "value": "utilities"
                                     },
@@ -9669,7 +9669,7 @@
               ],
               "name": "getAcceptedScanRequestsForDentist",
               "payable": false,
-              "scope": 2430,
+              "scope": 2550,
               "stateMutability": "view",
               "superFunction": null,
               "visibility": "internal"
@@ -9844,7 +9844,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "getIdArray",
-                              "referencedDeclaration": 9757,
+                              "referencedDeclaration": 10193,
                               "type": "function (address,address,string memory,string memory) view returns (uint256[] memory)"
                             },
                             "children": [
@@ -9854,7 +9854,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 13549,
+                                  "referencedDeclaration": 13985,
                                   "type": "type(library utilities)",
                                   "value": "utilities"
                                 },
@@ -10343,7 +10343,7 @@
                                       "isPure": false,
                                       "lValueRequested": false,
                                       "member_name": "getBooleanValue",
-                                      "referencedDeclaration": 14101,
+                                      "referencedDeclaration": 14537,
                                       "type": "function (bytes32) view external returns (bool)"
                                     },
                                     "children": [
@@ -10373,7 +10373,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 14441,
+                                              "referencedDeclaration": 14877,
                                               "type": "type(contract DB)",
                                               "value": "DB"
                                             },
@@ -10435,7 +10435,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 15705,
+                                          "referencedDeclaration": 15905,
                                           "type": "function () pure returns (bytes32)",
                                           "value": "keccak256"
                                         },
@@ -10741,7 +10741,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "take",
-                                  "referencedDeclaration": 12632,
+                                  "referencedDeclaration": 13068,
                                   "type": "function (uint256,uint256[] memory) pure returns (uint256[] memory)"
                                 },
                                 "children": [
@@ -10751,7 +10751,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 13549,
+                                      "referencedDeclaration": 13985,
                                       "type": "type(library utilities)",
                                       "value": "utilities"
                                     },
@@ -10827,7 +10827,7 @@
               ],
               "name": "getScanApplicationsForDentist",
               "payable": false,
-              "scope": 2430,
+              "scope": 2550,
               "stateMutability": "view",
               "superFunction": null,
               "visibility": "internal"
@@ -11005,7 +11005,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "getIdArray",
-                                  "referencedDeclaration": 9757,
+                                  "referencedDeclaration": 10193,
                                   "type": "function (address,address,string memory,string memory) view returns (uint256[] memory)"
                                 },
                                 "children": [
@@ -11015,7 +11015,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 13549,
+                                      "referencedDeclaration": 13985,
                                       "type": "type(library utilities)",
                                       "value": "utilities"
                                     },
@@ -11125,7 +11125,7 @@
               ],
               "name": "getTreatmentRequestsForPatient",
               "payable": false,
-              "scope": 2430,
+              "scope": 2550,
               "stateMutability": "view",
               "superFunction": null,
               "visibility": "internal"
@@ -11303,7 +11303,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "getIdArray",
-                                  "referencedDeclaration": 9757,
+                                  "referencedDeclaration": 10193,
                                   "type": "function (address,address,string memory,string memory) view returns (uint256[] memory)"
                                 },
                                 "children": [
@@ -11313,7 +11313,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 13549,
+                                      "referencedDeclaration": 13985,
                                       "type": "type(library utilities)",
                                       "value": "utilities"
                                     },
@@ -11423,7 +11423,7 @@
               ],
               "name": "getAllTreatmentRequests",
               "payable": false,
-              "scope": 2430,
+              "scope": 2550,
               "stateMutability": "view",
               "superFunction": null,
               "visibility": "internal"
@@ -11571,7 +11571,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "getArrayItems",
-                                  "referencedDeclaration": 9241,
+                                  "referencedDeclaration": 9677,
                                   "type": "function (address,string memory,string memory) view returns (uint256[] memory)"
                                 },
                                 "children": [
@@ -11581,7 +11581,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 13549,
+                                      "referencedDeclaration": 13985,
                                       "type": "type(library utilities)",
                                       "value": "utilities"
                                     },
@@ -11677,7 +11677,7 @@
               ],
               "name": "getTreatmentApplicationsForPatient",
               "payable": false,
-              "scope": 2430,
+              "scope": 2550,
               "stateMutability": "view",
               "superFunction": null,
               "visibility": "internal"
@@ -11855,7 +11855,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "getIdArray",
-                                  "referencedDeclaration": 9757,
+                                  "referencedDeclaration": 10193,
                                   "type": "function (address,address,string memory,string memory) view returns (uint256[] memory)"
                                 },
                                 "children": [
@@ -11865,7 +11865,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 13549,
+                                      "referencedDeclaration": 13985,
                                       "type": "type(library utilities)",
                                       "value": "utilities"
                                     },
@@ -11975,7 +11975,7 @@
               ],
               "name": "getTreatmentApplicationsForDentist",
               "payable": false,
-              "scope": 2430,
+              "scope": 2550,
               "stateMutability": "view",
               "superFunction": null,
               "visibility": "internal"
@@ -12153,7 +12153,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "getIdArray",
-                                  "referencedDeclaration": 9757,
+                                  "referencedDeclaration": 10193,
                                   "type": "function (address,address,string memory,string memory) view returns (uint256[] memory)"
                                 },
                                 "children": [
@@ -12163,7 +12163,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 13549,
+                                      "referencedDeclaration": 13985,
                                       "type": "type(library utilities)",
                                       "value": "utilities"
                                     },
@@ -12262,16 +12262,1716 @@
             "id": 2429,
             "name": "FunctionDefinition",
             "src": "8322:330:1"
+          },
+          {
+            "attributes": {
+              "constant": true,
+              "implemented": true,
+              "isConstructor": false,
+              "modifiers": [
+                null
+              ],
+              "name": "getCasesForPatient",
+              "payable": false,
+              "scope": 2550,
+              "stateMutability": "view",
+              "superFunction": null,
+              "visibility": "internal"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "dbAddress",
+                      "scope": 2450,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "type": "address"
+                        },
+                        "id": 2430,
+                        "name": "ElementaryTypeName",
+                        "src": "8690:7:1"
+                      }
+                    ],
+                    "id": 2431,
+                    "name": "VariableDeclaration",
+                    "src": "8690:17:1"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "patientId",
+                      "scope": 2450,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "type": "address"
+                        },
+                        "id": 2432,
+                        "name": "ElementaryTypeName",
+                        "src": "8713:7:1"
+                      }
+                    ],
+                    "id": 2433,
+                    "name": "VariableDeclaration",
+                    "src": "8713:17:1"
+                  }
+                ],
+                "id": 2434,
+                "name": "ParameterList",
+                "src": "8684:50:1"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "casesIds",
+                      "scope": 2450,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256[] memory",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "length": null,
+                          "type": "uint256[] storage pointer"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "uint",
+                              "type": "uint256"
+                            },
+                            "id": 2435,
+                            "name": "ElementaryTypeName",
+                            "src": "8777:4:1"
+                          }
+                        ],
+                        "id": 2436,
+                        "name": "ArrayTypeName",
+                        "src": "8777:6:1"
+                      }
+                    ],
+                    "id": 2437,
+                    "name": "VariableDeclaration",
+                    "src": "8777:15:1"
+                  }
+                ],
+                "id": 2438,
+                "name": "ParameterList",
+                "src": "8769:29:1"
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "operator": "=",
+                          "type": "uint256[] memory"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 2437,
+                              "type": "uint256[] memory",
+                              "value": "casesIds"
+                            },
+                            "id": 2439,
+                            "name": "Identifier",
+                            "src": "8807:8:1"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "isStructConstructorCall": false,
+                              "lValueRequested": false,
+                              "names": [
+                                null
+                              ],
+                              "type": "uint256[] memory",
+                              "type_conversion": false
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": [
+                                    {
+                                      "typeIdentifier": "t_address",
+                                      "typeString": "address"
+                                    },
+                                    {
+                                      "typeIdentifier": "t_address",
+                                      "typeString": "address"
+                                    },
+                                    {
+                                      "typeIdentifier": "t_stringliteral_9689109d24b506b69f310f712325536c1b4218c5ce4d879d27b117a82c97ecad",
+                                      "typeString": "literal_string \"patient/case\""
+                                    },
+                                    {
+                                      "typeIdentifier": "t_stringliteral_2a8e4d5b8f8b3117dd537091bcc71fe8e16e3ada6a9b998e06f23953a6eb37f5",
+                                      "typeString": "literal_string \"patient/cases-count\""
+                                    }
+                                  ],
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": false,
+                                  "lValueRequested": false,
+                                  "member_name": "getIdArray",
+                                  "referencedDeclaration": 10193,
+                                  "type": "function (address,address,string memory,string memory) view returns (uint256[] memory)"
+                                },
+                                "children": [
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": null,
+                                      "overloadedDeclarations": [
+                                        null
+                                      ],
+                                      "referencedDeclaration": 13985,
+                                      "type": "type(library utilities)",
+                                      "value": "utilities"
+                                    },
+                                    "id": 2440,
+                                    "name": "Identifier",
+                                    "src": "8818:9:1"
+                                  }
+                                ],
+                                "id": 2441,
+                                "name": "MemberAccess",
+                                "src": "8818:20:1"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 2431,
+                                  "type": "address",
+                                  "value": "dbAddress"
+                                },
+                                "id": 2442,
+                                "name": "Identifier",
+                                "src": "8839:9:1"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 2433,
+                                  "type": "address",
+                                  "value": "patientId"
+                                },
+                                "id": 2443,
+                                "name": "Identifier",
+                                "src": "8850:9:1"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "hexvalue": "70617469656e742f63617365",
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": true,
+                                  "lValueRequested": false,
+                                  "subdenomination": null,
+                                  "token": "string",
+                                  "type": "literal_string \"patient/case\"",
+                                  "value": "patient/case"
+                                },
+                                "id": 2444,
+                                "name": "Literal",
+                                "src": "8861:14:1"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "hexvalue": "70617469656e742f63617365732d636f756e74",
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": true,
+                                  "lValueRequested": false,
+                                  "subdenomination": null,
+                                  "token": "string",
+                                  "type": "literal_string \"patient/cases-count\"",
+                                  "value": "patient/cases-count"
+                                },
+                                "id": 2445,
+                                "name": "Literal",
+                                "src": "8877:21:1"
+                              }
+                            ],
+                            "id": 2446,
+                            "name": "FunctionCall",
+                            "src": "8818:81:1"
+                          }
+                        ],
+                        "id": 2447,
+                        "name": "Assignment",
+                        "src": "8807:92:1"
+                      }
+                    ],
+                    "id": 2448,
+                    "name": "ExpressionStatement",
+                    "src": "8807:92:1"
+                  }
+                ],
+                "id": 2449,
+                "name": "Block",
+                "src": "8801:103:1"
+              }
+            ],
+            "id": 2450,
+            "name": "FunctionDefinition",
+            "src": "8656:248:1"
+          },
+          {
+            "attributes": {
+              "constant": true,
+              "implemented": true,
+              "isConstructor": false,
+              "modifiers": [
+                null
+              ],
+              "name": "getCasesForDentist",
+              "payable": false,
+              "scope": 2550,
+              "stateMutability": "view",
+              "superFunction": null,
+              "visibility": "internal"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "dbAddress",
+                      "scope": 2471,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "type": "address"
+                        },
+                        "id": 2451,
+                        "name": "ElementaryTypeName",
+                        "src": "8942:7:1"
+                      }
+                    ],
+                    "id": 2452,
+                    "name": "VariableDeclaration",
+                    "src": "8942:17:1"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "dentistId",
+                      "scope": 2471,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "type": "address"
+                        },
+                        "id": 2453,
+                        "name": "ElementaryTypeName",
+                        "src": "8965:7:1"
+                      }
+                    ],
+                    "id": 2454,
+                    "name": "VariableDeclaration",
+                    "src": "8965:17:1"
+                  }
+                ],
+                "id": 2455,
+                "name": "ParameterList",
+                "src": "8936:50:1"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "casesIds",
+                      "scope": 2471,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256[] memory",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "length": null,
+                          "type": "uint256[] storage pointer"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "uint",
+                              "type": "uint256"
+                            },
+                            "id": 2456,
+                            "name": "ElementaryTypeName",
+                            "src": "9029:4:1"
+                          }
+                        ],
+                        "id": 2457,
+                        "name": "ArrayTypeName",
+                        "src": "9029:6:1"
+                      }
+                    ],
+                    "id": 2458,
+                    "name": "VariableDeclaration",
+                    "src": "9029:15:1"
+                  }
+                ],
+                "id": 2459,
+                "name": "ParameterList",
+                "src": "9021:29:1"
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "operator": "=",
+                          "type": "uint256[] memory"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 2458,
+                              "type": "uint256[] memory",
+                              "value": "casesIds"
+                            },
+                            "id": 2460,
+                            "name": "Identifier",
+                            "src": "9059:8:1"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "isStructConstructorCall": false,
+                              "lValueRequested": false,
+                              "names": [
+                                null
+                              ],
+                              "type": "uint256[] memory",
+                              "type_conversion": false
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": [
+                                    {
+                                      "typeIdentifier": "t_address",
+                                      "typeString": "address"
+                                    },
+                                    {
+                                      "typeIdentifier": "t_address",
+                                      "typeString": "address"
+                                    },
+                                    {
+                                      "typeIdentifier": "t_stringliteral_4b7334d0353c0abca69425245dd7bdabddeee71d1a59d032449682828a02e81a",
+                                      "typeString": "literal_string \"dentist/case\""
+                                    },
+                                    {
+                                      "typeIdentifier": "t_stringliteral_2e472e5b338a9ac74aa309f9b4d9ad9099f23266d24e8029e2695830376ac27e",
+                                      "typeString": "literal_string \"dentist/cases-count\""
+                                    }
+                                  ],
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": false,
+                                  "lValueRequested": false,
+                                  "member_name": "getIdArray",
+                                  "referencedDeclaration": 10193,
+                                  "type": "function (address,address,string memory,string memory) view returns (uint256[] memory)"
+                                },
+                                "children": [
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": null,
+                                      "overloadedDeclarations": [
+                                        null
+                                      ],
+                                      "referencedDeclaration": 13985,
+                                      "type": "type(library utilities)",
+                                      "value": "utilities"
+                                    },
+                                    "id": 2461,
+                                    "name": "Identifier",
+                                    "src": "9070:9:1"
+                                  }
+                                ],
+                                "id": 2462,
+                                "name": "MemberAccess",
+                                "src": "9070:20:1"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 2452,
+                                  "type": "address",
+                                  "value": "dbAddress"
+                                },
+                                "id": 2463,
+                                "name": "Identifier",
+                                "src": "9091:9:1"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 2454,
+                                  "type": "address",
+                                  "value": "dentistId"
+                                },
+                                "id": 2464,
+                                "name": "Identifier",
+                                "src": "9102:9:1"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "hexvalue": "64656e746973742f63617365",
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": true,
+                                  "lValueRequested": false,
+                                  "subdenomination": null,
+                                  "token": "string",
+                                  "type": "literal_string \"dentist/case\"",
+                                  "value": "dentist/case"
+                                },
+                                "id": 2465,
+                                "name": "Literal",
+                                "src": "9113:14:1"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "hexvalue": "64656e746973742f63617365732d636f756e74",
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": true,
+                                  "lValueRequested": false,
+                                  "subdenomination": null,
+                                  "token": "string",
+                                  "type": "literal_string \"dentist/cases-count\"",
+                                  "value": "dentist/cases-count"
+                                },
+                                "id": 2466,
+                                "name": "Literal",
+                                "src": "9129:21:1"
+                              }
+                            ],
+                            "id": 2467,
+                            "name": "FunctionCall",
+                            "src": "9070:81:1"
+                          }
+                        ],
+                        "id": 2468,
+                        "name": "Assignment",
+                        "src": "9059:92:1"
+                      }
+                    ],
+                    "id": 2469,
+                    "name": "ExpressionStatement",
+                    "src": "9059:92:1"
+                  }
+                ],
+                "id": 2470,
+                "name": "Block",
+                "src": "9053:103:1"
+              }
+            ],
+            "id": 2471,
+            "name": "FunctionDefinition",
+            "src": "8908:248:1"
+          },
+          {
+            "attributes": {
+              "constant": true,
+              "implemented": true,
+              "isConstructor": false,
+              "modifiers": [
+                null
+              ],
+              "name": "getAllCases",
+              "payable": false,
+              "scope": 2550,
+              "stateMutability": "view",
+              "superFunction": null,
+              "visibility": "internal"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "dbAddress",
+                      "scope": 2489,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "type": "address"
+                        },
+                        "id": 2472,
+                        "name": "ElementaryTypeName",
+                        "src": "9187:7:1"
+                      }
+                    ],
+                    "id": 2473,
+                    "name": "VariableDeclaration",
+                    "src": "9187:17:1"
+                  }
+                ],
+                "id": 2474,
+                "name": "ParameterList",
+                "src": "9181:27:1"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "casesIds",
+                      "scope": 2489,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256[] memory",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "length": null,
+                          "type": "uint256[] storage pointer"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "uint",
+                              "type": "uint256"
+                            },
+                            "id": 2475,
+                            "name": "ElementaryTypeName",
+                            "src": "9251:4:1"
+                          }
+                        ],
+                        "id": 2476,
+                        "name": "ArrayTypeName",
+                        "src": "9251:6:1"
+                      }
+                    ],
+                    "id": 2477,
+                    "name": "VariableDeclaration",
+                    "src": "9251:15:1"
+                  }
+                ],
+                "id": 2478,
+                "name": "ParameterList",
+                "src": "9243:29:1"
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "operator": "=",
+                          "type": "uint256[] memory"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 2477,
+                              "type": "uint256[] memory",
+                              "value": "casesIds"
+                            },
+                            "id": 2479,
+                            "name": "Identifier",
+                            "src": "9281:8:1"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "isStructConstructorCall": false,
+                              "lValueRequested": false,
+                              "names": [
+                                null
+                              ],
+                              "type": "uint256[] memory",
+                              "type_conversion": false
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": [
+                                    {
+                                      "typeIdentifier": "t_address",
+                                      "typeString": "address"
+                                    },
+                                    {
+                                      "typeIdentifier": "t_stringliteral_ddcb37d33c744d812d96624a71b9819abf8015dab8942050a8f97c075343ae79",
+                                      "typeString": "literal_string \"case\""
+                                    },
+                                    {
+                                      "typeIdentifier": "t_stringliteral_bdb0bef154b5e26bdbf20020821801306f2b2440765e8fa1989e8d451cf5a5ba",
+                                      "typeString": "literal_string \"cases-count\""
+                                    }
+                                  ],
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": false,
+                                  "lValueRequested": false,
+                                  "member_name": "getArrayItems",
+                                  "referencedDeclaration": 9677,
+                                  "type": "function (address,string memory,string memory) view returns (uint256[] memory)"
+                                },
+                                "children": [
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": null,
+                                      "overloadedDeclarations": [
+                                        null
+                                      ],
+                                      "referencedDeclaration": 13985,
+                                      "type": "type(library utilities)",
+                                      "value": "utilities"
+                                    },
+                                    "id": 2480,
+                                    "name": "Identifier",
+                                    "src": "9292:9:1"
+                                  }
+                                ],
+                                "id": 2481,
+                                "name": "MemberAccess",
+                                "src": "9292:23:1"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 2473,
+                                  "type": "address",
+                                  "value": "dbAddress"
+                                },
+                                "id": 2482,
+                                "name": "Identifier",
+                                "src": "9316:9:1"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "hexvalue": "63617365",
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": true,
+                                  "lValueRequested": false,
+                                  "subdenomination": null,
+                                  "token": "string",
+                                  "type": "literal_string \"case\"",
+                                  "value": "case"
+                                },
+                                "id": 2483,
+                                "name": "Literal",
+                                "src": "9327:6:1"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "hexvalue": "63617365732d636f756e74",
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": true,
+                                  "lValueRequested": false,
+                                  "subdenomination": null,
+                                  "token": "string",
+                                  "type": "literal_string \"cases-count\"",
+                                  "value": "cases-count"
+                                },
+                                "id": 2484,
+                                "name": "Literal",
+                                "src": "9335:13:1"
+                              }
+                            ],
+                            "id": 2485,
+                            "name": "FunctionCall",
+                            "src": "9292:57:1"
+                          }
+                        ],
+                        "id": 2486,
+                        "name": "Assignment",
+                        "src": "9281:68:1"
+                      }
+                    ],
+                    "id": 2487,
+                    "name": "ExpressionStatement",
+                    "src": "9281:68:1"
+                  }
+                ],
+                "id": 2488,
+                "name": "Block",
+                "src": "9275:79:1"
+              }
+            ],
+            "id": 2489,
+            "name": "FunctionDefinition",
+            "src": "9160:194:1"
+          },
+          {
+            "attributes": {
+              "constant": true,
+              "implemented": true,
+              "isConstructor": false,
+              "modifiers": [
+                null
+              ],
+              "name": "getTreatmentsForPatient",
+              "payable": false,
+              "scope": 2550,
+              "stateMutability": "view",
+              "superFunction": null,
+              "visibility": "internal"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "dbAddress",
+                      "scope": 2510,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "type": "address"
+                        },
+                        "id": 2490,
+                        "name": "ElementaryTypeName",
+                        "src": "9397:7:1"
+                      }
+                    ],
+                    "id": 2491,
+                    "name": "VariableDeclaration",
+                    "src": "9397:17:1"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "patientId",
+                      "scope": 2510,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "type": "address"
+                        },
+                        "id": 2492,
+                        "name": "ElementaryTypeName",
+                        "src": "9420:7:1"
+                      }
+                    ],
+                    "id": 2493,
+                    "name": "VariableDeclaration",
+                    "src": "9420:17:1"
+                  }
+                ],
+                "id": 2494,
+                "name": "ParameterList",
+                "src": "9391:50:1"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "treatmentIds",
+                      "scope": 2510,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256[] memory",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "length": null,
+                          "type": "uint256[] storage pointer"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "uint",
+                              "type": "uint256"
+                            },
+                            "id": 2495,
+                            "name": "ElementaryTypeName",
+                            "src": "9484:4:1"
+                          }
+                        ],
+                        "id": 2496,
+                        "name": "ArrayTypeName",
+                        "src": "9484:6:1"
+                      }
+                    ],
+                    "id": 2497,
+                    "name": "VariableDeclaration",
+                    "src": "9484:19:1"
+                  }
+                ],
+                "id": 2498,
+                "name": "ParameterList",
+                "src": "9476:33:1"
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "operator": "=",
+                          "type": "uint256[] memory"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 2497,
+                              "type": "uint256[] memory",
+                              "value": "treatmentIds"
+                            },
+                            "id": 2499,
+                            "name": "Identifier",
+                            "src": "9518:12:1"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "isStructConstructorCall": false,
+                              "lValueRequested": false,
+                              "names": [
+                                null
+                              ],
+                              "type": "uint256[] memory",
+                              "type_conversion": false
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": [
+                                    {
+                                      "typeIdentifier": "t_address",
+                                      "typeString": "address"
+                                    },
+                                    {
+                                      "typeIdentifier": "t_address",
+                                      "typeString": "address"
+                                    },
+                                    {
+                                      "typeIdentifier": "t_stringliteral_b3ddb224a5dc1290a5320269416afc326918fd5271656e8595bf0a665d5dea49",
+                                      "typeString": "literal_string \"patient/treatment\""
+                                    },
+                                    {
+                                      "typeIdentifier": "t_stringliteral_4b168d886d1e75c3faef5ee2a3359702335cc95818525e9a1ac34e28241ab5db",
+                                      "typeString": "literal_string \"patient/treatments-count\""
+                                    }
+                                  ],
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": false,
+                                  "lValueRequested": false,
+                                  "member_name": "getIdArray",
+                                  "referencedDeclaration": 10193,
+                                  "type": "function (address,address,string memory,string memory) view returns (uint256[] memory)"
+                                },
+                                "children": [
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": null,
+                                      "overloadedDeclarations": [
+                                        null
+                                      ],
+                                      "referencedDeclaration": 13985,
+                                      "type": "type(library utilities)",
+                                      "value": "utilities"
+                                    },
+                                    "id": 2500,
+                                    "name": "Identifier",
+                                    "src": "9533:9:1"
+                                  }
+                                ],
+                                "id": 2501,
+                                "name": "MemberAccess",
+                                "src": "9533:20:1"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 2491,
+                                  "type": "address",
+                                  "value": "dbAddress"
+                                },
+                                "id": 2502,
+                                "name": "Identifier",
+                                "src": "9554:9:1"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 2493,
+                                  "type": "address",
+                                  "value": "patientId"
+                                },
+                                "id": 2503,
+                                "name": "Identifier",
+                                "src": "9565:9:1"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "hexvalue": "70617469656e742f74726561746d656e74",
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": true,
+                                  "lValueRequested": false,
+                                  "subdenomination": null,
+                                  "token": "string",
+                                  "type": "literal_string \"patient/treatment\"",
+                                  "value": "patient/treatment"
+                                },
+                                "id": 2504,
+                                "name": "Literal",
+                                "src": "9576:19:1"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "hexvalue": "70617469656e742f74726561746d656e74732d636f756e74",
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": true,
+                                  "lValueRequested": false,
+                                  "subdenomination": null,
+                                  "token": "string",
+                                  "type": "literal_string \"patient/treatments-count\"",
+                                  "value": "patient/treatments-count"
+                                },
+                                "id": 2505,
+                                "name": "Literal",
+                                "src": "9597:26:1"
+                              }
+                            ],
+                            "id": 2506,
+                            "name": "FunctionCall",
+                            "src": "9533:91:1"
+                          }
+                        ],
+                        "id": 2507,
+                        "name": "Assignment",
+                        "src": "9518:106:1"
+                      }
+                    ],
+                    "id": 2508,
+                    "name": "ExpressionStatement",
+                    "src": "9518:106:1"
+                  }
+                ],
+                "id": 2509,
+                "name": "Block",
+                "src": "9512:117:1"
+              }
+            ],
+            "id": 2510,
+            "name": "FunctionDefinition",
+            "src": "9358:271:1"
+          },
+          {
+            "attributes": {
+              "constant": true,
+              "implemented": true,
+              "isConstructor": false,
+              "modifiers": [
+                null
+              ],
+              "name": "getTreatmentsForDentist",
+              "payable": false,
+              "scope": 2550,
+              "stateMutability": "view",
+              "superFunction": null,
+              "visibility": "internal"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "dbAddress",
+                      "scope": 2531,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "type": "address"
+                        },
+                        "id": 2511,
+                        "name": "ElementaryTypeName",
+                        "src": "9672:7:1"
+                      }
+                    ],
+                    "id": 2512,
+                    "name": "VariableDeclaration",
+                    "src": "9672:17:1"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "dentistId",
+                      "scope": 2531,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "type": "address"
+                        },
+                        "id": 2513,
+                        "name": "ElementaryTypeName",
+                        "src": "9695:7:1"
+                      }
+                    ],
+                    "id": 2514,
+                    "name": "VariableDeclaration",
+                    "src": "9695:17:1"
+                  }
+                ],
+                "id": 2515,
+                "name": "ParameterList",
+                "src": "9666:50:1"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "treatmentIds",
+                      "scope": 2531,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256[] memory",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "length": null,
+                          "type": "uint256[] storage pointer"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "uint",
+                              "type": "uint256"
+                            },
+                            "id": 2516,
+                            "name": "ElementaryTypeName",
+                            "src": "9759:4:1"
+                          }
+                        ],
+                        "id": 2517,
+                        "name": "ArrayTypeName",
+                        "src": "9759:6:1"
+                      }
+                    ],
+                    "id": 2518,
+                    "name": "VariableDeclaration",
+                    "src": "9759:19:1"
+                  }
+                ],
+                "id": 2519,
+                "name": "ParameterList",
+                "src": "9751:33:1"
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "operator": "=",
+                          "type": "uint256[] memory"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 2518,
+                              "type": "uint256[] memory",
+                              "value": "treatmentIds"
+                            },
+                            "id": 2520,
+                            "name": "Identifier",
+                            "src": "9793:12:1"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "isStructConstructorCall": false,
+                              "lValueRequested": false,
+                              "names": [
+                                null
+                              ],
+                              "type": "uint256[] memory",
+                              "type_conversion": false
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": [
+                                    {
+                                      "typeIdentifier": "t_address",
+                                      "typeString": "address"
+                                    },
+                                    {
+                                      "typeIdentifier": "t_address",
+                                      "typeString": "address"
+                                    },
+                                    {
+                                      "typeIdentifier": "t_stringliteral_475617105acdf61c2473691809d2392886ee78bb91a0cd2c6211bcf5e496bb73",
+                                      "typeString": "literal_string \"dentist/treatment\""
+                                    },
+                                    {
+                                      "typeIdentifier": "t_stringliteral_52a833c1bb51848fdf8420e546a827df1bad6a81367778e67ee6bea7e145f52b",
+                                      "typeString": "literal_string \"dentist/treatments-count\""
+                                    }
+                                  ],
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": false,
+                                  "lValueRequested": false,
+                                  "member_name": "getIdArray",
+                                  "referencedDeclaration": 10193,
+                                  "type": "function (address,address,string memory,string memory) view returns (uint256[] memory)"
+                                },
+                                "children": [
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": null,
+                                      "overloadedDeclarations": [
+                                        null
+                                      ],
+                                      "referencedDeclaration": 13985,
+                                      "type": "type(library utilities)",
+                                      "value": "utilities"
+                                    },
+                                    "id": 2521,
+                                    "name": "Identifier",
+                                    "src": "9808:9:1"
+                                  }
+                                ],
+                                "id": 2522,
+                                "name": "MemberAccess",
+                                "src": "9808:20:1"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 2512,
+                                  "type": "address",
+                                  "value": "dbAddress"
+                                },
+                                "id": 2523,
+                                "name": "Identifier",
+                                "src": "9829:9:1"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 2514,
+                                  "type": "address",
+                                  "value": "dentistId"
+                                },
+                                "id": 2524,
+                                "name": "Identifier",
+                                "src": "9840:9:1"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "hexvalue": "64656e746973742f74726561746d656e74",
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": true,
+                                  "lValueRequested": false,
+                                  "subdenomination": null,
+                                  "token": "string",
+                                  "type": "literal_string \"dentist/treatment\"",
+                                  "value": "dentist/treatment"
+                                },
+                                "id": 2525,
+                                "name": "Literal",
+                                "src": "9851:19:1"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "hexvalue": "64656e746973742f74726561746d656e74732d636f756e74",
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": true,
+                                  "lValueRequested": false,
+                                  "subdenomination": null,
+                                  "token": "string",
+                                  "type": "literal_string \"dentist/treatments-count\"",
+                                  "value": "dentist/treatments-count"
+                                },
+                                "id": 2526,
+                                "name": "Literal",
+                                "src": "9872:26:1"
+                              }
+                            ],
+                            "id": 2527,
+                            "name": "FunctionCall",
+                            "src": "9808:91:1"
+                          }
+                        ],
+                        "id": 2528,
+                        "name": "Assignment",
+                        "src": "9793:106:1"
+                      }
+                    ],
+                    "id": 2529,
+                    "name": "ExpressionStatement",
+                    "src": "9793:106:1"
+                  }
+                ],
+                "id": 2530,
+                "name": "Block",
+                "src": "9787:117:1"
+              }
+            ],
+            "id": 2531,
+            "name": "FunctionDefinition",
+            "src": "9633:271:1"
+          },
+          {
+            "attributes": {
+              "constant": true,
+              "implemented": true,
+              "isConstructor": false,
+              "modifiers": [
+                null
+              ],
+              "name": "getAllTreatments",
+              "payable": false,
+              "scope": 2550,
+              "stateMutability": "view",
+              "superFunction": null,
+              "visibility": "internal"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "dbAddress",
+                      "scope": 2549,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "type": "address"
+                        },
+                        "id": 2532,
+                        "name": "ElementaryTypeName",
+                        "src": "9940:7:1"
+                      }
+                    ],
+                    "id": 2533,
+                    "name": "VariableDeclaration",
+                    "src": "9940:17:1"
+                  }
+                ],
+                "id": 2534,
+                "name": "ParameterList",
+                "src": "9934:27:1"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "casesIds",
+                      "scope": 2549,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256[] memory",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "length": null,
+                          "type": "uint256[] storage pointer"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "uint",
+                              "type": "uint256"
+                            },
+                            "id": 2535,
+                            "name": "ElementaryTypeName",
+                            "src": "10004:4:1"
+                          }
+                        ],
+                        "id": 2536,
+                        "name": "ArrayTypeName",
+                        "src": "10004:6:1"
+                      }
+                    ],
+                    "id": 2537,
+                    "name": "VariableDeclaration",
+                    "src": "10004:15:1"
+                  }
+                ],
+                "id": 2538,
+                "name": "ParameterList",
+                "src": "9996:29:1"
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "operator": "=",
+                          "type": "uint256[] memory"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 2537,
+                              "type": "uint256[] memory",
+                              "value": "casesIds"
+                            },
+                            "id": 2539,
+                            "name": "Identifier",
+                            "src": "10034:8:1"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "isStructConstructorCall": false,
+                              "lValueRequested": false,
+                              "names": [
+                                null
+                              ],
+                              "type": "uint256[] memory",
+                              "type_conversion": false
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": [
+                                    {
+                                      "typeIdentifier": "t_address",
+                                      "typeString": "address"
+                                    },
+                                    {
+                                      "typeIdentifier": "t_stringliteral_a35af1bcfe3c64c99e069b253d70bff7e3c9701ebb15c6d687520d9052aabce7",
+                                      "typeString": "literal_string \"treatment\""
+                                    },
+                                    {
+                                      "typeIdentifier": "t_stringliteral_63468e6951951cc9e5fd17e5a54068aa23e362ef32b9f13c07216264d01a71bf",
+                                      "typeString": "literal_string \"treatments-count\""
+                                    }
+                                  ],
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": false,
+                                  "lValueRequested": false,
+                                  "member_name": "getArrayItems",
+                                  "referencedDeclaration": 9677,
+                                  "type": "function (address,string memory,string memory) view returns (uint256[] memory)"
+                                },
+                                "children": [
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": null,
+                                      "overloadedDeclarations": [
+                                        null
+                                      ],
+                                      "referencedDeclaration": 13985,
+                                      "type": "type(library utilities)",
+                                      "value": "utilities"
+                                    },
+                                    "id": 2540,
+                                    "name": "Identifier",
+                                    "src": "10045:9:1"
+                                  }
+                                ],
+                                "id": 2541,
+                                "name": "MemberAccess",
+                                "src": "10045:23:1"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 2533,
+                                  "type": "address",
+                                  "value": "dbAddress"
+                                },
+                                "id": 2542,
+                                "name": "Identifier",
+                                "src": "10069:9:1"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "hexvalue": "74726561746d656e74",
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": true,
+                                  "lValueRequested": false,
+                                  "subdenomination": null,
+                                  "token": "string",
+                                  "type": "literal_string \"treatment\"",
+                                  "value": "treatment"
+                                },
+                                "id": 2543,
+                                "name": "Literal",
+                                "src": "10080:11:1"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "hexvalue": "74726561746d656e74732d636f756e74",
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": true,
+                                  "lValueRequested": false,
+                                  "subdenomination": null,
+                                  "token": "string",
+                                  "type": "literal_string \"treatments-count\"",
+                                  "value": "treatments-count"
+                                },
+                                "id": 2544,
+                                "name": "Literal",
+                                "src": "10093:18:1"
+                              }
+                            ],
+                            "id": 2545,
+                            "name": "FunctionCall",
+                            "src": "10045:67:1"
+                          }
+                        ],
+                        "id": 2546,
+                        "name": "Assignment",
+                        "src": "10034:78:1"
+                      }
+                    ],
+                    "id": 2547,
+                    "name": "ExpressionStatement",
+                    "src": "10034:78:1"
+                  }
+                ],
+                "id": 2548,
+                "name": "Block",
+                "src": "10028:89:1"
+              }
+            ],
+            "id": 2549,
+            "name": "FunctionDefinition",
+            "src": "9908:209:1"
           }
         ],
-        "id": 2430,
+        "id": 2550,
         "name": "ContractDefinition",
-        "src": "52:8602:1"
+        "src": "52:10067:1"
       }
     ],
-    "id": 2431,
+    "id": 2551,
     "name": "SourceUnit",
-    "src": "0:8655:1"
+    "src": "0:10120:1"
   },
   "compiler": {
     "name": "solc",
@@ -12279,5 +13979,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-11-30T08:47:18.726Z"
+  "updatedAt": "2017-12-01T20:37:04.515Z"
 }

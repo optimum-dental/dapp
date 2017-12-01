@@ -299,4 +299,80 @@ library searchLibrary {
   {
     treatmentApplicationsIds = utilities.getIdArray(dbAddress, dentistId, "dentist/treatment-application", "dentist/treatment-applications-count");
   }
+
+  function getCasesForPatient (
+    address dbAddress,
+    address patientId
+  )
+    internal
+    view
+    returns (
+      uint[] casesIds
+    )
+  {
+    casesIds = utilities.getIdArray(dbAddress, patientId, "patient/case", "patient/cases-count");
+  }
+
+  function getCasesForDentist (
+    address dbAddress,
+    address dentistId
+  )
+    internal
+    view
+    returns (
+      uint[] casesIds
+    )
+  {
+    casesIds = utilities.getIdArray(dbAddress, dentistId, "dentist/case", "dentist/cases-count");
+  }
+
+  function getAllCases (
+    address dbAddress
+  )
+    internal
+    view
+    returns (
+      uint[] casesIds
+    )
+  {
+    casesIds = utilities.getArrayItems(dbAddress, "case", "cases-count");
+  }
+
+  function getTreatmentsForPatient (
+    address dbAddress,
+    address patientId
+  )
+    internal
+    view
+    returns (
+      uint[] treatmentIds
+    )
+  {
+    treatmentIds = utilities.getIdArray(dbAddress, patientId, "patient/treatment", "patient/treatments-count");
+  }
+
+  function getTreatmentsForDentist (
+    address dbAddress,
+    address dentistId
+  )
+    internal
+    view
+    returns (
+      uint[] treatmentIds
+    )
+  {
+    treatmentIds = utilities.getIdArray(dbAddress, dentistId, "dentist/treatment", "dentist/treatments-count");
+  }
+
+  function getAllTreatments (
+    address dbAddress
+  )
+    internal
+    view
+    returns (
+      uint[] casesIds
+    )
+  {
+    casesIds = utilities.getArrayItems(dbAddress, "treatment", "treatments-count");
+  }
 }

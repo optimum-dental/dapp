@@ -1093,4 +1093,110 @@ library userManager {
     treatmentApplicationsIds = searchLibrary.getTreatmentApplicationsForDentist(dbAddress, dentistId);
     (totalNumberFound, treatmentApplicationsIds) = utilities.getSlicedArray(treatmentApplicationsIds, offset, limit, seed);
   }
+
+  function fetchCasesForPatient (
+    address dbAddress,
+    address patientId,
+    uint offset, // starting from offset: 0-based
+    uint limit, // not more than limit
+    uint seed // seed value to give the illusion of randomisation
+  )
+    internal
+    view
+    returns (
+      uint totalNumberFound,
+      uint[] casesIds
+    )
+  {
+    casesIds = searchLibrary.getCasesForPatient(dbAddress, patientId);
+    (totalNumberFound, casesIds) = utilities.getSlicedArray(casesIds, offset, limit, seed);
+  }
+
+  function fetchCasesForDentist (
+    address dbAddress,
+    address dentistId,
+    uint offset, // starting from offset: 0-based
+    uint limit, // not more than limit
+    uint seed // seed value to give the illusion of randomisation
+  )
+    internal
+    view
+    returns (
+      uint totalNumberFound,
+      uint[] casesIds
+    )
+  {
+    casesIds = searchLibrary.getCasesForDentist(dbAddress, dentistId);
+    (totalNumberFound, casesIds) = utilities.getSlicedArray(casesIds, offset, limit, seed);
+  }
+
+  function fetchAllCases (
+    address dbAddress,
+    uint offset, // starting from offset: 0-based
+    uint limit, // not more than limit
+    uint seed // seed value to give the illusion of randomisation
+  )
+    internal
+    view
+    returns (
+      uint totalNumberFound,
+      uint[] casesIds
+    )
+  {
+    casesIds = searchLibrary.getAllCases(dbAddress);
+    (totalNumberFound, casesIds) = utilities.getSlicedArray(casesIds, offset, limit, seed);
+  }
+
+  function fetchTreatmentsForPatient (
+    address dbAddress,
+    address patientId,
+    uint offset, // starting from offset: 0-based
+    uint limit, // not more than limit
+    uint seed // seed value to give the illusion of randomisation
+  )
+    internal
+    view
+    returns (
+      uint totalNumberFound,
+      uint[] treatmentIds
+    )
+  {
+    treatmentIds = searchLibrary.getTreatmentsForPatient(dbAddress, patientId);
+    (totalNumberFound, treatmentIds) = utilities.getSlicedArray(treatmentIds, offset, limit, seed);
+  }
+
+  function fetchTreatmentsForDentist (
+    address dbAddress,
+    address dentistId,
+    uint offset, // starting from offset: 0-based
+    uint limit, // not more than limit
+    uint seed // seed value to give the illusion of randomisation
+  )
+    internal
+    view
+    returns (
+      uint totalNumberFound,
+      uint[] treatmentIds
+    )
+  {
+    treatmentIds = searchLibrary.getTreatmentsForDentist(dbAddress, dentistId);
+    (totalNumberFound, treatmentIds) = utilities.getSlicedArray(treatmentIds, offset, limit, seed);
+  }
+
+  function fetchAllTreatments (
+    address dbAddress,
+    uint offset, // starting from offset: 0-based
+    uint limit, // not more than limit
+    uint seed // seed value to give the illusion of randomisation
+  )
+    internal
+    view
+    returns (
+      uint totalNumberFound,
+      uint[] treatmentsIds
+    )
+  {
+    treatmentsIds = searchLibrary.getAllTreatments(dbAddress);
+    (totalNumberFound, treatmentsIds) = utilities.getSlicedArray(treatmentsIds, offset, limit, seed);
+  }
 }

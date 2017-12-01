@@ -13,6 +13,8 @@ import TreatmentRequestReader2 from '../../../build/contracts/TreatmentRequestRe
 import TreatmentApplicationWriter from '../../../build/contracts/TreatmentApplicationWriter.json'
 import TreatmentApplicationWriter2 from '../../../build/contracts/TreatmentApplicationWriter2.json'
 import TreatmentApplicationReader from '../../../build/contracts/TreatmentApplicationReader.json'
+import PostApplicationReader from '../../../build/contracts/PostApplicationReader.json'
+import PostApplicationReader2 from '../../../build/contracts/PostApplicationReader2.json'
 // import userManager from '../user/Manager'
 import {getObjectFromResponse, getSlicedAddressString, getSoliditySha3ForId, getLeftPaddedNumber} from '../utilities'
 import blockchainManager from '../BlockchainManager'
@@ -41,7 +43,9 @@ class Manager {
       TreatmentRequestReader2,
       TreatmentApplicationWriter,
       TreatmentApplicationWriter2,
-      TreatmentApplicationReader
+      TreatmentApplicationReader,
+      PostApplicationReader,
+      PostApplicationReader2
     ]
   }
 
@@ -171,6 +175,32 @@ class Manager {
     })
   }
 
+  getCaseDetail (state = null, dataObject = {}) {
+    const {applicationTypeId, caseId} = dataObject
+    return blockchainManager.querySmartContract({
+      contractToUse: DB,
+      smartContractMethod: 'getEntityList',
+      smartContractMethodParams: (coinbase) => [serviceManager.caseRecordFields(state, caseId), serviceManager.caseRecordFieldTypes(), {from: coinbase}],
+      state,
+      smartContractResolve: result => {
+        const dataObject = getObjectFromResponse(state, result, 1, serviceManager.caseKeys(), serviceManager.caseRecordFieldTypes())[0]
+        Object.assign(dataObject, {
+          serviceName: serviceTypes[applicationTypeId].subtypes[dataObject.serviceId],
+          applicationTypeId,
+          applicationId: dataObject.scanApplicationId,
+          caseId
+        })
+
+        return dataObject
+      },
+      smartContractReject: (error) => ({
+        error,
+        isValid: true,
+        warningMessage: "We've encountered a problem fetching your service information from the blockchain. Please do try again in a few minutes."
+      })
+    })
+  }
+
   keys () {
     return [
       'serviceFee'
@@ -231,7 +261,9 @@ class Manager {
       'userId',
       'serviceId',
       'quote',
-      'comment'
+      'comment',
+      'hasCase',
+      'caseId'
     ]
   }
 
@@ -243,13 +275,45 @@ class Manager {
       getSoliditySha3ForId(state, 'scan-application/dentist', scanApplicationId),
       getSoliditySha3ForId(state, 'scan-application/scan-service', scanApplicationId),
       getSoliditySha3ForId(state, 'scan-application/quote', scanApplicationId),
-      getSoliditySha3ForId(state, 'scan-application/comment', scanApplicationId)
+      getSoliditySha3ForId(state, 'scan-application/comment', scanApplicationId),
+      getSoliditySha3ForId(state, 'scan-application/has-case?', scanApplicationId),
+      getSoliditySha3ForId(state, 'scan-application/case', scanApplicationId)
     ]
   }
 
   applicationRecordFieldTypes () {
     // types: 1 => boolean, 2 => uint8, 3 => uint, 4 => address, 5 => bytes32, 7 => string
-    return [2, 3, 4, 3, 3, 7]
+    return [2, 3, 4, 3, 3, 7, 1, 3]
+  }
+
+  caseKeys () {
+    return [
+      'status',
+      'requestId',
+      'scanApplicationId',
+      'userId',
+      'serviceId',
+      'quote',
+      'amount'
+    ]
+  }
+
+  caseRecordFields (state, caseId) {
+    caseId = getSlicedAddressString(state, getLeftPaddedNumber(state, caseId, 1))
+    return [
+      getSoliditySha3ForId(state, 'case/status', caseId),
+      getSoliditySha3ForId(state, 'case/scan-request', caseId),
+      getSoliditySha3ForId(state, 'case/scan-application', caseId),
+      getSoliditySha3ForId(state, 'case/dentist', caseId),
+      getSoliditySha3ForId(state, 'case/scan-service', caseId),
+      getSoliditySha3ForId(state, 'case/quote', caseId),
+      getSoliditySha3ForId(state, 'case/amount', caseId)
+    ]
+  }
+
+  caseRecordFieldTypes () {
+    // types: 1 => boolean, 2 => uint8, 3 => uint, 4 => address, 5 => bytes32, 7 => string
+    return [2, 3, 3, 4, 3, 3, 3]
   }
 }
 

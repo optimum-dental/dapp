@@ -294,7 +294,11 @@ library servicesLibrary {
     DB(dbAddress).setAddressValue(keccak256("case/patient", caseId), patientId);
     DB(dbAddress).setUIntValue(keccak256("case/scan-service", caseId), scanServiceId);
     DB(dbAddress).setUIntValue(keccak256("case/scan-request", caseId), scanRequestId);
+    DB(dbAddress).setUIntValue(keccak256("scan-request/case", scanRequestId), caseId);
+    DB(dbAddress).setBooleanValue(keccak256("scan-request/has-case?", scanRequestId), true);
     DB(dbAddress).setUIntValue(keccak256("case/scan-application", caseId), scanApplicationId);
+    DB(dbAddress).setUIntValue(keccak256("scan-application/case", scanApplicationId), caseId);
+    DB(dbAddress).setBooleanValue(keccak256("scan-application/has-case?", scanApplicationId), true);
     utilities.addArrayItem(dbAddress, "case", "cases-count", caseId); // caseId is currently just there for counter purpose
   }
 
@@ -509,7 +513,11 @@ library servicesLibrary {
     DB(dbAddress).setAddressValue(keccak256("treatment/dentist", treatmentId), dentistId);
     DB(dbAddress).setAddressValue(keccak256("treatment/patient", treatmentId), patientId);
     DB(dbAddress).setUIntValue(keccak256("treatment/treatment-request", treatmentId), treatmentRequestId);
+    DB(dbAddress).setUIntValue(keccak256("treatment-request/treatment", treatmentRequestId), treatmentId);
+    DB(dbAddress).setBooleanValue(keccak256("treatment-request/has-treatment?", treatmentRequestId), true);
     DB(dbAddress).setUIntValue(keccak256("treatment/treatment-application", treatmentId), treatmentApplicationId);
+    DB(dbAddress).setUIntValue(keccak256("treatment-application/treatment", treatmentApplicationId), treatmentId);
+    DB(dbAddress).setBooleanValue(keccak256("treatment-application/has-treatment?", treatmentApplicationId), true);
     utilities.addArrayItem(dbAddress, "treatment", "treatments-count", treatmentId); // treatmentId is currently just there for counter purpose
   }
 

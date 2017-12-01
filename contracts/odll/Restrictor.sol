@@ -3,10 +3,15 @@ pragma solidity 0.4.18;
 import "./DB.sol";
 
 contract Restrictor is Ownable {
-
   address public dbAddress;
   uint8 public smartContractStatus;
+  event PaymentLocked(uint paymentId);
   event OnSmartContractStatusSet(uint8 status);
+
+  modifier inState (uint paymentId, uint8 stateId) {
+    require(DB(dbAddress).getUInt8Value(keccak256("payment/state", paymentId)) == stateId);
+    _;
+  }
 
   modifier onlyPermittedSmartContract {
     require(smartContractStatus == 0);
@@ -54,7 +59,7 @@ contract Restrictor is Ownable {
     require(hasStatus(msg.sender, 1));
     _;
   }
-  
+
   modifier onlyActiveAdminId(address userId) {
     require(isActiveAdmin(userId));
     _;
@@ -130,5 +135,14 @@ contract Restrictor is Ownable {
 
   function getUserType(address userId) internal view returns(uint8) {
     return DB(dbAddress).getUInt8Value(keccak256("user/type", userId));
+  }
+
+  function lockPayment (address userId, uint paymentId)
+    public
+    onlyActivePatientId(userId)
+    inState(paymentId, 1)
+  {
+    DB(dbAddress).setUInt8Value(keccak256("payment/state", paymentId), 2);
+    PaymentLocked(paymentId);
   }
 }

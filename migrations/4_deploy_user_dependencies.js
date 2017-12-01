@@ -1,6 +1,8 @@
 var contract = require('truffle-contract');
 var DBConfigObject = require('../build/contracts/DB.json');
 
+var Escrow = artifacts.require("./odll/Escrow.sol");
+
 var UserWriter = artifacts.require("./odll/UserWriter.sol");
 var UserReader = artifacts.require("./odll/UserReader.sol");
 
@@ -23,7 +25,8 @@ var TreatmentApplicationWriter = artifacts.require("./odll/TreatmentApplicationW
 var TreatmentApplicationWriter2 = artifacts.require("./odll/TreatmentApplicationWriter2.sol");
 var TreatmentApplicationReader = artifacts.require("./odll/TreatmentApplicationReader.sol");
 
-var Escrow = artifacts.require("./odll/Escrow.sol");
+var PostApplicationReader = artifacts.require("./odll/PostApplicationReader.sol");
+var PostApplicationReader2 = artifacts.require("./odll/PostApplicationReader2.sol");
 
 var DBContract = contract(DBConfigObject);
 DBContract.setProvider(web3.currentProvider);
@@ -31,9 +34,14 @@ DBContract.setProvider(web3.currentProvider);
 var dbAddress = DBContract.deployed()
 .then(function(instance) {
   return instance.address;
+})
+.catch(function(error) {
+  console.log(':::::::Unable to get deployed DB')
 });
 
 module.exports = function (deployer) {
+  deployer.deploy(Escrow, dbAddress);
+
   deployer.deploy(UserWriter, dbAddress);
   deployer.deploy(UserReader, dbAddress);
 
@@ -56,5 +64,6 @@ module.exports = function (deployer) {
   deployer.deploy(TreatmentApplicationWriter2, dbAddress);
   deployer.deploy(TreatmentApplicationReader, dbAddress);
 
-  deployer.deploy(Escrow, dbAddress);
+  deployer.deploy(PostApplicationReader, dbAddress);
+  deployer.deploy(PostApplicationReader2, dbAddress);
 };

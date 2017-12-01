@@ -15,6 +15,8 @@ import TreatmentRequestReader2 from '../../../build/contracts/TreatmentRequestRe
 import TreatmentApplicationWriter from '../../../build/contracts/TreatmentApplicationWriter.json'
 import TreatmentApplicationWriter2 from '../../../build/contracts/TreatmentApplicationWriter2.json'
 import TreatmentApplicationReader from '../../../build/contracts/TreatmentApplicationReader.json'
+import PostApplicationReader from '../../../build/contracts/PostApplicationReader.json'
+import PostApplicationReader2 from '../../../build/contracts/PostApplicationReader2.json'
 import blockchainManager from '../BlockchainManager'
 import {getObjectFromResponse, getSlicedAddressString, getSoliditySha3ForId, getGravatarFor} from '../utilities'
 // import {EXCHANGE_RATE_API} from '../../util/constants'
@@ -45,7 +47,9 @@ class Manager {
       TreatmentRequestReader2,
       TreatmentApplicationWriter,
       TreatmentApplicationWriter2,
-      TreatmentApplicationReader
+      TreatmentApplicationReader,
+      PostApplicationReader,
+      PostApplicationReader2
     ]
   }
 

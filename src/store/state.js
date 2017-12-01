@@ -101,6 +101,16 @@ export default {
       data: {},
       seed: null,
       totalNumberAvailable: 0
+    },
+    fetchCases: {
+      data: {},
+      seed: null,
+      totalNumberAvailable: 0
+    },
+    fetchTreatments: {
+      data: {},
+      seed: null,
+      totalNumberAvailable: 0
     }
   }
 }

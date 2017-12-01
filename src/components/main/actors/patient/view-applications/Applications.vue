@@ -9,6 +9,18 @@
           <div class="trigger" :class="addClass(2, 'active')" data-open="treatment-section" data-type="2" @click="switchView">Treatment Applications</div>
         </div>
         <div class="view-section">
+          <div class="query-section">
+            <div class="entry-item">
+              <div class="entry-param">Application Type</div>
+              <div class="entry-value">
+                <select id="application-type" class="list">
+                  <option>Unaccepted</option>
+                  <option>Accepted</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
           <div class="scan-section" :class="addClass(1, 'showing')" id="scan-section"></div>
           <div class="treatment-section" :class="addClass(2, 'showing')" id="treatment-section"></div>
         </div>
@@ -65,11 +77,30 @@
       setEventListeners () {
         const _this = this
         const servicesPage = document.querySelector('#services')
+
+        servicesPage.addEventListener('change', function (evt) {
+          let target = evt.target
+          const applicationTypeId = Number(_this.$route.query.aTI || 1)
+          switch (target.id) {
+            case 'application-type':
+              if (Number(evt.target.selectedIndex) === 0) {
+                _this.fetchApplications(evt, 0, null, 1, applicationTypeId)
+              } else {
+                _this.fetchPostApplications(evt, 0, null, 1, applicationTypeId)
+              }
+
+              break
+          }
+        })
+
         servicesPage.addEventListener('click', function (evt) {
           let target = evt.target
           switch (true) {
             case (target.classList.contains('accept-application')):
               _this.acceptApplication(evt)
+              break
+            case (target.classList.contains('release-fund')):
+              _this.releaseFund(evt)
               break
           }
         })
@@ -102,7 +133,7 @@
             callback: (status) => {
               this.endWait(document.querySelector('.wrapper'))
               this.enableNecessaryButtons(evt)
-              if (status) this.fetchApplications(null, this.currentOffset, this.$store.state.searchResult[applicationTypeId === 1 ? 'fetchScanApplications' : 'fetchTreatmentApplications'].seed, 1, Number(this.$route.query.aTI))
+              if (status) this.fetchApplications(null, this.currentOffset, this.$store.state.searchResult[applicationTypeId === 1 ? 'fetchScanApplications' : 'fetchTreatmentApplications'].seed, 1, Number(this.$route.query.aTI || 1))
               this.notify(status ? 'Application Successfully accepted' : 'Unable to accept Application')
             }
           })
@@ -164,6 +195,97 @@
           }
         })
       },
+      fetchPostApplications (evt, offset = 0, seed = null, direction = 1, applicationTypeId = 1) {
+        const fetchQuery = {
+          type: applicationTypeId === 1 ? 'fetchCases' : 'fetchTreatments',
+          requestParams: {
+            userId: this.user.coinbase,
+            offset,
+            limit: this.perPage,
+            seed: seed || Math.random()
+          },
+          managerIndex: 1, // which of the contract managers to use
+          contractIndexToUse: 8,
+          methodName: applicationTypeId === 1 ? 'fetchCasesForPatient' : 'fetchTreatmentsForPatient',
+          callOnEach: applicationTypeId === 1 ? 'getCaseDetail' : 'getTreatmentDetail',
+          callOnEachParams: caseId => ({applicationTypeId, caseId: caseId.toNumber()})
+        }
+
+        this.$router.push({
+          path: '/view-applications',
+          query: {
+            o: fetchQuery.offset,
+            l: fetchQuery.limit,
+            sd: fetchQuery.seed,
+            aTI: applicationTypeId
+          }
+        })
+        const offsetData = this.$store.state.searchResult[fetchQuery.type].data[offset]
+        if (direction < 0 && offsetData && offsetData.length > 0) {
+          this.populateResults(offsetData, applicationTypeId)
+        } else {
+          this.getPostApplications(evt, fetchQuery)
+        }
+      },
+      getPostApplications (evt, fetchQuery) {
+        const applicationTypeId = Number(this.$route.query.aTI || 1)
+        const resultSection = document.querySelector(`.${applicationTypeId === 1 ? 'scan-section' : 'treatment-section'}`)
+        this.clearDOMElementChildren(resultSection)
+        this.askUserToWaitWhileWeSearch(applicationTypeId)
+        this.disableNecessaryButtons()
+        this.$root.callToFetchDataObjects({
+          fetchQuery,
+          callback: (result = null, isCompleted = false) => {
+            // update result view
+            if (isCompleted) {
+              if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
+              this.enableNecessaryButtons()
+            }
+
+            if (result) {
+              this.appendResult(result.applicationObject, applicationTypeId)
+            } else {
+              this.informOfNoPostApplication(applicationTypeId)
+            }
+          }
+        })
+      },
+      releaseFund (evt) {
+        const sn = evt.target.dataset.params
+        const applicationTypeId = Number(this.$route.query.aTI || 1)
+        const application = this.$store.state.searchResult[applicationTypeId === 1 ? 'fetchScanApplications' : 'fetchTreatmentApplications'].data[this.currentOffset][sn]
+        // const ethereumValue = application.ethereumValue
+
+        fetch(EXCHANGE_RATE_API)
+        .then(response => response.json())
+        .then((JSONResponse) => {
+          const USDExchange = JSONResponse[0].price_usd
+          const quoteInEther = application.quote / USDExchange
+          const quoteInWei = this.$store.state.web3.instance().toWei(quoteInEther, 'ether')
+
+          this.scrollToTop()
+          this.disableNecessaryButtons(evt)
+          this.beginWait(document.querySelector('.wrapper'))
+          this.$root.callToWriteData({
+            requestParams: {
+              dentistId: application.userId,
+              applicationId: application.applicationId,
+              quote: quoteInWei
+            },
+            managerIndex: 2, // which of the contract managers to use
+            contractIndexToUse: applicationTypeId === 1 ? 6 : 12,
+            value: this.$store.state.web3.instance().toWei(Math.ceil(quoteInEther), 'ether'),
+            methodName: applicationTypeId === 1 ? 'acceptScanApplication' : 'acceptTreatmentApplication',
+            callback: (status) => {
+              this.endWait(document.querySelector('.wrapper'))
+              this.enableNecessaryButtons(evt)
+              if (status) this.fetchApplications(null, this.currentOffset, this.$store.state.searchResult[applicationTypeId === 1 ? 'fetchScanApplications' : 'fetchTreatmentApplications'].seed, 1, Number(this.$route.query.aTI || 1))
+              this.notify(status ? 'Application Successfully accepted' : 'Unable to accept Application')
+            }
+          })
+        })
+        .catch((e) => console.error(e))
+      },
       populateResults (results, resultType = 1) {
         if (typeof resultType === 'object' && resultType.toNumber) resultType = resultType.toNumber()
         const resultSection = document.querySelector(`.${resultType === 1 ? 'scan-section' : 'treatment-section'}`)
@@ -210,6 +332,11 @@
         let noServiceDOMElement = this.createNoApplicationDOMElement(applicationTypeId)
         if (document.querySelector('.result-section')) document.querySelector('.result-section').appendChild(noServiceDOMElement)
       },
+      informOfNoPostApplication (applicationTypeId = 1) {
+        if (document.querySelector('.no-service')) document.querySelector('.no-service').remove()
+        let noServiceDOMElement = this.createNoPostApplicationDOMElement(applicationTypeId)
+        if (document.querySelector('.result-section')) document.querySelector('.result-section').appendChild(noServiceDOMElement)
+      },
       createWaitOverlayDOMElement (applicationTypeId = 1) {
         const DOMELement = new DOMParser().parseFromString(`
           <div class="wait-overlay">
@@ -231,6 +358,17 @@
 
         return DOMELement.body.firstChild
       },
+      createNoPostApplicationDOMElement (applicationTypeId = 1) {
+        const DOMELement = new DOMParser().parseFromString(`
+          <div class="no-service">
+            <div class="no-service-message">
+              It appears you have no ${applicationTypeId === 1 ? 'Case' : 'Treatment'} on the blockchain.
+            </div>
+          </div>
+        `, 'text/html')
+
+        return DOMELement.body.firstChild
+      },
       createResultDOMElement (result) {
         const userObject = result.userObject
         const resultDOMElement = new DOMParser().parseFromString(`
@@ -243,7 +381,7 @@
               <div class="address">Address: <span>${userObject.address || 'Not Supplied'}</span></div>
               <div class="quote">Quote: <span>$${result.quote}</span></div>
               <div class="comment">Comment: <span>${result.comment}</span></div>
-              <input type="button" value="Accept" class="button accept-application" data-params="${result.SN}">
+              <input type="button" value="${result.status === 1 ? 'Accept' : 'Release Fund'}" class="button ${result.status === 1 ? 'accept-application' : 'release-fund'}" data-params="${result.SN}">
             </div>
           </div>
         `, 'text/html').body.firstChild

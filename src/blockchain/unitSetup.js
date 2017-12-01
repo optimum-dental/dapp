@@ -1,12 +1,15 @@
 // ropsten network owner account: 0x3b26a28666a28e5037613947ac09dcf5d6caf7b9
 
 // Sample keccak256 implementation
+web3.sha3(web3.toHex('scan-application/quote') + '0000000000000000000000000000000000000000000000000000000000000001', {encoding: 'hex'})
 web3.sha3(web3.toHex('scan-application/scan-service') + '0000000000000000000000000000000000000000000000000000000000000001', {encoding: 'hex'})
 web3.sha3(web3.toHex('scan-application/scan-request') + '0000000000000000000000000000000000000000000000000000000000000001', {encoding: 'hex'})
 web3.sha3(web3.toHex('scan-request/status') + '0000000000000000000000000000000000000000000000000000000000000001', {encoding: 'hex'})
 web3.sha3(web3.toHex('scan-request/patient') + '0000000000000000000000000000000000000000000000000000000000000001', {encoding: 'hex'})
 web3.sha3(web3.toHex('scan-application/patient') + '0000000000000000000000000000000000000000000000000000000000000001', {encoding: 'hex'})
 web3.sha3(web3.toHex('scan-application/dentist') + '0000000000000000000000000000000000000000000000000000000000000001', {encoding: 'hex'})
+web3.sha3(web3.toHex('scan-application/quote') + '0000000000000000000000000000000000000000000000000000000000000001', {encoding: 'hex'})
+web3.sha3(web3.toHex('scan-application/amount') + '0000000000000000000000000000000000000000000000000000000000000001', {encoding: 'hex'})
 web3.sha3(web3.toHex('case/status') + '0000000000000000000000000000000000000000000000000000000000000001', {encoding: 'hex'})
 
 // ADD ODLLSetter, ODLLUserWriter, ODLLUserReader // , ODLLServiceWriter, ODLLServiceReader
@@ -14,23 +17,25 @@ web3.sha3(web3.toHex('case/status') + '00000000000000000000000000000000000000000
 /*
 DB.at('0xc5668d26804abff30ca97dcf0eb4b14be11ab474').addPermittedContracts([
   "0xd1ba29ebc79e3fcda240165667af7f4c1d5da399", // Setter
-  "0x8ba4f172704c107e35155f6ce3e44aa2f198a9e5", // UserWriter
-  "0x1237a441badbca754b46dd2e2970ee174d855875", // UserReader
-  "0xc1be5021c5838b6f033555e823795e8c02a6dfab", // ServiceWriter
-  "0x8d3242af94a693000678ac038d31753dfff6632d", // ServiceReader
-  "0x5d2fb46227db33594128aac491faa8bd73ffe9df", // ScanRequestWriter
-  "0x6a8bfeca8525473da83d87e5aa12550b08f0bf13", // ScanRequestReader
-  "0x20f76e31ff795feeab0c862607eb45b9e531be5e", // ScanRequestReader2
-  "0xb005d7c38b3735a08a7ed0de3c27367732d68122", // ScanApplicationWriter
-  "0xb43f02433c5c72c8261d09c7037741de8321f624", // ScanApplicationWriter2
-  "0x3532f5bb5f2b7dbb647080bd398fbf64cc681d46", // ScanApplicationReader
-  "0xf5873fb394b069f3b5222525a58eff42fd083385", // TreatmentRequestWriter
-  "0x3365ecf6b8ca57fc5f5748eec0e45e752bc9dcef", // TreatmentRequestReader
-  "0xcdc709f802d71b28ee9fda7f3b70540989351b61", // TreatmentRequestReader2
-  "0x429905ae80b3ca9cfa42e08b079f9758972107db", // TreatmentApplicationWriter
-  "0x3d007df1a550a74970f75ac17967d220d41d478f", // TreatmentApplicationWriter2
-  "0x98b6d40616e3171c4f5b887458e44b5e2cd8043a", // TreatmentApplicationReader
-  "0x052078b18ddff9deb2c80ec536074ab0e7ccd7f4", // Escrow
+  "0x7c8ef7bb310478aeef0942322f2b04b5feb58a1a", // Escrow
+  "0x28543356ca81e7543fded1057a40215ad4f34512", // UserWriter
+  "0x7eb0be7150736b370e2b44cec466cb79ebd6941f", // UserReader
+  "0xc58e64513762fb1ae4b26d0f1708971825dd3b06", // ServiceWriter
+  "0x0e231906fdade50a58baa4f4863f2bac442095a2", // ServiceReader
+  "0x7b5442a55df3db707dbd180e3c9911d84ac94318", // ScanRequestWriter
+  "0xdde4ae919be067c0889e1e71f12a86c76c5520d4", // ScanRequestReader
+  "0x0ce4ec3f9aedaa31cc4db013336f1bbf9594b869", // ScanRequestReader2
+  "0x129522a73785e46da88d4b9fdb4722f72d78c84f", // ScanApplicationWriter
+  "0x840db4f852e9d8a569e20c40d3e852d3b12db13e", // ScanApplicationWriter2
+  "0xc307ff56eb1917829b729aa930fcded1bd7049c3", // ScanApplicationReader
+  "0xbbc9a2effde0e1a857788b2a3dde4bf7a67c9efc", // TreatmentRequestWriter
+  "0x7fc4a85a0319092e5050f5741052746a551f4416", // TreatmentRequestReader
+  "0x9d91e5e94f95380883589a4fa89b267269be0066", // TreatmentRequestReader2
+  "0x43acb91b4948f1fbbbbcff20e293e3e18fccede2", // TreatmentApplicationWriter
+  "0x7ae683da3cc0e9d3b356053680b5448fae91dd81", // TreatmentApplicationWriter2
+  "0xe4ca4e4748fb9fc8eb0861122fa128ae78ad2f9c", // TreatmentApplicationReader
+  "0x5edfd014e6d5be233d9ad67944d401502184ccd7", // PostApplicationReader
+  "0x5d4d0a92c31123fb16e6c95c79e010b83fac4405", // PostApplicationReader2
 ])
 */
 
@@ -38,12 +43,12 @@ DB.at('0xc5668d26804abff30ca97dcf0eb4b14be11ab474').addPermittedContracts([
 DB.at('0xc5668d26804abff30ca97dcf0eb4b14be11ab474').addPermittedContracts(["0xd1ba29ebc79e3fcda240165667af7f4c1d5da399"])
 
 // Add user contracts
-DB.at('0xc5668d26804abff30ca97dcf0eb4b14be11ab474').addPermittedContracts(["0x8ba4f172704c107e35155f6ce3e44aa2f198a9e5", "0x1237a441badbca754b46dd2e2970ee174d855875", "0xc1be5021c5838b6f033555e823795e8c02a6dfab", "0x8d3242af94a693000678ac038d31753dfff6632d", "0x5d2fb46227db33594128aac491faa8bd73ffe9df", "0x6a8bfeca8525473da83d87e5aa12550b08f0bf13", "0x20f76e31ff795feeab0c862607eb45b9e531be5e", "0xb005d7c38b3735a08a7ed0de3c27367732d68122", "0xb43f02433c5c72c8261d09c7037741de8321f624", "0x3532f5bb5f2b7dbb647080bd398fbf64cc681d46", "0xf5873fb394b069f3b5222525a58eff42fd083385", "0x3365ecf6b8ca57fc5f5748eec0e45e752bc9dcef", "0xcdc709f802d71b28ee9fda7f3b70540989351b61", "0x429905ae80b3ca9cfa42e08b079f9758972107db", "0x3d007df1a550a74970f75ac17967d220d41d478f", "0x98b6d40616e3171c4f5b887458e44b5e2cd8043a", "0x052078b18ddff9deb2c80ec536074ab0e7ccd7f4"])
+DB.at('0xc5668d26804abff30ca97dcf0eb4b14be11ab474').addPermittedContracts(["0x7c8ef7bb310478aeef0942322f2b04b5feb58a1a", "0x28543356ca81e7543fded1057a40215ad4f34512", "0x7eb0be7150736b370e2b44cec466cb79ebd6941f", "0xc58e64513762fb1ae4b26d0f1708971825dd3b06", "0x0e231906fdade50a58baa4f4863f2bac442095a2", "0x7b5442a55df3db707dbd180e3c9911d84ac94318", "0xdde4ae919be067c0889e1e71f12a86c76c5520d4", "0x0ce4ec3f9aedaa31cc4db013336f1bbf9594b869", "0x129522a73785e46da88d4b9fdb4722f72d78c84f", "0x840db4f852e9d8a569e20c40d3e852d3b12db13e", "0xc307ff56eb1917829b729aa930fcded1bd7049c3", "0xbbc9a2effde0e1a857788b2a3dde4bf7a67c9efc", "0x7fc4a85a0319092e5050f5741052746a551f4416", "0x9d91e5e94f95380883589a4fa89b267269be0066", "0x43acb91b4948f1fbbbbcff20e293e3e18fccede2", "0x7ae683da3cc0e9d3b356053680b5448fae91dd81", "0xe4ca4e4748fb9fc8eb0861122fa128ae78ad2f9c", "0x5edfd014e6d5be233d9ad67944d401502184ccd7", "0x5d4d0a92c31123fb16e6c95c79e010b83fac4405"])
 
 
 
 // misc
-DB.at('0xc5668d26804abff30ca97dcf0eb4b14be11ab474').addPermittedContracts(["0xb43f02433c5c72c8261d09c7037741de8321f624", "0x3d007df1a550a74970f75ac17967d220d41d478f", "0x052078b18ddff9deb2c80ec536074ab0e7ccd7f4"])
+DB.at('0xc5668d26804abff30ca97dcf0eb4b14be11ab474').addPermittedContracts(["0x7c8ef7bb310478aeef0942322f2b04b5feb58a1a", "0x840db4f852e9d8a569e20c40d3e852d3b12db13e", "0x7ae683da3cc0e9d3b356053680b5448fae91dd81", "0x5edfd014e6d5be233d9ad67944d401502184ccd7", "0x5d4d0a92c31123fb16e6c95c79e010b83fac4405"])
 
 
 
@@ -53,23 +58,23 @@ Setter.at('0xd1ba29ebc79e3fcda240165667af7f4c1d5da399').setOwner()
 Setter.at('0xd1ba29ebc79e3fcda240165667af7f4c1d5da399').setConfig()
 
 Setter.at('0xd1ba29ebc79e3fcda240165667af7f4c1d5da399').setFirstAdmin("0xe1eb3251dce3d8ba0bf186bffeba19cbc7c1ddf4") // Phoebe
-Setter.at('0xd1ba29ebc79e3fcda240165667af7f4c1d5da399').setEscrowAddress("0x052078b18ddff9deb2c80ec536074ab0e7ccd7f4")
+Setter.at('0xd1ba29ebc79e3fcda240165667af7f4c1d5da399').setEscrowAddress("0x7c8ef7bb310478aeef0942322f2b04b5feb58a1a")
 
-// UserWriter.at('0x8ba4f172704c107e35155f6ce3e44aa2f198a9e5').addOfficialToODLL('0xe2761238fe59bc0dde7d2a15bad605cda6047c5a', 4) // Quadri
-// UserWriter.at('0x8ba4f172704c107e35155f6ce3e44aa2f198a9e5').addOfficialToODLL('0xf0bc73eaa439392723f0dc653abfb9058112bee1', 4) // Tina
+// UserWriter.at('0x28543356ca81e7543fded1057a40215ad4f34512').addOfficialToODLL('0xe2761238fe59bc0dde7d2a15bad605cda6047c5a', 4) // Quadri
+// UserWriter.at('0x28543356ca81e7543fded1057a40215ad4f34512').addOfficialToODLL('0xf0bc73eaa439392723f0dc653abfb9058112bee1', 4) // Tina
 
 
 
 /* Ignore
-// Setter.at('0xd1ba29ebc79e3fcda240165667af7f4c1d5da399').setContract("contract/odll-user-writer", "0x8ba4f172704c107e35155f6ce3e44aa2f198a9e5", { from: "0xa6976e0d32f99930641ced889143bf0ca99ee51d" })
-// Setter.at('0xd1ba29ebc79e3fcda240165667af7f4c1d5da399').setContract("contract/odll-user-reader", "0x1237a441badbca754b46dd2e2970ee174d855875", { from: "0xa6976e0d32f99930641ced889143bf0ca99ee51d" })
+// Setter.at('0xd1ba29ebc79e3fcda240165667af7f4c1d5da399').setContract("contract/odll-user-writer", "0x28543356ca81e7543fded1057a40215ad4f34512", { from: "0xa6976e0d32f99930641ced889143bf0ca99ee51d" })
+// Setter.at('0xd1ba29ebc79e3fcda240165667af7f4c1d5da399').setContract("contract/odll-user-reader", "0x7eb0be7150736b370e2b44cec466cb79ebd6941f", { from: "0xa6976e0d32f99930641ced889143bf0ca99ee51d" })
 */
 
 
 // DB.at('0xc5668d26804abff30ca97dcf0eb4b14be11ab474').getEntityList(["0x9809848503a7a3c248ea05e4ff1f22340f5669a447314922d16089b378f07c01", "0xe328f31efd88b9b64e442ec2d7267d3043883ffde671c77d6c254b02207758b5", "0x8c6f0fe5fc4a6ab81e8ac401a8c9dbc1238f57cc246a5ffcdb095254cb665025", "0x897147767a635b5d5cd5d3c6a2cfbbcb020bd7fae3451a1086e2690743ec2281"], [7, 7, 5, 2])
 
 DB.at('0xc5668d26804abff30ca97dcf0eb4b14be11ab474').getPermittedContracts()
-DB.at('0xc5668d26804abff30ca97dcf0eb4b14be11ab474').permissionStatusForContract["0x052078b18ddff9deb2c80ec536074ab0e7ccd7f4"]
+DB.at('0xc5668d26804abff30ca97dcf0eb4b14be11ab474').permissionStatusForContract["0x7c8ef7bb310478aeef0942322f2b04b5feb58a1a"]
 
 // test user address: 0xe1eb3251dce3d8ba0bf186bffeba19cbc7c1ddf4 [name, email, phone-number, type]
 DB.at('0xc5668d26804abff30ca97dcf0eb4b14be11ab474').getEntityList(["0xccd13aae8586090a842432a7f94d232b9c2c6b01816f2726f80c35315fefda97", "0xbd2be66110356bab3ab40df26b8761f0abdf45df1c4a8ec8161b4939283aeba4", "0x4e668c29ca402563b67edaf8ed8436cb2f4110388fd3aa39766e31659f8a359d", "0xe7775de79d576d872d0662a58e80f361d9908313a7edadfdf0da7f2b069cd57b"], [7, 7, 5, 2])

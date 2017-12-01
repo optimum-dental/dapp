@@ -5,7 +5,7 @@
         <div class="user-icon"></div>
         <div class="address" :title="coinbase">{{ truncatedCoinbase }}</div>
         <div class="question-icon"></div>
-        <div class="menu-icon"></div>
+        <div class="menu-icon" :title="balance">{{ balance }}</div>
       </div>
 
       <div v-else>
@@ -26,6 +26,9 @@
       },
       truncatedCoinbase () {
         return this.user.hasCoinbase ? truncate(this.$root.coinbase, 22) : 'No account connected'
+      },
+      balance () {
+        return this.user.hasCoinbase ? truncate(this.user.balance, 5) : 0.00
       },
       user () {
         return this.$root.user

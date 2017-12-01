@@ -6,6 +6,8 @@ import ScanApplicationReader from '../../../build/contracts/ScanApplicationReade
 import TreatmentRequestReader from '../../../build/contracts/TreatmentRequestReader.json'
 import TreatmentRequestReader2 from '../../../build/contracts/TreatmentRequestReader2.json'
 import TreatmentApplicationReader from '../../../build/contracts/TreatmentApplicationReader.json'
+import PostApplicationReader from '../../../build/contracts/PostApplicationReader.json'
+import PostApplicationReader2 from '../../../build/contracts/PostApplicationReader2.json'
 import userManager from '../user/Manager'
 import serviceManager from '../service/Manager'
 import blockchainManager from '../BlockchainManager'
@@ -27,7 +29,9 @@ class Manager {
       ScanApplicationReader,
       TreatmentRequestReader,
       TreatmentRequestReader2,
-      TreatmentApplicationReader
+      TreatmentApplicationReader,
+      PostApplicationReader,
+      PostApplicationReader2
     ]
   }
 
@@ -128,6 +132,28 @@ class Manager {
           result.coinbase = dataObject.userId
           dataObject.userObject = result
           resolve(dataObject)
+        })
+        .catch(error => reject(error))
+      })
+      .catch(error => reject(error))
+    })
+  }
+
+  getCaseDetail (state = null, caseObject = {}) {
+    return new Promise((resolve, reject) => {
+      const dataObject = {}
+      serviceManager.getCaseDetail(state, caseObject)
+      .then((result) => {
+        Object.assign(dataObject, result)
+        userManager.getUserDataFromTheBlockchain(state, dataObject)
+        .then((result) => {
+          result.coinbase = dataObject.userId
+          dataObject.userObject = result
+          searchManager.getApplicationDetail(state, dataObject)
+          .then((result) => {
+            dataObject.applicationObject = result
+            resolve(dataObject)
+          })
         })
         .catch(error => reject(error))
       })
