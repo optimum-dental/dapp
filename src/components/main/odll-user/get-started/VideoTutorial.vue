@@ -5,7 +5,7 @@
         <p class='header-3 text'>{{ tutorial.title }}</p>
       </section>
       <section class='video-player'>
-        <iframe width="560" height="350" :src="tutorial.link" frameborder="0" allowfullscreen>
+        <iframe width="560" height="350" :src="tutorial.link" allowfullscreen>
         </iframe>
       </section>
     </div>
