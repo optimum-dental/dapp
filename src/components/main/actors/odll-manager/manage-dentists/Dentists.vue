@@ -5,7 +5,7 @@
 
       <div class="data-entry-section">
         <input type="text" id="entry" class="entry" placeholder="Enter the Ethereum address of a Dentist you want to add to the platform" @input="clearError">
-        <input type="button" class="add button" value="Add Dentist" @click="addDentist">
+        <input type="button" class="add-official button" value="Add Dentist" @click="addDentist">
       </div>
 
       <div class="result-section"></div>
@@ -423,7 +423,7 @@
     color: #bababa;
   }
 
-  .add {
+  .add, .add-official {
     padding: 2px;
     text-align: center;
     float: right;

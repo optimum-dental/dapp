@@ -737,7 +737,7 @@
       },
       {
         "attributes": {
-          "SourceUnit": 15831,
+          "SourceUnit": 15806,
           "absolutePath": "/Users/danielokwufulueze/dev/vue/apps/oraldatalink/contracts/zeppelin/ownership/Ownable.sol",
           "file": "../zeppelin/ownership/Ownable.sol",
           "scope": 14826,
@@ -752,7 +752,7 @@
       },
       {
         "attributes": {
-          "SourceUnit": 15775,
+          "SourceUnit": 15750,
           "absolutePath": "/Users/danielokwufulueze/dev/vue/apps/oraldatalink/contracts/zeppelin/math/SafeMath.sol",
           "file": "../zeppelin/math/SafeMath.sol",
           "scope": 14826,
@@ -783,14 +783,14 @@
       {
         "attributes": {
           "contractDependencies": [
-            15830
+            15805
           ],
           "contractKind": "contract",
           "documentation": null,
           "fullyImplemented": true,
           "linearizedBaseContracts": [
             14825,
-            15830
+            15805
           ],
           "name": "DB",
           "scope": 14826
@@ -807,7 +807,7 @@
                 "attributes": {
                   "contractScope": null,
                   "name": "Ownable",
-                  "referencedDeclaration": 15830,
+                  "referencedDeclaration": 15805,
                   "type": "contract Ownable"
                 },
                 "id": 13939,
@@ -969,7 +969,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 15845,
+                              "referencedDeclaration": 15820,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -1034,7 +1034,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 15842,
+                                          "referencedDeclaration": 15817,
                                           "type": "msg",
                                           "value": "msg"
                                         },
@@ -1085,7 +1085,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 15842,
+                                          "referencedDeclaration": 15817,
                                           "type": "msg",
                                           "value": "msg"
                                         },
@@ -1104,7 +1104,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 15778,
+                                      "referencedDeclaration": 15753,
                                       "type": "address",
                                       "value": "owner"
                                     },
@@ -1271,7 +1271,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 15804,
+                      "referencedDeclaration": 15779,
                       "type": "modifier ()",
                       "value": "onlyOwner"
                     },
@@ -1537,7 +1537,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 15804,
+                      "referencedDeclaration": 15779,
                       "type": "modifier ()",
                       "value": "onlyOwner"
                     },
@@ -2022,7 +2022,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 15804,
+                      "referencedDeclaration": 15779,
                       "type": "modifier ()",
                       "value": "onlyOwner"
                     },
@@ -2211,7 +2211,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 15804,
+                      "referencedDeclaration": 15779,
                       "type": "modifier ()",
                       "value": "onlyOwner"
                     },
@@ -4675,7 +4675,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "add",
-                                  "referencedDeclaration": 15773,
+                                  "referencedDeclaration": 15748,
                                   "type": "function (uint256,uint256) pure returns (uint256)"
                                 },
                                 "children": [
@@ -4685,7 +4685,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 15774,
+                                      "referencedDeclaration": 15749,
                                       "type": "type(library SafeMath)",
                                       "value": "SafeMath"
                                     },
@@ -4979,7 +4979,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "sub",
-                                  "referencedDeclaration": 15749,
+                                  "referencedDeclaration": 15724,
                                   "type": "function (uint256,uint256) pure returns (uint256)"
                                 },
                                 "children": [
@@ -4989,7 +4989,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 15774,
+                                      "referencedDeclaration": 15749,
                                       "type": "type(library SafeMath)",
                                       "value": "SafeMath"
                                     },
@@ -12513,5 +12513,5 @@
     }
   },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-12-02T06:02:32.670Z"
+  "updatedAt": "2017-12-02T20:02:13.476Z"
 }

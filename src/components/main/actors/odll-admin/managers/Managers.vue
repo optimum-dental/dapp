@@ -5,7 +5,7 @@
 
       <div class="data-entry-section">
         <input type="text" id="entry" class="entry" placeholder="Enter the Ethereum address of a Manager you want to add to the platform" @input="clearError">
-        <input type="button" class="add button" value="Add Manager" @click="addManager">
+        <input type="button" class="add-official button" value="Add Manager" @click="addManager">
       </div>
 
       <div class="result-section"></div>
@@ -376,7 +376,7 @@
     border: 1px solid #f18787;
   }
 
-  .add {
+  .add, .add-official {
     padding: 2px;
     text-align: center;
     float: right;

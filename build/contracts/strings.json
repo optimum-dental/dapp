@@ -700,7 +700,7 @@
                             "declaration": 34,
                             "isOffset": false,
                             "isSlot": false,
-                            "src": "2526:4:0",
+                            "src": "2578:4:0",
                             "valueSize": 1
                           }
                         },
@@ -769,7 +769,7 @@
                             "declaration": 8,
                             "isOffset": false,
                             "isSlot": false,
-                            "src": "2571:4:0",
+                            "src": "2603:4:0",
                             "valueSize": 1
                           }
                         },
@@ -778,7 +778,7 @@
                             "declaration": 8,
                             "isOffset": false,
                             "isSlot": false,
-                            "src": "2603:4:0",
+                            "src": "2571:4:0",
                             "valueSize": 1
                           },
                           "mask": {
@@ -13483,7 +13483,7 @@
                                     "declaration": 892,
                                     "isOffset": false,
                                     "isSlot": false,
-                                    "src": "14640:6:0",
+                                    "src": "14589:6:0",
                                     "valueSize": 1
                                   },
                                   "selfptr": {
@@ -14110,7 +14110,7 @@
                                             "declaration": 954,
                                             "isOffset": false,
                                             "isSlot": false,
-                                            "src": "15746:3:0",
+                                            "src": "15699:3:0",
                                             "valueSize": 1
                                           }
                                         },
@@ -14133,7 +14133,7 @@
                                             "declaration": 944,
                                             "isOffset": false,
                                             "isSlot": false,
-                                            "src": "15563:7:0",
+                                            "src": "15502:7:0",
                                             "valueSize": 1
                                           }
                                         },
@@ -14163,7 +14163,7 @@
                                             "declaration": 942,
                                             "isOffset": false,
                                             "isSlot": false,
-                                            "src": "15801:7:0",
+                                            "src": "15515:7:0",
                                             "valueSize": 1
                                           }
                                         },
@@ -14172,7 +14172,7 @@
                                             "declaration": 946,
                                             "isOffset": false,
                                             "isSlot": false,
-                                            "src": "15383:9:0",
+                                            "src": "15524:9:0",
                                             "valueSize": 1
                                           },
                                           "ptr": {
@@ -14195,7 +14195,7 @@
                                             "declaration": 954,
                                             "isOffset": false,
                                             "isSlot": false,
-                                            "src": "15642:3:0",
+                                            "src": "15556:3:0",
                                             "valueSize": 1
                                           },
                                           "needlelen": {
@@ -14211,7 +14211,7 @@
                                             "declaration": 954,
                                             "isOffset": false,
                                             "isSlot": false,
-                                            "src": "15556:3:0",
+                                            "src": "15688:3:0",
                                             "valueSize": 1
                                           },
                                           "selfptr": {
@@ -14262,7 +14262,7 @@
                                             "declaration": 946,
                                             "isOffset": false,
                                             "isSlot": false,
-                                            "src": "15524:9:0",
+                                            "src": "15383:9:0",
                                             "valueSize": 1
                                           }
                                         },
@@ -14287,6 +14287,13 @@
                                             "isSlot": false,
                                             "src": "15642:3:0",
                                             "valueSize": 1
+                                          },
+                                          "needleptr": {
+                                            "declaration": 948,
+                                            "isOffset": false,
+                                            "isSlot": false,
+                                            "src": "15449:9:0",
+                                            "valueSize": 1
                                           }
                                         },
                                         {
@@ -14301,7 +14308,7 @@
                                             "declaration": 944,
                                             "isOffset": false,
                                             "isSlot": false,
-                                            "src": "15792:7:0",
+                                            "src": "15563:7:0",
                                             "valueSize": 1
                                           },
                                           "ptr": {
@@ -14331,7 +14338,7 @@
                                             "declaration": 954,
                                             "isOffset": false,
                                             "isSlot": false,
-                                            "src": "15688:3:0",
+                                            "src": "15642:3:0",
                                             "valueSize": 1
                                           }
                                         },
@@ -14347,7 +14354,7 @@
                                             "declaration": 954,
                                             "isOffset": false,
                                             "isSlot": false,
-                                            "src": "15781:3:0",
+                                            "src": "15746:3:0",
                                             "valueSize": 1
                                           },
                                           "selfptr": {
@@ -14402,7 +14409,7 @@
                                             "declaration": 954,
                                             "isOffset": false,
                                             "isSlot": false,
-                                            "src": "15746:3:0",
+                                            "src": "15781:3:0",
                                             "valueSize": 1
                                           }
                                         }
@@ -15432,7 +15439,7 @@
                                             "declaration": 1028,
                                             "isOffset": false,
                                             "isSlot": false,
-                                            "src": "17223:3:0",
+                                            "src": "17166:3:0",
                                             "valueSize": 1
                                           },
                                           "needleptr": {
@@ -15448,7 +15455,7 @@
                                             "declaration": 1028,
                                             "isOffset": false,
                                             "isSlot": false,
-                                            "src": "17212:3:0",
+                                            "src": "17223:3:0",
                                             "valueSize": 1
                                           },
                                           "needlelen": {
@@ -15662,7 +15669,7 @@
                                             "declaration": 1018,
                                             "isOffset": false,
                                             "isSlot": false,
-                                            "src": "17316:7:0",
+                                            "src": "17279:7:0",
                                             "valueSize": 1
                                           },
                                           "ptr": {
@@ -15678,7 +15685,7 @@
                                             "declaration": 1028,
                                             "isOffset": false,
                                             "isSlot": false,
-                                            "src": "17411:3:0",
+                                            "src": "17400:3:0",
                                             "valueSize": 1
                                           },
                                           "needlelen": {
@@ -23465,5 +23472,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-12-02T06:02:32.637Z"
+  "updatedAt": "2017-12-02T20:02:13.279Z"
 }
