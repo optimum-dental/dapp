@@ -60,7 +60,6 @@ class Manager {
 
     delete blockchainData.contractIndexToUse
     delete blockchainData.methodName
-    console.log(UserWriter)
     return blockchainManager.querySmartContract({
       contractToUse: contractToUse || UserWriter,
       smartContractMethod: blockchainMethodName,
