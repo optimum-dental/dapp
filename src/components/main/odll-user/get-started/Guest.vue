@@ -58,12 +58,12 @@
           {
             id: 1,
             title: 'How to install Metamask',
-            link: 'https://www.youtube.com/embed/ALzWsh7OnR8'
+            link: 'https://www.youtube.com/embed/z_2AdSpOee4'
           },
           {
             id: 2,
             title: 'Register on Oral Data Link',
-            link: 'https://www.youtube.com/embed/z_2AdSpOee4'
+            link: 'https://www.youtube.com/embed/ALzWsh7OnR8'
           }
         ]
       }
