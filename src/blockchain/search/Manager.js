@@ -145,15 +145,21 @@ class Manager {
       serviceManager.getCaseDetail(state, caseObject)
       .then((result) => {
         Object.assign(dataObject, result)
-        userManager.getUserDataFromTheBlockchain(state, dataObject)
+        serviceManager.getPaymentDetail(state, dataObject)
         .then((result) => {
-          result.coinbase = dataObject.userId
-          dataObject.userObject = result
-          searchManager.getApplicationDetail(state, dataObject)
+          dataObject.paymentObject = result
+          userManager.getUserDataFromTheBlockchain(state, dataObject)
           .then((result) => {
-            dataObject.applicationObject = result
-            resolve(dataObject)
+            result.coinbase = dataObject.userId
+            dataObject.userObject = result
+            searchManager.getApplicationDetail(state, dataObject)
+            .then((result) => {
+              dataObject.applicationObject = result
+              console.log(dataObject)
+              resolve(dataObject)
+            })
           })
+          .catch(error => reject(error))
         })
         .catch(error => reject(error))
       })

@@ -29,7 +29,7 @@ contract TreatmentApplicationWriter2 is Restrictor {
     }
 
     uint paymentId = utilities.getArrayItemsCount(dbAddress, "payments-count");
-    DB(dbAddress).setUIntValue(keccak256("payment/for-type", paymentId), 2);
+    DB(dbAddress).setUInt8Value(keccak256("payment/for-type", paymentId), 2);
     userManager.acceptTreatmentApplication(dbAddress, dentistId, msg.sender, treatmentApplicationId, paymentId, amount, quote);
 
     lockPayment(msg.sender, paymentId);

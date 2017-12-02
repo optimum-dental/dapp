@@ -735,41 +735,29 @@ library userManager {
     address dbAddress,
     address dentistId,
     address patientId,
-    uint amount,
-    uint quote
+    uint ODLLFee,
+    uint dentistFee,
+    uint totalFee
   )
     internal
   {
     address ODLLId = DB(dbAddress).getAddressValue(keccak256("odll/payment-address"));
-    uint ODLLScanPaymentPercentage = DB(dbAddress).getUIntValue(keccak256("odll/scan-payment-percentage"));
-    uint change = SafeMath.sub(amount, quote);
-    uint ODLLFee = SafeMath.mul(SafeMath.div(ODLLScanPaymentPercentage, 100), quote);
-    uint dentistFee = SafeMath.sub(quote, ODLLFee);
+    require(ODLLId != 0x0 && dentistId != 0x0 && patientId != 0x0);
+    require(totalFee == SafeMath.add(ODLLFee, dentistFee));
 
-    uint tempODLLFee = ODLLFee;
-    ODLLFee = 0;
+    addToPatientScanTotalPaid(dbAddress, patientId, totalFee);
+    addToPatientTotalPaid(dbAddress, patientId, totalFee);
 
-    uint tempDentistFee = dentistFee;
-    dentistFee = 0;
+    addToDentistScanTotalEarned(dbAddress, dentistId, dentistFee);
+    addToDentistTotalEarned(dbAddress, dentistId, dentistFee);
 
-    addToPatientScanTotalPaid(dbAddress, patientId, quote);
-    addToPatientTotalPaid(dbAddress, patientId, quote);
-
-    addToDentistScanTotalEarned(dbAddress, dentistId, tempDentistFee);
-    addToDentistTotalEarned(dbAddress, dentistId, tempDentistFee);
-
-    addToODLLScanTotalEarned(dbAddress, ODLLId, tempODLLFee);
-    addToODLLTotalEarned(dbAddress, ODLLId, tempODLLFee);
+    addToODLLScanTotalEarned(dbAddress, ODLLId, ODLLFee);
+    addToODLLTotalEarned(dbAddress, ODLLId, ODLLFee);
 
     writeUserDentist(dbAddress, patientId, dentistId);
 
-    ODLLId.transfer(tempODLLFee);
-    dentistId.transfer(tempDentistFee);
-    if (change > 0) {
-      uint tempChange = change;
-      change = 0;
-      patientId.transfer(tempChange);
-    }
+    ODLLId.transfer(ODLLFee);
+    dentistId.transfer(dentistFee);
   }
 
   function writeTreatmentRequest (
@@ -839,41 +827,29 @@ library userManager {
     address dbAddress,
     address dentistId,
     address patientId,
-    uint amount,
-    uint quote
+    uint ODLLFee,
+    uint dentistFee,
+    uint totalFee
   )
     internal
   {
     address ODLLId = DB(dbAddress).getAddressValue(keccak256("odll/payment-address"));
-    uint ODLLTreatmentPaymentPercentage = DB(dbAddress).getUIntValue(keccak256("odll/treatment-payment-percentage"));
-    uint change = SafeMath.sub(amount, quote);
-    uint ODLLFee = SafeMath.mul(SafeMath.div(ODLLTreatmentPaymentPercentage, 100), quote);
-    uint dentistFee = SafeMath.sub(quote, ODLLFee);
+    require(ODLLId != 0x0 && dentistId != 0x0 && patientId != 0x0);
+    require(totalFee == SafeMath.add(ODLLFee, dentistFee));
 
-    uint tempODLLFee = ODLLFee;
-    ODLLFee = 0;
+    addToPatientTreatmentTotalPaid(dbAddress, patientId, totalFee);
+    addToPatientTotalPaid(dbAddress, patientId, totalFee);
 
-    uint tempDentistFee = dentistFee;
-    dentistFee = 0;
+    addToDentistTreatmentTotalEarned(dbAddress, dentistId, dentistFee);
+    addToDentistTotalEarned(dbAddress, dentistId, dentistFee);
 
-    addToPatientTreatmentTotalPaid(dbAddress, patientId, quote);
-    addToPatientTotalPaid(dbAddress, patientId, quote);
-
-    addToDentistTreatmentTotalEarned(dbAddress, dentistId, tempDentistFee);
-    addToDentistTotalEarned(dbAddress, dentistId, tempDentistFee);
-
-    addToODLLTreatmentTotalEarned(dbAddress, ODLLId, tempODLLFee);
-    addToODLLTotalEarned(dbAddress, ODLLId, tempODLLFee);
+    addToODLLTreatmentTotalEarned(dbAddress, ODLLId, ODLLFee);
+    addToODLLTotalEarned(dbAddress, ODLLId, ODLLFee);
 
     writeUserDentist(dbAddress, patientId, dentistId);
 
-    ODLLId.transfer(tempODLLFee);
-    dentistId.transfer(tempDentistFee);
-    if (change > 0) {
-      uint tempChange = change;
-      change = 0;
-      patientId.transfer(tempChange);
-    }
+    ODLLId.transfer(ODLLFee);
+    dentistId.transfer(dentistFee);
   }
 
   function cancelTreatment (

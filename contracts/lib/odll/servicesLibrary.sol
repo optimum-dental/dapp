@@ -246,7 +246,7 @@ library servicesLibrary {
     DB(dbAddress).setUInt8Value(keccak256("scan-application/status", scanApplicationId), 3);
   }
 
-  // case status: 1 => pending, 2 => treated
+  // case status: 1 => pending, 2 => treated, 3 => canceled
   function acceptScanApplication (
     address dbAddress,
     address dentistId,
@@ -305,6 +305,8 @@ library servicesLibrary {
   function writeCaseData (address dbAddress, address dentistId, address patientId, uint caseId, uint paymentId, uint amount, uint quote) internal {
     DB(dbAddress).setUIntValue(keccak256("case/amount", caseId), amount);
     DB(dbAddress).setUIntValue(keccak256("case/quote", caseId), quote);
+    DB(dbAddress).setUIntValue(keccak256("payment/amount", paymentId), amount);
+    DB(dbAddress).setUIntValue(keccak256("payment/quote", paymentId), quote);
     DB(dbAddress).setBooleanValue(keccak256("case/paid", caseId), true);
     DB(dbAddress).setUIntValue(keccak256("case/payment", caseId), paymentId);
     DB(dbAddress).setUIntValue(keccak256("payment/case", paymentId), caseId);
@@ -524,6 +526,8 @@ library servicesLibrary {
   function writeTreatmentData (address dbAddress, address dentistId, address patientId, uint treatmentId, uint paymentId, uint amount, uint quote) internal {
     DB(dbAddress).setUIntValue(keccak256("treatment/amount", treatmentId), amount);
     DB(dbAddress).setUIntValue(keccak256("treatment/quote", treatmentId), quote);
+    DB(dbAddress).setUIntValue(keccak256("payment/amount", paymentId), amount);
+    DB(dbAddress).setUIntValue(keccak256("payment/quote", paymentId), quote);
     DB(dbAddress).setBooleanValue(keccak256("treatment/paid", treatmentId), true);
     DB(dbAddress).setUIntValue(keccak256("treatment/payment", treatmentId), paymentId);
     DB(dbAddress).setUIntValue(keccak256("payment/treatment", paymentId), treatmentId);

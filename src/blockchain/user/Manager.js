@@ -209,7 +209,8 @@ class Manager {
       'phoneNumber',
       'socialSecurityNumber',
       'birthday',
-      'gender'
+      'gender',
+      'averageRating'
     ]
   }
 
@@ -230,13 +231,14 @@ class Manager {
       getSoliditySha3ForId(state, 'user/phone-number', userId),
       getSoliditySha3ForId(state, 'user/social-security-number', userId),
       getSoliditySha3ForId(state, 'user/birthday', userId),
-      getSoliditySha3ForId(state, 'user/gender', userId)
+      getSoliditySha3ForId(state, 'user/gender', userId),
+      getSoliditySha3ForId(state, 'dentist/average-rating', userId)
     ]
   }
 
   userRecordFieldTypes () {
     // types: 1 => boolean, 2 => uint8, 3 => uint, 4 => address, 5 => bytes32, 7 => string
-    return [2, 2, 7, 7, 5, 5, 5, 3, 5, 3, 5, 5, 5, 2]
+    return [2, 2, 7, 7, 5, 5, 5, 3, 5, 3, 5, 5, 5, 2, 2]
   }
 }
 

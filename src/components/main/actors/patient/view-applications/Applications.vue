@@ -14,8 +14,8 @@
               <div class="entry-param">Application Type</div>
               <div class="entry-value">
                 <select id="application-type" class="list">
-                  <option>Unaccepted</option>
-                  <option>Accepted</option>
+                  <option>Unaccepted Applications</option>
+                  <option>Accepted Applications</option>
                 </select>
               </div>
             </div>
@@ -35,6 +35,7 @@
 </template>
 
 <script>
+  var BigNumber = require('bignumber.js')
   export default {
     computed: {
       user () {
@@ -65,13 +66,18 @@
       },
       switchView (evt) {
         const target = evt.target
+        const whichApplication = document.querySelector('#application-type').selectedIndex
         if (!(target.classList.contains('active'))) {
           document.querySelector('.showing').classList.remove('showing')
           document.querySelector('.active').classList.remove('active')
           target.classList.add('active')
           document.querySelector(`.${target.dataset.open}`).classList.add('showing')
           const serviceType = Number(target.dataset.type)
-          this.fetchApplications(null, this.currentOffset, this.$store.state.searchResult[serviceType === 1 ? 'fetchScanApplications' : 'fetchTreatmentApplications'].seed, 1, serviceType)
+          if (whichApplication === 0) {
+            this.fetchApplications(null, this.currentOffset, this.$store.state.searchResult[serviceType === 1 ? 'fetchScanApplications' : 'fetchTreatmentApplications'].seed, 1, serviceType)
+          } else if (whichApplication === 1) {
+            this.fetchPostApplications(null, this.currentOffset, this.$store.state.searchResult[serviceType === 1 ? 'fetchCases' : 'fetchTreatments'].seed, 1, serviceType)
+          }
         }
       },
       setEventListeners () {
@@ -102,6 +108,36 @@
             case (target.classList.contains('release-fund')):
               _this.releaseFund(evt)
               break
+            case target.classList.contains('only-patient'):
+              const dentistId = _this.$store.state.searchResult.fetchCases.data[_this.currentOffset][target.dataset.sn].userObject.coinbase
+              if (_this.user.isPatient && dentistId) {
+                const rating = target.dataset.rating
+                _this.writeDentistRating(evt, dentistId, rating)
+              } else {
+                console.log(':::You have to be a patient of a doctor before you can rate them.')
+              }
+
+              break
+          }
+        })
+      },
+      writeDentistRating (evt, dentistId, rating) {
+        const applicationTypeId = Number(this.$route.query.aTI || 1)
+        this.disableNecessaryButtons(evt)
+        this.beginWait(document.querySelector('.wrapper'))
+        this.$root.callToWriteData({
+          requestParams: {
+            dentistId,
+            rating
+          },
+          methodName: 'writeDentistRating',
+          contractIndexToUse: 0,
+          managerIndex: 0,
+          callback: (status) => {
+            this.endWait(document.querySelector('.wrapper'))
+            this.enableNecessaryButtons(evt)
+            this.notify(status ? 'Rating Successfully added' : 'Unable to add Rating')
+            this.fetchPostApplications(evt, 0, null, 1, applicationTypeId)
           }
         })
       },
@@ -222,7 +258,7 @@
         })
         const offsetData = this.$store.state.searchResult[fetchQuery.type].data[offset]
         if (direction < 0 && offsetData && offsetData.length > 0) {
-          this.populateResults(offsetData, applicationTypeId)
+          this.populatePostApplicationResults(offsetData, applicationTypeId)
         } else {
           this.getPostApplications(evt, fetchQuery)
         }
@@ -243,7 +279,9 @@
             }
 
             if (result) {
-              this.appendResult(result.applicationObject, applicationTypeId)
+              result.applicationObject.SN = result.SN
+              result.paymentObject.SN = result.SN
+              this.appendPostApplicationResult(result, applicationTypeId)
             } else {
               this.informOfNoPostApplication(applicationTypeId)
             }
@@ -253,54 +291,66 @@
       releaseFund (evt) {
         const sn = evt.target.dataset.params
         const applicationTypeId = Number(this.$route.query.aTI || 1)
-        const application = this.$store.state.searchResult[applicationTypeId === 1 ? 'fetchScanApplications' : 'fetchTreatmentApplications'].data[this.currentOffset][sn]
-        // const ethereumValue = application.ethereumValue
+        const postApplication = this.$store.state.searchResult[applicationTypeId === 1 ? 'fetchCases' : 'fetchTreatments'].data[this.currentOffset][sn]
 
-        fetch(EXCHANGE_RATE_API)
-        .then(response => response.json())
-        .then((JSONResponse) => {
-          const USDExchange = JSONResponse[0].price_usd
-          const quoteInEther = application.quote / USDExchange
-          const quoteInWei = this.$store.state.web3.instance().toWei(quoteInEther, 'ether')
-
-          this.scrollToTop()
-          this.disableNecessaryButtons(evt)
-          this.beginWait(document.querySelector('.wrapper'))
-          this.$root.callToWriteData({
-            requestParams: {
-              dentistId: application.userId,
-              applicationId: application.applicationId,
-              quote: quoteInWei
-            },
-            managerIndex: 2, // which of the contract managers to use
-            contractIndexToUse: applicationTypeId === 1 ? 6 : 12,
-            value: this.$store.state.web3.instance().toWei(Math.ceil(quoteInEther), 'ether'),
-            methodName: applicationTypeId === 1 ? 'acceptScanApplication' : 'acceptTreatmentApplication',
-            callback: (status) => {
-              this.endWait(document.querySelector('.wrapper'))
-              this.enableNecessaryButtons(evt)
-              if (status) this.fetchApplications(null, this.currentOffset, this.$store.state.searchResult[applicationTypeId === 1 ? 'fetchScanApplications' : 'fetchTreatmentApplications'].seed, 1, Number(this.$route.query.aTI || 1))
-              this.notify(status ? 'Application Successfully accepted' : 'Unable to accept Application')
-            }
-          })
+        const percentage = new BigNumber(applicationTypeId === 1 ? (postApplication.ODLLSPP / 100) : (postApplication.ODLLTPP / 100))
+        const totalFee = new BigNumber(postApplication.amount)
+        const ODLLFee = totalFee.times(percentage)
+        const dentistFee = totalFee.minus(ODLLFee)
+        console.log(ODLLFee, dentistFee, totalFee, ODLLFee.plus(dentistFee))
+        this.scrollToTop()
+        this.disableNecessaryButtons(evt)
+        this.beginWait(document.querySelector('.wrapper'))
+        this.$root.callToWriteData({
+          requestParams: {
+            userId: this.user.coinbase,
+            dentistId: postApplication.userObject.coinbase,
+            paymentId: postApplication.paymentId,
+            ODLLFee,
+            dentistFee,
+            totalFee
+          },
+          managerIndex: 2, // which of the contract managers to use
+          contractIndexToUse: 16,
+          methodName: applicationTypeId === 1 ? 'releaseFundForScan' : 'releaseFundForTreatment',
+          callback: (status) => {
+            this.endWait(document.querySelector('.wrapper'))
+            this.enableNecessaryButtons(evt)
+            if (status) this.fetchPostApplications(null, this.currentOffset, this.$store.state.searchResult[applicationTypeId === 1 ? 'fetchScanApplications' : 'fetchTreatmentApplications'].seed, 1, Number(this.$route.query.aTI || 1))
+            this.notify(status ? 'Fund Successfully released' : 'Unable to release Fund')
+          }
         })
-        .catch((e) => console.error(e))
       },
       populateResults (results, resultType = 1) {
         if (typeof resultType === 'object' && resultType.toNumber) resultType = resultType.toNumber()
         const resultSection = document.querySelector(`.${resultType === 1 ? 'scan-section' : 'treatment-section'}`)
         this.clearDOMElementChildren(resultSection)
         results.forEach((result) => {
-          if (result.status === 1) {
-            const resultDOMElement = this.createResultDOMElement(result)
-            resultSection.appendChild(resultDOMElement)
-            resultDOMElement.querySelector('.gravatar-section').appendChild(result.userObject.avatarCanvas)
-          }
+          const resultDOMElement = this.createResultDOMElement(result)
+          resultSection.appendChild(resultDOMElement)
+          resultDOMElement.querySelector('.gravatar-section').appendChild(result.userObject.avatarCanvas)
+        })
+      },
+      populatePostApplicationResults (results, resultType = 1) {
+        if (typeof resultType === 'object' && resultType.toNumber) resultType = resultType.toNumber()
+        const resultSection = document.querySelector(`.${resultType === 1 ? 'scan-section' : 'treatment-section'}`)
+        this.clearDOMElementChildren(resultSection)
+        results.forEach((result) => {
+          const resultDOMElement = this.createPostApplicationResultDOMElement(result)
+          resultSection.appendChild(resultDOMElement)
+          resultDOMElement.querySelector('.gravatar-section').appendChild(result.userObject.avatarCanvas)
         })
       },
       appendResult (result, resultType = 1) {
         if (typeof resultType === 'object' && resultType.toNumber) resultType = resultType.toNumber()
         const resultDOMElement = this.createResultDOMElement(result)
+        const resultSection = document.querySelector(`.${Number(resultType) === 1 ? 'scan-section' : 'treatment-section'}`)
+        resultSection.appendChild(resultDOMElement)
+        if (resultDOMElement.querySelector('.gravatar-section')) resultDOMElement.querySelector('.gravatar-section').appendChild(result.userObject.avatarCanvas)
+      },
+      appendPostApplicationResult (result, resultType = 1) {
+        if (typeof resultType === 'object' && resultType.toNumber) resultType = resultType.toNumber()
+        const resultDOMElement = this.createPostApplicationResultDOMElement(result)
         const resultSection = document.querySelector(`.${Number(resultType) === 1 ? 'scan-section' : 'treatment-section'}`)
         resultSection.appendChild(resultDOMElement)
         if (resultDOMElement.querySelector('.gravatar-section')) resultDOMElement.querySelector('.gravatar-section').appendChild(result.userObject.avatarCanvas)
@@ -381,11 +431,42 @@
               <div class="address">Address: <span>${userObject.address || 'Not Supplied'}</span></div>
               <div class="quote">Quote: <span>$${result.quote}</span></div>
               <div class="comment">Comment: <span>${result.comment}</span></div>
-              <input type="button" value="${result.status === 1 ? 'Accept' : 'Release Fund'}" class="button ${result.status === 1 ? 'accept-application' : 'release-fund'}" data-params="${result.SN}">
+              <input type="button" value="Accept" class="button accept-application" data-params="${result.SN}">
             </div>
           </div>
         `, 'text/html').body.firstChild
         return resultDOMElement
+      },
+      createPostApplicationResultDOMElement (result) {
+        const userObject = result.userObject
+        const resultDOMElement = new DOMParser().parseFromString(`
+          <div class="applications-result">
+            <div class="gravatar-section"></div>
+            <div class="application-about-section">
+              <div class="service-name">Application for: <span>${result.serviceName}</span></div>
+              <div class="name">Dentist: <span>${userObject.name || 'Name: Not Supplied'}</span></div>
+              <div class="company-name">Company: <span>${userObject.companyName || 'Not Supplied'}</span></div>
+              <div class="address">Address: <span>${userObject.address || 'Not Supplied'}</span></div>
+              <div class="quote">Amount: <span>$${result.quote}</span></div>
+              <div class="status">Status: <span>${result.paymentObject.status === 3 ? 'Paid Dentist In Full' : 'Paid into Escrow'}</span></div>
+              ${this.createAverageRatingDOMElement(userObject.averageRating, result.SN).outerHTML}
+              ${result.paymentObject.status === 2 ? '<input type="button" value="Release Fund" class="button release-fund" data-params="' + result.SN + '">' : ''}
+            </div>
+          </div>
+        `, 'text/html').body.firstChild
+        return resultDOMElement
+      },
+      createAverageRatingDOMElement (averageRating, SN) {
+        const ratingsArray = []
+        for (let i = 0; i < 5; i++) {
+          ratingsArray.push(`
+            <div data-rating="${i + 1}" data-sn="${SN}" class="rating ${i < averageRating ? 'filled' : ''} ${this.user.isPatient ? 'only-patient' : ''}"></div>
+          `)
+        }
+
+        return new DOMParser().parseFromString(`
+          <div class="average-rating">${ratingsArray.join(' ')}</div>
+        `, 'text/html').body.firstChild
       },
       disableNecessaryButtons (evt = null) {
         Array.from(document.querySelectorAll('.button')).forEach(button => this.disableButton(button))
@@ -624,7 +705,7 @@
 <style>
   .no-service {
     position: absolute;
-    top: 40px;
+    top: 100px;
     width: 100%;
     min-height: 260px;
     text-align: center;
@@ -755,6 +836,44 @@
     line-height: 40px;
   }
 
+  .average-rating {
+    width: 100% !important;
+    margin: 20px 0px;
+  }
+
+  .average-rating > div {
+    background: url(/static/images/star_line.png) no-repeat;
+    background-size: contain;
+    height: 20px;
+    width: 20px;
+    display: inline-block;
+    float: left;
+  }
+
+  .average-rating > div.only-patient {
+    cursor: pointer;
+  }
+
+  .average-rating:hover > div.only-patient {
+    background: url(/static/images/star.png) no-repeat;
+    background-size: contain;
+  }
+
+  .average-rating > div.only-patient:hover {
+    background: url(/static/images/star.png) no-repeat;
+    background-size: contain;
+  }
+
+  .average-rating > div.only-patient:hover ~ div.only-patient {
+    background: url(/static/images/star_line.png) no-repeat;
+    background-size: contain;
+  }
+
+  .average-rating > .filled {
+    background: url(/static/images/star.png) no-repeat;
+    background-size: contain;
+  }
+
   .button {
     padding: 0px 2px;
     text-align: center;
@@ -766,7 +885,7 @@
     width: 100px;
     background: #29aae1;
     color: #ffffff;
-    margin-left: 10px;
+    /*margin-left: 10px;*/
     display: inline-block;
   }
 

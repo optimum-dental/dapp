@@ -15,6 +15,7 @@ import TreatmentApplicationWriter2 from '../../../build/contracts/TreatmentAppli
 import TreatmentApplicationReader from '../../../build/contracts/TreatmentApplicationReader.json'
 import PostApplicationReader from '../../../build/contracts/PostApplicationReader.json'
 import PostApplicationReader2 from '../../../build/contracts/PostApplicationReader2.json'
+import Escrow from '../../../build/contracts/Escrow.json'
 // import userManager from '../user/Manager'
 import {getObjectFromResponse, getSlicedAddressString, getSoliditySha3ForId, getLeftPaddedNumber} from '../utilities'
 import blockchainManager from '../BlockchainManager'
@@ -45,7 +46,8 @@ class Manager {
       TreatmentApplicationWriter2,
       TreatmentApplicationReader,
       PostApplicationReader,
-      PostApplicationReader2
+      PostApplicationReader2,
+      Escrow
     ]
   }
 
@@ -190,7 +192,30 @@ class Manager {
           applicationId: dataObject.scanApplicationId,
           caseId
         })
+        return dataObject
+      },
+      smartContractReject: (error) => ({
+        error,
+        isValid: true,
+        warningMessage: "We've encountered a problem fetching your service information from the blockchain. Please do try again in a few minutes."
+      })
+    })
+  }
 
+  getPaymentDetail (state = null, dataObject = {}) {
+    const {applicationTypeId, applicationId, paymentId} = dataObject
+    return blockchainManager.querySmartContract({
+      contractToUse: DB,
+      smartContractMethod: 'getEntityList',
+      smartContractMethodParams: (coinbase) => [serviceManager.paymentRecordFields(state, paymentId), serviceManager.paymentRecordFieldTypes(), {from: coinbase}],
+      state,
+      smartContractResolve: result => {
+        const dataObject = getObjectFromResponse(state, result, 1, serviceManager.paymentKeys(), serviceManager.paymentRecordFieldTypes())[0]
+        Object.assign(dataObject, {
+          applicationTypeId,
+          applicationId,
+          paymentId
+        })
         return dataObject
       },
       smartContractReject: (error) => ({
@@ -291,10 +316,13 @@ class Manager {
       'status',
       'requestId',
       'scanApplicationId',
+      'paymentId',
       'userId',
       'serviceId',
       'quote',
-      'amount'
+      'amount',
+      'ODLLSPP',
+      'ODLLTPP'
     ]
   }
 
@@ -304,16 +332,49 @@ class Manager {
       getSoliditySha3ForId(state, 'case/status', caseId),
       getSoliditySha3ForId(state, 'case/scan-request', caseId),
       getSoliditySha3ForId(state, 'case/scan-application', caseId),
+      getSoliditySha3ForId(state, 'case/payment', caseId),
       getSoliditySha3ForId(state, 'case/dentist', caseId),
       getSoliditySha3ForId(state, 'case/scan-service', caseId),
       getSoliditySha3ForId(state, 'case/quote', caseId),
-      getSoliditySha3ForId(state, 'case/amount', caseId)
+      getSoliditySha3ForId(state, 'case/amount', caseId),
+      getSoliditySha3ForId(state, 'odll/scan-payment-percentage'),
+      getSoliditySha3ForId(state, 'odll/treatment-payment-percentage')
     ]
   }
 
   caseRecordFieldTypes () {
     // types: 1 => boolean, 2 => uint8, 3 => uint, 4 => address, 5 => bytes32, 7 => string
-    return [2, 3, 3, 4, 3, 3, 3]
+    return [2, 3, 3, 3, 4, 3, 3, 3, 3, 3]
+  }
+
+  paymentKeys () {
+    return [
+      'status',
+      'caseId',
+      'treatmentId',
+      'quote',
+      'amount',
+      'ODLLSPP',
+      'ODLLTPP'
+    ]
+  }
+
+  paymentRecordFields (state, paymentId) {
+    paymentId = getSlicedAddressString(state, getLeftPaddedNumber(state, paymentId, 1))
+    return [
+      getSoliditySha3ForId(state, 'payment/state', paymentId),
+      getSoliditySha3ForId(state, 'payment/case', paymentId),
+      getSoliditySha3ForId(state, 'payment/treatment', paymentId),
+      getSoliditySha3ForId(state, 'payment/quote', paymentId),
+      getSoliditySha3ForId(state, 'payment/amount', paymentId),
+      getSoliditySha3ForId(state, 'odll/scan-payment-percentage'),
+      getSoliditySha3ForId(state, 'odll/treatment-payment-percentage')
+    ]
+  }
+
+  paymentRecordFieldTypes () {
+    // types: 1 => boolean, 2 => uint8, 3 => uint, 4 => address, 5 => bytes32, 7 => string
+    return [2, 3, 3, 3, 3, 3, 3]
   }
 }
 

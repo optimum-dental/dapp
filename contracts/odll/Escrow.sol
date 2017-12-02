@@ -9,14 +9,14 @@ contract Escrow is Restrictor {
   event Paid(address callerAddress, uint amount);
   //   uint public profit;
 
-  // States: 1 => Created, 2 => Locked, 3 => Inactive
+  // States: 1 => Created, 2 => Locked, 3 => Won, 4 => Lost
 
   function Escrow (address _dbAddress) public {
     require(_dbAddress != 0x0);
     dbAddress = _dbAddress;
   }
 
-  function releaseFundForScan (address userId, address payee, uint paymentId)
+  function releaseFundForScan (address userId, address payee, uint paymentId, uint ODLLFee, uint dentistFee, uint totalFee)
     external
     onlyActiveDentistId(payee)
     onlyActivePatientId(userId)
@@ -25,18 +25,16 @@ contract Escrow is Restrictor {
     uint caseId = DB(dbAddress).getUIntValue(keccak256("payment/case", paymentId));
     address dentistId = DB(dbAddress).getAddressValue(keccak256("case/dentist", caseId));
     address patientId = DB(dbAddress).getAddressValue(keccak256("case/patient", caseId));
-    uint amount = DB(dbAddress).getUIntValue(keccak256("case/amount", caseId));
-    uint quote = DB(dbAddress).getUIntValue(keccak256("case/quote", caseId));
+    uint amount = DB(dbAddress).getUIntValue(keccak256("payment/amount", paymentId));
 
-    require(amount >= 0 && this.balance >= amount);
-    /*secureFunding(amount, fundAmount);*/
+    require(amount >= 0 && amount == totalFee && this.balance >= amount);
 
+    userManager.releaseFundForScan(dbAddress, dentistId, patientId, ODLLFee, dentistFee, totalFee);
     DB(dbAddress).setUInt8Value(keccak256("payment/state", paymentId), 3);
-    userManager.releaseFundForScan(dbAddress, dentistId, patientId, amount, quote);
     FundReleased(paymentId, payee);
   }
 
-  function releaseFundForTreatment (address userId, address payee, uint paymentId)
+  function releaseFundForTreatment (address userId, address payee, uint paymentId, uint ODLLFee, uint dentistFee, uint totalFee)
     external
     onlyActiveDentistId(payee)
     onlyActivePatientId(userId)
@@ -45,13 +43,13 @@ contract Escrow is Restrictor {
     uint treatmentId = DB(dbAddress).getUIntValue(keccak256("payment/treatment", paymentId));
     address dentistId = DB(dbAddress).getAddressValue(keccak256("treatment/dentist", treatmentId));
     address patientId = DB(dbAddress).getAddressValue(keccak256("treatment/patient", treatmentId));
-    uint amount = DB(dbAddress).getUIntValue(keccak256("treatment/amount", treatmentId));
-    uint quote = DB(dbAddress).getUIntValue(keccak256("treatment/quote", treatmentId));
+    uint amount = DB(dbAddress).getUIntValue(keccak256("payment/amount", paymentId));
 
-    require(amount >= 0 && this.balance >= amount);
+    require(userId == patientId && payee == dentistId);
+    require(amount >= 0 && amount == totalFee && this.balance >= amount);
 
+    userManager.releaseFundForTreatment(dbAddress, dentistId, patientId, ODLLFee, dentistFee, totalFee);
     DB(dbAddress).setUInt8Value(keccak256("payment/state", paymentId), 3);
-    userManager.releaseFundForTreatment(dbAddress, dentistId, patientId, amount, quote);
     FundReleased(paymentId, payee);
   }
 
@@ -61,13 +59,12 @@ contract Escrow is Restrictor {
     onlyActivePatientId(payee)
     inState(paymentId, 2)
   {
-    uint paymentForType = DB(dbAddress).getUInt8Value(keccak256("payment/for-type", paymentId));
-    uint amount = paymentForType == 1 ? DB(dbAddress).getUIntValue(keccak256("case/amount", paymentId)) : DB(dbAddress).getUIntValue(keccak256("treatment/amount", paymentId));
+    uint amount = DB(dbAddress).getUIntValue(keccak256("payment/amount", paymentId));
 
     require(amount >= 0 && this.balance >= amount);
 
-    DB(dbAddress).setUInt8Value(keccak256("payment/state", paymentId), 3);
     payee.transfer(amount);
+    DB(dbAddress).setUInt8Value(keccak256("payment/state", paymentId), 4);
     Refunded(paymentId, payee);
   }
 
