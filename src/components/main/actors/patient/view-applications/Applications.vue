@@ -297,7 +297,6 @@
         const totalFee = new BigNumber(postApplication.amount)
         const ODLLFee = totalFee.times(percentage)
         const dentistFee = totalFee.minus(ODLLFee)
-        console.log(ODLLFee, dentistFee, totalFee, ODLLFee.plus(dentistFee))
         this.scrollToTop()
         this.disableNecessaryButtons(evt)
         this.beginWait(document.querySelector('.wrapper'))

@@ -58,22 +58,12 @@
           {
             id: 1,
             title: 'How to install Metamask',
-            link: 'https://www.youtube.com/embed/JeYlPFeLvLo'
+            link: 'https://www.youtube.com/embed/ALzWsh7OnR8'
           },
           {
             id: 2,
             title: 'Register on Oral Data Link',
-            link: 'https://www.youtube.com/embed/lwRQb9t3nIM'
-          },
-          {
-            id: 3,
-            title: 'View services',
-            link: 'https://www.youtube.com/embed/aerf7R2KzIY'
-          },
-          {
-            id: 4,
-            title: 'Find a dentist',
-            link: 'https://www.youtube.com/embed/aerf7R2KzIY'
+            link: 'https://www.youtube.com/embed/z_2AdSpOee4'
           }
         ]
       }

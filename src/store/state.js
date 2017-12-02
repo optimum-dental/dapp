@@ -17,6 +17,7 @@ export default {
     networkId: ''
   },
   user: {
+    balance: '0.00',
     type: '0',
     lastName: '',
     firstName: '',

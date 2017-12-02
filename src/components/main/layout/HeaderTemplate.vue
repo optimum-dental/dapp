@@ -4,15 +4,17 @@
       <div v-if="isDAppReady">
         <div class="user-icon"></div>
         <div class="address" :title="coinbase">{{ truncatedCoinbase }}</div>
-        <div class="question-icon"></div>
-        <div class="menu-icon" :title="balance">{{ balance }}</div>
+        <!-- <div class="question-icon"></div> -->
+        <!-- <div class="menu-icon" ></div> -->
+        <div class="balance" :title="balance">ETH {{ balance }}</div>
       </div>
 
       <div v-else>
         <div class="loader user-icon"></div>
         <div class="loader address"></div>
-        <div class="loader question-icon"></div>
-        <div class="loader menu-icon"></div>
+        <!-- <div class="loader question-icon"></div> -->
+        <!-- <div class="loader menu-icon"></div> -->
+        <div class="loader balance"></div>
       </div>
     </div>
   </div>
@@ -28,7 +30,7 @@
         return this.user.hasCoinbase ? truncate(this.$root.coinbase, 22) : 'No account connected'
       },
       balance () {
-        return this.user.hasCoinbase ? truncate(this.user.balance, 5) : 0.00
+        return this.user.hasCoinbase ? truncate(this.user.balance, 10) : 0.00
       },
       user () {
         return this.$root.user
@@ -109,6 +111,16 @@
     background-size: contain;
     width: 20px;
     height: 15px;
+  }
+
+  .balance {
+    width: 140px;
+    height: 20px;
+    cursor: default;
+    font-size: 14px;
+    position: relative;
+    top: -3px;
+    color: #555555;
   }
 
   .loader {

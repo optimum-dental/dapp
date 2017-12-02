@@ -155,7 +155,6 @@ class Manager {
             searchManager.getApplicationDetail(state, dataObject)
             .then((result) => {
               dataObject.applicationObject = result
-              console.log(dataObject)
               resolve(dataObject)
             })
           })

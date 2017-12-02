@@ -23,6 +23,18 @@ function assignPropertyTo (hashObject, key, value) {
   })
 }
 
+function getUserBalance (state, userCopy) {
+  return new Promise(function (resolve, reject) {
+    state.web3.instance().eth.getBalance(state.user.coinbase, (err, res) => {
+      if (!err) {
+        resolve(state.web3.instance().fromWei(res.toNumber()))
+      } else {
+        console.error(err)
+      }
+    })
+  })
+}
+
 // function stringifyBytesData (state, dataObject, datakeys) {
 //   // Remove the guard in front of the bytes32 encoding strings
 //   let result = []
@@ -165,8 +177,12 @@ export default {
       dentistsIds: userObject.dentistsIds || []
     })
 
-    state.user = userCopy
-    if (payload.callback) payload.callback(true)
+    getUserBalance(state)
+    .then((balance) => {
+      userCopy.balance = balance
+      state.user = userCopy
+      if (payload.callback) payload.callback(true)
+    })
   },
   [MUTATION_TYPES.CHANGE_CURRENT_ROUTE_TO] (state, newRoute) {
     state.currentRoute = newRoute
