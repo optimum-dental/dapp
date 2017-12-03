@@ -70,13 +70,13 @@
               userId = _this.$store.state.searchResult.fetchDentists.data[_this.currentOffset][Number(target.dataset.sn)].coinbase
               _this.manageODLLDentist(userId, 'dentists-add')
               target.classList.remove('dentists-add')
-              target.classList.add('remove')
+              target.classList.add('dentists-remove')
               break
 
-            case (target.classList.contains('remove')):
+            case (target.classList.contains('dentists-remove')):
               userId = _this.$store.state.searchResult.fetchDentists.data[_this.currentOffset][Number(target.dataset.sn)].coinbase
-              _this.manageODLLDentist(userId, 'remove')
-              target.classList.remove('remove')
+              _this.manageODLLDentist(userId, 'dentists-remove')
+              target.classList.remove('dentists-remove')
               target.classList.add('dentists-add')
               break
           }
@@ -273,7 +273,7 @@
             </div>
             <div class="dentists-action-section">
               <input type="button" value="${Number(result.status) === 2 ? 'Unblock Dentist' : 'Block Dentist'}" class="dentists-action-button ${Number(result.status) === 2 ? 'dentists-unblock' : 'dentists-block'} dentists-button" data-sn="${result.SN}">
-              <input type="button" value="${Number(result.isODLLDentist) ? 'Unmake ODLL Dentist' : 'Make ODLL Dentist'}" class="dentists-action-button ${Number(result.isODLLDentist) ? 'remove' : 'dentists-add'} dentists-button" data-sn="${result.SN}">
+              <input type="button" value="${Number(result.isODLLDentist) ? 'Unmake ODLL Dentist' : 'Make ODLL Dentist'}" class="dentists-action-button ${Number(result.isODLLDentist) ? 'dentists-remove' : 'dentists-add'} dentists-button" data-sn="${result.SN}">
             </div>
           </div>
         `, 'text/html').body.firstChild
@@ -605,7 +605,7 @@
   }
 
   .dentists-action-button {
-    width: 125px;
+    width: 110px;
     height: 30px;
     line-height: 30px;
     color: #ffffff;
@@ -616,5 +616,9 @@
     cursor: pointer;
     font-size: 12px;
     text-align: center;
+  }
+
+  .dentists-remove, .dentists-add {
+    width: 140px;
   }
 </style>
