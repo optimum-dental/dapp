@@ -50,6 +50,7 @@
 </template>
 
 <script>
+  const BigNumber = require('bignumber.js')
   export default {
     computed: {
       user () {
@@ -205,9 +206,9 @@
         }
       },
       writeServiceWithFee (evt) {
-        const serviceTypeId = Number(document.getElementById('services-service-type').selectedIndex)
-        const serviceSubtypeId = Number(document.getElementById('services-service-subtype').selectedIndex)
-        const fee = this.getFee()
+        const serviceTypeId = new BigNumber(Number(document.getElementById('services-service-type').selectedIndex))
+        const serviceSubtypeId = new BigNumber(Number(document.getElementById('services-service-subtype').selectedIndex))
+        const fee = new BigNumber(this.getFee())
         let errors = [serviceTypeId === 0 ? document.getElementById('services-service-type') : undefined, serviceSubtypeId === 0 ? document.getElementById('services-service-subtype') : undefined, fee === '' ? document.getElementById('services-fee') : undefined]
         errors = errors.filter(entry => entry !== undefined)
         if (errors.length > 0) {
@@ -287,7 +288,7 @@
         }
       },
       getFee () {
-        return document.getElementById('services-fee').value
+        return Number(document.getElementById('services-fee').value || 0)
       },
       getServices (evt, fetchQuery) {
         const serviceTypeId = fetchQuery.requestParams.serviceTypeId

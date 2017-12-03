@@ -27,6 +27,7 @@
 </template>
 
 <script>
+  const BigNumber = require('bignumber.js')
   export default {
     computed: {
       user () {
@@ -135,8 +136,8 @@
         const sn = evt.target.dataset.params
         const scanRequest = this.$store.state.searchResult['fetchScanRequests'].data[this.currentOffset][sn]
         const patientId = scanRequest.patientId
-        const requestId = scanRequest.requestId
-        const quote = Number(document.getElementById('appointment-requests-quote').value) || 0
+        const requestId = new BigNumber(scanRequest.requestId)
+        const quote = new BigNumber(Number(document.getElementById('appointment-requests-quote').value) || 0)
         const comment = `b${document.getElementById('appointment-requests-comment').value}`
 
         this.scrollToTop()

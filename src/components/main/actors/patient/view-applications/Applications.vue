@@ -35,7 +35,7 @@
 </template>
 
 <script>
-  var BigNumber = require('bignumber.js')
+  const BigNumber = require('bignumber.js')
   export default {
     computed: {
       user () {
@@ -128,7 +128,7 @@
         this.$root.callToWriteData({
           requestParams: {
             dentistId,
-            rating
+            rating: new BigNumber(rating)
           },
           methodName: 'writeDentistRating',
           contractIndexToUse: 0,
@@ -158,7 +158,7 @@
           this.$root.callToWriteData({
             requestParams: {
               dentistId: application.userId,
-              applicationId: application.applicationId,
+              applicationId: new BigNumber(application.applicationId),
               quote: quoteInWei
             },
             managerIndex: 2, // which of the contract managers to use
