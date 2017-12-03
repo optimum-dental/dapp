@@ -155,7 +155,7 @@
             }
 
             if (isCompleted) {
-              if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
+              if (document.querySelector('.dentists-wait-overlay')) document.querySelector('.dentists-wait-overlay').remove()
 
               this.endWait(document.querySelector('.wrapper'))
               this.enableNecessaryButtons()
@@ -229,7 +229,7 @@
         return offset / this.perPage
       },
       askUserToWaitWhileWeSearch () {
-        if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
+        if (document.querySelector('.dentists-wait-overlay')) document.querySelector('.dentists-wait-overlay').remove()
         if (document.querySelector('.dentists-no-official')) document.querySelector('.dentists-no-official').remove()
         let waitOverlayDOMElement = this.createWaitOverlayDOMElement()
         document.querySelector('.dentists-result-section').appendChild(waitOverlayDOMElement)
@@ -241,8 +241,8 @@
       },
       createWaitOverlayDOMElement () {
         const DOMELement = new DOMParser().parseFromString(`
-          <div class="wait-overlay">
-            <div class="wait-message">Please Wait... We're searching the blockchain for Dentists.</div>
+          <div class="dentists-wait-overlay">
+            <div class="dentists-wait-message">Please Wait... We're searching the blockchain for Dentists.</div>
             <div class="spin"></div>
           </div>
         `, 'text/html')
@@ -484,7 +484,7 @@
     top: 110px;
   }
 
-  .wait-overlay {
+  .dentists-wait-overlay {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -498,7 +498,7 @@
     background: rgba(255, 255, 255, 0.9);
   }
 
-  .wait-message {
+  .dentists-wait-message {
     height: 30px;
     line-height: 30px;
     position: relative;

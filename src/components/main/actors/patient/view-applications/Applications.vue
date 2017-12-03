@@ -597,7 +597,7 @@
     line-height: 20px;
   }
 
-  .applications-list, #fee {
+  .applications-list {
     height: 30px;
     width: 100%;
     background: #ffffff;
@@ -608,14 +608,6 @@
 
   .error {
     border: 1px solid #f18787 !important;
-  }
-
-  .submit {
-    position: relative;
-    top: -35px;
-    width: 100%;
-    height: 30px;
-    text-align: right;
   }
 
   .applications-button {

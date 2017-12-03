@@ -26,7 +26,7 @@
         </div>
       </div>
 
-      <div class="submit">
+      <div class="services-submit">
         <input type="button" class='services-post services-button' value="Add Service" @click="writeServiceWithFee">
       </div>
 
@@ -146,7 +146,7 @@
               let updateButton = document.querySelector('.services-post')
               updateButton.value = 'Update Service'
               if (document.querySelector('.services-cancel')) document.querySelector('.services-cancel').remove()
-              document.querySelector('.submit').insertBefore(_this.cancelButton(), updateButton)
+              document.querySelector('.services-submit').insertBefore(_this.cancelButton(), updateButton)
               serviceTypeDOMElement.disabled = true
               serviceSubtypeDOMElement.disabled = true
               break
@@ -532,7 +532,7 @@
     border: 1px solid #f18787 !important;
   }
 
-  .submit {
+  .services-submit {
     position: relative;
     top: 0px;
     width: 100%;
@@ -690,80 +690,6 @@
     border-bottom: 1px solid #a7a7a7;
     min-height: 180px;
     padding: 10px 0px;
-  }
-
-  .gravatar-section {
-    width: 60px;
-    height: 60px;
-    float: left;
-    display: inline-block;
-    margin-right: 10px;
-    border: 1px solid #c3c3c3;
-    border-radius: 6px;
-    padding: 3px;
-  }
-
-  .gravatar-section > canvas {
-    height: 100%;
-    width: 100%;
-    border-radius: 6px;
-  }
-
-  .about-section {
-    width: 250px;
-    height: 150px;
-    display: inline-block;
-    float: left;
-  }
-
-  .about-section > div {
-    display: block;
-    height: 20px;
-    line-height: 20px;
-    font-size: 14px;
-    text-align: left;
-    width: 100%;
-  }
-
-  .profile-link {
-    font-size: 10px !important;
-    color: #bfced9;
-    cursor: pointer;
-  }
-
-  .average-rating > div {
-    background: url(/static/images/star_line.png) no-repeat;
-    background-size: contain;
-    height: 20px;
-    width: 20px;
-    display: inline-block;
-    float: left;
-    margin: 0px 5px;
-  }
-
-  .average-rating > .filled {
-    background: url(/static/images/star.png) no-repeat;
-    background-size: contain;
-  }
-
-  .request-service-section {
-    width: auto;
-    height: 150px;
-    line-height: 150px;
-    display: inline-block;
-    float: right;
-  }
-
-  .link-to-service {
-    width: 200px;
-    height: 40px;
-    line-height: 40px;
-    color: #ffffff;
-    background: #3285b1;
-    display: inline-block;
-    text-decoration: none;
-    font-size: 14px;
-    text-align: center;
   }
 
   .services-service-name {

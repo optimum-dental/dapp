@@ -60,7 +60,7 @@
               </div>
             </div>
 
-            <div class="submit">
+            <div class="appointment-submit">
               <input type="button" class='appointment-post appointment-button' value="Send" @click="writeScanRequest">
             </div>
           </div>
@@ -95,7 +95,7 @@
               </div>
             </div>
 
-            <div class="submit">
+            <div class="appointment-submit">
               <input type="button" class='appointment-post appointment-button' value="Send" @click="writeTreatmentAppointment">
             </div>
           </div>
@@ -524,7 +524,7 @@
     border: 1px solid #f18787 !important;
   }
 
-  .submit {
+  .appointment-submit {
     width: 50%;
     height: 30px;
     text-align: right;

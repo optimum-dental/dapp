@@ -210,7 +210,7 @@
       createWaitOverlayDOMElement () {
         const DOMELement = new DOMParser().parseFromString(`
           <div class="managers-wait-overlay">
-            <div class="wait-message">Please Wait... We're searching the blockchain for Managers.</div>
+            <div class="managers-wait-message">Please Wait... We're searching the blockchain for Managers.</div>
             <div class="spin"></div>
           </div>
         `, 'text/html')
@@ -451,7 +451,7 @@
     background: rgba(255, 255, 255, 0.9);
   }
 
-  .wait-message {
+  .managers-wait-message {
     height: 30px;
     line-height: 30px;
     position: relative;
