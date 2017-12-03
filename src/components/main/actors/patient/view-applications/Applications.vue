@@ -151,8 +151,7 @@
         .then((JSONResponse) => {
           const USDExchange = JSONResponse[0].price_usd
           const quoteInEther = application.quote / USDExchange
-          const quoteInWei = this.$store.state.web3.instance().toWei(quoteInEther, 'ether')
-
+          const quoteInWei = new BigNumber(this.$store.state.web3.instance().toWei(quoteInEther, 'ether'))
           this.scrollToTop()
           this.disableNecessaryButtons(evt)
           this.beginWait(document.querySelector('.wrapper'))
@@ -164,7 +163,7 @@
             },
             managerIndex: 2, // which of the contract managers to use
             contractIndexToUse: applicationTypeId === 1 ? 6 : 12,
-            value: this.$store.state.web3.instance().toWei(Math.ceil(quoteInEther), 'ether'),
+            value: quoteInWei,
             methodName: applicationTypeId === 1 ? 'acceptScanApplication' : 'acceptTreatmentApplication',
             callback: (status) => {
               this.endWait(document.querySelector('.wrapper'))
