@@ -61,7 +61,7 @@
             </div>
 
             <div class="submit">
-              <input type="button" class='post button' value="Send" @click="writeScanRequest">
+              <input type="button" class='appointment-post appointment-button' value="Send" @click="writeScanRequest">
             </div>
           </div>
 
@@ -96,7 +96,7 @@
             </div>
 
             <div class="submit">
-              <input type="button" class='post button' value="Send" @click="writeTreatmentAppointment">
+              <input type="button" class='appointment-post appointment-button' value="Send" @click="writeTreatmentAppointment">
             </div>
           </div>
         </div>
@@ -233,7 +233,7 @@
         DOMElement.dispatchEvent(eventObject)
       },
       cancelButton () {
-        const DOMELement = new DOMParser().parseFromString(`<input type="button" class="button cancel" value="Cancel">`, 'text/html')
+        const DOMELement = new DOMParser().parseFromString(`<input type="button" class="appointment-button appointment-cancel" value="Cancel">`, 'text/html')
         return DOMELement.body.firstChild
       },
       addError (target) {
@@ -359,10 +359,10 @@
         }
       },
       disableNecessaryButtons (evt) {
-        Array.from(document.querySelectorAll('.button')).forEach(button => this.disableButton(button))
+        Array.from(document.querySelectorAll('.appointment-button')).forEach(button => this.disableButton(button))
       },
       enableNecessaryButtons (evt) {
-        Array.from(document.querySelectorAll('.button')).forEach(button => this.enableButton(button))
+        Array.from(document.querySelectorAll('.appointment-button')).forEach(button => this.enableButton(button))
       },
       disableButton (target) {
         target.disabled = true
@@ -530,7 +530,7 @@
     text-align: right;
   }
 
-  .button {
+  .appointment-button {
     padding: 2px;
     text-align: center;
     outline: 0px;
@@ -660,7 +660,7 @@
     }
   }
 
-  .button {
+  .appointment-button {
     padding: 2px;
     text-align: center;
     outline: 0px;

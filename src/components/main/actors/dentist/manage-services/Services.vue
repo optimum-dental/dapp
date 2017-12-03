@@ -27,7 +27,7 @@
       </div>
 
       <div class="submit">
-        <input type="button" class='post button' value="Add Service" @click="writeServiceWithFee">
+        <input type="button" class='services-post services-button' value="Add Service" @click="writeServiceWithFee">
       </div>
 
       <div class="services-result-section">
@@ -143,22 +143,22 @@
               _this.dispatchEventFrom(serviceTypeDOMElement, 'change')
               serviceSubtypeDOMElement.options[serviceSubtype].selected = true
               serviceFeeDOMElement.value = serviceFee
-              let updateButton = document.querySelector('.post')
+              let updateButton = document.querySelector('.services-post')
               updateButton.value = 'Update Service'
-              if (document.querySelector('.cancel')) document.querySelector('.cancel').remove()
+              if (document.querySelector('.services-cancel')) document.querySelector('.services-cancel').remove()
               document.querySelector('.submit').insertBefore(_this.cancelButton(), updateButton)
               serviceTypeDOMElement.disabled = true
               serviceSubtypeDOMElement.disabled = true
               break
 
-            case (target.classList.contains('cancel')):
+            case (target.classList.contains('services-cancel')):
               [serviceTypeDOMElement, serviceSubtypeDOMElement, serviceFeeDOMElement] = [document.getElementById('services-service-type'), document.getElementById('services-service-subtype'), document.getElementById('services-fee')]
               serviceTypeDOMElement.options[0].selected = true
               _this.dispatchEventFrom(serviceTypeDOMElement, 'change')
               serviceFeeDOMElement.value = ''
-              let insertButton = document.querySelector('.post')
+              let insertButton = document.querySelector('.services-post')
               insertButton.value = 'Add Service'
-              document.querySelector('.cancel').remove()
+              document.querySelector('.services-cancel').remove()
               serviceTypeDOMElement.disabled = false
               serviceSubtypeDOMElement.disabled = false
               break
@@ -176,7 +176,7 @@
         DOMElement.dispatchEvent(eventObject)
       },
       cancelButton () {
-        const DOMELement = new DOMParser().parseFromString(`<input type="button" class="button cancel" value="Cancel">`, 'text/html')
+        const DOMELement = new DOMParser().parseFromString(`<input type="button" class="services-button services-cancel" value="Cancel">`, 'text/html')
         return DOMELement.body.firstChild
       },
       clearError (target) {
@@ -381,18 +381,18 @@
             <div class="services-service-name">${result.serviceName}</div>
             <div class="services-service-fee">$ ${result.serviceFee}</div>
             <div class="services-action-buttons">
-              <input type="button" value="Edit" class="button services-edit-service" data-params="${result.serviceTypeId}%${result.serviceId}%${result.serviceFee}">
-              <input type="button" value="Delete" class="button services-delete-service" data-params="${result.serviceTypeId}%${result.serviceId}%${result.serviceFee}">
+              <input type="button" value="Edit" class="services-button services-edit-service" data-params="${result.serviceTypeId}%${result.serviceId}%${result.serviceFee}">
+              <input type="button" value="Delete" class="services-button services-delete-service" data-params="${result.serviceTypeId}%${result.serviceId}%${result.serviceFee}">
             </div>
           </div>
         `, 'text/html').body.firstChild
         return resultDOMElement
       },
       disableNecessaryButtons (evt = null) {
-        Array.from(document.querySelectorAll('.button')).forEach(button => this.disableButton(button))
+        Array.from(document.querySelectorAll('.services-button')).forEach(button => this.disableButton(button))
       },
       enableNecessaryButtons (evt = null) {
-        Array.from(document.querySelectorAll('.button')).forEach(button => this.enableButton(button))
+        Array.from(document.querySelectorAll('.services-button')).forEach(button => this.enableButton(button))
       },
       disableButton (target) {
         target.disabled = true
@@ -540,7 +540,7 @@
     text-align: right;
   }
 
-  .button {
+  .services-button {
     padding: 2px;
     text-align: center;
     outline: 0px;
@@ -780,7 +780,7 @@
     line-height: 40px;
   }
 
-  .button {
+  .services-button {
     padding: 2px;
     text-align: center;
     outline: 0px;

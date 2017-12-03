@@ -319,16 +319,16 @@
             <div class="appointment-requests-appointment-time appointment-requests-appointment-data">Time: <span>${result.time}</span></div>
             <div class="appointment-requests-appointment-insurance appointment-requests-appointment-data">Insurance: <span>${result.insurance}</span></div>
             <div class="appointment-requests-appointment-comment appointment-requests-appointment-data">Comment: <span>${result.comment}</span></div>
-            <input type="button" value="Apply" class="button apply-to-scan" data-params="${result.SN}">
+            <input type="button" value="Apply" class="appointment-requests-button apply-to-scan" data-params="${result.SN}">
           </div>
         `, 'text/html').body.firstChild
         return resultDOMElement
       },
       disableNecessaryButtons (evt = null) {
-        Array.from(document.querySelectorAll('.button')).forEach(button => this.disableButton(button))
+        Array.from(document.querySelectorAll('.appointment-requests-button')).forEach(button => this.disableButton(button))
       },
       enableNecessaryButtons (evt = null) {
-        Array.from(document.querySelectorAll('.button')).forEach(button => this.enableButton(button))
+        Array.from(document.querySelectorAll('.appointment-requests-button')).forEach(button => this.enableButton(button))
       },
       disableButton (target) {
         target.disabled = true

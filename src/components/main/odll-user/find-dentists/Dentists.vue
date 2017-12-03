@@ -34,8 +34,8 @@
         </div>
       </div>
 
-      <div class="submit">
-        <input type="button" class='submit-button button' value="Find" @click="findDentists">
+      <div class="find-dentists-submit">
+        <input type="button" class='find-dentists-submit-button find-dentists-button' value="Find" @click="findDentists">
       </div>
 
       <div class="find-dentists-result-section"></div>
@@ -452,10 +452,10 @@
         `, 'text/html').body.firstChild
       },
       disableNecessaryButtons (evt = null) {
-        Array.from(document.querySelectorAll('.button')).forEach(button => this.disableButton(button))
+        Array.from(document.querySelectorAll('.find-dentists-button')).forEach(button => this.disableButton(button))
       },
       enableNecessaryButtons (evt = null) {
-        Array.from(document.querySelectorAll('.button')).forEach(button => this.enableButton(button))
+        Array.from(document.querySelectorAll('.find-dentists-button')).forEach(button => this.enableButton(button))
       },
       disableButton (target) {
         target.disabled = true
@@ -594,14 +594,14 @@
     border: 1px solid #f18787;
   }
 
-  .submit {
+  .find-dentists-submit {
     position: relative;
     top: 0px;
     width: 100%;
     height: 30px;
   }
 
-  .submit-button {
+  .find-dentists-submit-button {
     margin-right: 7px;
     padding: 2px;
     text-align: center;

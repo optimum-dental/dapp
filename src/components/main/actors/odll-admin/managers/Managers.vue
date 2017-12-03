@@ -5,7 +5,7 @@
 
       <div class="managers-data-entry-section">
         <input type="text" id="managers-entry" class="managers-entry" placeholder="Enter the Ethereum address of a Manager you want to add to the platform" @input="clearError">
-        <input type="button" class="managers-add-official button" value="Add Manager" @click="addManager">
+        <input type="button" class="managers-add-official managers-button" value="Add Manager" @click="addManager">
       </div>
 
       <div class="managers-result-section"></div>
@@ -238,17 +238,17 @@
               <div class="managers-address">${result.address || 'Address: Not Supplied'}</div>
             </div>
             <div class="managers-action-section">
-              <input type="button" value="${Number(result.status) === 2 ? 'Unblock Manager' : 'Block Manager'}" class="managers-action-button ${Number(result.status) === 2 ? 'managers-unblock' : 'managers-block'} button" data-sn="${result.SN}">
+              <input type="button" value="${Number(result.status) === 2 ? 'Unblock Manager' : 'Block Manager'}" class="managers-action-button ${Number(result.status) === 2 ? 'managers-unblock' : 'managers-block'} managers-button" data-sn="${result.SN}">
             </div>
           </div>
         `, 'text/html').body.firstChild
         return resultDOMElement
       },
       disableNecessaryButtons (evt = null) {
-        Array.from(document.querySelectorAll('.button')).forEach(button => this.disableButton(button))
+        Array.from(document.querySelectorAll('.managers-button')).forEach(button => this.disableButton(button))
       },
       enableNecessaryButtons (evt = null) {
-        Array.from(document.querySelectorAll('.button')).forEach(button => this.enableButton(button))
+        Array.from(document.querySelectorAll('.managers-button')).forEach(button => this.enableButton(button))
       },
       disableButton (target) {
         target.disabled = true

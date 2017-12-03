@@ -25,8 +25,8 @@
         <div id="search-page-budget-range" class="noUiSlider"></div>
       </div>
 
-      <div class="search-page-search-item submit">
-        <input type="button" class='submit-button' value="Find" @click="findDentists">
+      <div class="search-page-search-item search-page-submit">
+        <input type="button" class='search-page-submit-button' value="Find" @click="findDentists">
       </div>
     </div>
   </div>
@@ -372,7 +372,7 @@
     line-height: 30px;
   }
 
-  .search-page-search-item:not(.submit) {
+  .search-page-search-item:not(.search-page-submit) {
     margin-bottom: 30px;
   }
 
@@ -409,7 +409,7 @@
     left: 10px;
   }
 
-  .submit-button {
+  .search-page-submit-button {
     background: #29aae1;
     color: #ffffff;
     height: 30px;

@@ -5,7 +5,7 @@
 
       <div class="dentists-data-entry-section">
         <input type="text" id="dentists-entry" class="dentists-entry" placeholder="Enter the Ethereum address of a Dentist you want to add to the platform" @input="clearError">
-        <input type="button" class="dentists-add-official button" value="Add Dentist" @click="addDentist">
+        <input type="button" class="dentists-add-official dentists-button" value="Add Dentist" @click="addDentist">
       </div>
 
       <div class="dentists-result-section"></div>
@@ -272,8 +272,8 @@
               <div class="dentists-address">${result.address || 'Address: Not Supplied'}</div>
             </div>
             <div class="dentists-action-section">
-              <input type="button" value="${Number(result.status) === 2 ? 'Unblock Dentist' : 'Block Dentist'}" class="dentists-action-button ${Number(result.status) === 2 ? 'dentists-unblock' : 'dentists-block'} button" data-sn="${result.SN}">
-              <input type="button" value="${Number(result.isODLLDentist) ? 'Unmake ODLL Dentist' : 'Make ODLL Dentist'}" class="dentists-action-button ${Number(result.isODLLDentist) ? 'remove' : 'dentists-add'} button" data-sn="${result.SN}">
+              <input type="button" value="${Number(result.status) === 2 ? 'Unblock Dentist' : 'Block Dentist'}" class="dentists-action-button ${Number(result.status) === 2 ? 'dentists-unblock' : 'dentists-block'} dentists-button" data-sn="${result.SN}">
+              <input type="button" value="${Number(result.isODLLDentist) ? 'Unmake ODLL Dentist' : 'Make ODLL Dentist'}" class="dentists-action-button ${Number(result.isODLLDentist) ? 'remove' : 'dentists-add'} dentists-button" data-sn="${result.SN}">
             </div>
           </div>
         `, 'text/html').body.firstChild
@@ -292,10 +292,10 @@
         `, 'text/html').body.firstChild
       },
       disableNecessaryButtons (evt = null) {
-        Array.from(document.querySelectorAll('.button')).forEach(button => this.disableButton(button))
+        Array.from(document.querySelectorAll('.dentists-button')).forEach(button => this.disableButton(button))
       },
       enableNecessaryButtons (evt = null) {
-        Array.from(document.querySelectorAll('.button')).forEach(button => this.enableButton(button))
+        Array.from(document.querySelectorAll('.dentists-button')).forEach(button => this.enableButton(button))
       },
       disableButton (target) {
         target.disabled = true

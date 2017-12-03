@@ -430,7 +430,7 @@
               <div class="applications-address">Address: <span>${userObject.address || 'Not Supplied'}</span></div>
               <div class="applications-quote">Quote: <span>$${result.quote}</span></div>
               <div class="applications-comment">Comment: <span>${result.comment}</span></div>
-              <input type="button" value="Accept" class="button accept-application" data-params="${result.SN}">
+              <input type="button" value="Accept" class="applications-button accept-application" data-params="${result.SN}">
             </div>
           </div>
         `, 'text/html').body.firstChild
@@ -449,7 +449,7 @@
               <div class="applications-quote">Amount: <span>$${result.quote}</span></div>
               <div class="applications-status">Status: <span>${result.paymentObject.status === 3 ? 'Paid Dentist In Full' : 'Paid into Escrow'}</span></div>
               ${this.createAverageRatingDOMElement(userObject.averageRating, result.SN).outerHTML}
-              ${result.paymentObject.status === 2 ? '<input type="button" value="Release Fund" class="button release-fund" data-params="' + result.SN + '">' : ''}
+              ${result.paymentObject.status === 2 ? '<input type="button" value="Release Fund" class="applications-button release-fund" data-params="' + result.SN + '">' : ''}
             </div>
           </div>
         `, 'text/html').body.firstChild
@@ -468,10 +468,10 @@
         `, 'text/html').body.firstChild
       },
       disableNecessaryButtons (evt = null) {
-        Array.from(document.querySelectorAll('.button')).forEach(button => this.disableButton(button))
+        Array.from(document.querySelectorAll('.applications-button')).forEach(button => this.disableButton(button))
       },
       enableNecessaryButtons (evt = null) {
-        Array.from(document.querySelectorAll('.button')).forEach(button => this.enableButton(button))
+        Array.from(document.querySelectorAll('.applications-button')).forEach(button => this.enableButton(button))
       },
       disableButton (target) {
         target.disabled = true
@@ -618,7 +618,7 @@
     text-align: right;
   }
 
-  .button {
+  .applications-button {
     padding: 2px;
     text-align: center;
     outline: 0px;
@@ -874,7 +874,7 @@
     background-size: contain;
   }
 
-  .button {
+  .applications-button {
     padding: 0px 2px;
     text-align: center;
     outline: 0px;
