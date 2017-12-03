@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper">
-    <div id="services">
+    <div id="view-services">
       <div class="title">Our Services</div>
       <div class="row" v-for="i in totalRows">
         <div class="column" v-for="j in 3">
@@ -43,7 +43,7 @@
     justify-content: center;
   }
 
-  #services {
+  #view-services {
     background: #ffffff;
     min-height: 70vh;
     width: 80%;

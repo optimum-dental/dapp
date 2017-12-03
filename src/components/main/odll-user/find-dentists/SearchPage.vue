@@ -2,30 +2,30 @@
   <div class="wrapper">
     <div id="search-page">
       <div class="title">Find Dentists</div>
-      <div class="choices" id="search-query">
-        <div class="search-icon"></div>
+      <div class="search-page-choices" id="search-page-search-query">
+        <div class="search-page-search-icon"></div>
       </div>
 
-      <div class="instruction">Choose by location, appointment type, and budget</div>
-      <div class="search-item">
-        <div class="search-param">Locations</div>
-        <div class="search-value"><select id="state" class="list" @input="addToSearchQuery"></select></div>
+      <div class="search-page-instruction">Choose by location, appointment type, and budget</div>
+      <div class="search-page-search-item">
+        <div class="search-page-search-param">Locations</div>
+        <div class="search-page-search-value"><select id="search-page-state" class="search-page-list" @input="addToSearchQuery"></select></div>
       </div>
 
-      <div class="search-item">
-        <div class="search-param">Appointment Type</div>
-        <div class="search-value">
-          <select id="appointment-type" class="list" @input="addToSearchQuery"></select>
+      <div class="search-page-search-item">
+        <div class="search-page-search-param">Appointment Type</div>
+        <div class="search-page-search-value">
+          <select id="appointment-type" class="search-page-list" @input="addToSearchQuery"></select>
           <div class="tip"></div>
         </div>
       </div>
 
-      <div class="search-item">
-        <div class="search-param budget">Budget <span class="small-text">[optional]</span></div>
-        <div id="budget-range" class="noUiSlider"></div>
+      <div class="search-page-search-item">
+        <div class="search-page-search-param budget">Budget <span class="search-page-small-text">[optional]</span></div>
+        <div id="search-page-budget-range" class="noUiSlider"></div>
       </div>
 
-      <div class="search-item submit">
+      <div class="search-page-search-item submit">
         <input type="button" class='submit-button' value="Find" @click="findDentists">
       </div>
     </div>
@@ -41,7 +41,7 @@
   export default {
     computed: {
       budgetRange () {
-        var budgetRangeElement = document.getElementById('budget-range')
+        var budgetRangeElement = document.getElementById('search-page-budget-range')
         rangeSlider.create(budgetRangeElement, {
           start: [this.budgetMin, this.budgetMax],
           connect: true,
@@ -74,7 +74,7 @@
     },
     methods: {
       populateStates () {
-        const statesElement = document.getElementById('state')
+        const statesElement = document.getElementById('search-page-state')
         states.forEach((state, index) => {
           const optionElement = document.createElement('option')
           optionElement.text = index === 0 ? 'Choose Location' : state.name
@@ -107,7 +107,7 @@
                 appointmentSubtypesElement = document.getElementById('appointment-sub-type')
               } else {
                 appointmentSubtypesElement = _this.createAppointmentSubTypeDOMElement(appointmentTypes[target.selectedIndex].subtypes[0])
-                document.querySelector('#search-page').insertBefore(appointmentSubtypesElement, target.closest('.search-item').nextElementSibling)
+                document.querySelector('#search-page').insertBefore(appointmentSubtypesElement, target.closest('.search-page-search-item').nextElementSibling)
               }
 
               _this.populateAppointmentSubTypes(target.selectedIndex)
@@ -131,7 +131,7 @@
           let range = budgetRangeArray[0] === _this.budgetMin && budgetRangeArray[1] === _this.budgetMax ? undefined : budgetRangeArray.map(value => '$' + value).join(' - ')
           _this.addToSearchQuery({
             target: {
-              id: 'budget-range',
+              id: 'search-page-budget-range',
               tagName: 'budgetRangeElement',
               range
             }
@@ -151,10 +151,10 @@
       },
       createAppointmentSubTypeDOMElement (title = '') {
         const DOMELement = new DOMParser().parseFromString(`
-          <div class="search-item">
-            <div class="search-param">${title}</div>
-            <div class="search-value">
-              <select id="appointment-sub-type" class="list"></select>
+          <div class="search-page-search-item">
+            <div class="search-page-search-param">${title}</div>
+            <div class="search-page-search-value">
+              <select id="appointment-sub-type" class="search-page-list"></select>
               <div class="tip"></div>
             </div>
           </div>
@@ -166,10 +166,10 @@
         const appointmentSubtypesElement = document.getElementById('appointment-sub-type')
         if (appointmentTypeIndex === 0) {
           $(appointmentSubtypesElement).fadeOut(500, function () {
-            appointmentSubtypesElement.closest('.search-item').remove()
+            appointmentSubtypesElement.closest('.search-page-search-item').remove()
           })
         } else {
-          appointmentSubtypesElement.closest('.search-item').querySelector('.search-param').innerHTML = appointmentTypes[appointmentTypeIndex].subtypes[0]
+          appointmentSubtypesElement.closest('.search-page-search-item').querySelector('.search-page-search-param').innerHTML = appointmentTypes[appointmentTypeIndex].subtypes[0]
           while (appointmentSubtypesElement.firstChild) {
             appointmentSubtypesElement.removeChild(appointmentSubtypesElement.firstChild)
           }
@@ -207,7 +207,7 @@
                 queryItem.innerHTML = value
 
                 break
-              case 'state':
+              case 'search-page-state':
                 value = states[target.selectedIndex].name
                 id = `query-${target.id}`
                 queryItem = document.getElementById(id) || this.createQueryItemElement(id)
@@ -228,7 +228,7 @@
           }
         }
 
-        let searchQueryElement = document.getElementById('search-query')
+        let searchQueryElement = document.getElementById('search-page-search-query')
         if (queryItem && !searchQueryElement.querySelector(`#${id}`)) {
           $(queryItem).hide()
           searchQueryElement.appendChild(queryItem)
@@ -253,7 +253,7 @@
           const appointmentSubtypeId = Number(document.getElementById('appointment-sub-type').selectedIndex)
           const searchQuery = {
             type: 'findDentists',
-            state: Number(document.getElementById('state').selectedIndex),
+            state: Number(document.getElementById('search-page-state').selectedIndex),
             appointmentTypeId,
             appointmentSubtypeId,
             budget: this.budget
@@ -340,7 +340,7 @@
     margin-bottom: 10px;
   }
 
-  .choices {
+  .search-page-choices {
     width: 80%;
     height: 40px;
     border-bottom: 1px solid #dcdede;
@@ -348,7 +348,7 @@
     background: #ffffff;
   }
 
-  .search-icon {
+  .search-page-search-icon {
     background: url('/static/images/search.png') no-repeat;
     width: 30px;
     height: 30px;
@@ -358,7 +358,7 @@
     float: left;
   }
 
-  .instruction {
+  .search-page-instruction {
     width: 80%;
     height: 30px;
     line-height: 30px;
@@ -366,17 +366,17 @@
     margin-bottom: 30px;
   }
 
-  .search-item {
+  .search-page-search-item {
     width: 80%;
     height: 80px;
     line-height: 30px;
   }
 
-  .search-item:not(.submit) {
+  .search-page-search-item:not(.submit) {
     margin-bottom: 30px;
   }
 
-  .search-param {
+  .search-page-search-param {
     color: #7a7a7a;
     margin-bottom: 15px;
     height: 20px;
@@ -388,7 +388,7 @@
     margin-bottom: 20px;
   }
 
-  .list {
+  .search-page-list {
     height: 30px;
     width: 200px;
     background: #ffffff;
@@ -401,7 +401,7 @@
     color: #f18787;
   }
 
-  .small-text {
+  .search-page-small-text {
     font-size: 10px;
     color: #b4b4b4;
     position: relative;
@@ -424,14 +424,14 @@
 </style>
 
 <style>
-  .search-item {
+  .search-page-search-item {
     width: 80%;
     height: 80px;
     margin-bottom: 25px;
     line-height: 25px;
   }
 
-  .search-param {
+  .search-page-search-param {
     color: #7a7a7a;
     margin-bottom: 15px;
     height: 20px;
@@ -439,7 +439,7 @@
     line-height: 20px;
   }
 
-  .list {
+  .search-page-list {
     height: 30px;
     width: 200px;
     color: #7a7a7a;

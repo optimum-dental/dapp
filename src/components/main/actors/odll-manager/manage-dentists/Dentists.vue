@@ -3,16 +3,16 @@
     <div id="dentists">
       <div class="title">Manage Dentists</div>
 
-      <div class="data-entry-section">
-        <input type="text" id="entry" class="entry" placeholder="Enter the Ethereum address of a Dentist you want to add to the platform" @input="clearError">
-        <input type="button" class="add-official button" value="Add Dentist" @click="addDentist">
+      <div class="dentists-data-entry-section">
+        <input type="text" id="dentists-entry" class="dentists-entry" placeholder="Enter the Ethereum address of a Dentist you want to add to the platform" @input="clearError">
+        <input type="button" class="dentists-add-official button" value="Add Dentist" @click="addDentist">
       </div>
 
-      <div class="result-section"></div>
+      <div class="dentists-result-section"></div>
 
-      <div class="navigation">
-        <div v-if="isThereMore" @click="showNextPage" class="fetch-next">Next ></div>
-        <div v-if="pageNumber !== 1" @click="showPreviousPage" class="fetch-previous">< Previous</div>
+      <div class="dentists-navigation">
+        <div v-if="isThereMore" @click="showNextPage" class="dentists-fetch-next">Next ></div>
+        <div v-if="pageNumber !== 1" @click="showPreviousPage" class="dentists-fetch-previous">< Previous</div>
       </div>
     </div>
   </div>
@@ -52,24 +52,24 @@
         document.querySelector('#dentists').addEventListener('click', function (evt) {
           const target = evt.target
           switch (true) {
-            case (target.classList.contains('block')):
+            case (target.classList.contains('dentists-block')):
               let userId = _this.$store.state.searchResult.fetchDentists.data[_this.currentOffset][Number(target.dataset.sn)].coinbase
               _this.manageBlocking(userId, 'blockUser')
-              target.classList.remove('block')
-              target.classList.add('unblock')
+              target.classList.remove('dentists-block')
+              target.classList.add('dentists-unblock')
               break
 
-            case (target.classList.contains('unblock')):
+            case (target.classList.contains('dentists-unblock')):
               userId = _this.$store.state.searchResult.fetchDentists.data[_this.currentOffset][Number(target.dataset.sn)].coinbase
               _this.manageBlocking(userId, 'unblockUser')
-              target.classList.remove('unblock')
-              target.classList.add('block')
+              target.classList.remove('dentists-unblock')
+              target.classList.add('dentists-block')
               break
 
-            case (target.classList.contains('add')):
+            case (target.classList.contains('dentists-add')):
               userId = _this.$store.state.searchResult.fetchDentists.data[_this.currentOffset][Number(target.dataset.sn)].coinbase
-              _this.manageODLLDentist(userId, 'add')
-              target.classList.remove('add')
+              _this.manageODLLDentist(userId, 'dentists-add')
+              target.classList.remove('dentists-add')
               target.classList.add('remove')
               break
 
@@ -77,7 +77,7 @@
               userId = _this.$store.state.searchResult.fetchDentists.data[_this.currentOffset][Number(target.dataset.sn)].coinbase
               _this.manageODLLDentist(userId, 'remove')
               target.classList.remove('remove')
-              target.classList.add('add')
+              target.classList.add('dentists-add')
               break
           }
         })
@@ -117,7 +117,7 @@
         if (target.classList.contains('error')) target.classList.remove('error')
       },
       addDentist (evt) {
-        const addressDOMElement = document.getElementById('entry')
+        const addressDOMElement = document.getElementById('dentists-entry')
         const addressPattern = /0x[0-9a-fA-F]{40}/
         if (addressDOMElement.value.trim() !== '' && addressPattern.test(addressDOMElement.value.trim())) {
           this.disableNecessaryButtons()
@@ -140,7 +140,7 @@
         }
       },
       getDentists (evt, fetchQuery) {
-        const resultSection = document.querySelector('.result-section')
+        const resultSection = document.querySelector('.dentists-result-section')
         this.clearDOMElementChildren(resultSection)
         this.askUserToWaitWhileWeSearch()
         this.disableNecessaryButtons()
@@ -188,7 +188,7 @@
         this.$root.callToWriteData({
           requestParams: {
             address: userId,
-            ODLLDentistValue: action === 'add'
+            ODLLDentistValue: action === 'dentists-add'
           },
           methodName: 'setODLLDentist',
           callback: (status = false) => {
@@ -200,19 +200,19 @@
         })
       },
       populateResults (results) {
-        const resultSection = document.querySelector('.result-section')
+        const resultSection = document.querySelector('.dentists-result-section')
         this.clearDOMElementChildren(resultSection)
         results.forEach((result) => {
           const resultDOMElement = this.createResultDOMElement(result)
           resultSection.appendChild(resultDOMElement)
-          resultDOMElement.querySelector('.gravatar-section').appendChild(result.avatarCanvas)
+          resultDOMElement.querySelector('.dentists-gravatar-section').appendChild(result.avatarCanvas)
         })
       },
       appendResult (result) {
         const resultDOMElement = this.createResultDOMElement(result)
-        const resultSection = document.querySelector('.result-section')
+        const resultSection = document.querySelector('.dentists-result-section')
         resultSection.appendChild(resultDOMElement)
-        resultDOMElement.querySelector('.gravatar-section').appendChild(result.avatarCanvas)
+        resultDOMElement.querySelector('.dentists-gravatar-section').appendChild(result.avatarCanvas)
       },
       clearDOMElementChildren (DOMElement) {
         while (DOMElement.hasChildNodes()) {
@@ -230,14 +230,14 @@
       },
       askUserToWaitWhileWeSearch () {
         if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
-        if (document.querySelector('.no-official')) document.querySelector('.no-official').remove()
+        if (document.querySelector('.dentists-no-official')) document.querySelector('.dentists-no-official').remove()
         let waitOverlayDOMElement = this.createWaitOverlayDOMElement()
-        document.querySelector('.result-section').appendChild(waitOverlayDOMElement)
+        document.querySelector('.dentists-result-section').appendChild(waitOverlayDOMElement)
       },
       informOfNoOfficial () {
-        if (document.querySelector('.no-official')) document.querySelector('.no-official').remove()
+        if (document.querySelector('.dentists-no-official')) document.querySelector('.dentists-no-official').remove()
         let noDentistDOMElement = this.createNoOfficialDOMElement()
-        document.querySelector('.result-section').insertBefore(noDentistDOMElement, document.querySelector('.dentists-result'))
+        document.querySelector('.dentists-result-section').insertBefore(noDentistDOMElement, document.querySelector('.dentists-result'))
       },
       createWaitOverlayDOMElement () {
         const DOMELement = new DOMParser().parseFromString(`
@@ -251,8 +251,8 @@
       },
       createNoOfficialDOMElement () {
         const DOMELement = new DOMParser().parseFromString(`
-          <div class="no-official">
-            <div class="no-official-message">
+          <div class="dentists-no-official">
+            <div class="dentists-no-official-message">
               No Dentist found. You can add some with the input tools above.
             </div>
           </div>
@@ -264,16 +264,16 @@
         const averageRatingDOMElement = this.createAverageRatingDOMElement(result.averageRating)
         const resultDOMElement = new DOMParser().parseFromString(`
           <div class="dentists-result">
-            <div class="gravatar-section"></div>
-            <div class="about-section">
-              <div class="name">${result.name || 'Name: Not Supplied'}</div>
-              <div class="company-name">${result.companyName || 'Company Name: Not Supplied'}</div>
+            <div class="dentists-gravatar-section"></div>
+            <div class="dentists-about-section">
+              <div class="dentists-name">${result.name || 'Name: Not Supplied'}</div>
+              <div class="dentists-company-name">${result.companyName || 'Company Name: Not Supplied'}</div>
               ${averageRatingDOMElement.outerHTML}
-              <div class="address">${result.address || 'Address: Not Supplied'}</div>
+              <div class="dentists-address">${result.address || 'Address: Not Supplied'}</div>
             </div>
-            <div class="action-section">
-              <input type="button" value="${Number(result.status) === 2 ? 'Unblock Dentist' : 'Block Dentist'}" class="action-button ${Number(result.status) === 2 ? 'unblock' : 'block'} button" data-sn="${result.SN}">
-              <input type="button" value="${Number(result.isODLLDentist) ? 'Unmake ODLL Dentist' : 'Make ODLL Dentist'}" class="action-button ${Number(result.isODLLDentist) ? 'remove' : 'add'} button" data-sn="${result.SN}">
+            <div class="dentists-action-section">
+              <input type="button" value="${Number(result.status) === 2 ? 'Unblock Dentist' : 'Block Dentist'}" class="dentists-action-button ${Number(result.status) === 2 ? 'dentists-unblock' : 'dentists-block'} button" data-sn="${result.SN}">
+              <input type="button" value="${Number(result.isODLLDentist) ? 'Unmake ODLL Dentist' : 'Make ODLL Dentist'}" class="dentists-action-button ${Number(result.isODLLDentist) ? 'remove' : 'dentists-add'} button" data-sn="${result.SN}">
             </div>
           </div>
         `, 'text/html').body.firstChild
@@ -283,12 +283,12 @@
         const ratingsArray = []
         for (let i = 0; i < 5; i++) {
           ratingsArray.push(`
-            <div class="rating ${i < averageRating ? 'filled' : ''}"></div>
+            <div class="dentists-rating ${i < averageRating ? 'filled' : ''}"></div>
           `)
         }
 
         return new DOMParser().parseFromString(`
-          <div class="average-rating">${ratingsArray.join(' ')}</div>
+          <div class="dentists-average-rating">${ratingsArray.join(' ')}</div>
         `, 'text/html').body.firstChild
       },
       disableNecessaryButtons (evt = null) {
@@ -394,7 +394,7 @@
     margin-bottom: 10px;
   }
 
-  .data-entry-section {
+  .dentists-data-entry-section {
     width: 100%;
     height: 70px;
     margin-bottom: 30px;
@@ -403,7 +403,7 @@
     flex-direction: row;
   }
 
-  .entry {
+  .dentists-entry {
     height: 40px;
     line-height: 40px;
     width: 85%;
@@ -415,15 +415,15 @@
     padding: 0px 10px;
   }
 
-  .entry.error {
+  .dentists-entry.error {
     border: 1px solid #f18787;
   }
 
-  .entry::placeholder {
+  .dentists-entry::placeholder {
     color: #bababa;
   }
 
-  .add, .add-official {
+  .dentists-add, .dentists-add-official {
     padding: 2px;
     text-align: center;
     float: right;
@@ -439,18 +439,18 @@
     font-size: 14px;
   }
 
-  .result-section {
+  .dentists-result-section {
     position: relative;
     min-height: 300px;
     margin-top: 20px;
   }
 
-  .navigation {
+  .dentists-navigation {
     width: 100%;
     float: right;
   }
 
-  .fetch-next, .fetch-previous {
+  .dentists-fetch-next, .dentists-fetch-previous {
     cursor: pointer;
     color: #6592ad;
     background: #ffffff;
@@ -464,13 +464,13 @@
     font-size: 14px;
   }
 
-  .fetch-next:hover, .fetch-previous:hover {
+  .dentists-fetch-next:hover, .dentists-fetch-previous:hover {
     background: #dae3e8;
   }
 </style>
 
 <style>
-  .no-official {
+  .dentists-no-official {
     position: relative;
     width: 100%;
     min-height: 300px;
@@ -478,7 +478,7 @@
     font-size: 16px;
   }
 
-  .no-official-message {
+  .dentists-no-official-message {
     height: 30px;
     position: relative;
     top: 110px;
@@ -534,7 +534,7 @@
     padding: 10px 0px;
   }
 
-  .gravatar-section {
+  .dentists-gravatar-section {
     width: 60px;
     height: 60px;
     float: left;
@@ -546,20 +546,20 @@
     padding: 3px;
   }
 
-  .gravatar-section > canvas {
+  .dentists-gravatar-section > canvas {
     height: 100%;
     width: 100%;
     border-radius: 6px;
   }
 
-  .about-section {
+  .dentists-about-section {
     width: 250px;
     height: 150px;
     display: inline-block;
     float: left;
   }
 
-  .about-section > div {
+  .dentists-about-section > div {
     display: block;
     height: 35px;
     line-height: 35px;
@@ -568,32 +568,32 @@
     width: 100%;
   }
 
-  .average-rating {
+  .dentists-average-rating {
     width: 100% !important;
   }
 
-  .average-rating > div {
+  .dentists-average-rating > div {
     background: url(/static/images/star_line.png) no-repeat;
     background-size: contain;
     height: 20px;
     width: 20px;
     display: inline-block;
     float: left;
-    margin: 0px 5px;
+    margin: 7px 5px;
   }
 
-  .average-rating > .filled {
+  .dentists-average-rating > .filled {
     background: url(/static/images/star.png) no-repeat;
     background-size: contain;
   }
 
-  .profile-link {
+  .dentists-profile-link {
     font-size: 10px !important;
     color: #bfced9;
     cursor: pointer;
   }
 
-  .action-section {
+  .dentists-action-section {
     width: 260px;
     height: 150px;
     line-height: 150px;
@@ -604,7 +604,7 @@
     float: right;
   }
 
-  .action-button {
+  .dentists-action-button {
     width: 125px;
     height: 30px;
     line-height: 30px;

@@ -3,30 +3,30 @@
     <div id="appointment">
       <div class="title">Request Appointment</div>
 
-      <div class="sections">
-        <div class="trigger-section">
-          <div class="trigger" :class="addClass(1, 'active')" data-open="scan-section" data-type="1" @click="switchView">Scan Appointment</div>
-          <div class="trigger" :class="addClass(2, 'active')" data-open="treatment-section" data-type="2" @click="switchView">Treatment Appointment</div>
+      <div class="appointment-sections">
+        <div class="appointment-trigger-section">
+          <div class="appointment-trigger" :class="addClass(1, 'active')" data-open="appointment-scan-section" data-type="1" @click="switchView">Scan Appointment</div>
+          <div class="appointment-trigger" :class="addClass(2, 'active')" data-open="appointment-treatment-section" data-type="2" @click="switchView">Treatment Appointment</div>
         </div>
 
-        <div class="view-section">
-          <div class="official-info" v-if="officialSN >= 0 && official.fee >= 0">
-            <div class="official-name official-detail">Appointment with: <span>{{official.name}}</span></div>
-            <div class="official-fee official-detail">Fee: <span>${{official.fee}}</span></div>
+        <div class="appointment-view-section">
+          <div class="appointment-official-info" v-if="officialSN >= 0 && official.fee >= 0">
+            <div class="official-name appointment-official-detail">Appointment with: <span>{{official.name}}</span></div>
+            <div class="official-fee appointment-official-detail">Fee: <span>${{official.fee}}</span></div>
           </div>
 
-          <div class="scan-section" :class="addClass(1, 'showing')" id="scan-section">
-            <div class="entry-item">
-              <div class="entry-param">Preferred Date *</div>
-              <div class="entry-value">
-                <datepicker   v-model="scanDate" class="list appointment-date scan-date" id="scan-date" @selected="validateScanDate"></datepicker>
+          <div class="appointment-scan-section" :class="addClass(1, 'showing')" id="appointment-scan-section">
+            <div class="appointment-entry-item">
+              <div class="appointment-entry-param">Preferred Date *</div>
+              <div class="appointment-entry-value">
+                <datepicker   v-model="scanDate" class="appointment-list appointment-date appointment-scan-date" id="appointment-scan-date" @selected="validateScanDate"></datepicker>
               </div>
             </div>
 
-            <div class="entry-item">
-              <div class="entry-param">Preferred Time *</div>
-              <div class="entry-value">
-                <select id="scan-time" class="list">
+            <div class="appointment-entry-item">
+              <div class="appointment-entry-param">Preferred Time *</div>
+              <div class="appointment-entry-value">
+                <select id="appointment-scan-time" class="appointment-list">
                   <option>Select</option>
                   <option>Morning (8AM - 12PM)</option>
                   <option>Early Afternoon (12PM - 3PM)</option>
@@ -35,17 +35,17 @@
               </div>
             </div>
 
-            <div class="entry-item">
-              <div class="entry-param">Appointment For *</div>
-              <div class="entry-value">
-                <select id="scan-appointment" class="list" :disabled="officialSN >= 0 && official.fee >= 0"></select>
+            <div class="appointment-entry-item">
+              <div class="appointment-entry-param">Appointment For *</div>
+              <div class="appointment-entry-value">
+                <select id="scan-appointment" class="appointment-list" :disabled="officialSN >= 0 && official.fee >= 0"></select>
               </div>
             </div>
 
-            <div class="entry-item">
-              <div class="entry-param">Do you have insurance?</div>
-              <div class="entry-value">
-                <select id="scan-insurance-query" class="list">
+            <div class="appointment-entry-item">
+              <div class="appointment-entry-param">Do you have insurance?</div>
+              <div class="appointment-entry-value">
+                <select id="appointment-scan-insurance-query" class="appointment-list">
                   <option>Select</option>
                   <option>Yes</option>
                   <option>No</option>
@@ -53,10 +53,10 @@
               </div>
             </div>
 
-            <div class="entry-item comment">
-              <div class="entry-param">Additional Comments [128 characters max]</div>
-              <div class="entry-value">
-                <textarea id="scan-comment" class="list" maxlength="128"></textarea>
+            <div class="appointment-entry-item comment">
+              <div class="appointment-entry-param">Additional Comments [128 characters max]</div>
+              <div class="appointment-entry-value">
+                <textarea id="appointment-scan-comment" class="appointment-list" maxlength="128"></textarea>
               </div>
             </div>
 
@@ -65,11 +65,11 @@
             </div>
           </div>
 
-          <div class="treatment-section" :class="addClass(2, 'showing')" id="treatment-section">
-            <div class="entry-item">
-              <div class="entry-param">Do you have insurance?</div>
-              <div class="entry-value">
-                <select id="treatment-insurance-query" class="list">
+          <div class="appointment-treatment-section" :class="addClass(2, 'showing')" id="appointment-treatment-section">
+            <div class="appointment-entry-item">
+              <div class="appointment-entry-param">Do you have insurance?</div>
+              <div class="appointment-entry-value">
+                <select id="treatment-insurance-query" class="appointment-list">
                   <option>Select</option>
                   <option>Yes</option>
                   <option>No</option>
@@ -77,21 +77,21 @@
               </div>
             </div>
 
-            <div class="entry-item">
-              <div class="entry-param">Scan Results *</div>
-              <div class="entry-value">
-                <label for="scan-result" class="scan-result-trigger list">
-                  <span class="icon"></span>
+            <div class="appointment-entry-item">
+              <div class="appointment-entry-param">Scan Results *</div>
+              <div class="appointment-entry-value">
+                <label for="appointment-scan-results" class="appointment-scan-results-trigger appointment-list">
+                  <span class="appointment-icon"></span>
                   <span class="text">Choose Scan Results</span>
                 </label>
-                <input id="scan-result" type="file" accept="image/*" multiple></select>
+                <input id="appointment-scan-results" type="file" accept="image/*" multiple></select>
               </div>
             </div>
 
-            <div class="entry-item comment">
-              <div class="entry-param">Additional Comments [128 characters max]</div>
-              <div class="entry-value">
-                <textarea id="treatment-comment" class="list" maxlength="128"></textarea>
+            <div class="appointment-entry-item comment">
+              <div class="appointment-entry-param">Additional Comments [128 characters max]</div>
+              <div class="appointment-entry-value">
+                <textarea id="appointment-treatment-comment" class="appointment-list" maxlength="128"></textarea>
               </div>
             </div>
 
@@ -137,33 +137,33 @@
         document.querySelector('#appointment').addEventListener('change', function (evt) {
           const target = evt.target
           switch (true) {
-            case (['scan-time', 'scan-appointment'].includes(target.id)):
+            case (['appointment-scan-time', 'scan-appointment'].includes(target.id)):
               _this.clearError(target)
               break
-            case (['scan-result'].includes(target.id)):
-              const label = target.closest('.entry-value').querySelector('.scan-result-trigger')
+            case (['appointment-scan-results'].includes(target.id)):
+              const label = target.closest('.appointment-entry-value').querySelector('.appointment-scan-results-trigger')
               _this.clearError(label)
               const fileNames = Array.from(target.files).map(file => file.name).join(', ')
               label.querySelector('.text').innerHTML = truncate(fileNames, 50)
               break
-            case (['scan-insurance-query', 'treatment-insurance-query'].includes(target.id)):
-              const serviceTypeId = target.id === 'scan-insurance-query' ? 1 : 2
+            case (['appointment-scan-insurance-query', 'treatment-insurance-query'].includes(target.id)):
+              const serviceTypeId = target.id === 'appointment-scan-insurance-query' ? 1 : 2
               const choice = target.selectedIndex
               let DOMElement
               if (choice === 0 || choice === 2) {
-                let insuranceDOMElement = target.closest('.entry-item').nextElementSibling
+                let insuranceDOMElement = target.closest('.appointment-entry-item').nextElementSibling
                 insuranceDOMElement = insuranceDOMElement.classList.contains('insurance') ? insuranceDOMElement : null
                 if (insuranceDOMElement) _this.removeDOMElement(insuranceDOMElement)
               } else {
                 DOMElement = _this.createDOMElementFromString(`
-                  <div class="entry-item insurance">
-                    <div class="entry-param">Insurance Name</div>
-                    <div class="entry-value">
-                      <input id="${serviceTypeId === 1 ? 'scan' : 'treatment'}-insurance" class="list" type="text">
+                  <div class="appointment-entry-item insurance">
+                    <div class="appointment-entry-param">Insurance Name</div>
+                    <div class="appointment-entry-value">
+                      <input id="${serviceTypeId === 1 ? 'scan' : 'treatment'}-insurance" class="appointment-list" type="text">
                     </div>
                   </div>
                 `)
-                _this.appendDOMElementAfter(DOMElement, target.closest('.entry-item'), document.querySelector(`.${serviceTypeId === 1 ? 'scan' : 'treatment'}-section`))
+                _this.appendDOMElementAfter(DOMElement, target.closest('.appointment-entry-item'), document.querySelector(`.${serviceTypeId === 1 ? 'scan' : 'treatment'}-section`))
               }
 
               break
@@ -191,10 +191,10 @@
         const today = Math.floor(+(new Date()) / 36000000)
         const pickedDate = Math.floor(+dateValue / 36000000)
         if (today > pickedDate) {
-          this.addError(document.querySelector('.scan-date'))
+          this.addError(document.querySelector('.appointment-scan-date'))
           this.scanDateError = true
         } else {
-          this.clearError(document.querySelector('.scan-date'))
+          this.clearError(document.querySelector('.appointment-scan-date'))
           this.scanDateError = false
         }
       },
@@ -260,12 +260,12 @@
       },
       writeScanRequest () {
         const appointmentDate = (+(this.scanDate)).toString()
-        const scanTime = document.getElementById('scan-time').options[document.getElementById('scan-time').selectedIndex].value
+        const scanTime = document.getElementById('appointment-scan-time').options[document.getElementById('appointment-scan-time').selectedIndex].value
         const scanAppointmentId = Number(document.getElementById('scan-appointment').selectedIndex)
-        const scanInsuranceQuery = Number(document.getElementById('scan-insurance-query').selectedIndex)
+        const scanInsuranceQuery = Number(document.getElementById('appointment-scan-insurance-query').selectedIndex)
         const scanInsurance = scanInsuranceQuery === 1 ? document.getElementById('scan-insurance').value : ''
-        const scanComment = document.getElementById('scan-comment').value
-        let errors = [scanTime === 0 ? document.getElementById('scan-time') : undefined, scanAppointmentId === 0 ? document.getElementById('scan-appointment') : undefined, this.scanDateError ? document.querySelector('.scan-date') : undefined]
+        const scanComment = document.getElementById('appointment-scan-comment').value
+        let errors = [scanTime === 0 ? document.getElementById('appointment-scan-time') : undefined, scanAppointmentId === 0 ? document.getElementById('scan-appointment') : undefined, this.scanDateError ? document.querySelector('.appointment-scan-date') : undefined]
         errors = errors.filter(entry => entry !== undefined)
         if (errors.length > 0) {
           errors.forEach((item) => {
@@ -303,20 +303,20 @@
       writeTreatmentAppointment () {
         const treatmentInsuranceQuery = Number(document.getElementById('treatment-insurance-query').selectedIndex)
         const treatmentInsurance = treatmentInsuranceQuery === 1 ? document.getElementById('treatment-insurance').value : ''
-        const treatmentComment = document.getElementById('treatment-comment').value
-        let errors = [document.getElementById('scan-result').files.length === 0 ? document.getElementById('scan-result') : undefined]
+        const treatmentComment = document.getElementById('appointment-treatment-comment').value
+        let errors = [document.getElementById('appointment-scan-results').files.length === 0 ? document.getElementById('appointment-scan-results') : undefined]
         errors = errors.filter(entry => entry !== undefined)
         if (errors.length > 0) {
           errors.forEach((item) => {
-            if (item.id === 'scan-result') {
-              const label = item.closest('.entry-value').querySelector('.scan-result-trigger')
+            if (item.id === 'appointment-scan-results') {
+              const label = item.closest('.appointment-entry-value').querySelector('.appointment-scan-results-trigger')
               this.addError(label)
             } else {
               this.addError(item)
             }
           })
         } else {
-          const scanResultURL = this.getURLFromFileUpload(document.getElementById('scan-result'))
+          const scanResultURL = this.getURLFromFileUpload(document.getElementById('appointment-scan-results'))
           this.scrollToTop()
           this.disableNecessaryButtons()
           this.beginWait(document.querySelector('.wrapper'))
@@ -458,14 +458,14 @@
     justify-content: space-between;
   }
 
-  .entry-item {
+  .appointment-entry-item {
     height: 60px;
     margin-top: 30px;
     justify-content: center;
     width: 50%;
   }
 
-  .entry-param {
+  .appointment-entry-param {
     color: #7f7f7f;
     margin-bottom: 5px;
     height: 20px;
@@ -473,7 +473,7 @@
     line-height: 20px;
   }
 
-  .list, label.list {
+  .appointment-list, label.appointment-list {
     display: block;
     height: 30px;
     width: 100%;
@@ -483,27 +483,27 @@
     color: #7f7f7f;
   }
 
-  label.list {
+  label.appointment-list {
     cursor: pointer;
     background: #edefef;
     text-align: center;
     line-height: 30px;
   }
 
-  label.list span {
+  label.appointment-list span {
     display: inline-block;
     float: left;
     height: 28px;
   }
 
-  label.list span.icon {
+  label.appointment-list span.appointment-icon {
     width: 28px;
     background: url('/static/images/upload.png') no-repeat;
     background-size: contain;
     margin-right: 10px;
   }
 
-  input#scan-result {
+  input#appointment-scan-results {
     opacity: 0;
     position: absolute;
     z-index: -1;
@@ -513,7 +513,7 @@
     height: 100px;
   }
 
-  #scan-comment, #treatment-comment {
+  #appointment-scan-comment, #appointment-treatment-comment {
     max-height: 50px;
     min-height: 50px;
     max-width: 100%;
@@ -544,12 +544,12 @@
     display: inline-block;
   }
 
-  .sections {
+  .appointment-sections {
     position: relative;
     min-height: 300px;
   }
 
-  .trigger-section {
+  .appointment-trigger-section {
     width: 100%;
     height: 40px;
     background: #edefef;
@@ -559,7 +559,7 @@
     align-items: center;
   }
 
-  .trigger {
+  .appointment-trigger {
     height: 35px;
     width: 50%;
     margin-top: 5px;
@@ -574,13 +574,13 @@
     cursor: auto;
   }
 
-  .view-section {
+  .appointment-view-section {
     background: #ffffff;
     min-height: 260px;
     width: 100%;
   }
 
-  .scan-section, .treatment-section {
+  .appointment-scan-section, .appointment-treatment-section {
     width: 100%;
     min-height: 260px;
     display: none;
@@ -598,29 +598,29 @@
     float: right;
   }
 
-  .official-info {
+  .appointment-official-info {
     margin-top: 20px;
   }
 
-  .official-detail {
+  .appointment-official-detail {
     font-weight: bold;
     font-size: 16px;
   }
 
-  .official-detail span {
+  .appointment-official-detail span {
     color: #296c92;
   }
 </style>
 
 <style>
-  .entry-item {
+  .appointment-entry-item {
     height: 60px;
     margin-top: 30px;
     justify-content: center;
     width: 50%;
   }
 
-  .entry-param {
+  .appointment-entry-param {
     color: #7f7f7f;
     margin-bottom: 5px;
     height: 20px;
@@ -628,7 +628,7 @@
     line-height: 20px;
   }
 
-  .list, label.list {
+  .appointment-list, label.appointment-list {
     display: block;
     height: 30px;
     width: 100%;
@@ -675,7 +675,7 @@
     display: inline-block;
   }
 
-  input#scan-date, input#treatment-date {
+  input#appointment-scan-date, input#appointment-treatment-date {
     height: 28px !important;
     width: 100% !important;
     background: #ffffff !important;

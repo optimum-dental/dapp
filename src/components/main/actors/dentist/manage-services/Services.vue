@@ -3,25 +3,25 @@
     <div id="services">
       <div class="title">Manage Services</div>
 
-      <div class="service-query-section">
-        <div class="entry-item">
-          <div class="entry-param">Service Type</div>
-          <div class="entry-value">
-            <select id="service-type" class="list"></select>
+      <div class="services-query-section">
+        <div class="services-entry-item">
+          <div class="services-entry-param">Service Type</div>
+          <div class="services-entry-value">
+            <select id="services-service-type" class="services-list"></select>
           </div>
         </div>
 
-        <div class="entry-item">
-          <div class="entry-param"></div>
-          <div class="entry-value">
-            <select id="service-subtype" class="list"></select>
+        <div class="services-entry-item">
+          <div class="services-entry-param"></div>
+          <div class="services-entry-value">
+            <select id="services-service-subtype" class="services-list"></select>
           </div>
         </div>
 
-        <div class="entry-item">
-          <div class="entry-param">Fee [USD]</div>
-          <div class="entry-value">
-            <input type="number" id="fee"></select>
+        <div class="services-entry-item">
+          <div class="services-entry-param">Fee [USD]</div>
+          <div class="services-entry-value">
+            <input type="number" id="services-fee"></select>
           </div>
         </div>
       </div>
@@ -30,20 +30,20 @@
         <input type="button" class='post button' value="Add Service" @click="writeServiceWithFee">
       </div>
 
-      <div class="result-section">
-        <div class="trigger-section">
-          <div class="trigger" :class="addClass(1, 'active')" data-open="scan-section" data-type="1" @click="switchView">Scan Services</div>
-          <div class="trigger" :class="addClass(2, 'active')" data-open="treatment-section" data-type="2" @click="switchView">Treatment Services</div>
+      <div class="services-result-section">
+        <div class="services-trigger-section">
+          <div class="services-trigger" :class="addClass(1, 'active')" data-open="services-scan-section" data-type="1" @click="switchView">Scan Services</div>
+          <div class="services-trigger" :class="addClass(2, 'active')" data-open="services-treatment-section" data-type="2" @click="switchView">Treatment Services</div>
         </div>
-        <div class="view-section">
-          <div class="scan-section" :class="addClass(1, 'showing')" id="scan-section"></div>
-          <div class="treatment-section" :class="addClass(2, 'showing')" id="treatment-section"></div>
+        <div class="services-view-section">
+          <div class="services-scan-section" :class="addClass(1, 'showing')" id="services-scan-section"></div>
+          <div class="services-treatment-section" :class="addClass(2, 'showing')" id="services-treatment-section"></div>
         </div>
       </div>
 
-      <div class="navigation">
-        <div v-if="isThereMore" @click="showNextPage" class="fetch-next">Next ></div>
-        <div v-if="pageNumber !== 1" @click="showPreviousPage" class="fetch-previous">< Previous</div>
+      <div class="services-navigation">
+        <div v-if="isThereMore" @click="showNextPage" class="services-fetch-next">Next ></div>
+        <div v-if="pageNumber !== 1" @click="showPreviousPage" class="services-fetch-previous">< Previous</div>
       </div>
     </div>
   </div>
@@ -90,7 +90,7 @@
         }
       },
       populateServiceTypes () {
-        const serviceTypesElement = document.getElementById('service-type')
+        const serviceTypesElement = document.getElementById('services-service-type')
         serviceTypes.forEach((serviceType, index) => {
           const optionElement = document.createElement('option')
           optionElement.text = serviceType.name
@@ -106,18 +106,18 @@
         servicesPage.addEventListener('change', function (evt) {
           let target = evt.target
           switch (target.id) {
-            case 'service-type':
+            case 'services-service-type':
               _this.clearError(target)
               let serviceSubtypesElement
-              serviceSubtypesElement = document.getElementById('service-subtype')
+              serviceSubtypesElement = document.getElementById('services-service-subtype')
               _this.populateServiceSubTypes(target.selectedIndex)
               _this.dispatchEventFrom(serviceSubtypesElement, 'change')
               serviceSubtypesElement.focus()
               break
-            case 'service-subtype':
+            case 'services-service-subtype':
               _this.clearError(target)
               break
-            case 'fee':
+            case 'services-fee':
               _this.clearError(target)
               break
           }
@@ -126,7 +126,7 @@
         servicesPage.addEventListener('keyup', function (evt) {
           let target = evt.target
           switch (target.id) {
-            case 'fee':
+            case 'services-fee':
               _this.clearError(target)
               break
           }
@@ -135,10 +135,10 @@
         servicesPage.addEventListener('click', function (evt) {
           let target = evt.target
           switch (true) {
-            case (target.classList.contains('edit-service')):
+            case (target.classList.contains('services-edit-service')):
               _this.scrollToTop()
               let [serviceType, serviceSubtype, serviceFee] = target.dataset.params.split('%').map(param => Number(param))
-              let [serviceTypeDOMElement, serviceSubtypeDOMElement, serviceFeeDOMElement] = [document.getElementById('service-type'), document.getElementById('service-subtype'), document.getElementById('fee')]
+              let [serviceTypeDOMElement, serviceSubtypeDOMElement, serviceFeeDOMElement] = [document.getElementById('services-service-type'), document.getElementById('services-service-subtype'), document.getElementById('services-fee')]
               serviceTypeDOMElement.options[serviceType].selected = true
               _this.dispatchEventFrom(serviceTypeDOMElement, 'change')
               serviceSubtypeDOMElement.options[serviceSubtype].selected = true
@@ -152,7 +152,7 @@
               break
 
             case (target.classList.contains('cancel')):
-              [serviceTypeDOMElement, serviceSubtypeDOMElement, serviceFeeDOMElement] = [document.getElementById('service-type'), document.getElementById('service-subtype'), document.getElementById('fee')]
+              [serviceTypeDOMElement, serviceSubtypeDOMElement, serviceFeeDOMElement] = [document.getElementById('services-service-type'), document.getElementById('services-service-subtype'), document.getElementById('services-fee')]
               serviceTypeDOMElement.options[0].selected = true
               _this.dispatchEventFrom(serviceTypeDOMElement, 'change')
               serviceFeeDOMElement.value = ''
@@ -163,7 +163,7 @@
               serviceSubtypeDOMElement.disabled = false
               break
 
-            case (target.classList.contains('delete-service')):
+            case (target.classList.contains('services-delete-service')):
               [serviceType, serviceSubtype, serviceFee] = target.dataset.params.split('%').map(param => Number(param))
               _this.deleteService(evt, serviceType, serviceSubtype)
               break
@@ -183,12 +183,12 @@
         target.classList.remove('error')
       },
       populateServiceSubTypes (serviceTypeIndex) {
-        const serviceSubtypesElement = document.getElementById('service-subtype')
+        const serviceSubtypesElement = document.getElementById('services-service-subtype')
         if (serviceTypeIndex === 0) {
           while (serviceSubtypesElement.hasChildNodes()) serviceSubtypesElement.firstChild.remove()
-          serviceSubtypesElement.closest('.entry-item').querySelector('.entry-param').innerHTML = ''
+          serviceSubtypesElement.closest('.services-entry-item').querySelector('.services-entry-param').innerHTML = ''
         } else {
-          serviceSubtypesElement.closest('.entry-item').querySelector('.entry-param').innerHTML = serviceTypes[serviceTypeIndex].subtypes[0]
+          serviceSubtypesElement.closest('.services-entry-item').querySelector('.services-entry-param').innerHTML = serviceTypes[serviceTypeIndex].subtypes[0]
           while (serviceSubtypesElement.firstChild) {
             serviceSubtypesElement.removeChild(serviceSubtypesElement.firstChild)
           }
@@ -205,10 +205,10 @@
         }
       },
       writeServiceWithFee (evt) {
-        const serviceTypeId = Number(document.getElementById('service-type').selectedIndex)
-        const serviceSubtypeId = Number(document.getElementById('service-subtype').selectedIndex)
+        const serviceTypeId = Number(document.getElementById('services-service-type').selectedIndex)
+        const serviceSubtypeId = Number(document.getElementById('services-service-subtype').selectedIndex)
         const fee = this.getFee()
-        let errors = [serviceTypeId === 0 ? document.getElementById('service-type') : undefined, serviceSubtypeId === 0 ? document.getElementById('service-subtype') : undefined, fee === '' ? document.getElementById('fee') : undefined]
+        let errors = [serviceTypeId === 0 ? document.getElementById('services-service-type') : undefined, serviceSubtypeId === 0 ? document.getElementById('services-service-subtype') : undefined, fee === '' ? document.getElementById('services-fee') : undefined]
         errors = errors.filter(entry => entry !== undefined)
         if (errors.length > 0) {
           errors.forEach((item) => {
@@ -287,11 +287,11 @@
         }
       },
       getFee () {
-        return document.getElementById('fee').value
+        return document.getElementById('services-fee').value
       },
       getServices (evt, fetchQuery) {
         const serviceTypeId = fetchQuery.requestParams.serviceTypeId
-        const resultSection = document.querySelector(`.${serviceTypeId === 1 ? 'scan-section' : 'treatment-section'}`)
+        const resultSection = document.querySelector(`.${serviceTypeId === 1 ? 'services-scan-section' : 'services-treatment-section'}`)
         this.clearDOMElementChildren(resultSection)
         this.askUserToWaitWhileWeSearch(serviceTypeId)
         this.disableNecessaryButtons()
@@ -300,7 +300,7 @@
           callback: (result = null, isCompleted = false) => {
             // update result view
             if (isCompleted) {
-              if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
+              if (document.querySelector('.services-wait-overlay')) document.querySelector('.services-wait-overlay').remove()
               this.enableNecessaryButtons()
             }
 
@@ -314,7 +314,7 @@
       },
       populateResults (results, resultType = 1) {
         if (typeof resultType === 'object' && resultType.toNumber) resultType = resultType.toNumber()
-        const resultSection = document.querySelector(`.${resultType === 1 ? 'scan-section' : 'treatment-section'}`)
+        const resultSection = document.querySelector(`.${resultType === 1 ? 'services-scan-section' : 'services-treatment-section'}`)
         this.clearDOMElementChildren(resultSection)
         results.forEach((result) => {
           const resultDOMElement = this.createResultDOMElement(result)
@@ -324,7 +324,7 @@
       appendResult (result, resultType = 1) {
         if (typeof resultType === 'object' && resultType.toNumber) resultType = resultType.toNumber()
         const resultDOMElement = this.createResultDOMElement(result)
-        const resultSection = document.querySelector(`.${Number(resultType) === 1 ? 'scan-section' : 'treatment-section'}`)
+        const resultSection = document.querySelector(`.${Number(resultType) === 1 ? 'services-scan-section' : 'services-treatment-section'}`)
         resultSection.appendChild(resultDOMElement)
       },
       clearDOMElementChildren (DOMElement) {
@@ -344,20 +344,20 @@
         return offset / this.perPage
       },
       askUserToWaitWhileWeSearch (serviceTypeId = 1) {
-        if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
-        if (document.querySelector('.no-service')) document.querySelector('.no-service').remove()
+        if (document.querySelector('.services-wait-overlay')) document.querySelector('.services-wait-overlay').remove()
+        if (document.querySelector('.services-no-service')) document.querySelector('.services-no-service').remove()
         let waitOverlayDOMElement = this.createWaitOverlayDOMElement(serviceTypeId)
-        document.querySelector('.result-section').appendChild(waitOverlayDOMElement)
+        document.querySelector('.services-result-section').appendChild(waitOverlayDOMElement)
       },
       informOfNoService (serviceTypeId = 1) {
-        if (document.querySelector('.no-service')) document.querySelector('.no-service').remove()
+        if (document.querySelector('.services-no-service')) document.querySelector('.services-no-service').remove()
         let noServiceDOMElement = this.createNoServiceDOMElement(serviceTypeId)
-        document.querySelector('.result-section').appendChild(noServiceDOMElement)
+        document.querySelector('.services-result-section').appendChild(noServiceDOMElement)
       },
       createWaitOverlayDOMElement (serviceTypeId = 1) {
         const DOMELement = new DOMParser().parseFromString(`
-          <div class="wait-overlay">
-            <div class="wait-message">Please Wait... We're searching the blockchain for your ${serviceTypeId === 1 ? 'Scan' : 'Treatment'} services.</div>
+          <div class="services-wait-overlay">
+            <div class="services-wait-message">Please Wait... We're searching the blockchain for your ${serviceTypeId === 1 ? 'Scan' : 'Treatment'} services.</div>
             <div class="spin"></div>
           </div>
         `, 'text/html')
@@ -366,8 +366,8 @@
       },
       createNoServiceDOMElement (serviceTypeId = 1) {
         const DOMELement = new DOMParser().parseFromString(`
-          <div class="no-service">
-            <div class="no-service-message">
+          <div class="services-no-service">
+            <div class="services-no-service-message">
               It appears you have no ${serviceTypeId === 1 ? 'Scan' : 'Treatment'} service on the blockchain.
             </div>
           </div>
@@ -377,12 +377,12 @@
       },
       createResultDOMElement (result) {
         const resultDOMElement = new DOMParser().parseFromString(`
-          <div class="result">
-            <div class="service-name">${result.serviceName}</div>
-            <div class="service-fee">$ ${result.serviceFee}</div>
-            <div class="action-buttons">
-              <input type="button" value="Edit" class="button edit-service" data-params="${result.serviceTypeId}%${result.serviceId}%${result.serviceFee}">
-              <input type="button" value="Delete" class="button delete-service" data-params="${result.serviceTypeId}%${result.serviceId}%${result.serviceFee}">
+          <div class="services-result">
+            <div class="services-service-name">${result.serviceName}</div>
+            <div class="services-service-fee">$ ${result.serviceFee}</div>
+            <div class="services-action-buttons">
+              <input type="button" value="Edit" class="button services-edit-service" data-params="${result.serviceTypeId}%${result.serviceId}%${result.serviceFee}">
+              <input type="button" value="Delete" class="button services-delete-service" data-params="${result.serviceTypeId}%${result.serviceId}%${result.serviceFee}">
             </div>
           </div>
         `, 'text/html').body.firstChild
@@ -492,7 +492,7 @@
     margin-bottom: 10px;
   }
 
-  .service-query-section {
+  .services-query-section {
     width: 100%;
     height: 65px;
     background: #ffffff;
@@ -501,7 +501,7 @@
     justify-content: space-between;
   }
 
-  .entry-item {
+  .services-entry-item {
     height: 60px;
     display: inline-block;
     /*margin-right: 10px;*/
@@ -511,7 +511,7 @@
     min-width: 33%;
   }
 
-  .entry-param {
+  .services-entry-param {
     color: #7f7f7f;
     margin-bottom: 5px;
     height: 20px;
@@ -519,7 +519,7 @@
     line-height: 20px;
   }
 
-  .list, #fee {
+  .services-list, #services-fee {
     height: 30px;
     width: 100%;
     background: #ffffff;
@@ -554,13 +554,13 @@
     display: inline-block;
   }
 
-  .result-section {
+  .services-result-section {
     position: relative;
     min-height: 300px;
     margin-top: 20px;
   }
 
-  .trigger-section {
+  .services-trigger-section {
     width: 100%;
     height: 40px;
     background: #edefef;
@@ -570,7 +570,7 @@
     align-items: center;
   }
 
-  .trigger {
+  .services-trigger {
     height: 35px;
     width: 50%;
     margin-top: 5px;
@@ -585,13 +585,13 @@
     cursor: auto;
   }
 
-  .view-section {
+  .services-view-section {
     background: #ffffff;
     min-height: 260px;
     width: 100%;
   }
 
-  .scan-section, .treatment-section {
+  .services-scan-section, .services-treatment-section {
     width: 100%;
     min-height: 260px;
     display: none;
@@ -601,12 +601,12 @@
     display: block;
   }
 
-  .navigation {
+  .services-navigation {
     width: 100%;
     float: right;
   }
 
-  .fetch-next, .fetch-previous {
+  .services-fetch-next, .services-fetch-previous {
     cursor: pointer;
     color: #6592ad;
     background: #ffffff;
@@ -620,13 +620,13 @@
     font-size: 14px;
   }
 
-  .fetch-next:hover, .fetch-previous:hover {
+  .services-fetch-next:hover, .services-fetch-previous:hover {
     background: #dae3e8;
   }
 </style>
 
 <style>
-  .no-service {
+  .services-no-service {
     position: absolute;
     top: 40px;
     width: 100%;
@@ -635,13 +635,13 @@
     font-size: 16px;
   }
 
-  .no-service-message {
+  .services-no-service-message {
     height: 30px;
     position: relative;
     top: 110px;
   }
 
-  .wait-overlay {
+  .services-wait-overlay {
     position: absolute;
     top: 40px;
     width: 100%;
@@ -656,7 +656,7 @@
     background: rgba(255, 255, 255, 0.9);
   }
 
-  .wait-message {
+  .services-wait-message {
     height: 30px;
     line-height: 30px;
     position: relative;
@@ -685,7 +685,7 @@
     }
   }
 
-  .result {
+  .services-result {
     width: 95%;
     border-bottom: 1px solid #a7a7a7;
     min-height: 180px;
@@ -766,14 +766,14 @@
     text-align: center;
   }
 
-  .service-name {
+  .services-service-name {
     width: 90%;
     height: 40px;
     font-size: 20px;
     line-height: 40px;
   }
 
-  .service-fee {
+  .services-service-fee {
     width: 90%;
     height: 40px;
     font-size: 16px;
@@ -795,7 +795,7 @@
     display: inline-block;
   }
 
-  .edit-service, .delete-service {
+  .services-edit-service, .services-delete-service {
     background: #3285b1 !important;
     text-decoration: none;
     margin: 0px 10px 0px 0px !important;

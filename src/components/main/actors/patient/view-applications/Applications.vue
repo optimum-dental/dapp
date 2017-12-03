@@ -1,19 +1,19 @@
 <template>
   <div class="wrapper">
-    <div id="services">
+    <div id="applications">
       <div class="title">Applications</div>
 
-      <div class="result-section">
-        <div class="trigger-section">
-          <div class="trigger" :class="addClass(1, 'active')" data-open="scan-section" data-type="1" @click="switchView">Scan Applications</div>
-          <div class="trigger" :class="addClass(2, 'active')" data-open="treatment-section" data-type="2" @click="switchView">Treatment Applications</div>
+      <div class="applications-result-section">
+        <div class="applications-trigger-section">
+          <div class="applications-trigger" :class="addClass(1, 'active')" data-open="applications-scan-section" data-type="1" @click="switchView">Scan Applications</div>
+          <div class="applications-trigger" :class="addClass(2, 'active')" data-open="applications-treatment-section" data-type="2" @click="switchView">Treatment Applications</div>
         </div>
-        <div class="view-section">
-          <div class="query-section">
-            <div class="entry-item">
-              <div class="entry-param">Application Type</div>
-              <div class="entry-value">
-                <select id="application-type" class="list">
+        <div class="applications-view-section">
+          <div class="applications-query-section">
+            <div class="applications-entry-item">
+              <div class="applications-entry-param">Application Type</div>
+              <div class="applications-entry-value">
+                <select id="applications-type" class="applications-list">
                   <option>Unaccepted Applications</option>
                   <option>Accepted Applications</option>
                 </select>
@@ -21,14 +21,14 @@
             </div>
           </div>
 
-          <div class="scan-section" :class="addClass(1, 'showing')" id="scan-section"></div>
-          <div class="treatment-section" :class="addClass(2, 'showing')" id="treatment-section"></div>
+          <div class="applications-scan-section" :class="addClass(1, 'showing')" id="applications-scan-section"></div>
+          <div class="applications-treatment-section" :class="addClass(2, 'showing')" id="applications-treatment-section"></div>
         </div>
       </div>
 
-      <div class="navigation">
-        <div v-if="isThereMore" @click="showNextPage" class="fetch-next">Next ></div>
-        <div v-if="pageNumber !== 1" @click="showPreviousPage" class="fetch-previous">< Previous</div>
+      <div class="applications-navigation">
+        <div v-if="isThereMore" @click="showNextPage" class="applications-fetch-next">Next ></div>
+        <div v-if="pageNumber !== 1" @click="showPreviousPage" class="applications-fetch-previous">< Previous</div>
       </div>
     </div>
   </div>
@@ -66,7 +66,7 @@
       },
       switchView (evt) {
         const target = evt.target
-        const whichApplication = document.querySelector('#application-type').selectedIndex
+        const whichApplication = document.querySelector('#applications-type').selectedIndex
         if (!(target.classList.contains('active'))) {
           document.querySelector('.showing').classList.remove('showing')
           document.querySelector('.active').classList.remove('active')
@@ -82,13 +82,13 @@
       },
       setEventListeners () {
         const _this = this
-        const servicesPage = document.querySelector('#services')
+        const applicationsPage = document.querySelector('#applications')
 
-        servicesPage.addEventListener('change', function (evt) {
+        applicationsPage.addEventListener('change', function (evt) {
           let target = evt.target
           const applicationTypeId = Number(_this.$route.query.aTI || 1)
           switch (target.id) {
-            case 'application-type':
+            case 'applications-type':
               if (Number(evt.target.selectedIndex) === 0) {
                 _this.fetchApplications(evt, 0, null, 1, applicationTypeId)
               } else {
@@ -99,7 +99,7 @@
           }
         })
 
-        servicesPage.addEventListener('click', function (evt) {
+        applicationsPage.addEventListener('click', function (evt) {
           let target = evt.target
           switch (true) {
             case (target.classList.contains('accept-application')):
@@ -108,7 +108,7 @@
             case (target.classList.contains('release-fund')):
               _this.releaseFund(evt)
               break
-            case target.classList.contains('only-patient'):
+            case target.classList.contains('applications-only-patient'):
               const dentistId = _this.$store.state.searchResult.fetchCases.data[_this.currentOffset][target.dataset.sn].userObject.coinbase
               if (_this.user.isPatient && dentistId) {
                 const rating = target.dataset.rating
@@ -210,7 +210,7 @@
       },
       getApplications (evt, fetchQuery) {
         const applicationTypeId = Number(this.$route.query.aTI || 1)
-        const resultSection = document.querySelector(`.${applicationTypeId === 1 ? 'scan-section' : 'treatment-section'}`)
+        const resultSection = document.querySelector(`.${applicationTypeId === 1 ? 'applications-scan-section' : 'applications-treatment-section'}`)
         this.clearDOMElementChildren(resultSection)
         this.askUserToWaitWhileWeSearch(applicationTypeId)
         this.disableNecessaryButtons()
@@ -219,7 +219,7 @@
           callback: (result = null, isCompleted = false) => {
             // update result view
             if (isCompleted) {
-              if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
+              if (document.querySelector('.applications-wait-overlay')) document.querySelector('.applications-wait-overlay').remove()
               this.enableNecessaryButtons()
             }
 
@@ -265,7 +265,7 @@
       },
       getPostApplications (evt, fetchQuery) {
         const applicationTypeId = Number(this.$route.query.aTI || 1)
-        const resultSection = document.querySelector(`.${applicationTypeId === 1 ? 'scan-section' : 'treatment-section'}`)
+        const resultSection = document.querySelector(`.${applicationTypeId === 1 ? 'applications-scan-section' : 'applications-treatment-section'}`)
         this.clearDOMElementChildren(resultSection)
         this.askUserToWaitWhileWeSearch(applicationTypeId)
         this.disableNecessaryButtons()
@@ -274,7 +274,7 @@
           callback: (result = null, isCompleted = false) => {
             // update result view
             if (isCompleted) {
-              if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
+              if (document.querySelector('.applications-wait-overlay')) document.querySelector('.applications-wait-overlay').remove()
               this.enableNecessaryButtons()
             }
 
@@ -322,37 +322,37 @@
       },
       populateResults (results, resultType = 1) {
         if (typeof resultType === 'object' && resultType.toNumber) resultType = resultType.toNumber()
-        const resultSection = document.querySelector(`.${resultType === 1 ? 'scan-section' : 'treatment-section'}`)
+        const resultSection = document.querySelector(`.${resultType === 1 ? 'applications-scan-section' : 'applications-treatment-section'}`)
         this.clearDOMElementChildren(resultSection)
         results.forEach((result) => {
           const resultDOMElement = this.createResultDOMElement(result)
           resultSection.appendChild(resultDOMElement)
-          resultDOMElement.querySelector('.gravatar-section').appendChild(result.userObject.avatarCanvas)
+          resultDOMElement.querySelector('.applications-gravatar-section').appendChild(result.userObject.avatarCanvas)
         })
       },
       populatePostApplicationResults (results, resultType = 1) {
         if (typeof resultType === 'object' && resultType.toNumber) resultType = resultType.toNumber()
-        const resultSection = document.querySelector(`.${resultType === 1 ? 'scan-section' : 'treatment-section'}`)
+        const resultSection = document.querySelector(`.${resultType === 1 ? 'applications-scan-section' : 'applications-treatment-section'}`)
         this.clearDOMElementChildren(resultSection)
         results.forEach((result) => {
           const resultDOMElement = this.createPostApplicationResultDOMElement(result)
           resultSection.appendChild(resultDOMElement)
-          resultDOMElement.querySelector('.gravatar-section').appendChild(result.userObject.avatarCanvas)
+          resultDOMElement.querySelector('.applications-gravatar-section').appendChild(result.userObject.avatarCanvas)
         })
       },
       appendResult (result, resultType = 1) {
         if (typeof resultType === 'object' && resultType.toNumber) resultType = resultType.toNumber()
         const resultDOMElement = this.createResultDOMElement(result)
-        const resultSection = document.querySelector(`.${Number(resultType) === 1 ? 'scan-section' : 'treatment-section'}`)
+        const resultSection = document.querySelector(`.${Number(resultType) === 1 ? 'applications-scan-section' : 'applications-treatment-section'}`)
         resultSection.appendChild(resultDOMElement)
-        if (resultDOMElement.querySelector('.gravatar-section')) resultDOMElement.querySelector('.gravatar-section').appendChild(result.userObject.avatarCanvas)
+        if (resultDOMElement.querySelector('.applications-gravatar-section')) resultDOMElement.querySelector('.applications-gravatar-section').appendChild(result.userObject.avatarCanvas)
       },
       appendPostApplicationResult (result, resultType = 1) {
         if (typeof resultType === 'object' && resultType.toNumber) resultType = resultType.toNumber()
         const resultDOMElement = this.createPostApplicationResultDOMElement(result)
-        const resultSection = document.querySelector(`.${Number(resultType) === 1 ? 'scan-section' : 'treatment-section'}`)
+        const resultSection = document.querySelector(`.${Number(resultType) === 1 ? 'applications-scan-section' : 'applications-treatment-section'}`)
         resultSection.appendChild(resultDOMElement)
-        if (resultDOMElement.querySelector('.gravatar-section')) resultDOMElement.querySelector('.gravatar-section').appendChild(result.userObject.avatarCanvas)
+        if (resultDOMElement.querySelector('.applications-gravatar-section')) resultDOMElement.querySelector('.applications-gravatar-section').appendChild(result.userObject.avatarCanvas)
       },
       clearDOMElementChildren (DOMElement) {
         while (DOMElement.hasChildNodes()) {
@@ -371,25 +371,25 @@
         return offset / this.perPage
       },
       askUserToWaitWhileWeSearch (applicationTypeId = 1) {
-        if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
-        if (document.querySelector('.no-service')) document.querySelector('.no-service').remove()
+        if (document.querySelector('.applications-wait-overlay')) document.querySelector('.applications-wait-overlay').remove()
+        if (document.querySelector('.no-application')) document.querySelector('.no-application').remove()
         let waitOverlayDOMElement = this.createWaitOverlayDOMElement(applicationTypeId)
-        document.querySelector('.result-section').appendChild(waitOverlayDOMElement)
+        document.querySelector('.applications-result-section').appendChild(waitOverlayDOMElement)
       },
       informOfNoApplication (applicationTypeId = 1) {
-        if (document.querySelector('.no-service')) document.querySelector('.no-service').remove()
+        if (document.querySelector('.no-application')) document.querySelector('.no-application').remove()
         let noServiceDOMElement = this.createNoApplicationDOMElement(applicationTypeId)
-        if (document.querySelector('.result-section')) document.querySelector('.result-section').appendChild(noServiceDOMElement)
+        if (document.querySelector('.applications-result-section')) document.querySelector('.applications-result-section').appendChild(noServiceDOMElement)
       },
       informOfNoPostApplication (applicationTypeId = 1) {
-        if (document.querySelector('.no-service')) document.querySelector('.no-service').remove()
+        if (document.querySelector('.no-application')) document.querySelector('.no-application').remove()
         let noServiceDOMElement = this.createNoPostApplicationDOMElement(applicationTypeId)
-        if (document.querySelector('.result-section')) document.querySelector('.result-section').appendChild(noServiceDOMElement)
+        if (document.querySelector('.applications-result-section')) document.querySelector('.applications-result-section').appendChild(noServiceDOMElement)
       },
       createWaitOverlayDOMElement (applicationTypeId = 1) {
         const DOMELement = new DOMParser().parseFromString(`
-          <div class="wait-overlay">
-            <div class="wait-message">Please Wait... We're searching the blockchain for your ${applicationTypeId === 1 ? 'Scan' : 'Treatment'} applications.</div>
+          <div class="applications-wait-overlay">
+            <div class="applications-wait-message">Please Wait... We're searching the blockchain for your ${applicationTypeId === 1 ? 'Scan' : 'Treatment'} applications.</div>
             <div class="spin"></div>
           </div>
         `, 'text/html')
@@ -398,8 +398,8 @@
       },
       createNoApplicationDOMElement (applicationTypeId = 1) {
         const DOMELement = new DOMParser().parseFromString(`
-          <div class="no-service">
-            <div class="no-service-message">
+          <div class="no-application">
+            <div class="no-application-message">
               It appears you have no ${applicationTypeId === 1 ? 'Scan' : 'Treatment'} application on the blockchain.
             </div>
           </div>
@@ -409,8 +409,8 @@
       },
       createNoPostApplicationDOMElement (applicationTypeId = 1) {
         const DOMELement = new DOMParser().parseFromString(`
-          <div class="no-service">
-            <div class="no-service-message">
+          <div class="no-application">
+            <div class="no-application-message">
               It appears you have no ${applicationTypeId === 1 ? 'Case' : 'Treatment'} on the blockchain.
             </div>
           </div>
@@ -422,14 +422,14 @@
         const userObject = result.userObject
         const resultDOMElement = new DOMParser().parseFromString(`
           <div class="applications-result">
-            <div class="gravatar-section"></div>
-            <div class="application-about-section">
-              <div class="service-name">Application for: <span>${result.serviceName}</span></div>
-              <div class="name">Dentist: <span>${userObject.name || 'Name: Not Supplied'}</span></div>
-              <div class="company-name">Company: <span>${userObject.companyName || 'Not Supplied'}</span></div>
-              <div class="address">Address: <span>${userObject.address || 'Not Supplied'}</span></div>
-              <div class="quote">Quote: <span>$${result.quote}</span></div>
-              <div class="comment">Comment: <span>${result.comment}</span></div>
+            <div class="applications-gravatar-section"></div>
+            <div class="applications-about-section">
+              <div class="applications-service-name">Application for: <span>${result.serviceName}</span></div>
+              <div class="applications-name">Dentist: <span>${userObject.name || 'Name: Not Supplied'}</span></div>
+              <div class="applications-company-name">Company: <span>${userObject.companyName || 'Not Supplied'}</span></div>
+              <div class="applications-address">Address: <span>${userObject.address || 'Not Supplied'}</span></div>
+              <div class="applications-quote">Quote: <span>$${result.quote}</span></div>
+              <div class="applications-comment">Comment: <span>${result.comment}</span></div>
               <input type="button" value="Accept" class="button accept-application" data-params="${result.SN}">
             </div>
           </div>
@@ -440,14 +440,14 @@
         const userObject = result.userObject
         const resultDOMElement = new DOMParser().parseFromString(`
           <div class="applications-result">
-            <div class="gravatar-section"></div>
-            <div class="application-about-section">
-              <div class="service-name">Application for: <span>${result.serviceName}</span></div>
-              <div class="name">Dentist: <span>${userObject.name || 'Name: Not Supplied'}</span></div>
-              <div class="company-name">Company: <span>${userObject.companyName || 'Not Supplied'}</span></div>
-              <div class="address">Address: <span>${userObject.address || 'Not Supplied'}</span></div>
-              <div class="quote">Amount: <span>$${result.quote}</span></div>
-              <div class="status">Status: <span>${result.paymentObject.status === 3 ? 'Paid Dentist In Full' : 'Paid into Escrow'}</span></div>
+            <div class="applications-gravatar-section"></div>
+            <div class="applications-about-section">
+              <div class="applications-service-name">Application for: <span>${result.serviceName}</span></div>
+              <div class="applications-name">Dentist: <span>${userObject.name || 'Name: Not Supplied'}</span></div>
+              <div class="applications-company-name">Company: <span>${userObject.companyName || 'Not Supplied'}</span></div>
+              <div class="applications-address">Address: <span>${userObject.address || 'Not Supplied'}</span></div>
+              <div class="applications-quote">Amount: <span>$${result.quote}</span></div>
+              <div class="applications-status">Status: <span>${result.paymentObject.status === 3 ? 'Paid Dentist In Full' : 'Paid into Escrow'}</span></div>
               ${this.createAverageRatingDOMElement(userObject.averageRating, result.SN).outerHTML}
               ${result.paymentObject.status === 2 ? '<input type="button" value="Release Fund" class="button release-fund" data-params="' + result.SN + '">' : ''}
             </div>
@@ -459,12 +459,12 @@
         const ratingsArray = []
         for (let i = 0; i < 5; i++) {
           ratingsArray.push(`
-            <div data-rating="${i + 1}" data-sn="${SN}" class="rating ${i < averageRating ? 'filled' : ''} ${this.user.isPatient ? 'only-patient' : ''}"></div>
+            <div data-rating="${i + 1}" data-sn="${SN}" class="applications-rating ${i < averageRating ? 'filled' : ''} ${this.user.isPatient ? 'applications-only-patient' : ''}"></div>
           `)
         }
 
         return new DOMParser().parseFromString(`
-          <div class="average-rating">${ratingsArray.join(' ')}</div>
+          <div class="applications-average-rating">${ratingsArray.join(' ')}</div>
         `, 'text/html').body.firstChild
       },
       disableNecessaryButtons (evt = null) {
@@ -549,7 +549,7 @@
     100% {width: 100%;}
   }
 
-  #services {
+  #applications {
     background: #ffffff;
     min-height: 70vh;
     width: 90%;
@@ -569,9 +569,9 @@
     margin-bottom: 10px;
   }
 
-  .query-section {
+  .applications-query-section {
     width: 100%;
-    height: 70px;
+    height: 100px;
     margin-bottom: 30px;
     background: #ffffff;
     display: flex;
@@ -579,16 +579,17 @@
     justify-content: space-between;
   }
 
-  .entry-item {
+  .applications-entry-item {
     height: 60px;
     display: inline-block;
     /*margin-right: 10px;*/
+    margin-top: 30px;
     margin-bottom: 30px;
     justify-content: center;
     min-width: 33%;
   }
 
-  .entry-param {
+  .applications-entry-param {
     color: #7f7f7f;
     margin-bottom: 5px;
     height: 20px;
@@ -596,7 +597,7 @@
     line-height: 20px;
   }
 
-  .list, #fee {
+  .applications-list, #fee {
     height: 30px;
     width: 100%;
     background: #ffffff;
@@ -631,12 +632,12 @@
     display: inline-block;
   }
 
-  .result-section {
+  .applications-result-section {
     position: relative;
     min-height: 300px;
   }
 
-  .trigger-section {
+  .applications-trigger-section {
     width: 100%;
     height: 40px;
     background: #edefef;
@@ -646,7 +647,7 @@
     align-items: center;
   }
 
-  .trigger {
+  .applications-trigger {
     height: 35px;
     width: 50%;
     margin-top: 5px;
@@ -661,13 +662,13 @@
     cursor: auto;
   }
 
-  .view-section {
+  .applications-view-section {
     background: #ffffff;
     min-height: 260px;
     width: 100%;
   }
 
-  .scan-section, .treatment-section {
+  .applications-scan-section, .applications-treatment-section {
     width: 100%;
     min-height: 260px;
     display: none;
@@ -677,12 +678,12 @@
     display: block;
   }
 
-  .navigation {
+  .applications-navigation {
     width: 100%;
     float: right;
   }
 
-  .fetch-next, .fetch-previous {
+  .applications-fetch-next, .applications-fetch-previous {
     cursor: pointer;
     color: #6592ad;
     background: #ffffff;
@@ -696,30 +697,30 @@
     font-size: 14px;
   }
 
-  .fetch-next:hover, .fetch-previous:hover {
+  .applications-fetch-next:hover, .applications-fetch-previous:hover {
     background: #dae3e8;
   }
 </style>
 
 <style>
-  .no-service {
+  .no-application {
     position: absolute;
-    top: 100px;
+    top: 160px;
     width: 100%;
     min-height: 260px;
     text-align: center;
     font-size: 16px;
   }
 
-  .no-service-message {
+  .no-application-message {
     height: 30px;
     position: relative;
     top: 110px;
   }
 
-  .wait-overlay {
+  .applications-wait-overlay {
     position: absolute;
-    top: 40px;
+    top: 160px;
     width: 100%;
     height: 100%;
     text-align: center;
@@ -732,7 +733,7 @@
     background: rgba(255, 255, 255, 0.9);
   }
 
-  .wait-message {
+  .applications-wait-message {
     height: 30px;
     line-height: 30px;
     position: relative;
@@ -770,7 +771,7 @@
     float: left;
   }
 
-  .gravatar-section {
+  .applications-gravatar-section {
     width: 60px;
     height: 60px;
     float: left;
@@ -781,19 +782,19 @@
     padding: 3px;
   }
 
-  .gravatar-section > canvas {
+  .applications-gravatar-section > canvas {
     height: 100%;
     width: 100%;
     border-radius: 6px;
   }
 
-  .application-about-section {
+  .applications-about-section {
     width: 80%;
     display: inline-block;
     float: left;
   }
 
-  .application-about-section > div {
+  .applications-about-section > div {
     display: block;
     height: 20px;
     line-height: 20px;
@@ -803,44 +804,44 @@
     font-weight: bold;
   }
 
-  .application-about-section > div span {
+  .applications-about-section > div span {
     font-weight: normal;
   }
 
-  .application-about-section > .comment {
+  .applications-about-section > .applications-comment {
     height: auto;
   }
 
-  .profile-link {
+  .applications-profile-link {
     font-size: 10px !important;
     color: #bfced9;
     cursor: pointer;
   }
 
-  .service-name {
+  .applications-service-name {
     width: 50%;
     height: 40px;
     font-size: 20px;
     line-height: 40px;
   }
 
-  .service-name span {
+  .applications-service-name span {
     color: #115588;
   }
 
-  .quote {
+  .applications-quote {
     width: 50%;
     height: 40px;
     font-size: 16px;
     line-height: 40px;
   }
 
-  .average-rating {
+  .applications-average-rating {
     width: 100% !important;
     margin: 20px 0px;
   }
 
-  .average-rating > div {
+  .applications-average-rating > div {
     background: url(/static/images/star_line.png) no-repeat;
     background-size: contain;
     height: 20px;
@@ -849,26 +850,26 @@
     float: left;
   }
 
-  .average-rating > div.only-patient {
+  .applications-average-rating > div.applications-only-patient {
     cursor: pointer;
   }
 
-  .average-rating:hover > div.only-patient {
+  .applications-average-rating:hover > div.applications-only-patient {
     background: url(/static/images/star.png) no-repeat;
     background-size: contain;
   }
 
-  .average-rating > div.only-patient:hover {
+  .applications-average-rating > div.applications-only-patient:hover {
     background: url(/static/images/star.png) no-repeat;
     background-size: contain;
   }
 
-  .average-rating > div.only-patient:hover ~ div.only-patient {
+  .applications-average-rating > div.applications-only-patient:hover ~ div.applications-only-patient {
     background: url(/static/images/star_line.png) no-repeat;
     background-size: contain;
   }
 
-  .average-rating > .filled {
+  .applications-average-rating > .filled {
     background: url(/static/images/star.png) no-repeat;
     background-size: contain;
   }

@@ -3,11 +3,11 @@
     <div id="appointment-requests">
       <div class="title">Appointment Requests</div>
 
-      <div class="query-section">
-        <div class="entry-item">
-          <div class="entry-param">Request Type</div>
-          <div class="entry-value">
-            <select id="request-type" class="list">
+      <div class="appointment-requests-query-section">
+        <div class="appointment-requests-entry-item">
+          <div class="appointment-requests-entry-param">Request Type</div>
+          <div class="appointment-requests-entry-value">
+            <select id="appointment-requests-request-type" class="appointment-requests-list">
               <option>General Scan Requests</option>
               <option>Direct Scan Request</option>
               <option>Accepted Scan Request</option>
@@ -16,11 +16,11 @@
         </div>
       </div>
 
-      <div class="result-section"></div>
+      <div class="appointment-requests-result-section"></div>
 
-      <div class="navigation">
-        <div v-if="isThereMore" @click="showNextPage" class="fetch-next">Next ></div>
-        <div v-if="pageNumber !== 1" @click="showPreviousPage" class="fetch-previous">< Previous</div>
+      <div class="appointment-requests-navigation">
+        <div v-if="isThereMore" @click="showNextPage" class="appointment-requests-fetch-next">Next ></div>
+        <div v-if="pageNumber !== 1" @click="showPreviousPage" class="appointment-requests-fetch-previous">< Previous</div>
       </div>
     </div>
   </div>
@@ -54,7 +54,7 @@
     methods: {
       populateRequestTypes () {
         const requestTypeIndex = Number(this.$route.query.rTI || 0)
-        const requestTypeDOMElement = document.getElementById('request-type')
+        const requestTypeDOMElement = document.getElementById('appointment-requests-request-type')
         requestTypeDOMElement.options[requestTypeIndex].selected = true
       },
       setEventListeners () {
@@ -63,7 +63,7 @@
         appointmentRequestsPage.addEventListener('change', function (evt) {
           let target = evt.target
           switch (target.id) {
-            case 'request-type':
+            case 'appointment-requests-request-type':
               _this.fetchRequests(evt, 0, null, 1, evt.target.selectedIndex)
               break
           }
@@ -88,7 +88,7 @@
               _this.applyToScan(evt)
               break
             case (target.classList.contains('cancel-apply-button')):
-              const applicationForm = document.querySelector('.modal')
+              const applicationForm = document.querySelector('.appointment-requests-modal')
               if (applicationForm) {
                 applicationForm.remove()
                 document.body.style.overflow = 'visible'
@@ -107,23 +107,23 @@
       },
       getApplicationFormDOMElement (scanRequest = {}) {
         return new DOMParser().parseFromString(`
-          <div class='modal'>
-            <div class='application-form'>
-              <div class='modal-entry'>
+          <div class='appointment-requests-modal'>
+            <div class='appointment-requests-application-form'>
+              <div class='appointment-requests-modal-entry'>
                 <label>Application for: ${scanRequest.serviceName}</label>
               </div>
 
-              <div class='modal-entry'>
-                <label for='quote'>Quote [USD]</label>
-                <input type='number' id='quote' placeholder='Quote in USD' value='${scanRequest.fee}'>
+              <div class='appointment-requests-modal-entry'>
+                <label for='appointment-requests-quote'>Quote [USD]</label>
+                <input type='number' id='appointment-requests-quote' placeholder='Quote in USD' value='${scanRequest.fee}'>
               </div>
 
-              <div class='modal-entry'>
-                <label for='comment'>Comment</label>
-                <textarea id='comment'></textarea>
+              <div class='appointment-requests-modal-entry'>
+                <label for='appointment-requests-comment'>Comment</label>
+                <textarea id='appointment-requests-comment'></textarea>
               </div>
 
-              <div class='modal-entry'>
+              <div class='appointment-requests-modal-entry'>
                 <input type='button' class='cancel-apply-button' value='Cancel'>
                 <input type='button' class='apply-button' value='Send' data-params='${scanRequest.SN}'>
               </div>
@@ -136,11 +136,11 @@
         const scanRequest = this.$store.state.searchResult['fetchScanRequests'].data[this.currentOffset][sn]
         const patientId = scanRequest.patientId
         const requestId = scanRequest.requestId
-        const quote = Number(document.getElementById('quote').value) || 0
-        const comment = `b${document.getElementById('comment').value}`
+        const quote = Number(document.getElementById('appointment-requests-quote').value) || 0
+        const comment = `b${document.getElementById('appointment-requests-comment').value}`
 
         this.scrollToTop()
-        const applicationForm = document.querySelector('.modal')
+        const applicationForm = document.querySelector('.appointment-requests-modal')
         if (applicationForm) applicationForm.style.top = '0px'
         this.disableNecessaryButtons(evt)
         this.beginWait(document.querySelector('.wrapper'))
@@ -222,7 +222,7 @@
         ]
       },
       getRequests (evt, fetchQuery) {
-        const resultSection = document.querySelector('.result-section')
+        const resultSection = document.querySelector('.appointment-requests-result-section')
         this.clearDOMElementChildren(resultSection)
         this.askUserToWaitWhileWeSearch()
         this.disableNecessaryButtons()
@@ -231,7 +231,7 @@
           callback: (result = null, isCompleted = false) => {
             // update result view
             if (isCompleted) {
-              if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
+              if (document.querySelector('.appointment-requests-wait-overlay')) document.querySelector('.appointment-requests-wait-overlay').remove()
               this.enableNecessaryButtons()
             }
 
@@ -244,7 +244,7 @@
         })
       },
       populateResults (results) {
-        const resultSection = document.querySelector('.result-section')
+        const resultSection = document.querySelector('.appointment-requests-result-section')
         this.clearDOMElementChildren(resultSection)
         results.forEach((result) => {
           const resultDOMElement = this.createResultDOMElement(result)
@@ -253,7 +253,7 @@
       },
       appendResult (result) {
         const resultDOMElement = this.createResultDOMElement(result)
-        const resultSection = document.querySelector('.result-section')
+        const resultSection = document.querySelector('.appointment-requests-result-section')
         resultSection.appendChild(resultDOMElement)
       },
       clearDOMElementChildren (DOMElement) {
@@ -273,20 +273,20 @@
         return offset / this.perPage
       },
       askUserToWaitWhileWeSearch () {
-        if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
-        if (document.querySelector('.no-service')) document.querySelector('.no-service').remove()
+        if (document.querySelector('.appointment-requests-wait-overlay')) document.querySelector('.appointment-requests-wait-overlay').remove()
+        if (document.querySelector('.no-appointment-request')) document.querySelector('.no-appointment-request').remove()
         let waitOverlayDOMElement = this.createWaitOverlayDOMElement()
-        document.querySelector('.result-section').appendChild(waitOverlayDOMElement)
+        document.querySelector('.appointment-requests-result-section').appendChild(waitOverlayDOMElement)
       },
       informOfNoRequest () {
-        if (document.querySelector('.no-service')) document.querySelector('.no-service').remove()
+        if (document.querySelector('.no-appointment-request')) document.querySelector('.no-appointment-request').remove()
         let noRequestDOMElement = this.createNoRequestDOMElement()
-        document.querySelector('.result-section').appendChild(noRequestDOMElement)
+        document.querySelector('.appointment-requests-result-section').appendChild(noRequestDOMElement)
       },
       createWaitOverlayDOMElement () {
         const DOMELement = new DOMParser().parseFromString(`
-          <div class="wait-overlay">
-            <div class="wait-message">Please Wait... We're searching the blockchain for Scan requests.</div>
+          <div class="appointment-requests-wait-overlay">
+            <div class="appointment-requests-wait-message">Please Wait... We're searching the blockchain for Scan requests.</div>
             <div class="spin"></div>
           </div>
         `, 'text/html')
@@ -312,13 +312,13 @@
       },
       createResultDOMElement (result) {
         const resultDOMElement = new DOMParser().parseFromString(`
-          <div class="result">
-            <div class="appointment-for appointment-data">Request for: <span>${serviceTypes[1].subtypes[result.serviceId]}</span></div>
-            <div class="appointment-for appointment-data">Original Quote: <span>$${result.fee}</span></div>
-            <div class="appointment-date appointment-data">Date: <span>${formatDate(new Date(Number(result.date)))}</span></div>
-            <div class="appointment-time appointment-data">Time: <span>${result.time}</span></div>
-            <div class="appointment-insurance appointment-data">Insurance: <span>${result.insurance}</span></div>
-            <div class="appointment-comment appointment-data">Comment: <span>${result.comment}</span></div>
+          <div class="appointment-requests-result">
+            <div class="appointment-requests-appointment-for appointment-requests-appointment-data">Request for: <span>${serviceTypes[1].subtypes[result.serviceId]}</span></div>
+            <div class="appointment-requests-appointment-for appointment-requests-appointment-data">Original Quote: <span>$${result.fee}</span></div>
+            <div class="appointment-requests-appointment-date appointment-requests-appointment-data">Date: <span>${formatDate(new Date(Number(result.date)))}</span></div>
+            <div class="appointment-requests-appointment-time appointment-requests-appointment-data">Time: <span>${result.time}</span></div>
+            <div class="appointment-requests-appointment-insurance appointment-requests-appointment-data">Insurance: <span>${result.insurance}</span></div>
+            <div class="appointment-requests-appointment-comment appointment-requests-appointment-data">Comment: <span>${result.comment}</span></div>
             <input type="button" value="Apply" class="button apply-to-scan" data-params="${result.SN}">
           </div>
         `, 'text/html').body.firstChild
@@ -427,63 +427,27 @@
     margin-bottom: 10px;
   }
 
-  .data-entry-section {
-    width: 100%;
-    height: 70px;
-    margin-bottom: 30px;
+  .appointment-requests-list {
+    height: 30px;
+    width: 300px;
     background: #ffffff;
-    display: flex;
-    flex-direction: row;
-  }
-
-  .entry {
-    height: 40px;
-    line-height: 40px;
-    width: 85%;
-    display: inline-block;
-    font-size: 14px;
-    color: #7a7a7a;
     outline: none;
-    border: 1px solid #dcdede;
-    padding: 0px 10px;
+    border: 1px solid #d3d3d3;
+    color: #7f7f7f;
   }
 
-  .entry::placeholder {
-    color: #bababa;
-  }
-
-  .entry.error {
-    border: 1px solid #f18787;
-  }
-
-  .add {
-    padding: 2px;
-    text-align: center;
-    float: right;
-    outline: 0px;
-    border: 0px;
-    cursor: pointer;
-    height: 40px;
-    line-height: 40px;
-    width: 15%;
-    min-width: 100px;
-    background: #29aae1;
-    color: #ffffff;
-    font-size: 14px;
-  }
-
-  .result-section {
+  .appointment-requests-result-section {
     position: relative;
     min-height: 300px;
     margin-top: 20px;
   }
 
-  .navigation {
+  .appointment-requests-navigation {
     width: 100%;
     float: right;
   }
 
-  .fetch-next, .fetch-previous {
+  .appointment-requests-fetch-next, .appointment-requests-fetch-previous {
     cursor: pointer;
     color: #6592ad;
     background: #ffffff;
@@ -497,7 +461,7 @@
     font-size: 14px
   }
 
-  .fetch-next:hover, .fetch-previous:hover {
+  .appointment-requests-fetch-next:hover, .appointment-requests-fetch-previous:hover {
     background: #dae3e8;
   }
 </style>
@@ -517,7 +481,7 @@
     top: 110px;
   }
 
-  .wait-overlay {
+  .appointment-requests-wait-overlay {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -531,7 +495,7 @@
     background: rgba(255, 255, 255, 0.9);
   }
 
-  .wait-message {
+  .appointment-requests-wait-message {
     height: 30px;
     line-height: 30px;
     position: relative;
@@ -560,7 +524,7 @@
     }
   }
 
-  .result {
+  .appointment-requests-result {
     width: 95%;
     border-bottom: 1px solid #a7a7a7;
     min-height: 180px;
@@ -570,7 +534,7 @@
     justify-content: center;
   }
 
-  .gravatar-section {
+  .appointment-requests-gravatar-section {
     width: 60px;
     height: 60px;
     float: left;
@@ -582,20 +546,20 @@
     padding: 3px;
   }
 
-  .gravatar-section > canvas {
+  .appointment-requests-gravatar-section > canvas {
     height: 100%;
     width: 100%;
     border-radius: 6px;
   }
 
-  .about-section {
+  .appointment-requests-about-section {
     width: 250px;
     height: 150px;
     display: inline-block;
     float: left;
   }
 
-  .about-section > div {
+  .appointment-requests-about-section > div {
     display: block;
     height: 35px;
     line-height: 35px;
@@ -604,13 +568,13 @@
     width: 100%;
   }
 
-  .profile-link {
+  .appointment-requests-profile-link {
     font-size: 10px !important;
     color: #bfced9;
     cursor: pointer;
   }
 
-  .action-section {
+  .appointment-requests-action-section {
     width: auto;
     height: 150px;
     line-height: 150px;
@@ -618,7 +582,7 @@
     float: right;
   }
 
-  .action-button {
+  .appointment-requests-action-button {
     width: 130px;
     height: 40px;
     line-height: 40px;
@@ -632,11 +596,11 @@
     text-align: center;
   }
 
-  .appointment-data {
+  .appointment-requests-appointment-data {
     font-weight: bold;
   }
 
-  .appointment-data span {
+  .appointment-requests-appointment-data span {
     font-weight: normal;
     color: #115588;
   }
@@ -653,7 +617,7 @@
     color: #ffffff;
   }
 
-  .modal {
+  .appointment-requests-modal {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -667,7 +631,7 @@
     z-index: 999999
   }
 
-  .application-form {
+  .appointment-requests-application-form {
     width: 500px;
     height: 500px;
     background: #ffffff;
@@ -680,24 +644,24 @@
     align-items: center;
   }
 
-  .application-form .modal-entry {
+  .appointment-requests-application-form .appointment-requests-modal-entry {
     display: block;
     margin-bottom: 30px;
     width: 80%;
   }
 
-  .application-form label {
+  .appointment-requests-application-form label {
     display: block;
     margin-bottom: 10px;
   }
 
-  .application-form input[type='number'], .application-form textarea {
+  .appointment-requests-application-form input[type='number'], .appointment-requests-application-form textarea {
     display: block;
     width: 100%;
     outline: none;
   }
 
-  .application-form textarea {
+  .appointment-requests-application-form textarea {
     display: block;
     max-width: 100%;
     min-width: 100%;

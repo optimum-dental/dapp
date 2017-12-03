@@ -1,35 +1,35 @@
 <template>
   <div class="wrapper">
-    <div id="dentists">
+    <div id="find-dentists">
       <div class="title">Find Dentists</div>
 
-      <div class="query-section">
-        <div class="search-icon"></div>
-        <div class="search-item">
-          <div class="search-param">Locations</div>
-          <div class="search-value">
-            <select id="state" class="list"></select>
+      <div class="find-dentists-query-section">
+        <div class="find-dentists-search-icon"></div>
+        <div class="find-dentists-search-item">
+          <div class="find-dentists-search-param">Locations</div>
+          <div class="find-dentists-search-value">
+            <select id="find-dentists-state" class="find-dentists-list"></select>
           </div>
         </div>
 
-        <div class="search-item">
-          <div class="search-param">Appointment Type</div>
-          <div class="search-value">
-            <select id="appointment-type" class="list"></select>
+        <div class="find-dentists-search-item">
+          <div class="find-dentists-search-param">Appointment Type</div>
+          <div class="find-dentists-search-value">
+            <select id="find-dentists-appointment-type" class="find-dentists-list"></select>
           </div>
         </div>
 
-        <div class="search-item">
-          <div class="search-param"></div>
-          <div class="search-value">
-            <select id="appointment-sub-type" class="list"></select>
+        <div class="find-dentists-search-item">
+          <div class="find-dentists-search-param"></div>
+          <div class="find-dentists-search-value">
+            <select id="find-dentists-appointment-sub-type" class="find-dentists-list"></select>
           </div>
         </div>
 
-        <div class="search-item">
-          <div class="search-param">Budget</div>
-          <div class="search-value">
-            <select id="budget-range" class="list"></select>
+        <div class="find-dentists-search-item">
+          <div class="find-dentists-search-param">Budget</div>
+          <div class="find-dentists-search-value">
+            <select id="find-dentists-budget-range" class="find-dentists-list"></select>
           </div>
         </div>
       </div>
@@ -38,11 +38,11 @@
         <input type="button" class='submit-button button' value="Find" @click="findDentists">
       </div>
 
-      <div class="result-section"></div>
+      <div class="find-dentists-result-section"></div>
 
-      <div class="navigation">
-        <div v-if="isThereMore" @click="showNextPage" class="fetch-next">Next ></div>
-        <div v-if="pageNumber !== 1" @click="showPreviousPage" class="fetch-previous">< Previous</div>
+      <div class="find-dentists-navigation">
+        <div v-if="isThereMore" @click="showNextPage" class="find-dentists-fetch-next">Next ></div>
+        <div v-if="pageNumber !== 1" @click="showPreviousPage" class="find-dentists-fetch-previous">< Previous</div>
       </div>
     </div>
   </div>
@@ -81,7 +81,7 @@
     },
     methods: {
       populateStates () {
-        const statesElement = document.getElementById('state')
+        const statesElement = document.getElementById('find-dentists-state')
         states.forEach((state, index) => {
           const optionElement = document.createElement('option')
           optionElement.text = index === 0 ? 'Choose Location' : state.name
@@ -92,7 +92,7 @@
         })
       },
       populateAppointmentTypes () {
-        const appointmentTypesElement = document.getElementById('appointment-type')
+        const appointmentTypesElement = document.getElementById('find-dentists-appointment-type')
         appointmentTypes.forEach((appointmentType, index) => {
           const optionElement = document.createElement('option')
           optionElement.text = appointmentType.name
@@ -104,21 +104,21 @@
       },
       setEventListeners () {
         const _this = this
-        const searchPage = document.querySelector('#dentists')
+        const searchPage = document.querySelector('#find-dentists')
         searchPage.addEventListener('change', function (evt) {
           let target = evt.target
           switch (target.id) {
-            case 'appointment-type':
+            case 'find-dentists-appointment-type':
               _this.clearError(target)
               let appointmentSubtypesElement
-              appointmentSubtypesElement = document.getElementById('appointment-sub-type')
+              appointmentSubtypesElement = document.getElementById('find-dentists-appointment-sub-type')
               _this.populateAppointmentSubTypes(target.selectedIndex)
               let eventObject = document.createEvent('HTMLEvents')
               eventObject.initEvent('change', true, true)
               appointmentSubtypesElement.dispatchEvent(eventObject)
               appointmentSubtypesElement.focus()
               break
-            case 'appointment-sub-type':
+            case 'find-dentists-appointment-sub-type':
               _this.clearError(target)
               break
           }
@@ -127,7 +127,7 @@
         searchPage.addEventListener('click', function (evt) {
           let target = evt.target
           switch (true) {
-            case target.classList.contains('only-patient'):
+            case target.classList.contains('find-dentists-only-patient'):
               const dentistId = _this.$store.state.searchResult.findDentists.data[_this.currentOffset][target.dataset.sn].coinbase
               if (_this.user.isPatient && _this.user.dentistsIds.includes(dentistId)) {
                 const rating = target.dataset.rating
@@ -137,7 +137,7 @@
               }
 
               break
-            case target.classList.contains('link-to-appointment'):
+            case target.classList.contains('find-dentists-link-to-appointment'):
               _this.$router.push({
                 path: '/request-appointment',
                 query: {
@@ -171,17 +171,17 @@
       },
       updateRating (rating, target) {
         const averageRatingDOMElement = this.createAverageRatingDOMElement(rating, target.dataset.sn)
-        document.querySelector('.find-dentist-about-section').replaceChild(averageRatingDOMElement, document.querySelector('.average-rating'))
+        document.querySelector('.find-dentist-about-section').replaceChild(averageRatingDOMElement, document.querySelector('.find-dentists-average-rating'))
       },
       clearError (target) {
         target.classList.remove('error')
       },
       populateAppointmentSubTypes (appointmentTypeIndex) {
-        const appointmentSubtypesElement = document.getElementById('appointment-sub-type')
+        const appointmentSubtypesElement = document.getElementById('find-dentists-appointment-sub-type')
         if (appointmentTypeIndex === 0) {
           appointmentSubtypesElement.options[0].selected = true
         } else {
-          appointmentSubtypesElement.closest('.search-item').querySelector('.search-param').innerHTML = appointmentTypes[appointmentTypeIndex].subtypes[0]
+          appointmentSubtypesElement.closest('.find-dentists-search-item').querySelector('.find-dentists-search-param').innerHTML = appointmentTypes[appointmentTypeIndex].subtypes[0]
           while (appointmentSubtypesElement.firstChild) {
             appointmentSubtypesElement.removeChild(appointmentSubtypesElement.firstChild)
           }
@@ -198,7 +198,7 @@
         }
       },
       populateBudgets () {
-        const budgetRangeElement = document.getElementById('budget-range')
+        const budgetRangeElement = document.getElementById('find-dentists-budget-range')
         const budgetRange = [Number(this.$route.query.bl), Number(this.$route.query.br)]
         const numberOfOptions = budgetMax / 500
         let budgetRangeText = `All Prices [$${budgetMin} - $${budgetMax}]`
@@ -217,13 +217,13 @@
         }
       },
       findDentists (evt, offset = 0, seed = null, direction = 1) {
-        if (document.getElementById('appointment-sub-type')) {
-          const appointmentTypeId = Number(document.getElementById('appointment-type').selectedIndex)
-          const appointmentSubtypeId = Number(document.getElementById('appointment-sub-type').selectedIndex)
+        if (document.getElementById('find-dentists-appointment-sub-type')) {
+          const appointmentTypeId = Number(document.getElementById('find-dentists-appointment-type').selectedIndex)
+          const appointmentSubtypeId = Number(document.getElementById('find-dentists-appointment-sub-type').selectedIndex)
           const searchQuery = {
             type: 'findDentists',
             requestParams: {
-              state: Number(document.getElementById('state').selectedIndex),
+              state: Number(document.getElementById('find-dentists-state').selectedIndex),
               appointmentTypeId,
               appointmentSubtypeId,
               budget: this.getBudget(),
@@ -245,7 +245,7 @@
             })
           }
 
-          let errors = [appointmentTypeId === 0 ? document.getElementById('appointment-type') : undefined, appointmentSubtypeId === 0 ? document.getElementById('appointment-sub-type') : undefined]
+          let errors = [appointmentTypeId === 0 ? document.getElementById('find-dentists-appointment-type') : undefined, appointmentSubtypeId === 0 ? document.getElementById('find-dentists-appointment-sub-type') : undefined]
           errors = errors.filter(entry => entry !== undefined)
           if (errors.length > 0) {
             errors.forEach((item) => {
@@ -276,7 +276,7 @@
             }
           }
         } else {
-          document.getElementById('appointment-type').classList.add('error')
+          document.getElementById('find-dentists-appointment-type').classList.add('error')
         }
       },
       officialKeys () {
@@ -326,11 +326,11 @@
         return [2, 2, 7, 7, 5, 5, 5, 3, 5, 3, 5, 5, 5, 2, 3, 2]
       },
       getBudget () {
-        const index = document.getElementById('budget-range').selectedIndex - 1
+        const index = document.getElementById('find-dentists-budget-range').selectedIndex - 1
         return index >= 0 ? [(index * budgetPivot), ((index + 1) * budgetPivot)] : [budgetMin, budgetMax]
       },
       getDentists (evt, fetchQuery) {
-        const resultSection = document.querySelector('.result-section')
+        const resultSection = document.querySelector('.find-dentists-result-section')
         this.clearDOMElementChildren(resultSection)
         this.askUserToWaitWhileWeSearch()
         this.disableNecessaryButtons()
@@ -348,7 +348,7 @@
           callback: (result = null, isCompleted = false) => {
             // update result view
             if (isCompleted) {
-              if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
+              if (document.querySelector('.find-dentists-wait-overlay')) document.querySelector('.find-dentists-wait-overlay').remove()
               this.enableNecessaryButtons()
             }
 
@@ -361,19 +361,19 @@
         })
       },
       populateResults (results) {
-        const resultSection = document.querySelector('.result-section')
+        const resultSection = document.querySelector('.find-dentists-result-section')
         this.clearDOMElementChildren(resultSection)
         results.forEach((result) => {
           const resultDOMElement = this.createResultDOMElement(result)
           resultSection.appendChild(resultDOMElement)
-          resultDOMElement.querySelector('.gravatar-section').appendChild(result.avatarCanvas)
+          resultDOMElement.querySelector('.find-dentists-gravatar-section').appendChild(result.avatarCanvas)
         })
       },
       appendResult (result) {
         const resultDOMElement = this.createResultDOMElement(result)
-        const resultSection = document.querySelector('.result-section')
+        const resultSection = document.querySelector('.find-dentists-result-section')
         resultSection.appendChild(resultDOMElement)
-        resultDOMElement.querySelector('.gravatar-section').appendChild(result.avatarCanvas)
+        resultDOMElement.querySelector('.find-dentists-gravatar-section').appendChild(result.avatarCanvas)
       },
       clearDOMElementChildren (DOMElement) {
         while (DOMElement.hasChildNodes()) {
@@ -390,20 +390,20 @@
         return offset / this.perPage
       },
       askUserToWaitWhileWeSearch () {
-        if (document.querySelector('.wait-overlay')) document.querySelector('.wait-overlay').remove()
-        if (document.querySelector('.no-dentist')) document.querySelector('.no-dentist').remove()
+        if (document.querySelector('.find-dentists-wait-overlay')) document.querySelector('.find-dentists-wait-overlay').remove()
+        if (document.querySelector('.find-dentists-no-dentist')) document.querySelector('.find-dentists-no-dentist').remove()
         let waitOverlayDOMElement = this.createWaitOverlayDOMElement()
-        document.querySelector('.result-section').insertBefore(waitOverlayDOMElement, document.querySelector('.find-dentists-result'))
+        document.querySelector('.find-dentists-result-section').insertBefore(waitOverlayDOMElement, document.querySelector('.find-dentists-result'))
       },
       informOfNoOfficial () {
-        if (document.querySelector('.no-dentist')) document.querySelector('.no-dentist').remove()
+        if (document.querySelector('.find-dentists-no-dentist')) document.querySelector('.find-dentists-no-dentist').remove()
         let noDentistDOMElement = this.createNoDentistDOMElement()
-        document.querySelector('.result-section').insertBefore(noDentistDOMElement, document.querySelector('.find-dentists-result'))
+        document.querySelector('.find-dentists-result-section').insertBefore(noDentistDOMElement, document.querySelector('.find-dentists-result'))
       },
       createWaitOverlayDOMElement () {
         const DOMELement = new DOMParser().parseFromString(`
-          <div class="wait-overlay">
-            <div class="wait-message">Please Wait... We're searching the blockchain for dentists matching your choices.</div>
+          <div class="find-dentists-wait-overlay">
+            <div class="find-dentists-wait-message">Please Wait... We're searching the blockchain for dentists matching your choices.</div>
             <div class="spin"></div>
           </div>
         `, 'text/html')
@@ -412,8 +412,8 @@
       },
       createNoDentistDOMElement () {
         const DOMELement = new DOMParser().parseFromString(`
-          <div class="no-dentist">
-            <div class="no-dentist-message">
+          <div class="find-dentists-no-dentist">
+            <div class="find-dentists-no-dentist-message">
               No Dentist matching your choices was found. Modify your search parameters above and try again.
             </div>
           </div>
@@ -425,16 +425,16 @@
         const averageRatingDOMElement = this.createAverageRatingDOMElement(result.averageRating, result.SN)
         const resultDOMElement = new DOMParser().parseFromString(`
           <div class="find-dentists-result">
-            <div class="gravatar-section"></div>
+            <div class="find-dentists-gravatar-section"></div>
             <div class="find-dentist-about-section">
-              <div class="name">${result.name || 'Name: Not Supplied'}</div>
-              <div class="company-name">${result.companyName || 'Company Name: Not Supplied'}</div>
-              <div class="service">${appointmentTypes[result.serviceTypeId].subtypes[result.serviceId]}</div>
-              <div class="fee">$ ${result.fee}</div>
+              <div class="find-dentists-name">${result.name || 'Name: Not Supplied'}</div>
+              <div class="find-dentists-company-name">${result.companyName || 'Company Name: Not Supplied'}</div>
+              <div class="find-dentists-service">${appointmentTypes[result.serviceTypeId].subtypes[result.serviceId]}</div>
+              <div class="find-dentists-fee">$ ${result.fee}</div>
               ${averageRatingDOMElement.outerHTML}
-              <div class="address">${result.address || 'Address: Not Supplied'}</div>
+              <div class="find-dentists-address">${result.address || 'Address: Not Supplied'}</div>
             </div>
-            ${this.user.isPatient && result.serviceTypeId !== 2 ? '<div class="request-appointment-section"><div class="link-to-appointment" data-sn="' + result.SN + '">Request Appointment</div></div>' : ''}
+            ${this.user.isPatient && result.serviceTypeId !== 2 ? '<div class="find-dentists-request-appointment-section"><div class="find-dentists-link-to-appointment" data-sn="' + result.SN + '">Request Appointment</div></div>' : ''}
           </div>
         `, 'text/html').body.firstChild
         return resultDOMElement
@@ -443,12 +443,12 @@
         const ratingsArray = []
         for (let i = 0; i < 5; i++) {
           ratingsArray.push(`
-            <div data-rating="${i + 1}" data-sn="${SN}" class="rating ${i < averageRating ? 'filled' : ''} ${this.user.isPatient ? 'only-patient' : ''}"></div>
+            <div data-rating="${i + 1}" data-sn="${SN}" class="find-dentists-rating ${i < averageRating ? 'filled' : ''} ${this.user.isPatient ? 'find-dentists-only-patient' : ''}"></div>
           `)
         }
 
         return new DOMParser().parseFromString(`
-          <div class="average-rating">${ratingsArray.join(' ')}</div>
+          <div class="find-dentists-average-rating">${ratingsArray.join(' ')}</div>
         `, 'text/html').body.firstChild
       },
       disableNecessaryButtons (evt = null) {
@@ -523,7 +523,7 @@
     flex-direction: column;
   }
 
-  #dentists {
+  #find-dentists {
     background: #ffffff;
     min-height: 70vh;
     width: 90%;
@@ -543,7 +543,7 @@
     margin-bottom: 10px;
   }
 
-  .query-section {
+  .find-dentists-query-section {
     width: 100%;
     height: 65px;
     background: #ffffff;
@@ -551,7 +551,7 @@
     flex-direction: row;
   }
 
-  .search-icon {
+  .find-dentists-search-icon {
     background: url('/static/images/search.png') no-repeat;
     min-width: 4%;
     height: 30px;
@@ -563,7 +563,7 @@
     top: 20px;
   }
 
-  .search-item {
+  .find-dentists-search-item {
     height: 60px;
     display: inline-block;
     /*margin-right: 10px;*/
@@ -573,7 +573,7 @@
     min-width: 24%;
   }
 
-  .search-param {
+  .find-dentists-search-param {
     color: #7f7f7f;
     margin-bottom: 5px;
     height: 20px;
@@ -581,7 +581,7 @@
     line-height: 20px;
   }
 
-  .list {
+  .find-dentists-list {
     height: 30px;
     width: 95%;
     background: #ffffff;
@@ -615,18 +615,18 @@
     color: #ffffff;
   }
 
-  .result-section {
+  .find-dentists-result-section {
     position: relative;
     min-height: 300px;
     margin-top: 20px;
   }
 
-  .navigation {
+  .find-dentists-navigation {
     width: 100%;
     float: right;
   }
 
-  .fetch-next, .fetch-previous {
+  .find-dentists-fetch-next, .find-dentists-fetch-previous {
     cursor: pointer;
     color: #6592ad;
     background: #ffffff;
@@ -640,13 +640,13 @@
     font-size: 14px;
   }
 
-  .fetch-next:hover, .fetch-previous:hover {
+  .find-dentists-fetch-next:hover, .find-dentists-fetch-previous:hover {
     background: #dae3e8;
   }
 </style>
 
 <style>
-  .no-dentist {
+  .find-dentists-no-dentist {
     position: relative;
     width: 100%;
     min-height: 300px;
@@ -654,13 +654,13 @@
     font-size: 16px;
   }
 
-  .no-dentist-message {
+  .find-dentists-no-dentist-message {
     height: 30px;
     position: relative;
     top: 110px;
   }
 
-  .wait-overlay {
+  .find-dentists-wait-overlay {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -674,7 +674,7 @@
     background: rgba(255, 255, 255, 0.9);
   }
 
-  .wait-message {
+  .find-dentists-wait-message {
     height: 30px;
     line-height: 30px;
     position: relative;
@@ -710,7 +710,7 @@
     padding: 10px 0px;
   }
 
-  .gravatar-section {
+  .find-dentists-gravatar-section {
     width: 60px;
     height: 60px;
     float: left;
@@ -721,7 +721,7 @@
     padding: 3px;
   }
 
-  .gravatar-section > canvas {
+  .find-dentists-gravatar-section > canvas {
     height: 100%;
     width: 100%;
     border-radius: 6px;
@@ -749,11 +749,11 @@
     cursor: pointer;
   }
 
-  .average-rating {
+  .find-dentists-average-rating {
     width: 100% !important;
   }
 
-  .average-rating > div {
+  .find-dentists-average-rating > div {
     background: url(/static/images/star_line.png) no-repeat;
     background-size: contain;
     height: 20px;
@@ -762,31 +762,31 @@
     float: left;
   }
 
-  .average-rating > div.only-patient {
+  .find-dentists-average-rating > div.find-dentists-only-patient {
     cursor: pointer;
   }
 
-  .average-rating:hover > div.only-patient {
+  .find-dentists-average-rating:hover > div.find-dentists-only-patient {
     background: url(/static/images/star.png) no-repeat;
     background-size: contain;
   }
 
-  .average-rating > div.only-patient:hover {
+  .find-dentists-average-rating > div.find-dentists-only-patient:hover {
     background: url(/static/images/star.png) no-repeat;
     background-size: contain;
   }
 
-  .average-rating > div.only-patient:hover ~ div.only-patient {
+  .find-dentists-average-rating > div.find-dentists-only-patient:hover ~ div.find-dentists-only-patient {
     background: url(/static/images/star_line.png) no-repeat;
     background-size: contain;
   }
 
-  .average-rating > .filled {
+  .find-dentists-average-rating > .filled {
     background: url(/static/images/star.png) no-repeat;
     background-size: contain;
   }
 
-  .request-appointment-section {
+  .find-dentists-request-appointment-section {
     width: auto;
     height: 150px;
     line-height: 150px;
@@ -794,7 +794,7 @@
     float: right;
   }
 
-  .link-to-appointment {
+  .find-dentists-link-to-appointment {
     width: 200px;
     height: 40px;
     line-height: 40px;
