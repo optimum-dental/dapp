@@ -1,0 +1,27 @@
+[
+  {
+    "name": "Choose Type",
+    "subtypes": []
+  },
+  {
+    "name": "Scan Appointment",
+    "subtypes": [
+      "Scan",
+      "Intraoral Radiographs",
+      "Extraoral Radiographs",
+      "Panoramic X-rays",
+      "Cephalometric Projections",
+      "Cone-beam computed tomograph",
+      "Computerized axial tomography"
+    ]
+  },
+  {
+    "name": "Treatment Appointment",
+    "subtypes": [
+      "Treatment",
+      "Teeth Whitening",
+      "Bonding",
+      "Filling"
+    ]
+  }
+]
