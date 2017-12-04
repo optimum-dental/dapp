@@ -106,7 +106,7 @@
 </template>
 
 <script>
-  const BigNumber = require('bignumber.js')
+  // const BigNumber = require('bignumber.js')
   export default {
     components: {
       Datepicker
@@ -262,7 +262,7 @@
       writeScanRequest () {
         const appointmentDate = (+(this.scanDate)).toString()
         const scanTime = document.getElementById('appointment-scan-time').options[document.getElementById('appointment-scan-time').selectedIndex].value
-        const scanAppointmentId = new BigNumber(Number(document.getElementById('scan-appointment').selectedIndex))
+        const scanAppointmentId = Number(document.getElementById('scan-appointment').selectedIndex)
         const scanInsuranceQuery = Number(document.getElementById('appointment-scan-insurance-query').selectedIndex)
         const scanInsurance = scanInsuranceQuery === 1 ? document.getElementById('scan-insurance').value : ''
         const scanComment = document.getElementById('appointment-scan-comment').value
