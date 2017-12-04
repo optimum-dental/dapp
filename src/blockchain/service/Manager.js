@@ -62,7 +62,6 @@ class Manager {
     const blockchainParams = (coinbase) => {
       return value ? {from: coinbase, value} : {from: coinbase}
     }
-    console.log(contractToUse, blockchainData)
     return blockchainManager.querySmartContract({
       smartContractMethod: blockchainMethodName,
       contractToUse,
