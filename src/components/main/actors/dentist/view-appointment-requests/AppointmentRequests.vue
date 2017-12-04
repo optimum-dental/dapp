@@ -140,7 +140,6 @@
         const quote = Number(document.getElementById('appointment-requests-quote').value) || 0
         const comment = `b${document.getElementById('appointment-requests-comment').value}`
 
-        console.log(scanRequest)
         this.scrollToTop()
         const applicationForm = document.querySelector('.appointment-requests-modal')
         if (applicationForm) applicationForm.style.top = '0px'

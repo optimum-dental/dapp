@@ -30,7 +30,7 @@
         return this.user.hasCoinbase ? truncate(this.$root.coinbase, 22) : 'No account connected'
       },
       balance () {
-        return this.user.hasCoinbase ? truncate(this.user.balance, 10) : 0.00
+        return this.user.hasCoinbase ? Number(this.user.balance).toFixed(2) : '0.00'
       },
       user () {
         return this.$root.user

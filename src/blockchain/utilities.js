@@ -27,7 +27,7 @@ export function getObjectFromResponse (state, result, entitiesCount, keys, field
         itemValue = entitiesIntsArrays[i] ? entitiesIntsArrays[i][intValuesIndex].toNumber() : 0
         intValuesIndex += 1
       } else if (fieldTypes[index] === 4) {
-        itemValue = entitiesIntsArrays[i] ? state.web3.instance().toHex(entitiesIntsArrays[i][intValuesIndex]) : '0x0'
+        itemValue = entitiesIntsArrays[i] ? state.web3.instance().toHex(entitiesIntsArrays[i][intValuesIndex].toString()) : '0x0'
         intValuesIndex += 1
       } else if (fieldTypes[index] === 5) {
         itemValue = entitiesIntsArrays[i] ? state.web3.instance().toUtf8(state.web3.instance().toHex(entitiesIntsArrays[i][intValuesIndex].toString())).slice(1) : ''
