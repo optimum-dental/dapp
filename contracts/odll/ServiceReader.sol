@@ -10,7 +10,7 @@ contract ServiceReader is Restrictor {
     dbAddress = _dbAddress;
   }
 
-  function fetchServicesWithFees(
+  function fetchServicesWithFees (
     address userId,
     uint serviceTypeId,
     uint offset, // starting from offset: 0-based
@@ -24,10 +24,10 @@ contract ServiceReader is Restrictor {
       uint[]
     )
   {
-    return userManager.fetchServicesWithFees(dbAddress, userId, serviceTypeId, offset, limit, seed);
+    return userManager.fetchServicesDataWithFees(dbAddress, userId, serviceTypeId, offset, limit, seed);
   }
 
-  function fetchServices(
+  function fetchServices (
     address userId,
     uint serviceTypeId,
     uint offset, // starting from offset: 0-based
@@ -41,6 +41,6 @@ contract ServiceReader is Restrictor {
       uint[]
     )
   {
-    return userManager.fetchServices(dbAddress, userId, serviceTypeId, offset, limit, seed);
+    return userManager.fetchServicesData(dbAddress, userId, serviceTypeId, offset, limit, seed);
   }
 }

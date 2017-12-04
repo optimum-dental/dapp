@@ -69,7 +69,7 @@ contract UserWriter is Restrictor {
     external
     onlyPermittedSmartContract
   {
-    userManager.setDentistCompany(dbAddress, msg.sender, companyName);
+    userManager.setDentistCompanyData(dbAddress, msg.sender, companyName);
     OnDentistCompanySet(msg.sender);
   }
 
@@ -79,7 +79,7 @@ contract UserWriter is Restrictor {
   )
     external
   {
-    userManager.setODLLDentist(dbAddress, userId, odllDentistValue);
+    userManager.setODLLDentistData(dbAddress, userId, odllDentistValue);
   }
 
   function setODLLDentists (
@@ -88,41 +88,34 @@ contract UserWriter is Restrictor {
   )
     external
   {
-    userManager.setODLLDentists(dbAddress, userIds, odllDentistValue);
+    userManager.setODLLDentistsData(dbAddress, userIds, odllDentistValue);
   }
 
   function addOfficialToODLL (address officialId, uint8 userType)
     external
     onlyOwnerOrActiveAdminOrActiveManager
   {
-    userManager.addOfficialToODLL(dbAddress, officialId, userType);
+    userManager.addOfficialDataToODLL(dbAddress, officialId, userType);
   }
 
-  function blockUser(address userId)
+  function blockUser (address userId)
     external
     onlyOwnerOrActiveAdminOrActiveManager
   {
-    userManager.blockUser(dbAddress, userId);
+    userManager.blockUserEntity(dbAddress, userId);
   }
 
-  function unblockUser(address userId)
+  function unblockUser (address userId)
     external
     onlyOwnerOrActiveAdminOrActiveManager
   {
-    userManager.unblockUser(dbAddress, userId);
+    userManager.unblockUserEntity(dbAddress, userId);
   }
 
-  function writeDentistRating(address dentistId, uint8 rating)
+  function writeDentistRating (address dentistId, uint8 rating)
     external
   {
     require(dentistId != 0x0 && rating > 0);
-    userManager.writeDentistRating(dbAddress, dentistId, rating);
-  }
-
-  function destroySelf(address callerAddress, address newContractAddress)
-    external
-    onlyOwnerCanCall(callerAddress)
-  {
-    selfdestruct(newContractAddress);
+    userManager.writeDentistEntityRating(dbAddress, dentistId, rating);
   }
 }

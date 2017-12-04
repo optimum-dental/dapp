@@ -23,21 +23,6 @@ contract TreatmentRequestReader is Restrictor {
       uint[]
     )
   {
-    return userManager.fetchTreatmentRequestsForPatient(dbAddress, patientId, offset, limit, seed);
-  }
-
-  function fetchAllTreatmentRequests (
-    uint offset, // starting from offset: 0-based
-    uint limit, // not more than limit
-    uint seed // seed value to give the illusion of randomisation
-  )
-    external
-    view
-    returns (
-      uint,
-      uint[]
-    )
-  {
-    return userManager.fetchAllTreatmentRequests(dbAddress, offset, limit, seed);
+    return userManager.fetchPatientTreatmentRequests(dbAddress, patientId, offset, limit, seed);
   }
 }

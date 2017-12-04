@@ -184,7 +184,7 @@ library userManager {
     }
   }
 
-  function setDentistCompany (
+  function setDentistCompanyData (
     address dbAddress,
     address userId,
     string companyName
@@ -198,7 +198,7 @@ library userManager {
     DB(dbAddress).setStringValue(keccak256("dentist/company-name", userId), companyName);
   }
 
-  function setODLLDentist (
+  function setODLLDentistData (
     address dbAddress,
     address userId,
     bool odllDentistValue
@@ -210,7 +210,7 @@ library userManager {
     DB(dbAddress).setBooleanValue(keccak256("user/is-odll-dentist?", userId), odllDentistValue);
   }
 
-  function setODLLDentists (
+  function setODLLDentistsData (
     address dbAddress,
     address[] userIds,
     bool odllDentistValue
@@ -260,19 +260,19 @@ library userManager {
     DB(dbAddress).setUInt8Value(keccak256("user.notification/scan-result-advert", userId), uint8NotificationSettings[0]);
   }
 
-  function addReceivedMessage  (address dbAddress, address userId, uint messageId) internal {
+  function addReceivedMessage (address dbAddress, address userId, uint messageId) internal {
     utilities.addIdArrayItem(dbAddress, userId, "user/received-messages", "user/received-messages-count", messageId);
   }
 
-  function addSentMessage  (address dbAddress, address userId, uint messageId) internal {
+  function addSentMessage (address dbAddress, address userId, uint messageId) internal {
     utilities.addIdArrayItem(dbAddress, userId, "user/sent-messages", "user/sent-messages-count", messageId);
   }
 
-  function writeDentistRating  (address dbAddress, address userId, uint8 rating) internal {
+  function writeDentistEntityRating (address dbAddress, address userId, uint8 rating) internal {
     addToAverageRating(dbAddress, userId, "dentist/average-rating-count", "dentist/average-rating", rating);
   }
 
-  function addToAverageRating  (address dbAddress, address userId, string countKey, string key, uint8 rating) internal {
+  function addToAverageRating (address dbAddress, address userId, string countKey, string key, uint8 rating) internal {
     var ratingsCount = DB(dbAddress).getUIntValue(keccak256(countKey, userId));
     var currentAverageRating = DB(dbAddress).getUInt8Value(keccak256(key, userId));
     var newRatingsCount = SafeMath.add(ratingsCount, 1);
@@ -416,7 +416,7 @@ library userManager {
     utilities.addRemovableIdItem(dbAddress, dentistId, 'dentist/patient', 'dentist/patient-key', 'dentist/patient-key', userId);
   }
 
-  function fetchUserDentists (
+  function fetchDentistsForUser (
     address dbAddress,
     address userId,
     uint offset, // starting from offset: 0-based
@@ -474,7 +474,7 @@ library userManager {
     (totalNumberFound, patientsIds) = utilities.getSlicedArray(patientsIds, offset, limit, seed);
   }
 
-  function findDentists (
+  function findDentistsIds (
     address dbAddress,
     uint stateId,
     uint serviceTypeId,
@@ -498,7 +498,7 @@ library userManager {
     (totalNumberFound, foundDentistsIds) = utilities.getSlicedArray(foundDentistsIds, offset, limit, seed);
   }
 
-  function addOfficialToODLL (address dbAddress, address officialId, uint8 userType)
+  function addOfficialDataToODLL (address dbAddress, address officialId, uint8 userType)
     internal
   {
     uint8 userTypeCheck = DB(dbAddress).getUInt8Value(keccak256('user/type', officialId));
@@ -506,19 +506,19 @@ library userManager {
     initUser(dbAddress, officialId, userType);
   }
 
-  function blockUser (address dbAddress, address userId)
+  function blockUserEntity (address dbAddress, address userId)
     internal
   {
     DB(dbAddress).setUInt8Value(keccak256("user/status", userId), 2);
   }
 
-  function unblockUser (address dbAddress, address userId)
+  function unblockUserEntity (address dbAddress, address userId)
     internal
   {
     DB(dbAddress).setUInt8Value(keccak256("user/status", userId), 1);
   }
 
-  function fetchDentists (
+  function fetchDentistsIds (
     address dbAddress,
     uint offset, // starting from offset: 0-based
     uint limit, // not more than limit
@@ -535,7 +535,7 @@ library userManager {
     (totalNumberFound, foundDentistsIds) = utilities.getSlicedArray(foundDentistsIds, offset, limit, seed);
   }
 
-  function fetchManagers (
+  function fetchManagersIds (
     address dbAddress,
     uint offset, // starting from offset: 0-based
     uint limit, // not more than limit
@@ -552,7 +552,7 @@ library userManager {
     (totalNumberFound, foundManagersIds) = utilities.getSlicedArray(foundManagersIds, offset, limit, seed);
   }
 
-  function fetchServicesWithFees (
+  function fetchServicesDataWithFees (
     address dbAddress,
     address userId,
     uint serviceTypeId,
@@ -567,10 +567,10 @@ library userManager {
       uint[] foundServiceIds
     )
   {
-    (totalNumberFound, foundServiceIds) = fetchServices(dbAddress, userId, serviceTypeId, offset, limit, seed);
+    (totalNumberFound, foundServiceIds) = fetchServicesData(dbAddress, userId, serviceTypeId, offset, limit, seed);
   }
 
-  function fetchServices (
+  function fetchServicesData (
     address dbAddress,
     address userId,
     uint serviceTypeId,
@@ -589,7 +589,7 @@ library userManager {
     (totalNumberFound, foundServiceIds) = utilities.getSlicedArray(foundServiceIds, offset, limit, seed);
   }
 
-  function writeServices (
+  function writeServicesData (
     address dbAddress,
     uint serviceTypeId,
     uint[] serviceIds,
@@ -600,7 +600,7 @@ library userManager {
     servicesLibrary.addDentist(dbAddress, serviceTypeId, serviceIds, userId);
   }
 
-  function writeServiceWithFee (
+  function writeServiceDataWithFee (
     address dbAddress,
     uint serviceTypeId,
     uint serviceId,
@@ -613,7 +613,7 @@ library userManager {
     servicesLibrary.setFee(dbAddress, serviceTypeId, serviceId, fee, userId);
   }
 
-  function removeDentistFromService (
+  function removeDentistService (
     address dbAddress,
     uint serviceTypeId,
     uint serviceId,
@@ -621,10 +621,10 @@ library userManager {
   )
     internal
   {
-    servicesLibrary.removeDentistFromService(dbAddress, serviceTypeId, serviceId, userId);
+    servicesLibrary.handleRemoveDentistService(dbAddress, serviceTypeId, serviceId, userId);
   }
 
-  function removeServices (
+  function removeServicesData (
     address dbAddress,
     uint serviceTypeId,
     uint[] serviceIds,
@@ -635,7 +635,7 @@ library userManager {
     servicesLibrary.removeDentist(dbAddress, serviceTypeId, serviceIds, userId);
   }
 
-  function writeScanRequest (
+  function writePatientScanRequest (
     address dbAddress,
     address dentistId,
     address patientId,
@@ -647,29 +647,29 @@ library userManager {
   )
     internal
   {
-    servicesLibrary.writeScanRequest(dbAddress, dentistId, patientId, scanAppointmentId, appointmentDate, scanTime, scanInsurance, comment);
+    servicesLibrary.handleWritePatientScanRequest(dbAddress, dentistId, patientId, scanAppointmentId, appointmentDate, scanTime, scanInsurance, comment);
   }
 
-  function cancelScanRequest (
+  function cancelPatientScanRequest (
     address dbAddress,
     address patientId,
     uint scanRequestId
   )
     internal
   {
-    servicesLibrary.cancelScanRequest(dbAddress, patientId, scanRequestId);
+    servicesLibrary.handleCancelPatientScanRequest(dbAddress, patientId, scanRequestId);
   }
 
-  function expireScanRequest (
+  function expirePatientScanRequest (
     address dbAddress,
     uint scanRequestId
   )
     internal
   {
-    servicesLibrary.expireScanRequest(dbAddress, scanRequestId);
+    servicesLibrary.handleExpirePatientScanRequest(dbAddress, scanRequestId);
   }
 
-  function acceptScanRequest (
+  function acceptPatientScanRequest (
     address dbAddress,
     address dentistId,
     address patientId,
@@ -679,10 +679,10 @@ library userManager {
   )
     internal
   {
-    servicesLibrary.acceptScanRequest(dbAddress, dentistId, patientId, scanRequestId, quote, comment);
+    servicesLibrary.handleAcceptPatientScanRequest(dbAddress, dentistId, patientId, scanRequestId, quote, comment);
   }
 
-  function rejectScanRequest (
+  function rejectPatientScanRequest (
     address dbAddress,
     address dentistId,
     address patientId,
@@ -690,10 +690,10 @@ library userManager {
   )
     internal
   {
-    servicesLibrary.rejectScanRequest(dbAddress, dentistId, patientId, scanRequestId);
+    servicesLibrary.handleRejectPatientScanRequest(dbAddress, dentistId, patientId, scanRequestId);
   }
 
-  function applyToScan (
+  function applyToScanPatient (
     address dbAddress,
     address dentistId,
     address patientId,
@@ -703,10 +703,10 @@ library userManager {
   )
     internal
   {
-    servicesLibrary.applyToScan(dbAddress, dentistId, patientId, scanRequestId, quote, comment);
+    servicesLibrary.handleApplyToScanPatient(dbAddress, dentistId, patientId, scanRequestId, quote, comment);
   }
 
-  function cancelScanApplication (
+  function cancelDentistScanApplication (
     address dbAddress,
     address dentistId,
     address patientId,
@@ -714,10 +714,10 @@ library userManager {
   )
     internal
   {
-    servicesLibrary.cancelScanApplication(dbAddress, dentistId, patientId, scanApplicationId);
+    servicesLibrary.handleCancelDentistScanApplication(dbAddress, dentistId, patientId, scanApplicationId);
   }
 
-  function acceptScanApplication (
+  function acceptDentistScanApplication (
     address dbAddress,
     address dentistId,
     address patientId,
@@ -728,10 +728,10 @@ library userManager {
   )
     internal
   {
-    servicesLibrary.acceptScanApplication(dbAddress, dentistId, patientId, scanApplicationId, paymentId, amount, quote);
+    servicesLibrary.handleAcceptDentistScanApplication(dbAddress, dentistId, patientId, scanApplicationId, paymentId, amount, quote);
   }
 
-  function releaseFundForScan (
+  function releaseScanFund (
     address dbAddress,
     address dentistId,
     address patientId,
@@ -760,7 +760,7 @@ library userManager {
     dentistId.transfer(dentistFee);
   }
 
-  function writeTreatmentRequest (
+  function writePatientTreatmentRequest (
     address dbAddress,
     address patientId,
     bool hasCaseId,
@@ -771,20 +771,20 @@ library userManager {
   )
     internal
   {
-    servicesLibrary.writeTreatmentRequest(dbAddress, patientId, hasCaseId, caseId, insurance, scanResults, comment);
+    servicesLibrary.handleWritePatientTreatmentRequest(dbAddress, patientId, hasCaseId, caseId, insurance, scanResults, comment);
   }
 
-  function cancelTreatmentRequest (
+  function cancelPatientTreatmentRequest (
     address dbAddress,
     address patientId,
     uint treatmentRequestId
   )
     internal
   {
-    servicesLibrary.cancelTreatmentRequest(dbAddress, patientId, treatmentRequestId);
+    servicesLibrary.handleCancelPatientTreatmentRequest(dbAddress, patientId, treatmentRequestId);
   }
 
-  function applyToTreat (
+  function applyToTreatPatient (
     address dbAddress,
     address dentistId,
     address patientId,
@@ -794,10 +794,10 @@ library userManager {
   )
     internal
   {
-    servicesLibrary.applyToTreat(dbAddress, dentistId, patientId, treatmentRequestId, quote, comment);
+    servicesLibrary.handleApplyToTreatPatient(dbAddress, dentistId, patientId, treatmentRequestId, quote, comment);
   }
 
-  function cancelTreatmentApplication (
+  function cancelDentistTreatmentApplication (
     address dbAddress,
     address dentistId,
     address patientId,
@@ -805,11 +805,11 @@ library userManager {
   )
     internal
   {
-    servicesLibrary.cancelTreatmentApplication(dbAddress, dentistId, patientId, treatmentApplicationId);
+    servicesLibrary.handleCancelDentistTreatmentApplication(dbAddress, dentistId, patientId, treatmentApplicationId);
   }
 
   // treatment status: 1 => pending, 2 => done, 3 => canceled
-  function acceptTreatmentApplication (
+  function acceptDentistTreatmentApplication (
     address dbAddress,
     address dentistId,
     address patientId,
@@ -820,10 +820,10 @@ library userManager {
   )
     internal
   {
-    servicesLibrary.acceptTreatmentApplication(dbAddress, dentistId, patientId, treatmentApplicationId, paymentId, amount, quote);
+    servicesLibrary.handleAcceptDentistTreatmentApplication(dbAddress, dentistId, patientId, treatmentApplicationId, paymentId, amount, quote);
   }
 
-  function releaseFundForTreatment (
+  function releaseTreatmentFund (
     address dbAddress,
     address dentistId,
     address patientId,
@@ -852,7 +852,7 @@ library userManager {
     dentistId.transfer(dentistFee);
   }
 
-  function cancelTreatment (
+  function cancelPatientTreatment (
     address dbAddress,
     address dentistId,
     address patientId,
@@ -860,10 +860,10 @@ library userManager {
   )
     internal
   {
-    servicesLibrary.cancelTreatment(dbAddress, dentistId, patientId, treatmentId);
+    servicesLibrary.handleCancelPatientTreatment(dbAddress, dentistId, patientId, treatmentId);
   }
 
-  function markTreatmentDone (
+  function markPatientTreatmentDone (
     address dbAddress,
     address dentistId,
     address patientId,
@@ -871,10 +871,10 @@ library userManager {
   )
     internal
   {
-    servicesLibrary.markTreatmentDone(dbAddress, dentistId, patientId, treatmentId);
+    servicesLibrary.handleMarkPatientTreatmentDone(dbAddress, dentistId, patientId, treatmentId);
   }
 
-  function fetchScanRequestsForPatient (
+  function fetchPatientScanRequests (
     address dbAddress,
     address patientId,
     uint offset, // starting from offset: 0-based
@@ -892,7 +892,7 @@ library userManager {
     (totalNumberFound, scanRequestsIds) = utilities.getSlicedArray(scanRequestsIds, offset, limit, seed);
   }
 
-  function fetchAcceptedScanRequestsForPatient (
+  function fetchPatientAcceptedScanRequests (
     address dbAddress,
     address patientId,
     uint offset, // starting from offset: 0-based
@@ -910,7 +910,7 @@ library userManager {
     (totalNumberFound, scanRequestsIds) = utilities.getSlicedArray(scanRequestsIds, offset, limit, seed);
   }
 
-  function fetchScanApplicationsForPatient (
+  function fetchPatientScanApplications (
     address dbAddress,
     address patientId,
     uint offset, // starting from offset: 0-based
@@ -928,7 +928,7 @@ library userManager {
     (totalNumberFound, scanApplicationsIds) = utilities.getSlicedArray(scanApplicationsIds, offset, limit, seed);
   }
 
-  function fetchAllScanRequests (
+  function fetchScanRequests (
     address dbAddress,
     uint offset, // starting from offset: 0-based
     uint limit, // not more than limit
@@ -945,7 +945,7 @@ library userManager {
     (totalNumberFound, scanRequestsIds) = utilities.getSlicedArray(scanRequestsIds, offset, limit, seed);
   }
 
-  function fetchDirectScanRequestsForDentist (
+  function fetchDentistDirectScanRequests (
     address dbAddress,
     address dentistId,
     uint offset, // starting from offset: 0-based
@@ -963,7 +963,7 @@ library userManager {
     (totalNumberFound, scanRequestsIds) = utilities.getSlicedArray(scanRequestsIds, offset, limit, seed);
   }
 
-  function fetchAcceptedScanRequestsForDentist (
+  function fetchDentistAcceptedScanRequests (
     address dbAddress,
     address dentistId,
     uint offset, // starting from offset: 0-based
@@ -981,7 +981,7 @@ library userManager {
     (totalNumberFound, scanRequestsIds) = utilities.getSlicedArray(scanRequestsIds, offset, limit, seed);
   }
 
-  function fetchScanApplicationsForDentist (
+  function fetchDentistScanApplications (
     address dbAddress,
     address dentistId,
     uint offset, // starting from offset: 0-based
@@ -999,7 +999,7 @@ library userManager {
     (totalNumberFound, scanApplicationsIds) = utilities.getSlicedArray(scanApplicationsIds, offset, limit, seed);
   }
 
-  function fetchTreatmentRequestsForPatient (
+  function fetchPatientTreatmentRequests (
     address dbAddress,
     address patientId,
     uint offset, // starting from offset: 0-based
@@ -1017,7 +1017,7 @@ library userManager {
     (totalNumberFound, treatmentRequestsIds) = utilities.getSlicedArray(treatmentRequestsIds, offset, limit, seed);
   }
 
-  function fetchAllTreatmentRequests (
+  function fetchTreatmentRequests (
     address dbAddress,
     uint offset, // starting from offset: 0-based
     uint limit, // not more than limit
@@ -1034,7 +1034,7 @@ library userManager {
     (totalNumberFound, treatmentRequestsIds) = utilities.getSlicedArray(treatmentRequestsIds, offset, limit, seed);
   }
 
-  function fetchTreatmentApplicationsForPatient (
+  function fetchPatientTreatmentApplications (
     address dbAddress,
     address patientId,
     uint offset, // starting from offset: 0-based
@@ -1052,7 +1052,7 @@ library userManager {
     (totalNumberFound, treatmentApplicationsIds) = utilities.getSlicedArray(treatmentApplicationsIds, offset, limit, seed);
   }
 
-  function fetchTreatmentApplicationsForDentist (
+  function fetchDentistTreatmentApplications (
     address dbAddress,
     address dentistId,
     uint offset, // starting from offset: 0-based
@@ -1070,7 +1070,7 @@ library userManager {
     (totalNumberFound, treatmentApplicationsIds) = utilities.getSlicedArray(treatmentApplicationsIds, offset, limit, seed);
   }
 
-  function fetchCasesForPatient (
+  function fetchPatientCases (
     address dbAddress,
     address patientId,
     uint offset, // starting from offset: 0-based
@@ -1088,7 +1088,7 @@ library userManager {
     (totalNumberFound, casesIds) = utilities.getSlicedArray(casesIds, offset, limit, seed);
   }
 
-  function fetchCasesForDentist (
+  function fetchDentistCases (
     address dbAddress,
     address dentistId,
     uint offset, // starting from offset: 0-based
@@ -1106,7 +1106,7 @@ library userManager {
     (totalNumberFound, casesIds) = utilities.getSlicedArray(casesIds, offset, limit, seed);
   }
 
-  function fetchAllCases (
+  function fetchCases (
     address dbAddress,
     uint offset, // starting from offset: 0-based
     uint limit, // not more than limit
@@ -1123,7 +1123,7 @@ library userManager {
     (totalNumberFound, casesIds) = utilities.getSlicedArray(casesIds, offset, limit, seed);
   }
 
-  function fetchTreatmentsForPatient (
+  function fetchPatientTreatment (
     address dbAddress,
     address patientId,
     uint offset, // starting from offset: 0-based
@@ -1141,7 +1141,7 @@ library userManager {
     (totalNumberFound, treatmentIds) = utilities.getSlicedArray(treatmentIds, offset, limit, seed);
   }
 
-  function fetchTreatmentsForDentist (
+  function fetchDentistTreatment (
     address dbAddress,
     address dentistId,
     uint offset, // starting from offset: 0-based
@@ -1159,7 +1159,7 @@ library userManager {
     (totalNumberFound, treatmentIds) = utilities.getSlicedArray(treatmentIds, offset, limit, seed);
   }
 
-  function fetchAllTreatments (
+  function fetchTreatments (
     address dbAddress,
     uint offset, // starting from offset: 0-based
     uint limit, // not more than limit

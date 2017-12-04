@@ -22,6 +22,6 @@ contract TreatmentRequestReader2 is Restrictor {
       uint[]
     )
   {
-    return userManager.fetchAllTreatmentRequests(dbAddress, offset, limit, seed);
+    return userManager.fetchTreatmentRequests(dbAddress, offset, limit, seed);
   }
 }

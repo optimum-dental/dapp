@@ -22,6 +22,6 @@ contract ScanRequestReader2 is Restrictor {
       uint[]
     )
   {
-    return userManager.fetchAllScanRequests(dbAddress, offset, limit, seed);
+    return userManager.fetchScanRequests(dbAddress, offset, limit, seed);
   }
 }

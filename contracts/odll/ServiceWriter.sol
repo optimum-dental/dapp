@@ -4,7 +4,7 @@ import "../lib/odll/userManager.sol";
 
 contract ServiceWriter is Restrictor {
 
-  function ServiceWriter(address _dbAddress) public {
+  function ServiceWriter (address _dbAddress) public {
     require(_dbAddress != 0x0);
     dbAddress = _dbAddress;
   }
@@ -16,10 +16,10 @@ contract ServiceWriter is Restrictor {
     external
   {
     require(serviceTypeId != 0 && serviceIds.length > 0);
-    userManager.writeServices(dbAddress, serviceTypeId, serviceIds, msg.sender);
+    userManager.writeServicesData(dbAddress, serviceTypeId, serviceIds, msg.sender);
   }
 
-  function writeServiceWithFee(
+  function writeServiceWithFee (
     uint serviceTypeId,
     uint serviceId,
     uint fee
@@ -27,26 +27,26 @@ contract ServiceWriter is Restrictor {
     external
   {
     require(serviceTypeId != 0 && serviceId != 0 && fee != 0);
-    userManager.writeServiceWithFee(dbAddress, serviceTypeId, serviceId, fee, msg.sender);
+    userManager.writeServiceDataWithFee(dbAddress, serviceTypeId, serviceId, fee, msg.sender);
   }
 
-  function removeDentistFromService(
+  function removeDentistFromService (
     uint serviceTypeId,
     uint serviceId
   )
     external
   {
     require(serviceTypeId != 0 && serviceId != 0);
-    userManager.removeDentistFromService(dbAddress, serviceTypeId, serviceId, msg.sender);
+    userManager.removeDentistService(dbAddress, serviceTypeId, serviceId, msg.sender);
   }
 
-  function removeServices(
+  function removeServices (
     uint serviceTypeId,
     uint[] serviceIds
   )
     external
   {
     require(serviceTypeId != 0 && serviceIds.length > 0);
-    userManager.removeServices(dbAddress, serviceTypeId, serviceIds, msg.sender);
+    userManager.removeServicesData(dbAddress, serviceTypeId, serviceIds, msg.sender);
   }
 }

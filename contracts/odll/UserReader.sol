@@ -23,7 +23,7 @@ contract UserReader is Restrictor {
       address[]
     )
   {
-    return userManager.fetchUserDentists(dbAddress, userId, offset, limit, seed);
+    return userManager.fetchDentistsForUser(dbAddress, userId, offset, limit, seed);
   }
 
   function findDentists (
@@ -42,7 +42,7 @@ contract UserReader is Restrictor {
         address[]
       )
   {
-    return userManager.findDentists(dbAddress, stateId, serviceTypeId, serviceId, budget, offset, limit, seed);
+    return userManager.findDentistsIds(dbAddress, stateId, serviceTypeId, serviceId, budget, offset, limit, seed);
   }
 
   function fetchDentists (
@@ -57,7 +57,7 @@ contract UserReader is Restrictor {
       address[]
     )
   {
-    return userManager.fetchDentists(dbAddress, offset, limit, seed);
+    return userManager.fetchDentistsIds(dbAddress, offset, limit, seed);
   }
 
   function fetchManagers (
@@ -72,14 +72,6 @@ contract UserReader is Restrictor {
       address[]
     )
   {
-    return userManager.fetchManagers(dbAddress, offset, limit, seed);
-  }
-
-  function destroySelf(address callerAddress, address newContractAddress)
-    external
-    onlyOwnerCanCall(callerAddress)
-  {
-    selfdestruct(newContractAddress);
+    return userManager.fetchManagersIds(dbAddress, offset, limit, seed);
   }
 }
-

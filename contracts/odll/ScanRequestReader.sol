@@ -23,7 +23,7 @@ contract ScanRequestReader is Restrictor {
       uint[]
     )
   {
-    return userManager.fetchScanRequestsForPatient(dbAddress, patientId, offset, limit, seed);
+    return userManager.fetchPatientScanRequests(dbAddress, patientId, offset, limit, seed);
   }
 
   function fetchAcceptedScanRequestsForPatient (
@@ -39,7 +39,7 @@ contract ScanRequestReader is Restrictor {
       uint[]
     )
   {
-    return userManager.fetchAcceptedScanRequestsForPatient(dbAddress, patientId, offset, limit, seed);
+    return userManager.fetchPatientAcceptedScanRequests(dbAddress, patientId, offset, limit, seed);
   }
 
   function fetchDirectScanRequestsForDentist (
@@ -55,7 +55,7 @@ contract ScanRequestReader is Restrictor {
       uint[]
     )
   {
-    return userManager.fetchDirectScanRequestsForDentist(dbAddress, dentistId, offset, limit, seed);
+    return userManager.fetchDentistDirectScanRequests(dbAddress, dentistId, offset, limit, seed);
   }
 
   function fetchAcceptedScanRequestsForDentist (
@@ -71,6 +71,6 @@ contract ScanRequestReader is Restrictor {
       uint[]
     )
   {
-    return userManager.fetchAcceptedScanRequestsForDentist(dbAddress, dentistId, offset, limit, seed);
+    return userManager.fetchDentistAcceptedScanRequests(dbAddress, dentistId, offset, limit, seed);
   }
 }

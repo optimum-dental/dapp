@@ -18,16 +18,16 @@ contract TreatmentApplicationWriter is Restrictor {
   )
     external
   {
-    userManager.applyToTreat(dbAddress, msg.sender, patientId, treatmentRequestId, quote, comment);
+    userManager.applyToTreatPatient(dbAddress, msg.sender, patientId, treatmentRequestId, quote, comment);
   }
-  
+
   function cancelTreatmentApplication (
     address patientId,
     uint treatmentApplicationId
   )
     external
   {
-    userManager.cancelTreatmentApplication(dbAddress, msg.sender, patientId, treatmentApplicationId);
+    userManager.cancelDentistTreatmentApplication(dbAddress, msg.sender, patientId, treatmentApplicationId);
   }
 
   function cancelTreatment (
@@ -36,7 +36,7 @@ contract TreatmentApplicationWriter is Restrictor {
   )
     external
   {
-    userManager.cancelTreatment(dbAddress, dentistId, msg.sender, treatmentId);
+    userManager.cancelPatientTreatment(dbAddress, dentistId, msg.sender, treatmentId);
   }
 
   function markTreatmentDone (
@@ -45,6 +45,6 @@ contract TreatmentApplicationWriter is Restrictor {
   )
     external
   {
-    userManager.markTreatmentDone(dbAddress, dentistId, msg.sender, treatmentId);
+    userManager.markPatientTreatmentDone(dbAddress, dentistId, msg.sender, treatmentId);
   }
 }

@@ -22,7 +22,7 @@ contract PostApplicationReader2 is Restrictor {
       uint[]
     )
   {
-    return userManager.fetchAllCases(dbAddress, offset, limit, seed);
+    return userManager.fetchCases(dbAddress, offset, limit, seed);
   }
 
   function fetchAllTreatments (
@@ -37,6 +37,6 @@ contract PostApplicationReader2 is Restrictor {
       uint[]
     )
   {
-    return userManager.fetchAllTreatments(dbAddress, offset, limit, seed);
+    return userManager.fetchTreatments(dbAddress, offset, limit, seed);
   }
 }

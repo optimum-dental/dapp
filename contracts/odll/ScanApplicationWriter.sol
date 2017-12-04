@@ -18,7 +18,7 @@ contract ScanApplicationWriter is Restrictor {
     external
     onlyPermittedSmartContract
   {
-    userManager.applyToScan(dbAddress, msg.sender, patientId, scanRequestId, quote, comment);
+    userManager.applyToScanPatient(dbAddress, msg.sender, patientId, scanRequestId, quote, comment);
   }
 
   function cancelScanApplication (
@@ -27,6 +27,6 @@ contract ScanApplicationWriter is Restrictor {
   )
     external
   {
-    userManager.cancelScanApplication(dbAddress, msg.sender, patientId, scanApplicationId);
+    userManager.cancelDentistScanApplication(dbAddress, msg.sender, patientId, scanApplicationId);
   }
 }

@@ -29,7 +29,7 @@ contract Escrow is Restrictor {
 
     require(amount >= 0 && amount == totalFee && this.balance >= amount);
 
-    userManager.releaseFundForScan(dbAddress, dentistId, patientId, ODLLFee, dentistFee, totalFee);
+    userManager.releaseScanFund(dbAddress, dentistId, patientId, ODLLFee, dentistFee, totalFee);
     DB(dbAddress).setUInt8Value(keccak256("payment/state", paymentId), 3);
     FundReleased(paymentId, payee);
   }
@@ -48,7 +48,7 @@ contract Escrow is Restrictor {
     require(userId == patientId && payee == dentistId);
     require(amount >= 0 && amount == totalFee && this.balance >= amount);
 
-    userManager.releaseFundForTreatment(dbAddress, dentistId, patientId, ODLLFee, dentistFee, totalFee);
+    userManager.releaseTreatmentFund(dbAddress, dentistId, patientId, ODLLFee, dentistFee, totalFee);
     DB(dbAddress).setUInt8Value(keccak256("payment/state", paymentId), 3);
     FundReleased(paymentId, payee);
   }

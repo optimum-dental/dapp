@@ -20,7 +20,7 @@ contract ScanRequestWriter is Restrictor {
     external
     onlyPermittedSmartContract
   {
-    userManager.writeScanRequest(dbAddress, dentistId, msg.sender, scanAppointmentId, appointmentDate, scanTime, scanInsurance, comment);
+    userManager.writePatientScanRequest(dbAddress, dentistId, msg.sender, scanAppointmentId, appointmentDate, scanTime, scanInsurance, comment);
   }
 
   function cancelScanRequest (
@@ -29,7 +29,7 @@ contract ScanRequestWriter is Restrictor {
     external
     onlyPermittedSmartContract
   {
-    userManager.cancelScanRequest(dbAddress, msg.sender, scanRequestId);
+    userManager.cancelPatientScanRequest(dbAddress, msg.sender, scanRequestId);
   }
 
   function expireScanRequest (
@@ -38,7 +38,7 @@ contract ScanRequestWriter is Restrictor {
     external
     onlyPermittedSmartContract
   {
-    userManager.expireScanRequest(dbAddress, scanRequestId);
+    userManager.expirePatientScanRequest(dbAddress, scanRequestId);
   }
 
   function acceptScanRequest (
@@ -50,7 +50,7 @@ contract ScanRequestWriter is Restrictor {
     external
     onlyPermittedSmartContract
   {
-    userManager.acceptScanRequest(dbAddress, msg.sender, patientId, scanRequestId, quote, comment);
+    userManager.acceptPatientScanRequest(dbAddress, msg.sender, patientId, scanRequestId, quote, comment);
   }
 
   function rejectScanRequest (
@@ -60,6 +60,6 @@ contract ScanRequestWriter is Restrictor {
     external
     onlyPermittedSmartContract
   {
-    userManager.rejectScanRequest(dbAddress, msg.sender, patientId, scanRequestId);
+    userManager.rejectPatientScanRequest(dbAddress, msg.sender, patientId, scanRequestId);
   }
 }

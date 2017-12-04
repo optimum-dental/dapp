@@ -20,7 +20,7 @@ contract TreatmentRequestWriter is Restrictor {
     external
     onlyPermittedSmartContract
   {
-    userManager.writeTreatmentRequest(dbAddress, msg.sender, hasCaseId, caseId, insurance, scanResults, comment);
+    userManager.writePatientTreatmentRequest(dbAddress, msg.sender, hasCaseId, caseId, insurance, scanResults, comment);
   }
 
   function cancelTreatmentRequest (
@@ -29,6 +29,6 @@ contract TreatmentRequestWriter is Restrictor {
     external
     onlyPermittedSmartContract
   {
-    userManager.cancelTreatmentRequest(dbAddress, msg.sender, treatmentRequestId);
+    userManager.cancelPatientTreatmentRequest(dbAddress, msg.sender, treatmentRequestId);
   }
 }

@@ -23,7 +23,7 @@ contract ScanApplicationReader is Restrictor {
       uint[]
     )
   {
-    return userManager.fetchScanApplicationsForPatient(dbAddress, patientId, offset, limit, seed);
+    return userManager.fetchPatientScanApplications(dbAddress, patientId, offset, limit, seed);
   }
 
   function fetchScanApplicationsForDentist (
@@ -39,6 +39,6 @@ contract ScanApplicationReader is Restrictor {
       uint[]
     )
   {
-    return userManager.fetchScanApplicationsForDentist(dbAddress, dentistId, offset, limit, seed);
+    return userManager.fetchDentistScanApplications(dbAddress, dentistId, offset, limit, seed);
   }
 }

@@ -31,7 +31,7 @@ module.exports = {
     "ropsten": {
       network_id: 3,    // Official ropsten network id
       provider: engine, // Use our custom provider
-      from: address,     // Use the address we derived
+      from: address,     // Use the address we derived: 0x3b26a28666a28e5037613947ac09dcf5d6caf7b9
       gas: 4700000
     },
     // development: {

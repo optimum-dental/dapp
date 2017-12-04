@@ -19,7 +19,7 @@ library servicesLibrary {
     }
   }
 
-  function removeDentistFromService(address dbAddress, uint serviceTypeId, uint serviceId, address userId) internal {
+  function handleRemoveDentistService(address dbAddress, uint serviceTypeId, uint serviceId, address userId) internal {
     if (serviceTypeId == 1) {
       utilities.removeIdItem(dbAddress, userId, "dentist/scan-service", serviceId);
       utilities.removeIdItem(dbAddress, serviceId, "scan-service/dentist", userId);
@@ -31,7 +31,7 @@ library servicesLibrary {
 
   function removeDentist(address dbAddress, uint serviceTypeId, uint[] serviceIds, address userId) internal {
     for (uint i = 0; i < serviceIds.length; i++) {
-      removeDentistFromService(dbAddress, serviceTypeId, serviceIds[i], userId);
+      handleRemoveDentistService(dbAddress, serviceTypeId, serviceIds[i], userId);
     }
   }
 
@@ -55,7 +55,7 @@ library servicesLibrary {
 
   // scan request status: 1 => active, 2 => expired, 3 => canceled, 4 => fulfilled, 5 => rejected
   // scan application status: 1 => pending, 2 => active, 3 => canceled, 4 => fulfilled, 5 => inactive
-  function writeScanRequest (
+  function handleWritePatientScanRequest (
     address dbAddress,
     address dentistId,
     address patientId,
@@ -113,7 +113,7 @@ library servicesLibrary {
     DB(dbAddress).setStringValue(keccak256("scan-request/appointment-comment", scanRequestId), scanComment);
   }
 
-  function cancelScanRequest (
+  function handleCancelPatientScanRequest (
     address dbAddress,
     address patientId,
     uint scanRequestId
@@ -126,7 +126,7 @@ library servicesLibrary {
     DB(dbAddress).setUInt8Value(keccak256("scan-request/status", scanRequestId), 3);
   }
 
-  function expireScanRequest (
+  function handleExpirePatientScanRequest (
     address dbAddress,
     uint scanRequestId
   )
@@ -137,7 +137,7 @@ library servicesLibrary {
     DB(dbAddress).setUInt8Value(keccak256("scan-request/status", scanRequestId), 2);
   }
 
-  function acceptScanRequest (
+  function handleAcceptPatientScanRequest (
     address dbAddress,
     address dentistId,
     address patientId,
@@ -152,7 +152,7 @@ library servicesLibrary {
     DB(dbAddress).setBooleanValue(keccak256("scan-request/is-accepted?", scanRequestId), true);
   }
 
-  function rejectScanRequest (
+  function handleRejectPatientScanRequest (
     address dbAddress,
     address dentistId,
     address patientId,
@@ -167,7 +167,7 @@ library servicesLibrary {
     DB(dbAddress).setUInt8Value(keccak256("scan-request/status", scanRequestId), 5);
   }
 
-  function applyToScan (
+  function handleApplyToScanPatient (
     address dbAddress,
     address dentistId,
     address patientId,
@@ -231,7 +231,7 @@ library servicesLibrary {
     utilities.addIdArrayItem(dbAddress, patientId, "patient/scan-application", "patient/scan-applications-count", scanApplicationId);
   }
 
-  function cancelScanApplication (
+  function handleCancelDentistScanApplication (
     address dbAddress,
     address dentistId,
     address patientId,
@@ -247,7 +247,7 @@ library servicesLibrary {
   }
 
   // case status: 1 => pending, 2 => treated, 3 => canceled
-  function acceptScanApplication (
+  function handleAcceptDentistScanApplication (
     address dbAddress,
     address dentistId,
     address patientId,
@@ -317,7 +317,7 @@ library servicesLibrary {
 
   // treatment request status: 1 => pending, 2 => fulfilled, 3 => canceled
   // treatment application status: 1 => pending, 2 => active, 3 => canceled, 4 => fulfilled, 5 => inactive
-  function writeTreatmentRequest (
+  function handleWritePatientTreatmentRequest (
     address dbAddress,
     address patientId,
     bool hasCaseId,
@@ -379,7 +379,7 @@ library servicesLibrary {
     DB(dbAddress).setStringValue(keccak256("treatment-request/comment", treatmentRequestId), comment);
   }
 
-  function cancelTreatmentRequest (
+  function handleCancelPatientTreatmentRequest (
     address dbAddress,
     address patientId,
     uint treatmentRequestId
@@ -392,7 +392,7 @@ library servicesLibrary {
     DB(dbAddress).setUInt8Value(keccak256("treatment-request/status", treatmentRequestId), 3);
   }
 
-  function applyToTreat(
+  function handleApplyToTreatPatient(
     address dbAddress,
     address dentistId,
     address patientId,
@@ -454,7 +454,7 @@ library servicesLibrary {
     utilities.addIdArrayItem(dbAddress, treatmentRequestId, "treatment-request/treatment-application", "treatment-request/treatment-applications-count", treatmentApplicationId);
   }
 
-  function cancelTreatmentApplication (
+  function handleCancelDentistTreatmentApplication (
     address dbAddress,
     address dentistId,
     address patientId,
@@ -470,7 +470,7 @@ library servicesLibrary {
   }
 
   // treatment status: 1 => pending, 2 => done, 3 => canceled
-  function acceptTreatmentApplication (
+  function handleAcceptDentistTreatmentApplication (
     address dbAddress,
     address dentistId,
     address patientId,
@@ -536,7 +536,7 @@ library servicesLibrary {
     utilities.addArrayItem(dbAddress, "payment", "payments-count", paymentId); // paymentId is currently just there for counter purpose
   }
 
-  function cancelTreatment (
+  function handleCancelPatientTreatment (
     address dbAddress,
     address dentistId,
     address patientId,
@@ -551,7 +551,7 @@ library servicesLibrary {
     DB(dbAddress).setUInt8Value(keccak256("treatment/status", treatmentId), 3);
   }
 
-  function markTreatmentDone (
+  function handleMarkPatientTreatmentDone (
     address dbAddress,
     address dentistId,
     address patientId,

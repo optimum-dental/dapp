@@ -23,7 +23,7 @@ contract PostApplicationReader is Restrictor {
       uint[]
     )
   {
-    return userManager.fetchCasesForPatient(dbAddress, patientId, offset, limit, seed);
+    return userManager.fetchPatientCases(dbAddress, patientId, offset, limit, seed);
   }
 
   function fetchCasesForDentist (
@@ -39,7 +39,7 @@ contract PostApplicationReader is Restrictor {
       uint[]
     )
   {
-    return userManager.fetchCasesForDentist(dbAddress, dentistId, offset, limit, seed);
+    return userManager.fetchDentistCases(dbAddress, dentistId, offset, limit, seed);
   }
 
   function fetchTreatmentsForPatient (
@@ -55,7 +55,7 @@ contract PostApplicationReader is Restrictor {
       uint[]
     )
   {
-    return userManager.fetchTreatmentsForPatient(dbAddress, patientId, offset, limit, seed);
+    return userManager.fetchPatientTreatment(dbAddress, patientId, offset, limit, seed);
   }
 
   function fetchTreatmentsForDentist (
@@ -71,6 +71,6 @@ contract PostApplicationReader is Restrictor {
       uint[]
     )
   {
-    return userManager.fetchTreatmentsForDentist(dbAddress, dentistId, offset, limit, seed);
+    return userManager.fetchDentistTreatment(dbAddress, dentistId, offset, limit, seed);
   }
 }

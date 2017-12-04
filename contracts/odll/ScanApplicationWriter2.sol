@@ -30,7 +30,7 @@ contract ScanApplicationWriter2 is Restrictor {
 
     uint paymentId = utilities.getArrayItemsCount(dbAddress, "payments-count");
     DB(dbAddress).setUInt8Value(keccak256("payment/for-type", paymentId), 1);
-    userManager.acceptScanApplication(dbAddress, dentistId, msg.sender, scanApplicationId, paymentId, amount, quote);
+    userManager.acceptDentistScanApplication(dbAddress, dentistId, msg.sender, scanApplicationId, paymentId, amount, quote);
 
     lockPayment(msg.sender, paymentId);
     escrowAddress.transfer(amount);
