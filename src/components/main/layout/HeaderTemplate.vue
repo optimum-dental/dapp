@@ -114,7 +114,7 @@
   }
 
   .balance {
-    width: 140px;
+    width: 80px;
     height: 20px;
     cursor: default;
     font-size: 14px;

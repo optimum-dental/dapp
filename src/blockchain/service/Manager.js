@@ -288,7 +288,9 @@ class Manager {
       'quote',
       'comment',
       'hasCase',
-      'caseId'
+      'caseId',
+      'ODLLSPP',
+      'ODLLTPP'
     ]
   }
 
@@ -302,13 +304,15 @@ class Manager {
       getSoliditySha3ForId(state, 'scan-application/quote', scanApplicationId),
       getSoliditySha3ForId(state, 'scan-application/comment', scanApplicationId),
       getSoliditySha3ForId(state, 'scan-application/has-case?', scanApplicationId),
-      getSoliditySha3ForId(state, 'scan-application/case', scanApplicationId)
+      getSoliditySha3ForId(state, 'scan-application/case', scanApplicationId),
+      getSoliditySha3ForId(state, 'odll/scan-payment-percentage'),
+      getSoliditySha3ForId(state, 'odll/treatment-payment-percentage')
     ]
   }
 
   applicationRecordFieldTypes () {
     // types: 1 => boolean, 2 => uint8, 3 => uint, 4 => address, 5 => bytes32, 7 => string
-    return [2, 3, 4, 3, 3, 7, 1, 3]
+    return [2, 3, 4, 3, 3, 7, 1, 3, 3, 3]
   }
 
   caseKeys () {

@@ -152,6 +152,12 @@
           const USDExchange = JSONResponse[0].price_usd
           const quoteInEther = application.quote / USDExchange
           const quoteInWei = this.$store.state.web3.instance().toWei(quoteInEther, 'ether')
+          const tempTotalFee = new BigNumber(quoteInWei)
+          const percentage = new BigNumber(Number(applicationTypeId === 1 ? (application.ODLLSPP / 100) : (application.ODLLTPP / 100)))
+          const ODLLFee = tempTotalFee.times(percentage)
+          const dentistFee = tempTotalFee.minus(ODLLFee)
+          const totalFee = ODLLFee.plus(dentistFee)
+          console.log(ODLLFee, dentistFee, totalFee)
           this.scrollToTop()
           this.disableNecessaryButtons(evt)
           this.beginWait(document.querySelector('.wrapper'))
@@ -159,11 +165,13 @@
             requestParams: {
               dentistId: application.userId,
               applicationId: application.applicationId,
-              quote: quoteInWei
+              quote: totalFee.toString(),
+              ODLLFee: ODLLFee.toString(),
+              dentistFee: dentistFee.toString()
             },
             managerIndex: 2, // which of the contract managers to use
             contractIndexToUse: applicationTypeId === 1 ? 6 : 12,
-            value: new BigNumber(quoteInWei),
+            value: totalFee,
             methodName: applicationTypeId === 1 ? 'acceptScanApplication' : 'acceptTreatmentApplication',
             callback: (status) => {
               this.endWait(document.querySelector('.wrapper'))
@@ -291,11 +299,6 @@
         const sn = evt.target.dataset.params
         const applicationTypeId = Number(this.$route.query.aTI || 1)
         const postApplication = this.$store.state.searchResult[applicationTypeId === 1 ? 'fetchCases' : 'fetchTreatments'].data[this.currentOffset][sn]
-
-        const percentage = applicationTypeId === 1 ? (postApplication.ODLLSPP / 100) : (postApplication.ODLLTPP / 100)
-        const totalFee = postApplication.amount
-        const ODLLFee = totalFee.times(percentage)
-        const dentistFee = totalFee.minus(ODLLFee)
         this.scrollToTop()
         this.disableNecessaryButtons(evt)
         this.beginWait(document.querySelector('.wrapper'))
@@ -303,10 +306,7 @@
           requestParams: {
             userId: this.user.coinbase,
             dentistId: postApplication.userObject.coinbase,
-            paymentId: postApplication.paymentId,
-            ODLLFee: ODLLFee.toNumber(),
-            dentistFee: dentistFee.toNumber(),
-            totalFee: totalFee.toNumber()
+            paymentId: postApplication.paymentId
           },
           managerIndex: 2, // which of the contract managers to use
           contractIndexToUse: 16,
@@ -437,6 +437,7 @@
       },
       createPostApplicationResultDOMElement (result) {
         const userObject = result.userObject
+        console.log(result)
         const resultDOMElement = new DOMParser().parseFromString(`
           <div class="applications-result">
             <div class="applications-gravatar-section"></div>
@@ -445,7 +446,7 @@
               <div class="applications-name">Dentist: <span>${userObject.name || 'Name: Not Supplied'}</span></div>
               <div class="applications-company-name">Company: <span>${userObject.companyName || 'Not Supplied'}</span></div>
               <div class="applications-address">Address: <span>${userObject.address || 'Not Supplied'}</span></div>
-              <div class="applications-quote">Amount: <span>$${result.quote}</span></div>
+              <div class="applications-quote">Amount: <span>$${result.applicationObject.quote}</span></div>
               <div class="applications-status">Status: <span>${result.paymentObject.status === 3 ? 'Paid Dentist In Full' : 'Paid into Escrow'}</span></div>
               ${this.createAverageRatingDOMElement(userObject.averageRating, result.SN).outerHTML}
               ${result.paymentObject.status === 2 ? '<input type="button" value="Release Fund" class="applications-button release-fund" data-params="' + result.SN + '">' : ''}

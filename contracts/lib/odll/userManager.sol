@@ -735,14 +735,15 @@ library userManager {
     address dbAddress,
     address dentistId,
     address patientId,
-    uint ODLLFee,
-    uint dentistFee,
-    uint totalFee
+    uint paymentId
   )
     internal
   {
     address ODLLId = DB(dbAddress).getAddressValue(keccak256("odll/payment-address"));
     require(ODLLId != 0x0 && dentistId != 0x0 && patientId != 0x0);
+    uint totalFee = DB(dbAddress).getUIntValue(keccak256("payment/quote", paymentId));
+    uint ODLLFee = DB(dbAddress).getUIntValue(keccak256("payment/odll-fee", paymentId));
+    uint dentistFee = DB(dbAddress).getUIntValue(keccak256("payment/dentist-fee", paymentId));
     require(totalFee == SafeMath.add(ODLLFee, dentistFee));
 
     addToPatientScanTotalPaid(dbAddress, patientId, totalFee);
@@ -827,14 +828,15 @@ library userManager {
     address dbAddress,
     address dentistId,
     address patientId,
-    uint ODLLFee,
-    uint dentistFee,
-    uint totalFee
+    uint paymentId
   )
     internal
   {
     address ODLLId = DB(dbAddress).getAddressValue(keccak256("odll/payment-address"));
     require(ODLLId != 0x0 && dentistId != 0x0 && patientId != 0x0);
+    uint totalFee = DB(dbAddress).getUIntValue(keccak256("payment/quote", paymentId));
+    uint ODLLFee = DB(dbAddress).getUIntValue(keccak256("payment/odll-fee", paymentId));
+    uint dentistFee = DB(dbAddress).getUIntValue(keccak256("payment/dentist-fee", paymentId));
     require(totalFee == SafeMath.add(ODLLFee, dentistFee));
 
     addToPatientTreatmentTotalPaid(dbAddress, patientId, totalFee);

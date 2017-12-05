@@ -1,6 +1,7 @@
 // ropsten network owner account: 0x3b26a28666a28e5037613947ac09dcf5d6caf7b9
 
 // ropsten coinbase: 0x3b26a28666a28e5037613947ac09dcf5d6caf7b9
+// development coinbase: 0xe1eb3251dce3d8ba0bf186bffeba19cbc7c1ddf4
 
 // Sample keccak256 implementation
 web3.sha3(web3.toHex('scan-application/quote') + '0000000000000000000000000000000000000000000000000000000000000001', {encoding: 'hex'})
