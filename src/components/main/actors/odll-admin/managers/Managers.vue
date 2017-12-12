@@ -163,7 +163,7 @@
             this.endWait(document.querySelector('.wrapper'))
             this.enableNecessaryButtons()
             this.fetchManagers(null, this.currentOffset, this.$store.state.searchResult.fetchManagers.seed)
-            this.notify(status ? `${action} successful for Manager` : `${action} unsuccessful for Manager`)
+            this.notify(status ? `${action} successful for Manager.` : `${action} unsuccessful for Manager.`)
           }
         })
       },
