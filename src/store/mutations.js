@@ -141,7 +141,7 @@ export default {
     const userObject = payload.userObject
     const userCopy = state.user
     const [lastName, firstName, middleName] = userObject.name.split(' ')
-    const [areaNumber, groupNumber, sequenceNumber] = userObject.socialSecurityNumber.split('-')
+    // const [areaNumber, groupNumber, sequenceNumber] = userObject.socialSecurityNumber.split('-')
     const [year, month, day] = userObject.birthday.split('/')
 
     Object.assign(userCopy, userObject, {
@@ -165,10 +165,10 @@ export default {
       zipCode: userObject.zipCode || '',
       country: userObject.country && userObject.country.toString() === '0' ? '' : userObject.country.toString(),
       phoneNumber: userObject.phoneNumber && userObject.phoneNumber.toString().trim() === '' ? '' : userObject.phoneNumber,
-      socialSecurityNumber: userObject.socialSecurityNumber || '',
-      areaNumber: areaNumber || '',
-      groupNumber: groupNumber || '',
-      sequenceNumber: sequenceNumber || '',
+      // socialSecurityNumber: userObject.socialSecurityNumber || '',
+      // areaNumber: areaNumber || '',
+      // groupNumber: groupNumber || '',
+      // sequenceNumber: sequenceNumber || '',
       birthday: userObject.birthday || '',
       day: day || '',
       month: month || '',

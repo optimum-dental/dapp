@@ -25,7 +25,6 @@ contract UserWriter is Restrictor {
     bytes32 zipCode,
     uint countryId,
     bytes32 phoneNumber,
-    bytes32 socialSecurityNumber,
     bytes32 birthday,
     uint8 gender
   )
@@ -37,7 +36,7 @@ contract UserWriter is Restrictor {
 
     writeUserIdentity(userType, name, email, gravatar);
     writeUserLocation(street, city, stateId, zipCode, countryId);
-    writeUserOptionalValues(phoneNumber, socialSecurityNumber, birthday, gender);
+    writeUserOptionalValues(phoneNumber, birthday, gender);
     determineEvent(userType);
   }
 
@@ -49,8 +48,8 @@ contract UserWriter is Restrictor {
     userManager.setUserLocation(dbAddress, msg.sender, street, city, stateId, zipCode, countryId);
   }
 
-  function writeUserOptionalValues(bytes32 phoneNumber, bytes32 socialSecurityNumber, bytes32 birthday, uint8 gender) public {
-    userManager.setUserOptionalValues(dbAddress, msg.sender, phoneNumber, socialSecurityNumber, birthday, gender);
+  function writeUserOptionalValues(bytes32 phoneNumber, bytes32 birthday, uint8 gender) public {
+    userManager.setUserOptionalValues(dbAddress, msg.sender, phoneNumber, birthday, gender);
   }
 
   function determineEvent(uint8 userType) public {

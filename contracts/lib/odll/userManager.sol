@@ -150,7 +150,6 @@ library userManager {
     address dbAddress,
     address userId,
     bytes32 phoneNumber,
-    bytes32 socialSecurityNumber,
     bytes32 birthday,
     uint8 gender
   )
@@ -159,7 +158,6 @@ library userManager {
     require(userExists(dbAddress, userId));
     require(isActiveUser(dbAddress, userId));
     DB(dbAddress).setBytes32Value(keccak256("user/phone-number", userId), phoneNumber);
-    DB(dbAddress).setBytes32Value(keccak256("user/social-security-number", userId), socialSecurityNumber);
     DB(dbAddress).setBytes32Value(keccak256("user/birthday", userId), birthday);
     DB(dbAddress).setUInt8Value(keccak256("user/gender", userId), gender);
   }

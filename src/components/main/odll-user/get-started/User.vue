@@ -50,12 +50,12 @@
         <input type="text" class="field-value" id="phone-number" placeholder="Phone Number" @input="displayLabel" data-name="phoneNumber">
       </div>
 
-      <div class="field">
+      <!-- <div class="field">
         <label class="field-key show">Social Security Number</label>
         <input type="text" id='area-number' data-next="group-number" class="field-value special social-security-number" maxlength="3" size="3" required placeholder="XXX" @input="decideIfNext" data-name="areaNumber"></span>
         <input type="text" id='group-number' data-next="sequence-number" class="field-value special social-security-number" maxlength="2" size="2" required placeholder="XX" @input="decideIfNext" data-name="groupNumber"></span>
         <input type="text" id='sequence-number' class="field-value special social-security-number" maxlength="4" size="4" required placeholder="XXXX" @input="decideIfNext" data-name="sequenceNumber">
-      </div>
+      </div> -->
 
       <div class="field">
         <label class="field-key show">Birthday</label>
@@ -83,14 +83,14 @@
 <script>
   export default {
     computed: {
-      socialSecurityNumber () {
-        const areaNumber = this.user.areaNumber
-        const groupNumber = this.user.groupNumber
-        const sequenceNumber = this.user.sequenceNumber
-        if (areaNumber && groupNumber && sequenceNumber) {
-          return `${areaNumber}-${groupNumber}-${sequenceNumber}`
-        }
-      },
+      // socialSecurityNumber () {
+      //   const areaNumber = this.user.areaNumber
+      //   const groupNumber = this.user.groupNumber
+      //   const sequenceNumber = this.user.sequenceNumber
+      //   if (areaNumber && groupNumber && sequenceNumber) {
+      //     return `${areaNumber}-${groupNumber}-${sequenceNumber}`
+      //   }
+      // },
       user () {
         return this.$root.user
       },
@@ -226,26 +226,26 @@
           })
         }
       },
-      decideIfNext (evt) {
-        const target = evt.target
-        const entry = target.value.trim()
-        if (isNaN(entry)) {
-          target.value = ''
-        } else {
-          if (target.value.trim().length === target.maxLength) {
-            if (!validateFor(target.id, entry)) {
-              target.value = ''
-            } else {
-              const nextInput = document.getElementById(target.dataset.next)
-              if (nextInput) {
-                nextInput.focus()
-              }
-            }
-          }
-        }
-      },
+      // decideIfNext (evt) {
+      //   const target = evt.target
+      //   const entry = target.value.trim()
+      //   if (isNaN(entry)) {
+      //     target.value = ''
+      //   } else {
+      //     if (target.value.trim().length === target.maxLength) {
+      //       if (!validateFor(target.id, entry)) {
+      //         target.value = ''
+      //       } else {
+      //         const nextInput = document.getElementById(target.dataset.next)
+      //         if (nextInput) {
+      //           nextInput.focus()
+      //         }
+      //       }
+      //     }
+      //   }
+      // },
       populateOtherInputs () {
-        const elements = [ document.getElementById('name'), document.getElementById('email'), document.getElementById('street'), document.getElementById('city'), document.getElementById('zip-code'), document.getElementById('phone-number'), document.getElementById('area-number'), document.getElementById('group-number'), document.getElementById('sequence-number') ]
+        const elements = [ document.getElementById('name'), document.getElementById('email'), document.getElementById('street'), document.getElementById('city'), document.getElementById('zip-code'), document.getElementById('phone-number'), document.getElementById('group-number'), document.getElementById('sequence-number') ]
         elements.forEach((element) => {
           if (element) {
             element.value = this.user[element.dataset.name] || ''
@@ -271,10 +271,10 @@
         const state = Number(document.getElementById('state').selectedIndex)
         const zipCode = document.getElementById('zip-code').value
         const country = Number(document.getElementById('country').selectedIndex)
-        const areaNumber = document.getElementById('area-number').value
-        const groupNumber = document.getElementById('group-number').value
-        const sequenceNumber = document.getElementById('sequence-number').value
-        const socialSecurityNumber = `${areaNumber}-${groupNumber}-${sequenceNumber}`
+        // const areaNumber = document.getElementById('area-number').value
+        // const groupNumber = document.getElementById('group-number').value
+        // const sequenceNumber = document.getElementById('sequence-number').value
+        // const socialSecurityNumber = `${areaNumber}-${groupNumber}-${sequenceNumber}`
         const day = document.getElementById('day').options[document.getElementById('day').selectedIndex].value
         const month = document.getElementById('month').selectedIndex - 1
         const year = document.getElementById('year').options[document.getElementById('year').selectedIndex].value
@@ -303,7 +303,7 @@
             zipCode: `b${zipCode}`,
             country,
             phoneNumber: `b${document.getElementById('phone-number').value}`,
-            socialSecurityNumber: `b${socialSecurityNumber}`,
+            // socialSecurityNumber: `b${socialSecurityNumber}`,
             birthday: `b${birthday}`,
             gender: Number(gender)
           }
@@ -319,15 +319,15 @@
             zipCode,
             country,
             phoneNumber: document.getElementById('phone-number').value,
-            socialSecurityNumber: socialSecurityNumber,
+            // socialSecurityNumber: socialSecurityNumber,
             birthday: birthday,
             gender: Number(gender),
             lastName,
             firstName,
             middleName,
-            areaNumber,
-            groupNumber,
-            sequenceNumber,
+            // areaNumber,
+            // groupNumber,
+            // sequenceNumber,
             day,
             month,
             year
@@ -389,7 +389,7 @@
   import countries from '../../../../../static/json/countries/countries.json'
   import states from '../../../../../static/json/states/states.json'
   import dateSelectionManager from 'date-selection-manager'
-  import { validateFor } from '../../../../util/ssnValidator'
+  // import { validateFor } from '../../../../util/ssnValidator'
   import $ from 'jquery'
 </script>
 
