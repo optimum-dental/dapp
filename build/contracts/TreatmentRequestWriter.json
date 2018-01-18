@@ -11,18 +11,6 @@
         {
           "name": "paymentId",
           "type": "uint256"
-        },
-        {
-          "name": "insurance",
-          "type": "bytes32"
-        },
-        {
-          "name": "scanResults",
-          "type": "bytes32[]"
-        },
-        {
-          "name": "comment",
-          "type": "bytes32"
         }
       ],
       "name": "lockPayment",
@@ -84,12 +72,7 @@
         }
       ],
       "name": "writeTreatmentRequest",
-      "outputs": [
-        {
-          "name": "",
-          "type": "address"
-        }
-      ],
+      "outputs": [],
       "payable": false,
       "stateMutability": "nonpayable",
       "type": "function"
@@ -110,12 +93,7 @@
     },
     {
       "constant": true,
-      "inputs": [
-        {
-          "name": "newOwner",
-          "type": "address"
-        }
-      ],
+      "inputs": [],
       "name": "dbAddress",
       "outputs": [
         {
@@ -128,32 +106,29 @@
       "type": "function"
     },
     {
+      "constant": false,
       "inputs": [
         {
           "name": "newOwner",
           "type": "address"
         }
       ],
+      "name": "transferOwnership",
+      "outputs": [],
       "payable": false,
       "stateMutability": "nonpayable",
-      "type": "function",
-      "constant": false,
-      "name": "transferOwnership",
-      "outputs": []
+      "type": "function"
     },
     {
-      "anonymous": false,
       "inputs": [
         {
-          "indexed": false,
           "name": "_dbAddress",
           "type": "address"
         }
       ],
-      "name": "OnSmartContractStatusSet",
-      "type": "constructor",
       "payable": false,
-      "stateMutability": "nonpayable"
+      "stateMutability": "nonpayable",
+      "type": "constructor"
     },
     {
       "anonymous": false,
@@ -162,11 +137,6 @@
           "indexed": false,
           "name": "paymentId",
           "type": "uint256"
-        },
-        {
-          "indexed": true,
-          "name": "newOwner",
-          "type": "address"
         }
       ],
       "name": "PaymentLocked",
@@ -628,21 +598,9 @@
                     "children": [
                       {
                         "attributes": {
-                          "length": null,
-                          "type": "string storage pointer",
-                          "name": "string"
+                          "name": "string",
+                          "type": "string storage pointer"
                         },
-                        "children": [
-                          {
-                            "attributes": {
-                              "name": "bytes32",
-                              "type": "bytes32"
-                            },
-                            "id": 16014,
-                            "name": "ElementaryTypeName",
-                            "src": "389:7:18"
-                          }
-                        ],
                         "id": 17664,
                         "name": "ElementaryTypeName",
                         "src": "388:6:25"
@@ -1177,9 +1135,9 @@
     "666": {
       "events": {},
       "links": {},
-      "address": "0x431e71faca053deaa705a0bcdbe3c50d69995fa9"
+      "address": "0xe3aa4669d18620284763ee9d8761c53d7dce8aeb"
     }
   },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-01-13T15:25:43.528Z"
+  "updatedAt": "2018-01-13T20:39:45.865Z"
 }

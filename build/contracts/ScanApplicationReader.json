@@ -14,45 +14,19 @@
         }
       ],
       "name": "lockPayment",
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint8"
-        }
-      ],
+      "outputs": [],
       "payable": false,
       "stateMutability": "nonpayable",
       "type": "function"
     },
     {
       "constant": true,
-      "inputs": [
-        {
-          "name": "dentistId",
-          "type": "address"
-        },
-        {
-          "name": "offset",
-          "type": "uint256"
-        },
-        {
-          "name": "limit",
-          "type": "uint256"
-        },
-        {
-          "name": "seed",
-          "type": "uint256"
-        }
-      ],
+      "inputs": [],
       "name": "smartContractStatus",
       "outputs": [
         {
           "name": "",
           "type": "uint8"
-        },
-        {
-          "name": "",
-          "type": "uint256[]"
         }
       ],
       "payable": false,
@@ -110,33 +84,12 @@
     },
     {
       "constant": true,
-      "inputs": [
-        {
-          "name": "patientId",
-          "type": "address"
-        },
-        {
-          "name": "offset",
-          "type": "uint256"
-        },
-        {
-          "name": "limit",
-          "type": "uint256"
-        },
-        {
-          "name": "seed",
-          "type": "uint256"
-        }
-      ],
+      "inputs": [],
       "name": "dbAddress",
       "outputs": [
         {
           "name": "",
           "type": "address"
-        },
-        {
-          "name": "",
-          "type": "uint256[]"
         }
       ],
       "payable": false,
@@ -179,32 +132,29 @@
       "type": "function"
     },
     {
+      "constant": false,
       "inputs": [
         {
           "name": "newOwner",
           "type": "address"
         }
       ],
+      "name": "transferOwnership",
+      "outputs": [],
       "payable": false,
       "stateMutability": "nonpayable",
-      "type": "function",
-      "constant": false,
-      "name": "transferOwnership",
-      "outputs": []
+      "type": "function"
     },
     {
-      "anonymous": false,
       "inputs": [
         {
-          "indexed": false,
           "name": "_dbAddress",
           "type": "address"
         }
       ],
-      "name": "OnSmartContractStatusSet",
-      "type": "constructor",
       "payable": false,
-      "stateMutability": "nonpayable"
+      "stateMutability": "nonpayable",
+      "type": "constructor"
     },
     {
       "anonymous": false,
@@ -213,11 +163,6 @@
           "indexed": false,
           "name": "paymentId",
           "type": "uint256"
-        },
-        {
-          "indexed": true,
-          "name": "newOwner",
-          "type": "address"
         }
       ],
       "name": "PaymentLocked",
@@ -1312,9 +1257,9 @@
     "666": {
       "events": {},
       "links": {},
-      "address": "0x1fa09f082e0b6342801e162e940c0e9946afa16f"
+      "address": "0xaa84ca869a430e6b8fe2ed343502ae5baa443532"
     }
   },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-01-13T15:25:43.533Z"
+  "updatedAt": "2018-01-13T20:39:45.858Z"
 }

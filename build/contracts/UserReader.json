@@ -11,27 +11,10 @@
         {
           "name": "paymentId",
           "type": "uint256"
-        },
-        {
-          "name": "limit",
-          "type": "uint256"
-        },
-        {
-          "name": "seed",
-          "type": "uint256"
         }
       ],
       "name": "lockPayment",
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256"
-        },
-        {
-          "name": "",
-          "type": "address[]"
-        }
-      ],
+      "outputs": [],
       "payable": false,
       "stateMutability": "nonpayable",
       "type": "function"
@@ -101,29 +84,12 @@
     },
     {
       "constant": true,
-      "inputs": [
-        {
-          "name": "offset",
-          "type": "uint256"
-        },
-        {
-          "name": "limit",
-          "type": "uint256"
-        },
-        {
-          "name": "seed",
-          "type": "uint256"
-        }
-      ],
+      "inputs": [],
       "name": "dbAddress",
       "outputs": [
         {
           "name": "",
           "type": "address"
-        },
-        {
-          "name": "",
-          "type": "address[]"
         }
       ],
       "payable": false,
@@ -283,11 +249,6 @@
           "indexed": false,
           "name": "status",
           "type": "uint8"
-        },
-        {
-          "indexed": true,
-          "name": "newOwner",
-          "type": "address"
         }
       ],
       "name": "OnSmartContractStatusSet",
@@ -2128,196 +2089,6 @@
             "id": 17834,
             "name": "FunctionDefinition",
             "src": "1456:334:26"
-          },
-          {
-            "attributes": {
-              "constant": false,
-              "implemented": true,
-              "isConstructor": false,
-              "name": "destroySelf",
-              "payable": false,
-              "scope": 16201,
-              "stateMutability": "nonpayable",
-              "superFunction": null,
-              "visibility": "external"
-            },
-            "children": [
-              {
-                "children": [
-                  {
-                    "attributes": {
-                      "constant": false,
-                      "name": "callerAddress",
-                      "scope": 16200,
-                      "stateVariable": false,
-                      "storageLocation": "default",
-                      "type": "address",
-                      "value": null,
-                      "visibility": "internal"
-                    },
-                    "children": [
-                      {
-                        "attributes": {
-                          "name": "address",
-                          "type": "address"
-                        },
-                        "id": 16186,
-                        "name": "ElementaryTypeName",
-                        "src": "1803:7:19"
-                      }
-                    ],
-                    "id": 16187,
-                    "name": "VariableDeclaration",
-                    "src": "1803:21:19"
-                  },
-                  {
-                    "attributes": {
-                      "constant": false,
-                      "name": "newContractAddress",
-                      "scope": 16200,
-                      "stateVariable": false,
-                      "storageLocation": "default",
-                      "type": "address",
-                      "value": null,
-                      "visibility": "internal"
-                    },
-                    "children": [
-                      {
-                        "attributes": {
-                          "name": "address",
-                          "type": "address"
-                        },
-                        "id": 16188,
-                        "name": "ElementaryTypeName",
-                        "src": "1826:7:19"
-                      }
-                    ],
-                    "id": 16189,
-                    "name": "VariableDeclaration",
-                    "src": "1826:26:19"
-                  }
-                ],
-                "id": 16190,
-                "name": "ParameterList",
-                "src": "1802:51:19"
-              },
-              {
-                "attributes": {
-                  "parameters": [
-                    null
-                  ]
-                },
-                "children": [],
-                "id": 16194,
-                "name": "ParameterList",
-                "src": "1905:0:19"
-              },
-              {
-                "children": [
-                  {
-                    "attributes": {
-                      "argumentTypes": null,
-                      "overloadedDeclarations": [
-                        null
-                      ],
-                      "referencedDeclaration": 14165,
-                      "type": "modifier (address)",
-                      "value": "onlyOwnerCanCall"
-                    },
-                    "id": 16191,
-                    "name": "Identifier",
-                    "src": "1871:16:19"
-                  },
-                  {
-                    "attributes": {
-                      "argumentTypes": null,
-                      "overloadedDeclarations": [
-                        null
-                      ],
-                      "referencedDeclaration": 16187,
-                      "type": "address",
-                      "value": "callerAddress"
-                    },
-                    "id": 16192,
-                    "name": "Identifier",
-                    "src": "1888:13:19"
-                  }
-                ],
-                "id": 16193,
-                "name": "ModifierInvocation",
-                "src": "1871:31:19"
-              },
-              {
-                "children": [
-                  {
-                    "children": [
-                      {
-                        "attributes": {
-                          "argumentTypes": null,
-                          "isConstant": false,
-                          "isLValue": false,
-                          "isPure": false,
-                          "isStructConstructorCall": false,
-                          "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
-                          "type": "tuple()",
-                          "type_conversion": false
-                        },
-                        "children": [
-                          {
-                            "attributes": {
-                              "argumentTypes": [
-                                {
-                                  "typeIdentifier": "t_address",
-                                  "typeString": "address"
-                                }
-                              ],
-                              "overloadedDeclarations": [
-                                null
-                              ],
-                              "referencedDeclaration": 16928,
-                              "type": "function (address)",
-                              "value": "selfdestruct"
-                            },
-                            "id": 16195,
-                            "name": "Identifier",
-                            "src": "1911:12:19"
-                          },
-                          {
-                            "attributes": {
-                              "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
-                              "referencedDeclaration": 16189,
-                              "type": "address",
-                              "value": "newContractAddress"
-                            },
-                            "id": 16196,
-                            "name": "Identifier",
-                            "src": "1924:18:19"
-                          }
-                        ],
-                        "id": 16197,
-                        "name": "FunctionCall",
-                        "src": "1911:32:19"
-                      }
-                    ],
-                    "id": 16198,
-                    "name": "ExpressionStatement",
-                    "src": "1911:32:19"
-                  }
-                ],
-                "id": 16199,
-                "name": "Block",
-                "src": "1905:43:19"
-              }
-            ],
-            "id": 16200,
-            "name": "FunctionDefinition",
-            "src": "1782:166:19"
           }
         ],
         "id": 17835,
@@ -2337,9 +2108,9 @@
     "666": {
       "events": {},
       "links": {},
-      "address": "0x1bbcea85e5143749cd5e49218f01e720307d10df"
+      "address": "0xb2f9c4f47277d3120e4d52f287774a9d243afb43"
     }
   },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-01-13T15:25:42.787Z"
+  "updatedAt": "2018-01-13T20:39:45.786Z"
 }

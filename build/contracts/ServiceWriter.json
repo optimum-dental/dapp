@@ -14,28 +14,14 @@
         }
       ],
       "name": "lockPayment",
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint8"
-        }
-      ],
+      "outputs": [],
       "payable": false,
       "stateMutability": "nonpayable",
       "type": "function"
     },
     {
       "constant": true,
-      "inputs": [
-        {
-          "name": "serviceTypeId",
-          "type": "uint256"
-        },
-        {
-          "name": "serviceId",
-          "type": "uint256"
-        }
-      ],
+      "inputs": [],
       "name": "smartContractStatus",
       "outputs": [
         {
@@ -78,12 +64,7 @@
         }
       ],
       "name": "removeServices",
-      "outputs": [
-        {
-          "name": "",
-          "type": "address"
-        }
-      ],
+      "outputs": [],
       "payable": false,
       "stateMutability": "nonpayable",
       "type": "function"
@@ -104,16 +85,7 @@
     },
     {
       "constant": true,
-      "inputs": [
-        {
-          "name": "serviceTypeId",
-          "type": "uint256"
-        },
-        {
-          "name": "serviceIds",
-          "type": "uint256[]"
-        }
-      ],
+      "inputs": [],
       "name": "dbAddress",
       "outputs": [
         {
@@ -149,14 +121,6 @@
         {
           "name": "newOwner",
           "type": "address"
-        },
-        {
-          "name": "serviceId",
-          "type": "uint256"
-        },
-        {
-          "name": "fee",
-          "type": "uint256"
         }
       ],
       "name": "transferOwnership",
@@ -166,6 +130,7 @@
       "type": "function"
     },
     {
+      "constant": false,
       "inputs": [
         {
           "name": "serviceTypeId",
@@ -180,26 +145,22 @@
           "type": "uint256"
         }
       ],
+      "name": "writeServiceWithFee",
+      "outputs": [],
       "payable": false,
       "stateMutability": "nonpayable",
-      "type": "function",
-      "constant": false,
-      "name": "writeServiceWithFee",
-      "outputs": []
+      "type": "function"
     },
     {
-      "anonymous": false,
       "inputs": [
         {
-          "indexed": false,
           "name": "_dbAddress",
           "type": "address"
         }
       ],
-      "name": "OnSmartContractStatusSet",
-      "type": "constructor",
       "payable": false,
-      "stateMutability": "nonpayable"
+      "stateMutability": "nonpayable",
+      "type": "constructor"
     },
     {
       "anonymous": false,
@@ -208,11 +169,6 @@
           "indexed": false,
           "name": "paymentId",
           "type": "uint256"
-        },
-        {
-          "indexed": true,
-          "name": "newOwner",
-          "type": "address"
         }
       ],
       "name": "PaymentLocked",
@@ -2412,9 +2368,9 @@
     "666": {
       "events": {},
       "links": {},
-      "address": "0xb66a1dde0da83a982022c1901b4fc52ea04a570f"
+      "address": "0x45a86ea8c1be5af81ecad7bc113e38e22626998d"
     }
   },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-01-13T15:25:42.778Z"
+  "updatedAt": "2018-01-13T20:39:45.809Z"
 }

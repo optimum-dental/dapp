@@ -22,12 +22,7 @@
         }
       ],
       "name": "acceptScanRequest",
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint8"
-        }
-      ],
+      "outputs": [],
       "payable": false,
       "stateMutability": "nonpayable",
       "type": "function"
@@ -45,12 +40,7 @@
         }
       ],
       "name": "lockPayment",
-      "outputs": [
-        {
-          "name": "",
-          "type": "address"
-        }
-      ],
+      "outputs": [],
       "payable": false,
       "stateMutability": "nonpayable",
       "type": "function"
@@ -105,24 +95,7 @@
     },
     {
       "constant": true,
-      "inputs": [
-        {
-          "name": "patientId",
-          "type": "address"
-        },
-        {
-          "name": "scanRequestId",
-          "type": "uint256"
-        },
-        {
-          "name": "quote",
-          "type": "uint256"
-        },
-        {
-          "name": "comment",
-          "type": "bytes32"
-        }
-      ],
+      "inputs": [],
       "name": "owner",
       "outputs": [
         {
@@ -136,16 +109,7 @@
     },
     {
       "constant": true,
-      "inputs": [
-        {
-          "name": "patientId",
-          "type": "address"
-        },
-        {
-          "name": "scanRequestId",
-          "type": "uint256"
-        }
-      ],
+      "inputs": [],
       "name": "dbAddress",
       "outputs": [
         {
@@ -195,26 +159,6 @@
         {
           "name": "scanRequestId",
           "type": "uint256"
-        },
-        {
-          "name": "scanAppointmentId",
-          "type": "uint256"
-        },
-        {
-          "name": "appointmentDate",
-          "type": "bytes32"
-        },
-        {
-          "name": "scanTime",
-          "type": "bytes32"
-        },
-        {
-          "name": "scanInsurance",
-          "type": "bytes32"
-        },
-        {
-          "name": "comment",
-          "type": "bytes32"
         }
       ],
       "name": "expireScanRequest",
@@ -224,32 +168,29 @@
       "type": "function"
     },
     {
+      "constant": false,
       "inputs": [
         {
           "name": "newOwner",
           "type": "address"
         }
       ],
+      "name": "transferOwnership",
+      "outputs": [],
       "payable": false,
       "stateMutability": "nonpayable",
-      "type": "function",
-      "constant": false,
-      "name": "transferOwnership",
-      "outputs": []
+      "type": "function"
     },
     {
-      "anonymous": false,
       "inputs": [
         {
-          "indexed": false,
           "name": "_dbAddress",
           "type": "address"
         }
       ],
-      "name": "OnSmartContractStatusSet",
-      "type": "constructor",
       "payable": false,
-      "stateMutability": "nonpayable"
+      "stateMutability": "nonpayable",
+      "type": "constructor"
     },
     {
       "anonymous": false,
@@ -258,11 +199,6 @@
           "indexed": false,
           "name": "paymentId",
           "type": "uint256"
-        },
-        {
-          "indexed": true,
-          "name": "newOwner",
-          "type": "address"
         }
       ],
       "name": "PaymentLocked",
@@ -2121,9 +2057,9 @@
     "666": {
       "events": {},
       "links": {},
-      "address": "0xf76216db4b9199bcb2de2137aef87d030782d236"
+      "address": "0x7a8f7169e592712cce23929632310dfb3f07c97f"
     }
   },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-01-13T15:25:43.482Z"
+  "updatedAt": "2018-01-13T20:39:45.840Z"
 }
