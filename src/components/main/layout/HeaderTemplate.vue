@@ -114,13 +114,15 @@
   }
 
   .balance {
-    width: 80px;
+    width: 150px;
     height: 20px;
     cursor: default;
     font-size: 14px;
     position: relative;
     top: -3px;
     color: #555555;
+    text-align: right;
+    margin-right: 20px !important;
   }
 
   .loader {

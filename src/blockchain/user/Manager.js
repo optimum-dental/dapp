@@ -239,7 +239,7 @@ class Manager {
 
   userRecordFieldTypes () {
     // types: 1 => boolean, 2 => uint8, 3 => uint, 4 => address, 5 => bytes32, 7 => string
-    return [2, 2, 7, 7, 5, 5, 5, 3, 5, 3, 5, 5, 5, 2, 2, 1]
+    return [2, 2, 7, 7, 5, 5, 5, 3, 5, 3, 5, 5, 2, 2, 1]
   }
 }
 
