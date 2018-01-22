@@ -16,3 +16,11 @@ export const truncate = function (stringObject, limitSize = 14, truncatingString
     return stringObject
   }
 }
+
+export const prependZeroIfNecessary = function (stringObject) {
+  if (stringObject.length === 1) {
+    return `0${stringObject}`
+  }
+
+  return stringObject
+}

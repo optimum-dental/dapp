@@ -29,6 +29,9 @@
 <script>
   // const BigNumber = require('bignumber.js')
   export default {
+    components: {
+      Datepicker
+    },
     computed: {
       user () {
         return this.$root.user
@@ -52,11 +55,27 @@
         return 5
       }
     },
+    data: function () {
+      return {
+        availableDateError: true
+      }
+    },
     methods: {
       populateRequestTypes () {
         const requestTypeIndex = Number(this.$route.query.rTI || 0)
         const requestTypeDOMElement = document.getElementById('appointment-requests-request-type')
         requestTypeDOMElement.options[requestTypeIndex].selected = true
+      },
+      validateAvailableDate (dateValue) {
+        const today = Math.floor(+(new Date()) / 36000000)
+        const pickedDate = Math.floor(+dateValue / 36000000)
+        if (today > pickedDate) {
+          this.addError(document.querySelector('.appointment-requests-scan-date'))
+          this.availableDateError = true
+        } else {
+          this.clearError(document.querySelector('.appointment-requests-scan-date'))
+          this.availableDateError = false
+        }
       },
       setEventListeners () {
         const _this = this
@@ -82,6 +101,9 @@
         document.body.addEventListener('click', function (evt) {
           let target = evt.target
           switch (true) {
+            case (['appointment-requests-scan-time'].includes(target.id)):
+              _this.clearError(target)
+              break
             case (target.classList.contains('apply-to-scan')):
               _this.showApplicationForm(evt)
               break
@@ -97,6 +119,12 @@
               break
           }
         })
+      },
+      addError (target) {
+        target.classList.add('error')
+      },
+      clearError (target) {
+        target.classList.remove('error')
       },
       showApplicationForm (evt) {
         const sn = evt.target.dataset.params
@@ -115,8 +143,26 @@
               </div>
 
               <div class='appointment-requests-modal-entry'>
-                <label for='appointment-requests-quote'>Quote [USD]</label>
+                <label for='appointment-requests-quote' class='appointment-requests-scan-quote-label'>Quote [USD] <span>[Modify if changed]</span></label>
                 <input type='number' id='appointment-requests-quote' placeholder='Quote in USD' value='${scanRequest.fee}'>
+              </div>
+
+              <div class='appointment-requests-modal-entry'>
+                <label for='appointment-requests-scan-date' class='appointment-requests-scan-date-label'>Available Date <span>[Modify if inconvenient]</span></label>
+                <input type="date" class="appointment-requests-date appointment-requests-scan-date" id="datepicker appointment-requests-scan-date" value="${formatDate(new Date(Number(scanRequest.date)), 'yyyy-mm-dd')}">
+                <!--<datepicker class="appointment-requests-date appointment-requests-scan-date" id="appointment-requests-scan-date"></datepicker>-->
+              </div>
+
+              <div class="appointment-requests-modal-entry">
+                <div class="appointment-requests-entry-param appointment-requests-scan-time-label">Preferred Time <span>[Modify if inconvenient]</span></div>
+                <div class="appointment-requests-entry-value">
+                  <select id="appointment-requests-scan-time" class="appointment-list">
+                    <option>Select</option>
+                    <option ${scanRequest.time === 'Morning (8AM - 12PM)' ? 'selected' : ''}>Morning (8AM - 12PM)</option>
+                    <option ${scanRequest.time === 'Early Afternoon (12PM - 3PM)' ? 'selected' : ''}>Early Afternoon (12PM - 3PM)</option>
+                    <option ${scanRequest.time === 'Late Afternoon (3PM - 6PM)' ? 'selected' : ''}>Late Afternoon (3PM - 6PM)</option>
+                  </select>
+                </div>
               </div>
 
               <div class='appointment-requests-modal-entry'>
@@ -237,7 +283,6 @@
             }
 
             if (result) {
-              console.log(result)
               if (!result.hasDentistApplied) this.appendResult(result)
             } else {
               this.informOfNoRequest()
@@ -371,6 +416,7 @@
     }
   }
 
+  import Datepicker from 'vuejs-datepicker'
   import serviceTypes from '../../../../../../static/json/appointment_types/appointment_types.json'
   import {formatDate} from '../../../../../util/others'
   import $ from 'jquery'
@@ -635,7 +681,7 @@
 
   .appointment-requests-application-form {
     width: 500px;
-    height: 500px;
+    height: 600px;
     background: #ffffff;
     position: relative;
     margin: auto;
@@ -650,6 +696,11 @@
     display: block;
     margin-bottom: 30px;
     width: 80%;
+  }
+
+  .appointment-requests-application-form .appointment-requests-modal-entry:nth-child(1) {
+    margin-bottom: 10px;
+    margin-top: 20px;
   }
 
   .appointment-requests-application-form label {
@@ -669,5 +720,19 @@
     min-width: 100%;
     max-height: 200px;
     min-height: 200px;
+  }
+
+  input#appointment-requests-scan-date, input#appointment-requests-treatment-date {
+    height: 28px !important;
+    width: 100% !important;
+    background: #ffffff !important;
+    outline: none !important;
+    border: 0px;
+    color: #7f7f7f !important;
+    cursor: pointer;
+  }
+
+  .appointment-requests-scan-date-label span, .appointment-requests-scan-time-label span, .appointment-requests-scan-quote-label span {
+    font-size: 11px;
   }
 </style>

@@ -63,7 +63,7 @@ Setter.at('0x236fd6b135e8aea00ba889222037d07eaa3d33f0').setOwner()
 
 Setter.at('0x236fd6b135e8aea00ba889222037d07eaa3d33f0').setConfig()
 
-Setter.at('0x236fd6b135e8aea00ba889222037d07eaa3d33f0').setFirstAdmin("0xe1eb3251dce3d8ba0bf186bffeba19cbc7c1ddf4") // Phoebe
+Setter.at('0x236fd6b135e8aea00ba889222037d07eaa3d33f0').setFirstAdmin("0xf378d4b0ef447b051fad06133615b33649423c0a") // Phoebe
 Setter.at('0x236fd6b135e8aea00ba889222037d07eaa3d33f0').setEscrowAddress("0x3ed1cb5663ec309c7fcf39b6b15aba252d5e58a0")
 
 Setter.at("0x236fd6b135e8aea00ba889222037d07eaa3d33f0").setScanPaymentPercentage(5)
