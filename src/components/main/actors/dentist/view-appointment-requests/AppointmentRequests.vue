@@ -29,9 +29,9 @@
 <script>
   // const BigNumber = require('bignumber.js')
   export default {
-    components: {
-      Datepicker
-    },
+    // components: {
+    //   Datepicker
+    // },
     computed: {
       user () {
         return this.$root.user
@@ -143,14 +143,13 @@
               </div>
 
               <div class='appointment-requests-modal-entry'>
-                <label for='appointment-requests-quote' class='appointment-requests-scan-quote-label'>Quote [USD] <span>[Modify if changed]</span></label>
-                <input type='number' id='appointment-requests-quote' placeholder='Quote in USD' value='${scanRequest.fee}'>
+                <label for='appointment-requests-scan-quote' class='appointment-requests-scan-quote-label'>Quote [USD] <span>[Modify if changed]</span></label>
+                <input type='number' id='appointment-requests-scan-quote' placeholder='Quote in USD' value='${scanRequest.fee}'>
               </div>
 
               <div class='appointment-requests-modal-entry'>
                 <label for='appointment-requests-scan-date' class='appointment-requests-scan-date-label'>Available Date <span>[Modify if inconvenient]</span></label>
-                <input type="date" class="appointment-requests-date appointment-requests-scan-date" id="datepicker appointment-requests-scan-date" value="${formatDate(new Date(Number(scanRequest.date)), 'yyyy-mm-dd')}">
-                <!--<datepicker class="appointment-requests-date appointment-requests-scan-date" id="appointment-requests-scan-date"></datepicker>-->
+                <input type="date" class="appointment-requests-date appointment-requests-scan-date" id="appointment-requests-scan-date" value="${formatDate(new Date(Number(scanRequest.date)), 'yyyy-mm-dd')}">
               </div>
 
               <div class="appointment-requests-modal-entry">
@@ -178,12 +177,20 @@
           </div>
         `, 'text/html').body.firstChild
       },
+      getJustDate (dateObject) {
+        // const timeValue = dateObject.getTime()
+        // return timeValue - (timeValue % 86400000)
+        const dateString = dateObject.toDateString()
+        return (+(new Date(dateString)))
+      },
       applyToScan (evt) {
         const sn = evt.target.dataset.params
         const scanRequest = this.$store.state.searchResult['fetchScanRequests'].data[this.currentOffset][sn]
         const patientId = scanRequest.patientId
         const requestId = scanRequest.requestId
-        const quote = Number(document.getElementById('appointment-requests-quote').value) || 0
+        const quote = Number(document.getElementById('appointment-requests-scan-quote').value) || 0
+        const scanDate = `b${(this.getJustDate(new Date(document.getElementById('appointment-requests-scan-date').value)) || scanRequest.date).toString()}`
+        const scanTime = `b${document.getElementById('appointment-requests-scan-time').options[document.getElementById('appointment-requests-scan-time').selectedIndex].value || scanRequest.time}`
         const comment = `b${document.getElementById('appointment-requests-comment').value}`
 
         this.scrollToTop()
@@ -196,6 +203,8 @@
             patientId,
             requestId,
             quote,
+            scanDate,
+            scanTime,
             comment
           },
           managerIndex: 2, // which of the contract managers to use
@@ -416,7 +425,7 @@
     }
   }
 
-  import Datepicker from 'vuejs-datepicker'
+  // import Datepicker from 'vuejs-datepicker'
   import serviceTypes from '../../../../../../static/json/appointment_types/appointment_types.json'
   import {formatDate} from '../../../../../util/others'
   import $ from 'jquery'
@@ -722,12 +731,12 @@
     min-height: 200px;
   }
 
-  input#appointment-requests-scan-date, input#appointment-requests-treatment-date {
+  input#appointment-requests-scan-quote, input#appointment-requests-scan-date, input#appointment-requests-treatment-date, select#appointment-requests-scan-time, select#appointment-requests-treatment-time {
     height: 28px !important;
     width: 100% !important;
     background: #ffffff !important;
     outline: none !important;
-    border: 0px;
+    border: 1px solid #a6a6a6;
     color: #7f7f7f !important;
     cursor: pointer;
   }

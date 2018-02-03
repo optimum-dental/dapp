@@ -259,8 +259,15 @@
           })
         }
       },
+      getJustDate (dateObject) {
+        // const timeValue = dateObject.getTime()
+        // return timeValue - (timeValue % 86400000)
+        const dateString = dateObject.toDateString()
+        return (+(new Date(dateString)))
+      },
       writeScanRequest () {
-        const appointmentDate = (+(this.scanDate)).toString()
+        // const oldAppointmentDate = (+(this.scanDate)).toString()
+        const appointmentDate = this.getJustDate(this.scanDate).toString()
         const scanTime = document.getElementById('appointment-scan-time').options[document.getElementById('appointment-scan-time').selectedIndex].value
         const scanAppointmentId = Number(document.getElementById('scan-appointment').selectedIndex)
         const scanInsuranceQuery = Number(document.getElementById('appointment-scan-insurance-query').selectedIndex)

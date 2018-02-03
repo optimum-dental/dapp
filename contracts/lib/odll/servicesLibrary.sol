@@ -143,12 +143,14 @@ library servicesLibrary {
     address patientId,
     uint scanRequestId,
     uint quote,
+    bytes32 scanDate,
+    bytes32 scanTime,
     string comment
   )
     internal
   {
     require(DB(dbAddress).getAddressValue(keccak256("scan-request/dentist", scanRequestId)) == dentistId);
-    writeScanApplication(dbAddress, dentistId, patientId, scanRequestId, quote, comment);
+    writeScanApplication(dbAddress, dentistId, patientId, scanRequestId, quote, scanDate, scanTime, comment);
     DB(dbAddress).setBooleanValue(keccak256("scan-request/is-accepted?", scanRequestId), true);
   }
 
@@ -173,11 +175,13 @@ library servicesLibrary {
     address patientId,
     uint scanRequestId,
     uint quote,
+    bytes32 scanDate,
+    bytes32 scanTime,
     string comment
   )
     internal
   {
-    writeScanApplication(dbAddress, dentistId, patientId, scanRequestId, quote, comment);
+    writeScanApplication(dbAddress, dentistId, patientId, scanRequestId, quote, scanDate, scanTime, comment);
   }
 
   function writeScanApplication (
@@ -186,6 +190,8 @@ library servicesLibrary {
     address patientId,
     uint scanRequestId,
     uint quote,
+    bytes32 scanDate,
+    bytes32 scanTime,
     string comment
   )
     internal
@@ -210,7 +216,7 @@ library servicesLibrary {
     uint scanServiceId = DB(dbAddress).getUIntValue(keccak256("scan-request/scan-service", scanRequestId));
     DB(dbAddress).setBooleanValue(keccak256("dentist/scan-request", dentistId, scanRequestId), true);
     initScanApplication(dbAddress, scanServiceId, scanRequestId, scanApplicationId);
-    writeScanApplicationData(dbAddress, dentistId, patientId, scanApplicationId, quote, comment);
+    writeScanApplicationData(dbAddress, dentistId, patientId, scanApplicationId, quote, scanDate, scanTime, comment);
   }
 
   function initScanApplication (address dbAddress, uint scanServiceId, uint scanRequestId, uint scanApplicationId) internal {
@@ -222,8 +228,10 @@ library servicesLibrary {
     utilities.addIdArrayItem(dbAddress, scanRequestId, "scan-request/scan-application", "scan-request/scan-applications-count", scanApplicationId);
   }
 
-  function writeScanApplicationData (address dbAddress, address dentistId, address patientId, uint scanApplicationId, uint quote, string comment) internal {
+  function writeScanApplicationData (address dbAddress, address dentistId, address patientId, uint scanApplicationId, uint quote, bytes32 scanDate, bytes32 scanTime, string comment) internal {
     DB(dbAddress).setUIntValue(keccak256("scan-application/quote", scanApplicationId), quote);
+    DB(dbAddress).setBytes32Value(keccak256("scan-application/appointment-date", scanApplicationId), scanDate);
+    DB(dbAddress).setBytes32Value(keccak256("scan-application/appointment-time", scanApplicationId), scanTime);
     DB(dbAddress).setStringValue(keccak256("scan-application/comment", scanApplicationId), comment);
     DB(dbAddress).setAddressValue(keccak256("scan-application/dentist", scanApplicationId), dentistId);
     DB(dbAddress).setAddressValue(keccak256("scan-application/patient", scanApplicationId), patientId);

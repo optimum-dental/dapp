@@ -45,12 +45,14 @@ contract ScanRequestWriter is Restrictor {
     address patientId,
     uint scanRequestId,
     uint quote,
+    bytes32 scanDate,
+    bytes32 scanTime,
     string comment
   )
     external
     onlyPermittedSmartContract
   {
-    userManager.acceptPatientScanRequest(dbAddress, msg.sender, patientId, scanRequestId, quote, comment);
+    userManager.acceptPatientScanRequest(dbAddress, msg.sender, patientId, scanRequestId, quote, scanDate, scanTime, comment);
   }
 
   function rejectScanRequest (

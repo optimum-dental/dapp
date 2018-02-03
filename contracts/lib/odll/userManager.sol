@@ -673,11 +673,13 @@ library userManager {
     address patientId,
     uint scanRequestId,
     uint quote,
+    bytes32 scanDate,
+    bytes32 scanTime,
     string comment
   )
     internal
   {
-    servicesLibrary.handleAcceptPatientScanRequest(dbAddress, dentistId, patientId, scanRequestId, quote, comment);
+    servicesLibrary.handleAcceptPatientScanRequest(dbAddress, dentistId, patientId, scanRequestId, quote, scanDate, scanTime, comment);
   }
 
   function rejectPatientScanRequest (
@@ -697,11 +699,13 @@ library userManager {
     address patientId,
     uint scanRequestId,
     uint quote,
+    bytes32 scanDate,
+    bytes32 scanTime,
     string comment
   )
     internal
   {
-    servicesLibrary.handleApplyToScanPatient(dbAddress, dentistId, patientId, scanRequestId, quote, comment);
+    servicesLibrary.handleApplyToScanPatient(dbAddress, dentistId, patientId, scanRequestId, quote, scanDate, scanTime, comment);
   }
 
   function cancelDentistScanApplication (

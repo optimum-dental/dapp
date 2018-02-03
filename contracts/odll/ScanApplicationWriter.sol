@@ -13,12 +13,14 @@ contract ScanApplicationWriter is Restrictor {
     address patientId,
     uint scanRequestId,
     uint quote,
+    bytes32 scanDate,
+    bytes32 scanTime,
     string comment
   )
     external
     onlyPermittedSmartContract
   {
-    userManager.applyToScanPatient(dbAddress, msg.sender, patientId, scanRequestId, quote, comment);
+    userManager.applyToScanPatient(dbAddress, msg.sender, patientId, scanRequestId, quote, scanDate, scanTime, comment);
   }
 
   function cancelScanApplication (

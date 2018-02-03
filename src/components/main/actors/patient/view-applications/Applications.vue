@@ -428,6 +428,8 @@
               <div class="applications-company-name">Company: <span>${userObject.companyName || 'Not Supplied'}</span></div>
               <div class="applications-address">Address: <span>${userObject.address || 'Not Supplied'}</span></div>
               <div class="applications-quote">Quote: <span>$${result.quote}</span></div>
+              <div class="applications-appointment-date">Date: <span>${formatDate(new Date(Number(result.appointmentDate)))}</span></div>
+              <div class="applications-appointment-time">Time: <span>${result.appointmentTime}</span></div>
               <div class="applications-comment">Comment: <span>${result.comment}</span></div>
               <input type="button" value="Accept" class="applications-button accept-application" data-params="${result.SN}">
             </div>
@@ -517,6 +519,7 @@
   }
 
   import $ from 'jquery'
+  import {formatDate} from '../../../../../util/others'
   import {EXCHANGE_RATE_API} from '../../../../../util/constants'
 </script>
 

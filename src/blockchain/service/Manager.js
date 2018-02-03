@@ -286,6 +286,8 @@ class Manager {
       'userId',
       'serviceId',
       'quote',
+      'appointmentDate',
+      'appointmentTime',
       'comment',
       'hasCase',
       'caseId',
@@ -302,6 +304,8 @@ class Manager {
       getSoliditySha3ForId(state, 'scan-application/dentist', scanApplicationId),
       getSoliditySha3ForId(state, 'scan-application/scan-service', scanApplicationId),
       getSoliditySha3ForId(state, 'scan-application/quote', scanApplicationId),
+      getSoliditySha3ForId(state, 'scan-application/appointment-date', scanApplicationId),
+      getSoliditySha3ForId(state, 'scan-application/appointment-time', scanApplicationId),
       getSoliditySha3ForId(state, 'scan-application/comment', scanApplicationId),
       getSoliditySha3ForId(state, 'scan-application/has-case?', scanApplicationId),
       getSoliditySha3ForId(state, 'scan-application/case', scanApplicationId),
@@ -312,7 +316,7 @@ class Manager {
 
   applicationRecordFieldTypes () {
     // types: 1 => boolean, 2 => uint8, 3 => uint, 4 => address, 5 => bytes32, 7 => string
-    return [2, 3, 4, 3, 3, 7, 1, 3, 3, 3]
+    return [2, 3, 4, 3, 3, 5, 5, 7, 1, 3, 3, 3]
   }
 
   caseKeys () {
