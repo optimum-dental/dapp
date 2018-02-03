@@ -256,6 +256,7 @@
         const phoneNumberElement = document.getElementById('phone-number')
         if (phoneNumberElement && phoneNumberElement.value === '') {
           phoneNumberElement.value = '+1 '
+          this.displayLabel(null, phoneNumberElement)
         }
       },
       registerUser (evt) {
