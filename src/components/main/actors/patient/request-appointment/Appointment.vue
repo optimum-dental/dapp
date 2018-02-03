@@ -44,12 +44,41 @@
 
             <div class="appointment-entry-item">
               <div class="appointment-entry-param">Do you have insurance?</div>
-              <div class="appointment-entry-value">
+                <div class="appointment-entry-value">
                 <select id="appointment-scan-insurance-query" class="appointment-list">
                   <option>Select</option>
                   <option>Yes</option>
                   <option>No</option>
                 </select>
+              </div>
+            </div>
+
+            <div class="appointment-entry-item policy-number">
+              <label for="policy-number" class="appointment-entry-param">Policy Number</label>
+              <div class="appointment-entry-value">
+                <input type="text" class="appointment-list" id="policy-number" data-name="policy-number" required>
+                <div class="tip">Important</div>
+              </div>
+            </div>
+
+            <div class="appointment-entry-item payer-id">
+              <label for="payer-id" class="field-key">Payer ID</label>
+              <div class="appointment-entry-value">
+                <input type="text" class="appointment-list" id="payer-id" data-name="payer-id">
+              </div>
+            </div>
+
+            <div class="appointment-entry-item main-subscriber">
+              <label for="main-subscriber" class="field-key">Insurance Main Subscriber</label>
+              <div class="appointment-entry-value">
+                <input type="text" class="appointment-list" id="main-subscriber" data-name="main-subscriber">
+              </div>
+            </div>
+
+            <div class="appointment-entry-item insurance-address">
+              <div class="appointment-entry-param">Insurance Address [or P.O.Box Number]</div>
+              <div class="appointment-entry-value">
+                <textarea id="insurance-address" rows="5" class="appointment-list"></textarea>
               </div>
             </div>
 
@@ -74,6 +103,36 @@
                   <option>Yes</option>
                   <option>No</option>
                 </select>
+              </div>
+            </div>
+
+
+            <div class="appointment-entry-item policy-number">
+              <label for="policy-number" class="appointment-entry-param">Policy Number</label>
+              <div class="appointment-entry-value">
+                <input type="text" class="appointment-list" id="policy-number" data-name="policy-number" required>
+                <div class="tip">Important</div>
+              </div>
+            </div>
+
+            <div class="appointment-entry-item payer-id">
+              <label for="payer-id" class="field-key">Payer ID</label>
+              <div class="appointment-entry-value">
+                <input type="text" class="appointment-list" id="payer-id" data-name="payer-id">
+              </div>
+            </div>
+
+            <div class="appointment-entry-item main-subscriber">
+              <label for="main-subscriber" class="field-key">Insurance Main Subscriber</label>
+              <div class="appointment-entry-value">
+                <input type="text" class="appointment-list" id="main-subscriber" data-name="main-subscriber">
+              </div>
+            </div>
+
+            <div class="appointment-entry-item insurance-address">
+              <div class="appointment-entry-param">Insurance Address [or P.O.Box Number]</div>
+              <div class="appointment-entry-value">
+                <textarea id="insurance-address" rows="5" class="appointment-list"></textarea>
               </div>
             </div>
 
@@ -691,5 +750,9 @@
     border: 0px;
     color: #7f7f7f !important;
     cursor: pointer;
+  }
+
+  .tip {
+    color: red;
   }
 </style>
