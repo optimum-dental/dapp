@@ -14,11 +14,13 @@ contract TreatmentApplicationWriter is Restrictor {
     address patientId,
     uint treatmentRequestId,
     uint quote,
+    bytes32 treatmentDate,
+    bytes32 treatmentTime,
     string comment
   )
     external
   {
-    userManager.applyToTreatPatient(dbAddress, msg.sender, patientId, treatmentRequestId, quote, comment);
+    userManager.applyToTreatPatient(dbAddress, msg.sender, patientId, treatmentRequestId, quote, treatmentDate, treatmentTime, comment);
   }
 
   function cancelTreatmentApplication (

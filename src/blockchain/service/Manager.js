@@ -2,12 +2,14 @@ import DB from '../../../build/contracts/DB.json'
 import ServiceWriter from '../../../build/contracts/ServiceWriter.json'
 import ServiceReader from '../../../build/contracts/ServiceReader.json'
 import ScanRequestWriter from '../../../build/contracts/ScanRequestWriter.json'
+import ScanRequestWriter2 from '../../../build/contracts/ScanRequestWriter2.json'
 import ScanRequestReader from '../../../build/contracts/ScanRequestReader.json'
 import ScanRequestReader2 from '../../../build/contracts/ScanRequestReader2.json'
 import ScanApplicationWriter from '../../../build/contracts/ScanApplicationWriter.json'
 import ScanApplicationWriter2 from '../../../build/contracts/ScanApplicationWriter2.json'
 import ScanApplicationReader from '../../../build/contracts/ScanApplicationReader.json'
 import TreatmentRequestWriter from '../../../build/contracts/TreatmentRequestWriter.json'
+import TreatmentRequestWriter2 from '../../../build/contracts/TreatmentRequestWriter2.json'
 import TreatmentRequestReader from '../../../build/contracts/TreatmentRequestReader.json'
 import TreatmentRequestReader2 from '../../../build/contracts/TreatmentRequestReader2.json'
 import TreatmentApplicationWriter from '../../../build/contracts/TreatmentApplicationWriter.json'
@@ -30,16 +32,18 @@ class Manager {
   }
 
   getContractToUse () {
-    return [
+    return {
       ServiceWriter,
       ServiceReader,
       ScanRequestWriter,
+      ScanRequestWriter2,
       ScanRequestReader,
       ScanRequestReader2,
       ScanApplicationWriter,
       ScanApplicationWriter2,
       ScanApplicationReader,
       TreatmentRequestWriter,
+      TreatmentRequestWriter2,
       TreatmentRequestReader,
       TreatmentRequestReader2,
       TreatmentApplicationWriter,
@@ -48,7 +52,7 @@ class Manager {
       PostApplicationReader,
       PostApplicationReader2,
       Escrow
-    ]
+    }
   }
 
   writeData (state = null, data = {}, value = null) {
@@ -255,6 +259,10 @@ class Manager {
       'date',
       'time',
       'insurance',
+      'insurancePolicyNumber',
+      'insurancePayerId',
+      'insuranceMainSubscriber',
+      'insuranceAddress',
       'comment'
     ]
   }
@@ -270,13 +278,17 @@ class Manager {
       getSoliditySha3ForId(state, 'scan-request/appointment-date', scanRequestId),
       getSoliditySha3ForId(state, 'scan-request/appointment-time', scanRequestId),
       getSoliditySha3ForId(state, 'scan-request/appointment-insurance', scanRequestId),
+      getSoliditySha3ForId(state, 'scan-request/appointment-insurance-policy-number', scanRequestId),
+      getSoliditySha3ForId(state, 'scan-request/appointment-insurance-payer-id', scanRequestId),
+      getSoliditySha3ForId(state, 'scan-request/appointment-insurance-main-subscriber', scanRequestId),
+      getSoliditySha3ForId(state, 'scan-request/appointment-insurance-address', scanRequestId),
       getSoliditySha3ForId(state, 'scan-request/appointment-comment', scanRequestId)
     ]
   }
 
   requestRecordFieldTypes () {
     // types: 1 => boolean, 2 => uint8, 3 => uint, 4 => address, 5 => bytes32, 7 => string
-    return [1, 2, 4, 3, 5, 5, 7, 7]
+    return [1, 2, 4, 3, 5, 5, 5, 5, 5, 5, 7, 7]
   }
 
   applicationKeys () {

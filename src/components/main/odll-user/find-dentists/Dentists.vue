@@ -159,8 +159,8 @@
             rating
           },
           methodName: 'writeDentistRating',
-          contractIndexToUse: 0,
-          managerIndex: 0,
+          contractIndexToUse: 'UserWriter',
+          managerIndex: 'userManager',
           callback: (status) => {
             this.endWait(document.querySelector('.wrapper'))
             this.enableNecessaryButtons(evt)
@@ -231,9 +231,9 @@
               limit: this.perPage,
               seed: seed || Math.random()
             },
-            managerIndex: 1, // which of the contract managers to use
+            managerIndex: 'searchManager', // which of the contract managers to use
             methodName: 'findDentists',
-            contractIndexToUse: 0,
+            contractIndexToUse: 'UserReader',
             callOnEach: 'getOfficial',
             callOnEachParams: dentistId => ({
               officialId: dentistId,
@@ -491,9 +491,9 @@
           limit: Number(this.$route.query.l),
           seed: Number(this.$route.query.sd)
         },
-        managerIndex: 1, // which of the contract managers to use
+        managerIndex: 'searchManager', // which of the contract managers to use
         methodName: 'findDentists',
-        contractIndexToUse: 0,
+        contractIndexToUse: 'UserReader',
         callOnEach: 'getOfficial',
         callOnEachParams: dentistId => ({
           officialId: dentistId,

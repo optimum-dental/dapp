@@ -90,9 +90,9 @@
             limit: this.perPage,
             seed: seed || Math.random()
           },
-          managerIndex: 1, // which of the contract managers to use
+          managerIndex: 'searchManager', // which of the contract managers to use
           methodName: 'fetchDentists',
-          contractIndexToUse: 0,
+          contractIndexToUse: 'UserReader',
           callOnEach: 'getOfficial',
           callOnEachParams: officialId => ({officialId})
         }
@@ -128,8 +128,8 @@
               userType: 2
             },
             methodName: 'addOfficialToODLL',
-            contractIndexToUse: 0,
-            managerIndex: 0,
+            contractIndexToUse: 'UserWriter',
+            managerIndex: 'userManager',
             callback: (status = false) => {
               this.fetchDentists(evt, this.currentOffset, this.$store.state.searchResult['fetchDentists'].seed, 1)
               this.notify(status ? 'Dentist Successfully added' : 'Unable to add Dentist')
@@ -329,9 +329,9 @@
           limit: Number(this.$route.query.l || this.perPage),
           seed: Number(this.$route.query.sd || Math.random())
         },
-        managerIndex: 1, // which of the contract managers to use
+        managerIndex: 'searchManager', // which of the contract managers to use
         methodName: 'fetchDentists',
-        contractIndexToUse: 0,
+        contractIndexToUse: 'UserReader',
         callOnEach: 'getOfficial',
         callOnEachParams: officialId => ({officialId})
       })

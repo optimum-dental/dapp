@@ -131,16 +131,16 @@ new Vue({
       this[ACTION_TYPES.UPDATE_USER_GRAVATAR](payload)
     },
     callToWriteUser (payload = null) {
-      const managers = [
+      const managers = {
         userManager,
         searchManager,
         serviceManager
-      ]
+      }
       const actionParams = Object.assign({}, payload.requestParams, {
         methodName: payload.methodName,
         contractIndexToUse: payload.contractIndexToUse
       })
-      managers[payload.managerIndex || 0].writeData(this.$store.state, actionParams)
+      managers[payload.managerIndex || 'userManager'].writeData(this.$store.state, actionParams)
       .then((userData) => {
         this[ACTION_TYPES.UPDATE_USER_STATE]({
           userObject: payload.vueObject
@@ -174,11 +174,11 @@ new Vue({
     },
     callToFetchDataObjects (payload) {
       const fetchQuery = payload.fetchQuery
-      const managers = [
+      const managers = {
         userManager,
         searchManager,
         serviceManager
-      ]
+      }
       const actionParams = Object.assign({}, fetchQuery.requestParams, {
         methodName: fetchQuery.methodName,
         contractIndexToUse: fetchQuery.contractIndexToUse,
@@ -187,7 +187,7 @@ new Vue({
         callOnEachParams: fetchQuery.callOnEachParams
       })
 
-      managers[fetchQuery.managerIndex || 0].fetchDataObjects(this.$store.state, actionParams)
+      managers[fetchQuery.managerIndex || 'userManager'].fetchDataObjects(this.$store.state, actionParams)
       .then((fetchResult) => {
         this[ACTION_TYPES.SAVE_SEARCH_RESULT]({
           type: fetchQuery.type,
@@ -209,17 +209,17 @@ new Vue({
       })
     },
     callToWriteData (payload = null) {
-      const managers = [
+      const managers = {
         userManager,
         searchManager,
         serviceManager
-      ]
+      }
       const actionParams = Object.assign({}, payload.requestParams, {
         methodName: payload.methodName,
         contractIndexToUse: payload.contractIndexToUse
       })
       const value = payload.value
-      managers[payload.managerIndex || 0].writeData(this.$store.state, actionParams, value)
+      managers[payload.managerIndex || 'userManager'].writeData(this.$store.state, actionParams, value)
       .then((responseObject) => {
         if (payload.callback) payload.callback(responseObject)
       })

@@ -31,6 +31,10 @@
     box-sizing: border-box;
   }
 
+  textarea {
+    resize: none;
+  }
+
   #app {
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;

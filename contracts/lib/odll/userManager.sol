@@ -633,19 +633,43 @@ library userManager {
     servicesLibrary.removeDentist(dbAddress, serviceTypeId, serviceIds, userId);
   }
 
+  function initScanRequest (
+    address dbAddress,
+    uint scanAppointmentId
+  )
+    internal
+    view
+    returns (uint scanRequestId)
+  {
+    scanRequestId = servicesLibrary.initScanRequest(dbAddress, scanAppointmentId);
+  }
+
   function writePatientScanRequest (
     address dbAddress,
+    uint scanRequestId,
     address dentistId,
     address patientId,
-    uint scanAppointmentId,
     bytes32 appointmentDate,
     bytes32 scanTime,
-    string scanInsurance,
     string comment
   )
     internal
   {
-    servicesLibrary.handleWritePatientScanRequest(dbAddress, dentistId, patientId, scanAppointmentId, appointmentDate, scanTime, scanInsurance, comment);
+    servicesLibrary.handleWritePatientScanRequest(dbAddress, scanRequestId, dentistId, patientId, appointmentDate, scanTime, comment);
+  }
+
+  function writePatientScanRequestInsurance(
+    address dbAddress,
+    uint scanRequestId,
+    bytes32 scanInsurance,
+    bytes32 scanPolicyNumber,
+    bytes32 scanPayerId,
+    bytes32 scanMainSubscriber,
+    string scanInsuranceAddress
+  )
+    internal
+  {
+    servicesLibrary.handleWritePatientScanRequestInsurance(dbAddress, scanRequestId, scanInsurance, scanPolicyNumber, scanPayerId, scanMainSubscriber, scanInsuranceAddress);
   }
 
   function cancelPatientScanRequest (
@@ -763,18 +787,34 @@ library userManager {
     dentistId.transfer(dentistFee);
   }
 
+  function initTreatmentRequest (address dbAddress, bool hasCaseId, uint caseId) internal view returns (uint treatmentRequestId) {
+    treatmentRequestId = servicesLibrary.initTreatmentRequest(dbAddress, hasCaseId, caseId);
+  }
+
   function writePatientTreatmentRequest (
     address dbAddress,
+    uint treatmentRequestId,
     address patientId,
-    bool hasCaseId,
-    uint caseId,
-    string insurance,
     string scanResults,
     string comment
   )
     internal
   {
-    servicesLibrary.handleWritePatientTreatmentRequest(dbAddress, patientId, hasCaseId, caseId, insurance, scanResults, comment);
+    servicesLibrary.handleWritePatientTreatmentRequest(dbAddress, treatmentRequestId, patientId, scanResults, comment);
+  }
+
+  function writePatientTreatmentRequestInsurance (
+    address dbAddress,
+    uint treatmentRequestId,
+    bytes32 treatmentInsurance,
+    bytes32 treatmentPolicyNumber,
+    bytes32 treatmentPayerId,
+    bytes32 treatmentMainSubscriber,
+    string treatmentInsuranceAddress
+  )
+    internal
+  {
+    servicesLibrary.handleWritePatientTreatmentRequestInsurance(dbAddress, treatmentRequestId, treatmentInsurance, treatmentPolicyNumber, treatmentPayerId, treatmentMainSubscriber, treatmentInsuranceAddress);
   }
 
   function cancelPatientTreatmentRequest (
@@ -793,11 +833,13 @@ library userManager {
     address patientId,
     uint treatmentRequestId,
     uint quote,
+    bytes32 treatmentDate,
+    bytes32 treatmentTime,
     string comment
   )
     internal
   {
-    servicesLibrary.handleApplyToTreatPatient(dbAddress, dentistId, patientId, treatmentRequestId, quote, comment);
+    servicesLibrary.handleApplyToTreatPatient(dbAddress, dentistId, patientId, treatmentRequestId, quote, treatmentDate, treatmentTime, comment);
   }
 
   function cancelDentistTreatmentApplication (

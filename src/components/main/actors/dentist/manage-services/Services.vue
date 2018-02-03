@@ -225,8 +225,8 @@
               serviceSubtypeId,
               fee
             },
-            managerIndex: 2, // which of the contract managers to use
-            contractIndexToUse: 0,
+            managerIndex: 'serviceManager', // which of the contract managers to use
+            contractIndexToUse: 'ServiceWriter',
             methodName: 'writeServiceWithFee',
             callback: (status) => {
               this.endWait(document.querySelector('.wrapper'))
@@ -264,9 +264,9 @@
             limit: this.perPage,
             seed: seed || Math.random()
           },
-          managerIndex: 1, // which of the contract managers to use
+          managerIndex: 'searchManager', // which of the contract managers to use
           methodName: 'fetchServices',
-          contractIndexToUse: 1,
+          contractIndexToUse: 'ServiceReader',
           callOnEach: 'getServiceDetail',
           callOnEachParams: serviceId => ({serviceTypeId, serviceId: serviceId.toNumber()})
         }
@@ -431,9 +431,9 @@
           limit: Number(this.$route.query.l || this.perPage),
           seed: Number(this.$route.query.sd || Math.random())
         },
-        managerIndex: 1, // which of the contract managers to use
+        managerIndex: 'searchManager', // which of the contract managers to use
         methodName: 'fetchServices',
-        contractIndexToUse: 1,
+        contractIndexToUse: 'ServiceReader',
         callOnEach: 'getServiceDetail',
         callOnEachParams: serviceId => ({serviceTypeId, serviceId: serviceId.toNumber()})
       })

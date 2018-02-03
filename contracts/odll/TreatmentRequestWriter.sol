@@ -13,22 +13,22 @@ contract TreatmentRequestWriter is Restrictor {
   function writeTreatmentRequest (
     bool hasCaseId,
     uint caseId,
-    string insurance,
+    bytes32 treatmentInsurance,
+    bytes32 treatmentPolicyNumber,
+    bytes32 treatmentPayerId,
+    bytes32 treatmentMainSubscriber,
+    string treatmentInsuranceAddress,
     string scanResults,
     string comment
   )
     external
     onlyPermittedSmartContract
   {
-    userManager.writePatientTreatmentRequest(dbAddress, msg.sender, hasCaseId, caseId, insurance, scanResults, comment);
-  }
+    uint treatmentRequestId = userManager.initTreatmentRequest(dbAddress, hasCaseId, caseId);
+    require(DB(dbAddress).getUInt8Value(keccak256("treatment-request/status", treatmentRequestId)) == 1
+      && DB(dbAddress).getUInt8Value(keccak256("case/status", caseId)) == 1);
 
-  function cancelTreatmentRequest (
-    uint treatmentRequestId
-  )
-    external
-    onlyPermittedSmartContract
-  {
-    userManager.cancelPatientTreatmentRequest(dbAddress, msg.sender, treatmentRequestId);
+    userManager.writePatientTreatmentRequest(dbAddress, treatmentRequestId, msg.sender, scanResults, comment);
+    userManager.writePatientTreatmentRequestInsurance(dbAddress, treatmentRequestId, treatmentInsurance, treatmentPolicyNumber, treatmentPayerId, treatmentMainSubscriber, treatmentInsuranceAddress);
   }
 }

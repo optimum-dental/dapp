@@ -131,8 +131,8 @@
             rating: rating
           },
           methodName: 'writeDentistRating',
-          contractIndexToUse: 0,
-          managerIndex: 0,
+          contractIndexToUse: 'UserWriter',
+          managerIndex: 'userManager',
           callback: (status) => {
             this.endWait(document.querySelector('.wrapper'))
             this.enableNecessaryButtons(evt)
@@ -169,8 +169,8 @@
               ODLLFee: ODLLFee.toString(),
               dentistFee: dentistFee.toString()
             },
-            managerIndex: 2, // which of the contract managers to use
-            contractIndexToUse: applicationTypeId === 1 ? 6 : 12,
+            managerIndex: 'serviceManager', // which of the contract managers to use
+            contractIndexToUse: applicationTypeId === 1 ? 'ScanApplicationWriter2' : 'TreatmentApplicationWriter2',
             value: totalFee,
             methodName: applicationTypeId === 1 ? 'acceptScanApplication' : 'acceptTreatmentApplication',
             callback: (status) => {
@@ -192,8 +192,8 @@
             limit: this.perPage,
             seed: seed || Math.random()
           },
-          managerIndex: 1, // which of the contract managers to use
-          contractIndexToUse: applicationTypeId === 1 ? 4 : 7,
+          managerIndex: 'searchManager', // which of the contract managers to use
+          contractIndexToUse: applicationTypeId === 1 ? 'ScanApplicationReader' : 'TreatmentApplicationReader',
           methodName: applicationTypeId === 1 ? 'fetchScanApplicationsForPatient' : 'fetchTreatmentApplicationsForPatient',
           callOnEach: 'getApplicationDetail',
           callOnEachParams: applicationId => ({applicationTypeId, applicationId: applicationId.toNumber()})
@@ -247,8 +247,8 @@
             limit: this.perPage,
             seed: seed || Math.random()
           },
-          managerIndex: 1, // which of the contract managers to use
-          contractIndexToUse: 8,
+          managerIndex: 'searchManager', // which of the contract managers to use
+          contractIndexToUse: 'PostApplicationReader',
           methodName: applicationTypeId === 1 ? 'fetchCasesForPatient' : 'fetchTreatmentsForPatient',
           callOnEach: applicationTypeId === 1 ? 'getCaseDetail' : 'getTreatmentDetail',
           callOnEachParams: caseId => ({applicationTypeId, caseId: caseId.toNumber()})
@@ -308,8 +308,8 @@
             dentistId: postApplication.userObject.coinbase,
             paymentId: postApplication.paymentId
           },
-          managerIndex: 2, // which of the contract managers to use
-          contractIndexToUse: 16,
+          managerIndex: 'serviceManager', // which of the contract managers to use
+          contractIndexToUse: 'Escrow',
           methodName: applicationTypeId === 1 ? 'releaseFundForScan' : 'releaseFundForTreatment',
           callback: (status) => {
             this.endWait(document.querySelector('.wrapper'))
@@ -509,8 +509,8 @@
           limit: Number(this.$route.query.l || this.perPage),
           seed: Number(this.$route.query.sd || Math.random())
         },
-        managerIndex: 1, // which of the contract managers to use
-        contractIndexToUse: applicationTypeId === 1 ? 4 : 7,
+        managerIndex: 'searchManager', // which of the contract managers to use
+        contractIndexToUse: applicationTypeId === 1 ? 'ScanApplicationReader' : 'TreatmentApplicationReader',
         methodName: applicationTypeId === 1 ? 'fetchScanApplicationsForPatient' : 'fetchTreatmentApplicationsForPatient',
         callOnEach: 'getApplicationDetail',
         callOnEachParams: applicationId => ({applicationTypeId, applicationId: applicationId.toNumber()})

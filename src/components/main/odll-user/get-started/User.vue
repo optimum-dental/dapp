@@ -337,9 +337,9 @@
           this.$root.callToWriteUser({
             vueObject: vueUserObject,
             requestParams: userObject,
-            contractIndexToUse: 0,
+            contractIndexToUse: 'UserWriter',
             methodName: 'writeUser',
-            managerIndex: 0,
+            managerIndex: 'userManager',
             callback: (userData = null) => {
               this.endWait(document.querySelector('.wrapper'))
               this.enableButton(target)

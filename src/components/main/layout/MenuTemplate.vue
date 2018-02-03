@@ -29,11 +29,11 @@
                 text: 'Manage Services',
                 icon: '/static/images/teeth.png'
               },
-              {
-                key: 'view-patients',
-                text: 'View Your Patients',
-                icon: '/static/images/person.png'
-              },
+              // {
+              //   key: 'view-patients',
+              //   text: 'View Your Patients',
+              //   icon: '/static/images/person.png'
+              // },
               {
                 key: 'view-appointment-requests',
                 text: 'View Appointment Requests',
@@ -63,11 +63,11 @@
                 text: 'View Dentists',
                 icon: '/static/images/search.png'
               },
-              {
-                key: 'view-scan-results',
-                text: 'View Scan Results',
-                icon: '/static/images/scan-application.png'
-              },
+              // {
+              //   key: 'view-scan-results',
+              //   text: 'View Scan Results',
+              //   icon: '/static/images/scan-application.png'
+              // },
               profile
             ]
           case '4':
@@ -87,11 +87,11 @@
                 text: 'View Dentists',
                 icon: '/static/images/search.png'
               },
-              {
-                key: 'view-scan-results',
-                text: 'View Scan Results',
-                icon: '/static/images/scan-application.png'
-              },
+              // {
+              //   key: 'view-scan-results',
+              //   text: 'View Scan Results',
+              //   icon: '/static/images/scan-application.png'
+              // },
               profile
             ]
           default:

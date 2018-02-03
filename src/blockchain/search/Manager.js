@@ -21,7 +21,7 @@ class Manager {
   }
 
   getContractToUse () {
-    return [
+    return {
       UserReader,
       ServiceReader,
       ScanRequestReader,
@@ -32,7 +32,7 @@ class Manager {
       TreatmentApplicationReader,
       PostApplicationReader,
       PostApplicationReader2
-    ]
+    }
   }
 
   fetchDataObjects (state = null, dataObject = {}) {

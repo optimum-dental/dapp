@@ -14,54 +14,18 @@ contract ScanRequestWriter is Restrictor {
     uint scanAppointmentId,
     bytes32 appointmentDate,
     bytes32 scanTime,
-    string scanInsurance,
+    bytes32 scanInsurance,
+    bytes32 scanPolicyNumber,
+    bytes32 scanPayerId,
+    bytes32 scanMainSubscriber,
+    string scanInsuranceAddress,
     string comment
   )
     external
     onlyPermittedSmartContract
   {
-    userManager.writePatientScanRequest(dbAddress, dentistId, msg.sender, scanAppointmentId, appointmentDate, scanTime, scanInsurance, comment);
-  }
-
-  function cancelScanRequest (
-    uint scanRequestId
-  )
-    external
-    onlyPermittedSmartContract
-  {
-    userManager.cancelPatientScanRequest(dbAddress, msg.sender, scanRequestId);
-  }
-
-  function expireScanRequest (
-    uint scanRequestId
-  )
-    external
-    onlyPermittedSmartContract
-  {
-    userManager.expirePatientScanRequest(dbAddress, scanRequestId);
-  }
-
-  function acceptScanRequest (
-    address patientId,
-    uint scanRequestId,
-    uint quote,
-    bytes32 scanDate,
-    bytes32 scanTime,
-    string comment
-  )
-    external
-    onlyPermittedSmartContract
-  {
-    userManager.acceptPatientScanRequest(dbAddress, msg.sender, patientId, scanRequestId, quote, scanDate, scanTime, comment);
-  }
-
-  function rejectScanRequest (
-    address patientId,
-    uint scanRequestId
-  )
-    external
-    onlyPermittedSmartContract
-  {
-    userManager.rejectPatientScanRequest(dbAddress, msg.sender, patientId, scanRequestId);
+    uint scanRequestId = userManager.initScanRequest(dbAddress, scanAppointmentId);
+    userManager.writePatientScanRequest(dbAddress, scanRequestId, dentistId, msg.sender, appointmentDate, scanTime, comment);
+    userManager.writePatientScanRequestInsurance(dbAddress, scanRequestId, scanInsurance, scanPolicyNumber, scanPayerId, scanMainSubscriber, scanInsuranceAddress);
   }
 }

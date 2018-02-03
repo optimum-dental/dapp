@@ -4,12 +4,14 @@ import UserReader from '../../../build/contracts/UserReader.json'
 import ServiceWriter from '../../../build/contracts/ServiceWriter.json'
 import ServiceReader from '../../../build/contracts/ServiceReader.json'
 import ScanRequestWriter from '../../../build/contracts/ScanRequestWriter.json'
+import ScanRequestWriter2 from '../../../build/contracts/ScanRequestWriter2.json'
 import ScanRequestReader from '../../../build/contracts/ScanRequestReader.json'
 import ScanRequestReader2 from '../../../build/contracts/ScanRequestReader2.json'
 import ScanApplicationWriter from '../../../build/contracts/ScanApplicationWriter.json'
 import ScanApplicationWriter2 from '../../../build/contracts/ScanApplicationWriter2.json'
 import ScanApplicationReader from '../../../build/contracts/ScanApplicationReader.json'
 import TreatmentRequestWriter from '../../../build/contracts/TreatmentRequestWriter.json'
+import TreatmentRequestWriter2 from '../../../build/contracts/TreatmentRequestWriter2.json'
 import TreatmentRequestReader from '../../../build/contracts/TreatmentRequestReader.json'
 import TreatmentRequestReader2 from '../../../build/contracts/TreatmentRequestReader2.json'
 import TreatmentApplicationWriter from '../../../build/contracts/TreatmentApplicationWriter.json'
@@ -31,18 +33,20 @@ class Manager {
   }
 
   getContractToUse () {
-    return [
+    return {
       UserWriter,
       UserReader,
       ServiceWriter,
       ServiceReader,
       ScanRequestWriter,
+      ScanRequestWriter2,
       ScanRequestReader,
       ScanRequestReader2,
       ScanApplicationWriter,
       ScanApplicationWriter2,
       ScanApplicationReader,
       TreatmentRequestWriter,
+      TreatmentRequestWriter2,
       TreatmentRequestReader,
       TreatmentRequestReader2,
       TreatmentApplicationWriter,
@@ -50,7 +54,7 @@ class Manager {
       TreatmentApplicationReader,
       PostApplicationReader,
       PostApplicationReader2
-    ]
+    }
   }
 
   writeData (state = null, data = {}) {

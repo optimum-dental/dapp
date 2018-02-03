@@ -180,6 +180,10 @@
       getJustDate (dateObject) {
         // const timeValue = dateObject.getTime()
         // return timeValue - (timeValue % 86400000)
+        if (dateObject === '') {
+          return ''
+        }
+
         const dateString = dateObject.toDateString()
         return (+(new Date(dateString)))
       },
@@ -193,6 +197,7 @@
         const scanTime = `b${document.getElementById('appointment-requests-scan-time').options[document.getElementById('appointment-requests-scan-time').selectedIndex].value || scanRequest.time}`
         const comment = `b${document.getElementById('appointment-requests-comment').value}`
 
+        console.log(comment)
         this.scrollToTop()
         const applicationForm = document.querySelector('.appointment-requests-modal')
         if (applicationForm) applicationForm.style.top = '0px'
@@ -207,8 +212,8 @@
             scanTime,
             comment
           },
-          managerIndex: 2, // which of the contract managers to use
-          contractIndexToUse: 5,
+          managerIndex: 'serviceManager', // which of the contract managers to use
+          contractIndexToUse: 'ScanApplicationWriter',
           methodName: 'applyToScan',
           callback: (status) => {
             this.endWait(document.querySelector('.wrapper'))
@@ -226,8 +231,8 @@
         const fetchQuery = {
           type: 'fetchScanRequests',
           requestParams: this.getSmartContractMethodParams(offset, this.perPage, seed || Math.random())[requestTypeIndex],
-          managerIndex: 1, // which of the contract managers to use
-          contractIndexToUse: requestTypeIndex === 0 ? 3 : 2,
+          managerIndex: 'searchManager', // which of the contract managers to use
+          contractIndexToUse: requestTypeIndex === 0 ? 'ScanRequestReader2' : 'ScanRequestReader',
           methodName: this.getSmartContractMethodName()[requestTypeIndex],
           callOnEach: 'getRequestDetail',
           callOnEachParams: requestId => ({requestTypeId: 1, requestId: requestId.toNumber(), dentistId: this.user.coinbase})
@@ -416,8 +421,8 @@
       this.getRequests(null, {
         type: 'fetchScanRequests',
         requestParams: this.getSmartContractMethodParams(Number(this.$route.query.o || 0), Number(this.$route.query.l || this.perPage), Number(this.$route.query.sd || Math.random()))[requestTypeIndex],
-        managerIndex: 1, // which of the contract managers to use
-        contractIndexToUse: requestTypeIndex === 0 ? 3 : 2,
+        managerIndex: 'searchManager', // which of the contract managers to use
+        contractIndexToUse: requestTypeIndex === 0 ? 'ScanRequestReader2' : 'ScanRequestReader',
         methodName: this.getSmartContractMethodName()[requestTypeIndex],
         callOnEach: 'getRequestDetail',
         callOnEachParams: requestId => ({requestTypeId: 1, requestId: requestId.toNumber(), dentistId: this.user.coinbase})

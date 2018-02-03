@@ -53,35 +53,6 @@
               </div>
             </div>
 
-            <div class="appointment-entry-item policy-number">
-              <label for="policy-number" class="appointment-entry-param">Policy Number</label>
-              <div class="appointment-entry-value">
-                <input type="text" class="appointment-list" id="policy-number" data-name="policy-number" required>
-                <div class="tip">Important</div>
-              </div>
-            </div>
-
-            <div class="appointment-entry-item payer-id">
-              <label for="payer-id" class="field-key">Payer ID</label>
-              <div class="appointment-entry-value">
-                <input type="text" class="appointment-list" id="payer-id" data-name="payer-id">
-              </div>
-            </div>
-
-            <div class="appointment-entry-item main-subscriber">
-              <label for="main-subscriber" class="field-key">Insurance Main Subscriber</label>
-              <div class="appointment-entry-value">
-                <input type="text" class="appointment-list" id="main-subscriber" data-name="main-subscriber">
-              </div>
-            </div>
-
-            <div class="appointment-entry-item insurance-address">
-              <div class="appointment-entry-param">Insurance Address [or P.O.Box Number]</div>
-              <div class="appointment-entry-value">
-                <textarea id="insurance-address" rows="5" class="appointment-list"></textarea>
-              </div>
-            </div>
-
             <div class="appointment-entry-item comment">
               <div class="appointment-entry-param">Additional Comments [128 characters max]</div>
               <div class="appointment-entry-value">
@@ -98,41 +69,11 @@
             <div class="appointment-entry-item">
               <div class="appointment-entry-param">Do you have insurance?</div>
               <div class="appointment-entry-value">
-                <select id="treatment-insurance-query" class="appointment-list">
+                <select id="appointment-treatment-insurance-query" class="appointment-list">
                   <option>Select</option>
                   <option>Yes</option>
                   <option>No</option>
                 </select>
-              </div>
-            </div>
-
-
-            <div class="appointment-entry-item policy-number">
-              <label for="policy-number" class="appointment-entry-param">Policy Number</label>
-              <div class="appointment-entry-value">
-                <input type="text" class="appointment-list" id="policy-number" data-name="policy-number" required>
-                <div class="tip">Important</div>
-              </div>
-            </div>
-
-            <div class="appointment-entry-item payer-id">
-              <label for="payer-id" class="field-key">Payer ID</label>
-              <div class="appointment-entry-value">
-                <input type="text" class="appointment-list" id="payer-id" data-name="payer-id">
-              </div>
-            </div>
-
-            <div class="appointment-entry-item main-subscriber">
-              <label for="main-subscriber" class="field-key">Insurance Main Subscriber</label>
-              <div class="appointment-entry-value">
-                <input type="text" class="appointment-list" id="main-subscriber" data-name="main-subscriber">
-              </div>
-            </div>
-
-            <div class="appointment-entry-item insurance-address">
-              <div class="appointment-entry-param">Insurance Address [or P.O.Box Number]</div>
-              <div class="appointment-entry-value">
-                <textarea id="insurance-address" rows="5" class="appointment-list"></textarea>
               </div>
             </div>
 
@@ -206,7 +147,7 @@
               const fileNames = Array.from(target.files).map(file => file.name).join(', ')
               label.querySelector('.text').innerHTML = truncate(fileNames, 50)
               break
-            case (['appointment-scan-insurance-query', 'treatment-insurance-query'].includes(target.id)):
+            case (['appointment-scan-insurance-query', 'appointment-treatment-insurance-query'].includes(target.id)):
               const serviceTypeId = target.id === 'appointment-scan-insurance-query' ? 1 : 2
               const choice = target.selectedIndex
               let DOMElement
@@ -216,10 +157,41 @@
                 if (insuranceDOMElement) _this.removeDOMElement(insuranceDOMElement)
               } else {
                 DOMElement = _this.createDOMElementFromString(`
-                  <div class="appointment-entry-item insurance">
-                    <div class="appointment-entry-param">Insurance Name</div>
-                    <div class="appointment-entry-value">
-                      <input id="${serviceTypeId === 1 ? 'scan' : 'treatment'}-insurance" class="appointment-list" type="text">
+                  <div class="grouping insurance">
+                    <div class="appointment-entry-item insurance-name">
+                      <div class="appointment-entry-param">Insurance Name</div>
+                      <div class="appointment-entry-value">
+                        <input id="${serviceTypeId === 1 ? 'scan' : 'treatment'}-insurance" class="appointment-list" type="text">
+                      </div>
+                    </div>
+
+                    <div class="appointment-entry-item policy-number">
+                      <label for="policy-number" class="appointment-entry-param">Policy Number</label>
+                      <div class="appointment-entry-value">
+                        <input type="text" class="appointment-list" id="${serviceTypeId === 1 ? 'scan' : 'treatment'}-policy-number">
+                        <div class="tip">Important</div>
+                      </div>
+                    </div>
+
+                    <div class="appointment-entry-item payer-id">
+                      <label for="payer-id" class="field-key">Payer ID</label>
+                      <div class="appointment-entry-value">
+                        <input type="text" class="appointment-list" id="${serviceTypeId === 1 ? 'scan' : 'treatment'}-payer-id">
+                      </div>
+                    </div>
+
+                    <div class="appointment-entry-item main-subscriber">
+                      <label for="main-subscriber" class="field-key">Insurance Main Subscriber</label>
+                      <div class="appointment-entry-value">
+                        <input type="text" class="appointment-list" id="${serviceTypeId === 1 ? 'scan' : 'treatment'}-main-subscriber">
+                      </div>
+                    </div>
+
+                    <div class="appointment-entry-item insurance-address">
+                      <div class="appointment-entry-param">Insurance Address [or P.O.Box Number]</div>
+                      <div class="appointment-entry-value">
+                        <textarea id="${serviceTypeId === 1 ? 'scan' : 'treatment'}-insurance-address" rows="5" class="appointment-list insurance-address"></textarea>
+                      </div>
                     </div>
                   </div>
                 `)
@@ -321,6 +293,10 @@
       getJustDate (dateObject) {
         // const timeValue = dateObject.getTime()
         // return timeValue - (timeValue % 86400000)
+        if (dateObject === '') {
+          return ''
+        }
+
         const dateString = dateObject.toDateString()
         return (+(new Date(dateString)))
       },
@@ -330,7 +306,13 @@
         const scanTime = document.getElementById('appointment-scan-time').options[document.getElementById('appointment-scan-time').selectedIndex].value
         const scanAppointmentId = Number(document.getElementById('scan-appointment').selectedIndex)
         const scanInsuranceQuery = Number(document.getElementById('appointment-scan-insurance-query').selectedIndex)
+
         const scanInsurance = scanInsuranceQuery === 1 ? document.getElementById('scan-insurance').value : ''
+        const scanPolicyNumber = scanInsuranceQuery === 1 ? document.getElementById('scan-policy-number').value : ''
+        const scanPayerId = scanInsuranceQuery === 1 ? document.getElementById('scan-payer-id').value : ''
+        const scanMainSubscriber = scanInsuranceQuery === 1 ? document.getElementById('scan-main-subscriber').value : ''
+        const scanInsuranceAddress = scanInsuranceQuery === 1 ? document.getElementById('scan-insurance-address').value : ''
+
         const scanComment = document.getElementById('appointment-scan-comment').value
         let errors = [scanTime === 0 ? document.getElementById('appointment-scan-time') : undefined, scanAppointmentId === 0 ? document.getElementById('scan-appointment') : undefined, this.scanDateError ? document.querySelector('.appointment-scan-date') : undefined]
         errors = errors.filter(entry => entry !== undefined)
@@ -349,11 +331,15 @@
               appointmentDate: `b${appointmentDate}`,
               scanTime: `b${scanTime}`,
               scanInsurance: `b${scanInsurance}`,
+              scanPolicyNumber: `b${scanPolicyNumber}`,
+              scanPayerId: `b${scanPayerId}`,
+              scanMainSubscriber: `b${scanMainSubscriber}`,
+              scanInsuranceAddress: `b${scanInsuranceAddress}`,
               scanComment: `b${scanComment}`
             },
-            contractIndexToUse: 2,
+            contractIndexToUse: 'ScanRequestWriter',
             methodName: 'writeScanRequest',
-            managerIndex: 2,
+            managerIndex: 'serviceManager',
             callback: (status) => {
               this.endWait(document.querySelector('.wrapper'))
               this.enableNecessaryButtons()
@@ -368,7 +354,7 @@
         }
       },
       writeTreatmentAppointment () {
-        const treatmentInsuranceQuery = Number(document.getElementById('treatment-insurance-query').selectedIndex)
+        const treatmentInsuranceQuery = Number(document.getElementById('appointment-treatment-insurance-query').selectedIndex)
         const treatmentInsurance = treatmentInsuranceQuery === 1 ? document.getElementById('treatment-insurance').value : ''
         const treatmentComment = document.getElementById('appointment-treatment-comment').value
         let errors = [document.getElementById('appointment-scan-results').files.length === 0 ? document.getElementById('appointment-scan-results') : undefined]
@@ -581,10 +567,7 @@
   }
 
   #appointment-scan-comment, #appointment-treatment-comment {
-    max-height: 50px;
-    min-height: 50px;
-    max-width: 100%;
-    min-width: 100%;
+    height: 70px !important;
   }
 
   .error {
@@ -680,6 +663,15 @@
 </style>
 
 <style>
+  .grouping {
+    width: 100%;
+    min-height: 520px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #edefef;
+  }
+
   .appointment-entry-item {
     height: 60px;
     margin-top: 30px;
@@ -750,6 +742,11 @@
     border: 0px;
     color: #7f7f7f !important;
     cursor: pointer;
+  }
+
+  .insurance-address {
+    height: 70px !important;
+    max-width: 100%;
   }
 
   .tip {
