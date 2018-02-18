@@ -30,13 +30,19 @@ library utilities {
   function addArrayItem(address dbAddress, string key, string countKey, address val) internal {
     var idx = DB(dbAddress).getUIntValue(keccak256(countKey));
     DB(dbAddress).setAddressValue(keccak256(key, idx), val);
+    DB(dbAddress).setUIntValue(keccak256(key, val, "index"), idx);
     DB(dbAddress).setUIntValue(keccak256(countKey), idx + 1);
   }
 
   function addArrayItem(address dbAddress, string key, string countKey, uint val) internal {
     var idx = DB(dbAddress).getUIntValue(keccak256(countKey));
     DB(dbAddress).setUIntValue(keccak256(key, idx), val);
+    DB(dbAddress).setUIntValue(keccak256(key, val, "index"), idx);
     DB(dbAddress).setUIntValue(keccak256(countKey), idx + 1);
+  }
+
+  function getIdFromArrayItemsCount(address dbAddress, string countKey) internal view returns(uint idValue) {
+    idValue = getArrayItemsCount(dbAddress, countKey) + 1;
   }
 
   function getArrayItems(address dbAddress, string key, string countKey) internal view returns(uint[] result) {
@@ -74,36 +80,42 @@ library utilities {
   function addIdArrayItem(address dbAddress, uint id, string key, string countKey, uint val) internal {
     var idx = getIdArrayItemsCount(dbAddress, id, countKey);
     DB(dbAddress).setUIntValue(keccak256(key, id, idx), val);
+    DB(dbAddress).setUIntValue(keccak256(key, id, val, "index"), idx);
     DB(dbAddress).setUIntValue(keccak256(countKey, id), idx + 1);
   }
 
   function addIdArrayItem(address dbAddress, uint id, string key, string countKey, address val) internal {
     var idx = getIdArrayItemsCount(dbAddress, id, countKey);
     DB(dbAddress).setAddressValue(keccak256(key, id, idx), val);
+    DB(dbAddress).setUIntValue(keccak256(key, id, val, "index"), idx);
     DB(dbAddress).setUIntValue(keccak256(countKey, id), idx + 1);
   }
 
   function addIdArrayItem(address dbAddress, address id, string key, string countKey, uint val) internal {
     var idx = getIdArrayItemsCount(dbAddress, id, countKey);
     DB(dbAddress).setUIntValue(keccak256(key, id, idx), val);
+    DB(dbAddress).setUIntValue(keccak256(key, id, val, "index"), idx);
     DB(dbAddress).setUIntValue(keccak256(countKey, id), idx + 1);
   }
 
   function addIdArrayItem(address dbAddress, address id, string key, string countKey, address val) internal {
     var idx = getIdArrayItemsCount(dbAddress, id, countKey);
     DB(dbAddress).setAddressValue(keccak256(key, id, idx), val);
+    DB(dbAddress).setUIntValue(keccak256(key, id, val, "index"), idx);
     DB(dbAddress).setUIntValue(keccak256(countKey, id), idx + 1);
   }
 
   function addIdArrayItem(address dbAddress, uint id, string key, string countKey, bytes32 val) internal {
     var idx = getIdArrayItemsCount(dbAddress, id, countKey);
     DB(dbAddress).setBytes32Value(keccak256(key, id, idx), val);
+    DB(dbAddress).setUIntValue(keccak256(key, id, val, "index"), idx);
     DB(dbAddress).setUIntValue(keccak256(countKey, id), idx + 1);
   }
 
   function addIdArrayItem(address dbAddress, address id, string key, string countKey, bytes32 val) internal {
     var idx = getIdArrayItemsCount(dbAddress, id, countKey);
     DB(dbAddress).setBytes32Value(keccak256(key, id, idx), val);
+    DB(dbAddress).setUIntValue(keccak256(key, id, val, "index"), idx);
     DB(dbAddress).setUIntValue(keccak256(countKey, id), idx + 1);
   }
 

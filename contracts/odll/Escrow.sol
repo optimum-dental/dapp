@@ -30,8 +30,8 @@ contract Escrow is Restrictor {
     require(userId == patientId && payee == dentistId);
     require(amount >= 0 && this.balance >= amount);
 
-    userManager.releaseScanFund(dbAddress, dentistId, patientId, paymentId);
     DB(dbAddress).setUInt8Value(keccak256("payment/state", paymentId), 3);
+    userManager.releaseScanFund(dbAddress, dentistId, patientId, paymentId);
     FundReleased(paymentId, payee);
   }
 
@@ -49,8 +49,8 @@ contract Escrow is Restrictor {
     require(userId == patientId && payee == dentistId);
     require(amount >= 0 && this.balance >= amount);
 
-    userManager.releaseTreatmentFund(dbAddress, dentistId, patientId, paymentId);
     DB(dbAddress).setUInt8Value(keccak256("payment/state", paymentId), 3);
+    userManager.releaseTreatmentFund(dbAddress, dentistId, patientId, paymentId);
     FundReleased(paymentId, payee);
   }
 
@@ -64,8 +64,8 @@ contract Escrow is Restrictor {
 
     require(amount >= 0 && this.balance >= amount);
 
-    payee.transfer(amount);
     DB(dbAddress).setUInt8Value(keccak256("payment/state", paymentId), 4);
+    payee.transfer(amount);
     Refunded(paymentId, payee);
   }
 
